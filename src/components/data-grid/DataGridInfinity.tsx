@@ -19,6 +19,7 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
     tableWidthMode,
     emptyMessage,
     bordered,
+    rowHeight,
     estimateRowHeight,
     overscan,
     hasNextPage,
@@ -75,6 +76,7 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
           tableHeight={tableHeight}
           tableWidthMode={tableWidthMode}
           bordered={bordered}
+          rowHeight={rowHeight}
           estimateRowHeight={estimateRowHeight}
           overscan={overscan}
           onMeasureColumns={measure}

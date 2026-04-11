@@ -7,6 +7,7 @@ import { LiveUpdateTab } from './tabs/LiveUpdateTab'
 import { PinningTab }    from './tabs/PinningTab'
 import { SelectionTab }  from './tabs/SelectionTab'
 import { BorderedTab }   from './tabs/BorderedTab'
+import { RowHeightTab } from './tabs/RowHeightTab'
 
 const TABS = [
   { id: 'pagination',  label: 'Pagination',      content: <PaginationTab /> },
@@ -17,6 +18,7 @@ const TABS = [
   { id: 'pinning',     label: 'Column Pinning',  content: <PinningTab /> },
   { id: 'selection',   label: 'Row Selection',   content: <SelectionTab /> },
   { id: 'bordered',    label: 'Bordered',        content: <BorderedTab /> },
+  { id: 'row-height',  label: 'Row Height',      content: <RowHeightTab /> },
 ] as const
 
 type TabId = typeof TABS[number]['id']

@@ -339,6 +339,7 @@ interface DataGridBodyRowProps<T extends object>
   showSpacer?: boolean
   fillLast?: boolean
   bordered?: boolean
+  rowHeight?: number
   onActionTrigger?: (row: T, el: HTMLElement) => void
 }
 
@@ -353,6 +354,7 @@ function DataGridBodyRow<T extends object>({
   showSpacer = false,
   fillLast = false,
   bordered = false,
+  rowHeight,
   onActionTrigger,
 }: DataGridBodyRowProps<T>) {
   const visibleCells = row.getVisibleCells()
@@ -365,7 +367,7 @@ function DataGridBodyRow<T extends object>({
         'flex w-full',
         onRowClick || rowCursor ? 'cursor-pointer' : 'hover:bg-muted/30',
       )}
-      style={style}
+      style={{ minHeight: rowHeight, ...style }}
     >
       {visibleCells.map((cell, idx) => {
         const meta = cell.column.columnDef.meta
@@ -416,7 +418,7 @@ function DataGridBodyRow<T extends object>({
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface DataGridVirtualBodyProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'onRowClick' | 'rowCursor' | 'bordered'> {
+  extends Pick<TableViewConfig<T>, 'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'> {
   rows: Row<T>[]
   table: Table<T>
   rowVirtualizer: Virtualizer<HTMLDivElement, Element>
@@ -431,6 +433,7 @@ function DataGridVirtualBody<T extends object>({
   onRowClick,
   rowCursor,
   bordered,
+  rowHeight,
   onActionTrigger,
   tableWidthMode = 'spacer',
 }: DataGridVirtualBodyProps<T>) {
@@ -438,7 +441,7 @@ function DataGridVirtualBody<T extends object>({
   const totalSize = rowVirtualizer.getTotalSize()
 
   return (
-    <TableBody style={{ display: 'grid', height: totalSize, position: 'relative' }}>
+    <TableBody style={{ display: 'block', height: totalSize, position: 'relative' }}>
       {virtualItems.map((virtualRow) => {
         const row = rows[virtualRow.index]!
         return (
@@ -449,6 +452,7 @@ function DataGridVirtualBody<T extends object>({
             onRowClick={onRowClick}
             rowCursor={rowCursor}
             bordered={bordered}
+            rowHeight={rowHeight}
             dataIndex={virtualRow.index}
             measureRef={rowVirtualizer.measureElement}
             style={{ position: 'absolute', width: '100%', transform: `translateY(${virtualRow.start}px)` }}
@@ -466,7 +470,7 @@ function DataGridVirtualBody<T extends object>({
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface DataGridFlexBodyProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'isLoading' | 'emptyMessage' | 'onRowClick' | 'rowCursor' | 'bordered'> {
+  extends Pick<TableViewConfig<T>, 'isLoading' | 'emptyMessage' | 'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'> {
   rows: Row<T>[]
   table: Table<T>
   visibleLeafColumns: Column<T>[]
@@ -483,6 +487,7 @@ function DataGridFlexBody<T extends object>({
   onRowClick,
   rowCursor,
   bordered,
+  rowHeight,
   onActionTrigger,
   tableWidthMode = 'spacer',
 }: DataGridFlexBodyProps<T>) {
@@ -493,7 +498,7 @@ function DataGridFlexBody<T extends object>({
     return (
       <TableBody style={{ display: 'block' }}>
         {Array.from({ length: 6 }).map((_, i) => (
-          <TableRow key={i} className="flex w-full">
+          <TableRow key={i} className="flex w-full" style={{ minHeight: rowHeight }}>
             {visibleLeafColumns.map((col, colIdx) => {
               const isLast = colIdx === visibleLeafColumns.length - 1
               return (
@@ -531,6 +536,7 @@ function DataGridFlexBody<T extends object>({
           onRowClick={onRowClick}
           rowCursor={rowCursor}
           bordered={bordered}
+          rowHeight={rowHeight}
           showSpacer={showSpacer}
           fillLast={fillLast}
           onActionTrigger={onActionTrigger}
@@ -556,13 +562,17 @@ export function DataGridTableView<T extends object>({
   enableColumnFilters = false,
   tableHeight,
   tableWidthMode = 'spacer',
-  estimateRowHeight = 33,
+  rowHeight,
+  estimateRowHeight,
   overscan = 10,
   loadMoreRef,
   isFetchingNextPage,
   bordered = false,
   onMeasureColumns,
 }: DataGridTableViewProps<T>) {
+  // rowHeight drives both CSS min-height and virtualizer estimate.
+  // estimateRowHeight can override the virtualizer estimate independently.
+  const effectiveEstimate = estimateRowHeight ?? rowHeight ?? 33
   // ── Action menu state — ONE menu at table level, anchored to the clicked trigger ─
   // Snapshot rect at click time (VirtualElement) so the anchor remains valid even
   // after the virtualizer unmounts the trigger row's DOM node.
@@ -618,7 +628,7 @@ export function DataGridTableView<T extends object>({
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => containerRef.current,
-    estimateSize: () => estimateRowHeight,
+    estimateSize: () => effectiveEstimate,
     overscan,
     enabled: virtual,
   })
@@ -680,6 +690,7 @@ export function DataGridTableView<T extends object>({
               onRowClick={onRowClick}
               rowCursor={rowCursor}
               bordered={bordered}
+              rowHeight={rowHeight}
               onActionTrigger={actionCol ? handleActionTrigger : undefined}
               tableWidthMode={tableWidthMode}
             />
@@ -693,6 +704,7 @@ export function DataGridTableView<T extends object>({
               onRowClick={onRowClick}
               rowCursor={rowCursor}
               bordered={bordered}
+              rowHeight={rowHeight}
               onActionTrigger={actionCol ? handleActionTrigger : undefined}
               tableWidthMode={tableWidthMode}
             />

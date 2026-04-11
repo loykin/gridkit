@@ -19,6 +19,7 @@ export function DataGrid<T extends object>(props: DataGridProps<T>) {
     tableWidthMode,
     emptyMessage,
     bordered,
+    rowHeight,
     estimateRowHeight,
     overscan,
     enablePagination = true,
@@ -66,6 +67,7 @@ export function DataGrid<T extends object>(props: DataGridProps<T>) {
           tableHeight={tableHeight}
           tableWidthMode={tableWidthMode}
           bordered={bordered}
+          rowHeight={rowHeight}
           estimateRowHeight={estimateRowHeight}
           overscan={overscan}
           onMeasureColumns={measure}

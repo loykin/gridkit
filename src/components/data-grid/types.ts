@@ -95,9 +95,15 @@ export interface TableViewConfig<T extends object> {
    */
   tableWidthMode?: TableWidthMode
   /**
-   * Estimated row height in px for the virtualizer (default: 37).
-   * The virtualizer auto-enables when tableHeight is set and rows >= 100.
-   * Use measureElement to handle variable-height rows (multiline, badges).
+   * Fixed row height in px. Sets both the actual CSS min-height of each row
+   * and the virtualizer's estimateSize so they stay in sync. Default: 33.
+   * Rows with meta.wrap=true can still grow beyond this height — measureElement
+   * will track the actual size for accurate virtual positioning.
+   */
+  rowHeight?: number
+  /**
+   * Override the virtualizer's estimated row height independently of rowHeight.
+   * Only needed for variable-height rows where you want a different estimate.
    */
   estimateRowHeight?: number
   /** Rows to render outside the visible area (virtualizer overscan, default: 10) */
