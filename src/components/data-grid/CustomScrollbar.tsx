@@ -55,13 +55,9 @@ export function CustomScrollbar({ scrollRef, direction, className, style }: Cust
     // Also observe first child so virtualizer total-height changes are detected
     if (el.firstElementChild) ro.observe(el.firstElementChild)
 
-    // Fallback poll for content size changes (e.g. infinite-scroll row additions)
-    const interval = setInterval(sync, 150)
-
     return () => {
       el.removeEventListener('scroll', sync)
       ro.disconnect()
-      clearInterval(interval)
     }
   }, [scrollRef, sync])
 

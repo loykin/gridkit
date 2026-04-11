@@ -355,7 +355,6 @@ interface DataGridBodyRowProps<T extends object>
   measureRef?: (node: Element | null) => void
   showSpacer?: boolean
   fillLast?: boolean
-  bordered?: boolean
   rowHeight?: number
   onActionTrigger?: (row: T, el: HTMLElement) => void
 }
