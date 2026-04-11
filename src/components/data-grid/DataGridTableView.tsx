@@ -109,7 +109,7 @@ function DataGridHeaderRow<T extends object>({
           // data-col-id: used by useColumnSizing DOM measurement
           data-col-id={header.column.id}
           className={cn(
-            'relative px-3 text-xs font-medium h-9 bg-muted/40',
+            'relative px-3 text-xs font-medium h-9 bg-muted',
             'text-muted-foreground whitespace-normal',
             'select-none group',
             header.column.getCanSort() && 'cursor-pointer',
@@ -162,7 +162,7 @@ function DataGridHeaderRow<T extends object>({
         </TableHead>
         )
       })}
-      {!virtual && tableWidthMode === 'spacer' && <TableHead style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-muted/40" />}
+      {!virtual && tableWidthMode === 'spacer' && <TableHead style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-muted" />}
     </TableRow>
   )
 }
@@ -257,7 +257,7 @@ function DataGridFilterRow<T extends object>({
 }: DataGridFilterRowProps<T>) {
   return (
     <TableRow
-      className="border-b bg-muted/50 hover:bg-muted/50"
+      className="border-b bg-muted hover:bg-muted"
       style={{ display: 'flex', width: '100%', height: '36px' }}
     >
       {visibleLeafColumns.map((col) => {
@@ -647,7 +647,7 @@ export function DataGridTableView<T extends object>({
           }
         >
           <TableHeader
-            className="sticky top-0 z-10 bg-muted/40 [&_tr]:border-b"
+            className="sticky top-0 z-10 bg-muted [&_tr]:border-b"
             style={{ display: 'block', transform: 'translateZ(0)', willChange: 'transform' }}
           >
             {headerGroups.map((headerGroup) => (

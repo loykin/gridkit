@@ -1,5 +1,6 @@
 export { DataGrid } from './components/data-grid/DataGrid'
 export { DataGridInfinity } from './components/data-grid/DataGridInfinity'
+export { ColumnVisibilityDropdown } from './components/data-grid/ColumnVisibilityDropdown'
 export type {
   DataGridProps,
   DataGridInfinityProps,
