@@ -123,7 +123,7 @@ export function CustomScrollbar({ scrollRef, direction, className, style }: Cust
     <div
       ref={trackRef}
       onClick={handleTrackClick}
-      className={cn('relative', !visible && 'invisible pointer-events-none', className)}
+      className={cn('relative', !visible && 'hidden', className)}
       style={style}
     >
       <div

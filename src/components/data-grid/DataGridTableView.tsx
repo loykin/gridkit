@@ -667,14 +667,21 @@ export function DataGridTableView<T extends object>({
     enabled: virtual,
   })
 
-  // Body panel height: fixed for virtual (exact), maxHeight for non-virtual (clamped)
-  const bodyStyle: React.CSSProperties = {
-    overflow: 'auto',
-    ...(virtual
+  // Body wrapper: fixed height when tableHeight is set so hscroll stays inside
+  const bodyWrapperStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
+    ...(tableHeight && tableHeight !== 'auto'
       ? { height: tableHeight as string | number }
-      : tableHeight && tableHeight !== 'auto'
-      ? { maxHeight: tableHeight }
       : {}),
+  }
+
+  // Body scroll element: fills remaining space after hscroll takes its height
+  const bodyStyle: React.CSSProperties = {
+    flex: 1,
+    minHeight: 0,
+    overflow: 'auto',
   }
 
   const innerWidth = table.getTotalSize()
@@ -717,8 +724,8 @@ export function DataGridTableView<T extends object>({
           </div>
         </div>
 
-        {/* Body scroll container + vertical custom scrollbar */}
-        <div style={{ position: 'relative' }}>
+        {/* Body scroll container + scrollbars */}
+        <div style={bodyWrapperStyle}>
           <div ref={bodyScrollRef} style={bodyStyle} onScroll={syncScroll} className="scrollbar-none">
             <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
               {virtual ? (
@@ -764,14 +771,14 @@ export function DataGridTableView<T extends object>({
             className="absolute right-0 top-0 bottom-0"
             style={{ width: 8 }}
           />
-        </div>
 
-        {/* Horizontal custom scrollbar */}
-        <CustomScrollbar
-          scrollRef={bodyScrollRef}
-          direction="horizontal"
-          style={{ height: 8 }}
-        />
+          {/* Horizontal scrollbar — flex item, pushes rows up from inside */}
+          <CustomScrollbar
+            scrollRef={bodyScrollRef}
+            direction="horizontal"
+            style={{ height: 8 }}
+          />
+        </div>
       </div>
 
       {/* Single shared action menu — anchored to the clicked trigger button */}
