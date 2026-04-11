@@ -16,6 +16,7 @@ import { Button } from '../ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { ScrollTable } from './ScrollTable'
+import { CustomScrollbar } from './CustomScrollbar'
 import type { TableViewConfig, TableWidthMode } from './types'
 import { VIRTUAL_THRESHOLD } from './hooks/useColumnSizing'
 
@@ -716,44 +717,61 @@ export function DataGridTableView<T extends object>({
           </div>
         </div>
 
-        {/* Body scroll container */}
-        <div ref={bodyScrollRef} style={bodyStyle} onScroll={syncScroll}>
-          <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
-            {virtual ? (
-              <DataGridVirtualBody
-                rows={rows}
-                table={table}
-                rowVirtualizer={rowVirtualizer}
-                onRowClick={onRowClick}
-                rowCursor={rowCursor}
-                bordered={bordered}
-                rowHeight={rowHeight}
-                onActionTrigger={actionCol ? handleActionTrigger : undefined}
-                tableWidthMode={tableWidthMode}
-              />
-            ) : (
-              <DataGridFlexBody
-                rows={rows}
-                table={table}
-                visibleLeafColumns={visibleLeafColumns}
-                isLoading={isLoading}
-                emptyMessage={emptyMessage}
-                onRowClick={onRowClick}
-                rowCursor={rowCursor}
-                bordered={bordered}
-                rowHeight={rowHeight}
-                onActionTrigger={actionCol ? handleActionTrigger : undefined}
-                tableWidthMode={tableWidthMode}
-              />
-            )}
-          </ScrollTable>
+        {/* Body scroll container + vertical custom scrollbar */}
+        <div style={{ position: 'relative' }}>
+          <div ref={bodyScrollRef} style={bodyStyle} onScroll={syncScroll} className="scrollbar-none">
+            <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
+              {virtual ? (
+                <DataGridVirtualBody
+                  rows={rows}
+                  table={table}
+                  rowVirtualizer={rowVirtualizer}
+                  onRowClick={onRowClick}
+                  rowCursor={rowCursor}
+                  bordered={bordered}
+                  rowHeight={rowHeight}
+                  onActionTrigger={actionCol ? handleActionTrigger : undefined}
+                  tableWidthMode={tableWidthMode}
+                />
+              ) : (
+                <DataGridFlexBody
+                  rows={rows}
+                  table={table}
+                  visibleLeafColumns={visibleLeafColumns}
+                  isLoading={isLoading}
+                  emptyMessage={emptyMessage}
+                  onRowClick={onRowClick}
+                  rowCursor={rowCursor}
+                  bordered={bordered}
+                  rowHeight={rowHeight}
+                  onActionTrigger={actionCol ? handleActionTrigger : undefined}
+                  tableWidthMode={tableWidthMode}
+                />
+              )}
+            </ScrollTable>
 
-          {loadMoreRef && (
-            <div ref={loadMoreRef} className="py-2 flex justify-center">
-              {isFetchingNextPage && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
-            </div>
-          )}
+            {loadMoreRef && (
+              <div ref={loadMoreRef} className="py-2 flex justify-center">
+                {isFetchingNextPage && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
+              </div>
+            )}
+          </div>
+
+          {/* Vertical custom scrollbar — overlays body right edge */}
+          <CustomScrollbar
+            scrollRef={bodyScrollRef}
+            direction="vertical"
+            className="absolute right-0 top-0 bottom-0"
+            style={{ width: 8 }}
+          />
         </div>
+
+        {/* Horizontal custom scrollbar */}
+        <CustomScrollbar
+          scrollRef={bodyScrollRef}
+          direction="horizontal"
+          style={{ height: 8 }}
+        />
       </div>
 
       {/* Single shared action menu — anchored to the clicked trigger button */}
