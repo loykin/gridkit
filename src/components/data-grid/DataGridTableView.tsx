@@ -633,12 +633,19 @@ export function DataGridTableView<T extends object>({
     enabled: virtual,
   })
 
+  // Native overflow: browser natively tracks scrollWidth/scrollHeight changes,
+  // so the scrollbar appears and disappears correctly on column resize.
+  // macOS overlay scrollbars are thin and accepted OS-standard behavior.
+  // The gradient background makes the header-height portion of the scrollbar
+  // gutter show --muted (matching the header) instead of --background (row color).
+  const headerHeight = enableColumnFilters ? 72 : 36
   const containerStyle: React.CSSProperties = {
     overflow: 'auto',
     position: 'relative',
     width: '100%',
     minWidth: 0,
     isolation: 'isolate',
+    background: `linear-gradient(var(--muted) ${headerHeight}px, var(--background) ${headerHeight}px)`,
     ...(virtual
       ? { height: tableHeight as string | number }
       : tableHeight && tableHeight !== 'auto'
@@ -648,7 +655,7 @@ export function DataGridTableView<T extends object>({
 
   return (
     <>
-      <div ref={containerRef} style={containerStyle} className="dg-scroll rounded-md">
+      <div ref={containerRef} style={containerStyle} className="rounded-md">
         <ScrollTable
           style={
             virtual
