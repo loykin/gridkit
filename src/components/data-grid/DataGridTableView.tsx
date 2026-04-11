@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   flexRender,
   type Row,
@@ -239,20 +239,63 @@ function NumberFilterPopover<T extends object>({ col }: { col: Column<T> }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// SelectFilterCell — lazily scans rows on first open
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SelectFilterCell<T extends object>({ col, table }: { col: Column<T>; table: Table<T> }) {
+  const [options, setOptions] = useState<{ label: string; value: string | null }[] | null>(null)
+  const filterValue = (col.getFilterValue() ?? '') as string
+
+  const handleOpenChange = (open: boolean) => {
+    if (open && options === null) {
+      const vals = new Set<string>()
+      table.getCoreRowModel().rows.forEach((row) => {
+        const v = row.getValue(col.id)
+        if (v != null) vals.add(String(v))
+      })
+      const sorted = Array.from(vals).sort()
+      setOptions([{ label: 'All', value: null }, ...sorted.map((v) => ({ label: v, value: v }))])
+    }
+  }
+
+  const items = options ?? []
+
+  return (
+    <Select
+      items={items}
+      value={filterValue || null}
+      onValueChange={(val) => col.setFilterValue(val ?? undefined)}
+      onOpenChange={handleOpenChange}
+    >
+      <SelectTrigger size="sm" className="h-7 w-full text-xs">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {items.map((item) => (
+          <SelectItem key={item.value ?? '__all__'} value={item.value}>
+            {item.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // DataGridFilterRow
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface DataGridFilterRowProps<T extends object>
   extends Pick<TableViewConfig<T>, 'bordered'> {
   visibleLeafColumns: Column<T>[]
-  selectOptions: Record<string, string[]>
+  table: Table<T>
   virtual: boolean
   tableWidthMode?: TableWidthMode
 }
 
 function DataGridFilterRow<T extends object>({
   visibleLeafColumns,
-  selectOptions,
+  table,
   virtual,
   bordered,
   tableWidthMode = 'spacer',
@@ -269,10 +312,6 @@ function DataGridFilterRow<T extends object>({
         const cellStyle: React.CSSProperties = virtual
           ? { display: 'flex', alignItems: 'center', width: col.getSize() }
           : { ...colStyle(col), display: 'flex', alignItems: 'center' }
-
-        const selectItems = ft === 'select'
-          ? [{ label: 'All', value: null }, ...(selectOptions[col.id] ?? []).map((v) => ({ label: v, value: v }))]
-          : []
 
         if (ft === false) {
           return (
@@ -293,22 +332,7 @@ function DataGridFilterRow<T extends object>({
             style={cellStyle}
           >
             {ft === 'select' ? (
-              <Select
-                items={selectItems}
-                value={filterValue || null}
-                onValueChange={(val) => col.setFilterValue(val ?? undefined)}
-              >
-                <SelectTrigger size="sm" className="h-7 w-full text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {selectItems.map((item) => (
-                    <SelectItem key={item.value ?? '__all__'} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SelectFilterCell col={col} table={table} />
             ) : ft === 'number' ? (
               <NumberFilterPopover col={col} />
             ) : (
@@ -630,20 +654,6 @@ export function DataGridTableView<T extends object>({
     }
   })
 
-  const selectOptions = useMemo(() => {
-    if (!enableColumnFilters) return {}
-    const map: Record<string, string[]> = {}
-    for (const col of visibleLeafColumns) {
-      if (col.columnDef.meta?.filterType !== 'select') continue
-      const vals = new Set<string>()
-      table.getCoreRowModel().rows.forEach((row) => {
-        const v = row.getValue(col.id)
-        if (v != null) vals.add(String(v))
-      })
-      map[col.id] = Array.from(vals).sort()
-    }
-    return map
-  }, [enableColumnFilters, visibleLeafColumns, table])
 
   // ── Separated header/body scroll refs ──────────────────────────────────────
   // headerScrollRef: overflow:hidden panel — scrollLeft is synced from body
@@ -714,7 +724,7 @@ export function DataGridTableView<T extends object>({
             {enableColumnFilters && (
               <DataGridFilterRow
                 visibleLeafColumns={visibleLeafColumns}
-                selectOptions={selectOptions}
+                table={table}
                 virtual={virtual}
                 bordered={bordered}
                 tableWidthMode={tableWidthMode}
