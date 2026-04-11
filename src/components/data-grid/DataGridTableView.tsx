@@ -11,7 +11,6 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, MoreHorizontal, SlidersHorizo
 import type { Virtualizer } from '@tanstack/react-virtual'
 import { Menu as ActionMenu } from '@base-ui/react/menu'
 import { cn } from '@/lib/utils'
-import { TableHeader, TableBody, TableRow, TableHead, TableCell } from '../ui/table'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
@@ -94,8 +93,9 @@ function DataGridHeaderRow<T extends object>({
 }: DataGridHeaderRowProps<T>) {
   const headers = headerGroup.headers
   return (
-    <TableRow
-      className="hover:bg-transparent"
+    <div
+      role="row"
+      className="border-b border-border"
       style={{ display: 'flex', width: '100%', height: '36px' }}
     >
       {headers.map((header, idx) => {
@@ -103,67 +103,68 @@ function DataGridHeaderRow<T extends object>({
         const isLast = idx === headers.length - 1
         const isFillLast = tableWidthMode === 'fill-last' && isLast
         return (
-        <TableHead
-          key={header.id}
-          colSpan={header.colSpan}
-          // data-col-id: used by useColumnSizing DOM measurement
-          data-col-id={header.column.id}
-          className={cn(
-            'relative px-3 text-xs font-medium h-9 bg-muted',
-            'text-muted-foreground whitespace-normal',
-            'select-none group',
-            header.column.getCanSort() && 'cursor-pointer',
-            bordered && 'border-r border-border',
-            edge === 'left-edge' && 'shadow-[1px_0_0_0_hsl(var(--border))]',
-            edge === 'right-edge' && 'shadow-[-1px_0_0_0_hsl(var(--border))]',
-          )}
-          style={
-            virtual
-              ? { display: 'flex', alignItems: 'center', width: isFillLast ? undefined : header.getSize(), ...(isFillLast && { flex: 1, minWidth: header.getSize() }) }
-              : { ...colStyle(header.column), display: 'flex', alignItems: 'center', overflow: 'hidden', ...(isFillLast && { flex: 1, width: 'auto' }) }
-          }
-          onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
-        >
-          <span className="flex items-center gap-1 min-w-0 overflow-hidden">
-            <span className="truncate">
-              {header.isPlaceholder
-                ? null
-                : flexRender(header.column.columnDef.header, header.getContext())}
-            </span>
-            {header.column.getCanSort() && (
-              <span className="ml-1 shrink-0">
-                {header.column.getIsSorted() === 'asc' ? (
-                  <ArrowUp className="h-3.5 w-3.5" />
-                ) : header.column.getIsSorted() === 'desc' ? (
-                  <ArrowDown className="h-3.5 w-3.5" />
-                ) : (
-                  <ArrowUpDown className="h-3.5 w-3.5 opacity-40 group-hover:opacity-100" />
-                )}
-              </span>
+          <div
+            role="columnheader"
+            key={header.id}
+            data-col-id={header.column.id}
+            className={cn(
+              'relative px-3 text-xs font-medium h-full bg-muted',
+              'text-muted-foreground whitespace-normal',
+              'select-none group',
+              header.column.getCanSort() && 'cursor-pointer',
+              bordered && 'border-r border-border',
+              edge === 'left-edge' && 'shadow-[1px_0_0_0_hsl(var(--border))]',
+              edge === 'right-edge' && 'shadow-[-1px_0_0_0_hsl(var(--border))]',
             )}
-          </span>
+            style={
+              virtual
+                ? { display: 'flex', alignItems: 'center', width: isFillLast ? undefined : header.getSize(), ...(isFillLast && { flex: 1, minWidth: header.getSize() }) }
+                : { ...colStyle(header.column), display: 'flex', alignItems: 'center', overflow: 'hidden', ...(isFillLast && { flex: 1, width: 'auto' }) }
+            }
+            onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+          >
+            <span className="flex items-center gap-1 min-w-0 overflow-hidden">
+              <span className="truncate">
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
+              </span>
+              {header.column.getCanSort() && (
+                <span className="ml-1 shrink-0">
+                  {header.column.getIsSorted() === 'asc' ? (
+                    <ArrowUp className="h-3.5 w-3.5" />
+                  ) : header.column.getIsSorted() === 'desc' ? (
+                    <ArrowDown className="h-3.5 w-3.5" />
+                  ) : (
+                    <ArrowUpDown className="h-3.5 w-3.5 opacity-40 group-hover:opacity-100" />
+                  )}
+                </span>
+              )}
+            </span>
 
-          {enableColumnResizing && header.column.getCanResize() && (
-            <div
-              onMouseDown={(e) => { e.stopPropagation(); header.getResizeHandler()(e) }}
-              onTouchStart={(e) => { e.stopPropagation(); header.getResizeHandler()(e) }}
-              onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none touch-none"
-            >
-              <div className={cn(
-                'absolute right-1.5 top-2 bottom-2 w-px rounded-full transition-colors',
-                'opacity-0 group-hover:opacity-100',
-                header.column.getIsResizing()
-                  ? 'opacity-100 bg-primary'
-                  : 'bg-border hover:bg-primary',
-              )} />
-            </div>
-          )}
-        </TableHead>
+            {enableColumnResizing && header.column.getCanResize() && (
+              <div
+                onMouseDown={(e) => { e.stopPropagation(); header.getResizeHandler()(e) }}
+                onTouchStart={(e) => { e.stopPropagation(); header.getResizeHandler()(e) }}
+                onClick={(e) => e.stopPropagation()}
+                className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none touch-none"
+              >
+                <div className={cn(
+                  'absolute right-1.5 top-2 bottom-2 w-px rounded-full transition-colors',
+                  'opacity-0 group-hover:opacity-100',
+                  header.column.getIsResizing()
+                    ? 'opacity-100 bg-primary'
+                    : 'bg-border hover:bg-primary',
+                )} />
+              </div>
+            )}
+          </div>
         )
       })}
-      {!virtual && tableWidthMode === 'spacer' && <TableHead style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-muted" />}
-    </TableRow>
+      {!virtual && tableWidthMode === 'spacer' && (
+        <div role="columnheader" style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-muted" />
+      )}
+    </div>
   )
 }
 
@@ -256,14 +257,15 @@ function DataGridFilterRow<T extends object>({
   tableWidthMode = 'spacer',
 }: DataGridFilterRowProps<T>) {
   return (
-    <TableRow
-      className="border-b bg-muted hover:bg-muted"
+    <div
+      role="row"
+      className="border-b border-border bg-muted"
       style={{ display: 'flex', width: '100%', height: '36px' }}
     >
       {visibleLeafColumns.map((col) => {
         const ft = col.columnDef.meta?.filterType
         const filterValue = (col.getFilterValue() ?? '') as string
-        const thStyle: React.CSSProperties = virtual
+        const cellStyle: React.CSSProperties = virtual
           ? { display: 'flex', alignItems: 'center', width: col.getSize() }
           : { ...colStyle(col), display: 'flex', alignItems: 'center' }
 
@@ -272,11 +274,23 @@ function DataGridFilterRow<T extends object>({
           : []
 
         if (ft === false) {
-          return <TableHead key={col.id} className={cn('px-2 py-1 h-auto', bordered && 'border-r border-border')} style={thStyle} />
+          return (
+            <div
+              role="columnheader"
+              key={col.id}
+              className={cn('px-2 py-1', bordered && 'border-r border-border')}
+              style={cellStyle}
+            />
+          )
         }
 
         return (
-          <TableHead key={col.id} className={cn('px-2 py-1 h-auto font-normal', bordered && 'border-r border-border')} style={thStyle}>
+          <div
+            role="columnheader"
+            key={col.id}
+            className={cn('px-2 py-1 font-normal', bordered && 'border-r border-border')}
+            style={cellStyle}
+          >
             {ft === 'select' ? (
               <Select
                 items={selectItems}
@@ -297,7 +311,7 @@ function DataGridFilterRow<T extends object>({
             ) : ft === 'number' ? (
               <NumberFilterPopover col={col} />
             ) : (
-              <div className="relative">
+              <div className="relative w-full">
                 <Input
                   type="text"
                   placeholder="Filter…"
@@ -317,11 +331,13 @@ function DataGridFilterRow<T extends object>({
                 )}
               </div>
             )}
-          </TableHead>
+          </div>
         )
       })}
-      {!virtual && tableWidthMode === 'spacer' && <TableHead style={{ flex: 1, minWidth: 0, padding: 0 }} />}
-    </TableRow>
+      {!virtual && tableWidthMode === 'spacer' && (
+        <div role="columnheader" style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-muted" />
+      )}
+    </div>
   )
 }
 
@@ -359,13 +375,14 @@ function DataGridBodyRow<T extends object>({
 }: DataGridBodyRowProps<T>) {
   const visibleCells = row.getVisibleCells()
   return (
-    <TableRow
+    <div
+      role="row"
       data-index={dataIndex}
       ref={measureRef}
       onClick={onRowClick ? () => onRowClick(row.original) : undefined}
       className={cn(
-        'flex w-full',
-        onRowClick || rowCursor ? 'cursor-pointer' : 'hover:bg-muted/30',
+        'flex w-full border-b border-border transition-colors',
+        onRowClick || rowCursor ? 'cursor-pointer hover:bg-muted/50' : 'hover:bg-muted/30',
       )}
       style={{ minHeight: rowHeight, ...style }}
     >
@@ -375,9 +392,9 @@ function DataGridBodyRow<T extends object>({
         const isLast = idx === visibleCells.length - 1
         const isFillCell = fillLast && isLast
         return (
-          <TableCell
+          <div
+            role="gridcell"
             key={cell.id}
-            // data-col-id: used by useColumnSizing DOM measurement
             data-col-id={cell.column.id}
             className={cn(
               'flex items-center px-3 py-1 overflow-hidden bg-background',
@@ -405,11 +422,13 @@ function DataGridBodyRow<T extends object>({
             ) : (
               flexRender(cell.column.columnDef.cell, cell.getContext())
             )}
-          </TableCell>
+          </div>
         )
       })}
-      {showSpacer && <TableCell style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-background" />}
-    </TableRow>
+      {showSpacer && (
+        <div role="gridcell" style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-background" />
+      )}
+    </div>
   )
 }
 
@@ -441,7 +460,7 @@ function DataGridVirtualBody<T extends object>({
   const totalSize = rowVirtualizer.getTotalSize()
 
   return (
-    <TableBody style={{ display: 'block', height: totalSize, position: 'relative' }}>
+    <div role="rowgroup" style={{ display: 'block', height: totalSize, position: 'relative' }}>
       {virtualItems.map((virtualRow) => {
         const row = rows[virtualRow.index]!
         return (
@@ -461,7 +480,7 @@ function DataGridVirtualBody<T extends object>({
           />
         )
       })}
-    </TableBody>
+    </div>
   )
 }
 
@@ -496,38 +515,49 @@ function DataGridFlexBody<T extends object>({
 
   if (isLoading) {
     return (
-      <TableBody style={{ display: 'block' }}>
+      <div role="rowgroup" style={{ display: 'block' }}>
         {Array.from({ length: 6 }).map((_, i) => (
-          <TableRow key={i} className="flex w-full" style={{ minHeight: rowHeight }}>
+          <div
+            role="row"
+            key={i}
+            className="flex w-full border-b border-border"
+            style={{ minHeight: rowHeight }}
+          >
             {visibleLeafColumns.map((col, colIdx) => {
               const isLast = colIdx === visibleLeafColumns.length - 1
               return (
-                <TableCell key={col.id} data-col-id={col.id} className={cn('flex items-center px-3 py-1', bordered && 'border-r border-border')} style={{ ...colStyle(col), ...(fillLast && isLast && { flex: 1, width: 'auto' }) }}>
-                  <div className="h-4 animate-pulse rounded bg-muted" />
-                </TableCell>
+                <div
+                  role="gridcell"
+                  key={col.id}
+                  data-col-id={col.id}
+                  className={cn('flex items-center px-3 py-1', bordered && 'border-r border-border')}
+                  style={{ ...colStyle(col), ...(fillLast && isLast && { flex: 1, width: 'auto' }) }}
+                >
+                  <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                </div>
               )
             })}
-            {showSpacer && <TableCell style={{ flex: 1, minWidth: 0, padding: 0 }} />}
-          </TableRow>
+            {showSpacer && <div role="gridcell" style={{ flex: 1, minWidth: 0, padding: 0 }} />}
+          </div>
         ))}
-      </TableBody>
+      </div>
     )
   }
 
   if (rows.length === 0) {
     return (
-      <TableBody style={{ display: 'block' }}>
-        <TableRow className="flex w-full hover:bg-transparent">
-          <TableCell className="flex-1 py-12 text-center text-muted-foreground">
+      <div role="rowgroup" style={{ display: 'block' }}>
+        <div role="row" className="flex w-full">
+          <div role="gridcell" className="flex-1 py-12 text-center text-muted-foreground text-sm">
             {emptyMessage}
-          </TableCell>
-        </TableRow>
-      </TableBody>
+          </div>
+        </div>
+      </div>
     )
   }
 
   return (
-    <TableBody style={{ display: 'block' }}>
+    <div role="rowgroup" style={{ display: 'block' }}>
       {rows.map((row) => (
         <DataGridBodyRow
           key={row.id}
@@ -542,7 +572,7 @@ function DataGridFlexBody<T extends object>({
           onActionTrigger={onActionTrigger}
         />
       ))}
-    </TableBody>
+    </div>
   )
 }
 
@@ -570,12 +600,9 @@ export function DataGridTableView<T extends object>({
   bordered = false,
   onMeasureColumns,
 }: DataGridTableViewProps<T>) {
-  // rowHeight drives both CSS min-height and virtualizer estimate.
-  // estimateRowHeight can override the virtualizer estimate independently.
   const effectiveEstimate = estimateRowHeight ?? rowHeight ?? 33
-  // ── Action menu state — ONE menu at table level, anchored to the clicked trigger ─
-  // Snapshot rect at click time (VirtualElement) so the anchor remains valid even
-  // after the virtualizer unmounts the trigger row's DOM node.
+
+  // ── Action menu state ──────────────────────────────────────────────────────
   const [actionMenuOpen, setActionMenuOpen] = useState(false)
   const [activeRow, setActiveRow] = useState<T | null>(null)
   const anchorRef = useRef<{ getBoundingClientRect: () => DOMRect } | null>(null)
@@ -590,20 +617,13 @@ export function DataGridTableView<T extends object>({
   const headerGroups = table.getHeaderGroups()
   const visibleLeafColumns = table.getVisibleLeafColumns()
 
-  // Find the column that has meta.actions (if any) — used to build the shared action menu
   const actionCol = visibleLeafColumns.find((col) => col.columnDef.meta?.actions != null)
   const actionItems = actionCol && activeRow ? actionCol.columnDef.meta!.actions!(activeRow) : []
 
   const hasFixedHeight = tableHeight != null && tableHeight !== 'auto'
-
-  // Virtualizer auto-enables when the table has a fixed height and rows exceed
-  // the threshold. This is an internal optimization — callers don't control it.
   const virtual = hasFixedHeight && rows.length >= VIRTUAL_THRESHOLD
 
-  // ── After each render, trigger column auto-measurement ─────────────────
-  // Skip while a column is being resized: forced layout reads (scrollWidth)
-  // during pointer drag cause jank. Measurement resumes on the next render
-  // after the drag ends.
+  // ── After each render, trigger column auto-measurement ─────────────────────
   useEffect(() => {
     if (!table.getState().columnSizingInfo.isResizingColumn) {
       onMeasureColumns?.()
@@ -625,27 +645,30 @@ export function DataGridTableView<T extends object>({
     return map
   }, [enableColumnFilters, visibleLeafColumns, table])
 
+  // ── Separated header/body scroll refs ──────────────────────────────────────
+  // headerScrollRef: overflow:hidden panel — scrollLeft is synced from body
+  // bodyScrollRef:   actual scroll container — drives virtualizer + scroll events
+  // containerRef:    outer wrapper — used by useColumnSizing (clientWidth + DOM query)
+  const headerScrollRef = useRef<HTMLDivElement>(null)
+  const bodyScrollRef = useRef<HTMLDivElement>(null)
+
+  const syncScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    if (headerScrollRef.current) {
+      headerScrollRef.current.scrollLeft = e.currentTarget.scrollLeft
+    }
+  }, [])
+
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => containerRef.current,
+    getScrollElement: () => bodyScrollRef.current,
     estimateSize: () => effectiveEstimate,
     overscan,
     enabled: virtual,
   })
 
-  // Native overflow: browser natively tracks scrollWidth/scrollHeight changes,
-  // so the scrollbar appears and disappears correctly on column resize.
-  // macOS overlay scrollbars are thin and accepted OS-standard behavior.
-  // The gradient background makes the header-height portion of the scrollbar
-  // gutter show --muted (matching the header) instead of --background (row color).
-  const headerHeight = enableColumnFilters ? 72 : 36
-  const containerStyle: React.CSSProperties = {
+  // Body panel height: fixed for virtual (exact), maxHeight for non-virtual (clamped)
+  const bodyStyle: React.CSSProperties = {
     overflow: 'auto',
-    position: 'relative',
-    width: '100%',
-    minWidth: 0,
-    isolation: 'isolate',
-    background: `linear-gradient(var(--muted) ${headerHeight}px, var(--background) ${headerHeight}px)`,
     ...(virtual
       ? { height: tableHeight as string | number }
       : tableHeight && tableHeight !== 'auto'
@@ -653,20 +676,23 @@ export function DataGridTableView<T extends object>({
       : {}),
   }
 
+  const innerWidth = table.getTotalSize()
+
   return (
     <>
-      <div ref={containerRef} style={containerStyle} className="rounded-md">
-        <ScrollTable
-          style={
-            virtual
-              ? { display: 'grid', width: table.getTotalSize(), minWidth: '100%' }
-              : { display: 'block', width: table.getTotalSize(), minWidth: '100%' }
-          }
-        >
-          <TableHeader
-            className="sticky top-0 z-10 bg-muted [&_tr]:border-b"
-            style={{ display: 'block', transform: 'translateZ(0)', willChange: 'transform' }}
-          >
+      {/*
+        Outer wrapper — containerRef:
+          - ResizeObserver target for useColumnSizing
+          - querySelectorAll('[data-col-id]') finds cells in both header and body
+      */}
+      <div
+        ref={containerRef}
+        style={{ position: 'relative', width: '100%', minWidth: 0, isolation: 'isolate' }}
+        className="rounded-md border border-border"
+      >
+        {/* Header panel — overflow:hidden, scrollLeft mirrors body */}
+        <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className="bg-muted">
+          <div style={{ width: innerWidth, minWidth: '100%' }}>
             {headerGroups.map((headerGroup) => (
               <DataGridHeaderRow
                 key={headerGroup.id}
@@ -687,42 +713,47 @@ export function DataGridTableView<T extends object>({
                 tableWidthMode={tableWidthMode}
               />
             )}
-          </TableHeader>
-
-          {virtual ? (
-            <DataGridVirtualBody
-              rows={rows}
-              table={table}
-              rowVirtualizer={rowVirtualizer}
-              onRowClick={onRowClick}
-              rowCursor={rowCursor}
-              bordered={bordered}
-              rowHeight={rowHeight}
-              onActionTrigger={actionCol ? handleActionTrigger : undefined}
-              tableWidthMode={tableWidthMode}
-            />
-          ) : (
-            <DataGridFlexBody
-              rows={rows}
-              table={table}
-              visibleLeafColumns={visibleLeafColumns}
-              isLoading={isLoading}
-              emptyMessage={emptyMessage}
-              onRowClick={onRowClick}
-              rowCursor={rowCursor}
-              bordered={bordered}
-              rowHeight={rowHeight}
-              onActionTrigger={actionCol ? handleActionTrigger : undefined}
-              tableWidthMode={tableWidthMode}
-            />
-          )}
-        </ScrollTable>
-
-        {loadMoreRef && (
-          <div ref={loadMoreRef} className="py-2 flex justify-center">
-            {isFetchingNextPage && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
           </div>
-        )}
+        </div>
+
+        {/* Body scroll container */}
+        <div ref={bodyScrollRef} style={bodyStyle} onScroll={syncScroll}>
+          <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
+            {virtual ? (
+              <DataGridVirtualBody
+                rows={rows}
+                table={table}
+                rowVirtualizer={rowVirtualizer}
+                onRowClick={onRowClick}
+                rowCursor={rowCursor}
+                bordered={bordered}
+                rowHeight={rowHeight}
+                onActionTrigger={actionCol ? handleActionTrigger : undefined}
+                tableWidthMode={tableWidthMode}
+              />
+            ) : (
+              <DataGridFlexBody
+                rows={rows}
+                table={table}
+                visibleLeafColumns={visibleLeafColumns}
+                isLoading={isLoading}
+                emptyMessage={emptyMessage}
+                onRowClick={onRowClick}
+                rowCursor={rowCursor}
+                bordered={bordered}
+                rowHeight={rowHeight}
+                onActionTrigger={actionCol ? handleActionTrigger : undefined}
+                tableWidthMode={tableWidthMode}
+              />
+            )}
+          </ScrollTable>
+
+          {loadMoreRef && (
+            <div ref={loadMoreRef} className="py-2 flex justify-center">
+              {isFetchingNextPage && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Single shared action menu — anchored to the clicked trigger button */}
