@@ -84,6 +84,12 @@ export interface TableViewConfig<T extends object> {
   enableColumnResizing?: boolean
   /** Show per-column filter row below the header (AG Grid style) */
   enableColumnFilters?: boolean
+  /**
+   * Controls how column filters are displayed when enableColumnFilters=true.
+   * - 'row' (default): dedicated filter row below the header
+   * - 'icon': filter icon inside each header cell that opens a popover
+   */
+  filterDisplay?: 'row' | 'icon'
   tableHeight?: string | number | 'auto'
   /** Show vertical dividers between columns */
   bordered?: boolean

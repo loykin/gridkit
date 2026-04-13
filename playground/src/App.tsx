@@ -10,6 +10,7 @@ import { BorderedTab }   from './tabs/BorderedTab'
 import { RowHeightTab } from './tabs/RowHeightTab'
 import { TreeTab }     from './tabs/TreeTab'
 import { DragTab }     from './tabs/DragTab'
+import { FilterIconTab } from './tabs/FilterIconTab'
 
 const TABS = [
   { id: 'pagination',  label: 'Pagination',      content: <PaginationTab /> },
@@ -23,6 +24,7 @@ const TABS = [
   { id: 'row-height',  label: 'Row Height',      content: <RowHeightTab /> },
   { id: 'tree',        label: 'Tree / Groups',   content: <TreeTab /> },
   { id: 'drag',        label: 'Row Drag',        content: <DragTab /> },
+  { id: 'filter-icon', label: 'Filter Icon',     content: <FilterIconTab /> },
 ] as const
 
 type TabId = typeof TABS[number]['id']

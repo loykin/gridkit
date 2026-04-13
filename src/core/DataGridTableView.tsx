@@ -7,7 +7,7 @@ import {
   type HeaderGroup,
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, MoreHorizontal, SlidersHorizontal, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Filter, Loader2, MoreHorizontal, SlidersHorizontal, X } from 'lucide-react'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import { Menu as ActionMenu } from '@base-ui/react/menu'
 import { cn } from '@/lib/utils'
@@ -78,7 +78,7 @@ function isPinnedEdge<T extends object>(col: Column<T>, table: Table<T>): 'left-
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface DataGridHeaderRowProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'enableColumnResizing' | 'bordered'> {
+  extends Pick<TableViewConfig<T>, 'enableColumnResizing' | 'bordered' | 'enableColumnFilters' | 'filterDisplay'> {
   headerGroup: HeaderGroup<T>
   table: Table<T>
   virtual: boolean
@@ -92,6 +92,8 @@ function DataGridHeaderRow<T extends object>({
   virtual,
   bordered,
   tableWidthMode = 'spacer',
+  enableColumnFilters,
+  filterDisplay = 'row',
 }: DataGridHeaderRowProps<T>) {
   const headers = headerGroup.headers
   return (
@@ -125,7 +127,7 @@ function DataGridHeaderRow<T extends object>({
             }
             onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
           >
-            <span className="flex items-center gap-1 min-w-0 overflow-hidden">
+            <span className="flex items-center gap-1 min-w-0 overflow-hidden flex-1">
               <span className="truncate">
                 {header.isPlaceholder
                   ? null
@@ -143,6 +145,10 @@ function DataGridHeaderRow<T extends object>({
                 </span>
               )}
             </span>
+
+            {enableColumnFilters && filterDisplay === 'icon' && (
+              <HeaderFilterPopover col={header.column} table={table} />
+            )}
 
             {enableColumnResizing && header.column.getCanResize() && (
               <div
@@ -166,6 +172,113 @@ function DataGridHeaderRow<T extends object>({
       {!virtual && tableWidthMode === 'spacer' && (
         <div role="columnheader" style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-muted" />
       )}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HeaderFilterPopover — icon mode filter trigger inside header cell
+// ─────────────────────────────────────────────────────────────────────────────
+
+function HeaderFilterPopover<T extends object>({ col, table }: { col: Column<T>; table: Table<T> }) {
+  const [open, setOpen] = useState(false)
+  const ft = col.columnDef.meta?.filterType
+  if (ft === false || ft === undefined) return null
+
+  const hasFilter = col.getIsFiltered()
+  const filterValue = (col.getFilterValue() ?? '') as string
+  const numFilter = col.getFilterValue() as [string, string] | undefined
+  const min = numFilter?.[0] ?? ''
+  const max = numFilter?.[1] ?? ''
+
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger render={(props) => (
+        <Button
+          {...props}
+          variant="ghost"
+          size="icon-xs"
+          className={cn(
+            'h-5 w-5 shrink-0',
+            hasFilter ? 'text-primary opacity-100' : 'opacity-0 group-hover:opacity-60',
+          )}
+        >
+          <Filter className="h-3 w-3" />
+        </Button>
+      )} />
+      <PopoverContent
+        side="bottom"
+        align="start"
+        className="w-52"
+      >
+        {ft === 'select' ? (
+          <SelectFilterCell
+            col={col}
+            table={table}
+            onSelect={() => setOpen(false)}
+          />
+        ) : ft === 'number' ? (
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-muted-foreground">Min</span>
+              <Input
+                type="number"
+                placeholder="Min"
+                value={min}
+                onChange={(e) =>
+                  col.setFilterValue((old: [string, string] = ['', '']) => [e.target.value, old[1]])
+                }
+                className="h-7 text-xs"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-muted-foreground">Max</span>
+              <Input
+                type="number"
+                placeholder="Max"
+                value={max}
+                onChange={(e) =>
+                  col.setFilterValue((old: [string, string] = ['', '']) => [old[0], e.target.value])
+                }
+                className="h-7 text-xs"
+              />
+            </div>
+            {hasFilter && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => col.setFilterValue(undefined)}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Filter…"
+              value={filterValue}
+              onChange={(e) => col.setFilterValue(e.target.value || undefined)}
+              className="h-7 text-xs pr-6"
+              autoFocus
+            />
+            {filterValue && (
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => col.setFilterValue(undefined)}
+                className="absolute right-0.5 top-1/2 -translate-y-1/2"
+              >
+                <X />
+              </Button>
+            )}
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
     </div>
   )
 }
@@ -243,7 +356,15 @@ function NumberFilterPopover<T extends object>({ col }: { col: Column<T> }) {
 // SelectFilterCell — lazily scans rows on first open
 // ─────────────────────────────────────────────────────────────────────────────
 
-function SelectFilterCell<T extends object>({ col, table }: { col: Column<T>; table: Table<T> }) {
+function SelectFilterCell<T extends object>({
+  col,
+  table,
+  onSelect,
+}: {
+  col: Column<T>
+  table: Table<T>
+  onSelect?: () => void
+}) {
   const [options, setOptions] = useState<{ label: string; value: string | null }[] | null>(null)
   const filterValue = (col.getFilterValue() ?? '') as string
 
@@ -265,7 +386,10 @@ function SelectFilterCell<T extends object>({ col, table }: { col: Column<T>; ta
     <Select
       items={items}
       value={filterValue || null}
-      onValueChange={(val) => col.setFilterValue(val ?? undefined)}
+      onValueChange={(val) => {
+        col.setFilterValue(val ?? undefined)
+        onSelect?.()
+      }}
       onOpenChange={handleOpenChange}
     >
       <SelectTrigger size="sm" className="h-7 w-full text-xs">
@@ -621,6 +745,7 @@ export function DataGridTableView<T extends object>({
   rowCursor,
   enableColumnResizing = true,
   enableColumnFilters = false,
+  filterDisplay = 'row',
   tableHeight,
   tableWidthMode = 'spacer',
   rowHeight,
@@ -723,12 +848,14 @@ export function DataGridTableView<T extends object>({
                 headerGroup={headerGroup}
                 table={table}
                 enableColumnResizing={enableColumnResizing}
+                enableColumnFilters={enableColumnFilters}
+                filterDisplay={filterDisplay}
                 virtual={virtual}
                 bordered={bordered}
                 tableWidthMode={tableWidthMode}
               />
             ))}
-            {enableColumnFilters && (
+            {enableColumnFilters && filterDisplay !== 'icon' && (
               <DataGridFilterRow
                 visibleLeafColumns={visibleLeafColumns}
                 table={table}
