@@ -11,6 +11,8 @@ interface UseDataGridBaseOptions<T extends object> extends DataGridBaseProps<T> 
   paginationConfig?: { pageSize?: number; initialPageIndex?: number }
   totalCount?: number
   onPageChange?: (pageIndex: number, pageSize: number) => void
+  // Row identity — required for DataGridDrag stable reordering
+  getRowId?: (originalRow: T, index: number) => string
 }
 
 export function useDataGridBase<T extends object>(options: UseDataGridBaseOptions<T>) {
@@ -33,6 +35,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     checkboxConfig,
     enableExpanding,
     getSubRows,
+    getRowId,
     tableKey,
     persistState,
     enablePagination = true,
@@ -83,6 +86,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     onColumnSizingChange,
     enableExpanding,
     getSubRows,
+    getRowId,
     sizing,
     setSizing,
   })

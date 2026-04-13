@@ -58,6 +58,7 @@ interface UseDataGridCoreOptions<T extends object>
     | 'getSubRows'
   > {
   columns: DataGridColumnDef<T>[]
+  getRowId?: (originalRow: T, index: number) => string
   enablePagination?: boolean
   paginationConfig?: { pageSize?: number; initialPageIndex?: number }
   totalCount?: number
@@ -91,6 +92,7 @@ export function useDataGridCore<T extends object>({
   onColumnSizingChange,
   enableExpanding = false,
   getSubRows,
+  getRowId,
   sizing,
   setSizing,
 }: UseDataGridCoreOptions<T>) {
@@ -168,6 +170,7 @@ export function useDataGridCore<T extends object>({
   const table = useReactTable<T>({
     data,
     columns: enrichedColumns,
+    getRowId,
     state: {
       sorting,
       columnFilters: effectiveColumnFilters,

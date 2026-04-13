@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   flexRender,
   type Row,
@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { ScrollTable } from './ScrollTable'
 import { CustomScrollbar } from './CustomScrollbar'
+import { RowWrapperContext } from './RowWrapperContext'
 import type { TableViewConfig, TableWidthMode } from './types'
 import { VIRTUAL_THRESHOLD } from './hooks/useColumnSizing'
 
@@ -536,6 +537,7 @@ function DataGridFlexBody<T extends object>({
 }: DataGridFlexBodyProps<T>) {
   const showSpacer = tableWidthMode === 'spacer'
   const fillLast = tableWidthMode === 'fill-last'
+  const RowWrapper = useContext(RowWrapperContext)
 
   if (isLoading) {
     return (
@@ -582,20 +584,25 @@ function DataGridFlexBody<T extends object>({
 
   return (
     <div role="rowgroup" style={{ display: 'block' }}>
-      {rows.map((row) => (
-        <DataGridBodyRow
-          key={row.id}
-          row={row}
-          table={table}
-          onRowClick={onRowClick}
-          rowCursor={rowCursor}
-          bordered={bordered}
-          rowHeight={rowHeight}
-          showSpacer={showSpacer}
-          fillLast={fillLast}
-          onActionTrigger={onActionTrigger}
-        />
-      ))}
+      {rows.map((row) => {
+        const bodyRow = (
+          <DataGridBodyRow
+            row={row}
+            table={table}
+            onRowClick={onRowClick}
+            rowCursor={rowCursor}
+            bordered={bordered}
+            rowHeight={rowHeight}
+            showSpacer={showSpacer}
+            fillLast={fillLast}
+            onActionTrigger={onActionTrigger}
+          />
+        )
+        if (RowWrapper) {
+          return <RowWrapper key={row.id} row={row}>{bodyRow}</RowWrapper>
+        }
+        return <React.Fragment key={row.id}>{bodyRow}</React.Fragment>
+      })}
     </div>
   )
 }

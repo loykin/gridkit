@@ -165,6 +165,13 @@ export interface DataGridProps<T extends object> extends DataGridBaseProps<T> {
   onPageChange?: (pageIndex: number, pageSize: number) => void
 }
 
+export interface DataGridDragProps<T extends object> extends DataGridBaseProps<T> {
+  /** Required: stable unique id per data item — used to track row identity across reorders */
+  getRowId: (originalRow: T, index: number) => string
+  /** Called with the full reordered data array after each drag */
+  onRowReorder: (newData: T[]) => void
+}
+
 export interface DataGridInfinityProps<T extends object> extends DataGridBaseProps<T> {
   hasNextPage?: boolean
   isFetchingNextPage?: boolean
