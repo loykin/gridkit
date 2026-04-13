@@ -11,6 +11,7 @@ import { RowHeightTab } from './tabs/RowHeightTab'
 import { TreeTab }     from './tabs/TreeTab'
 import { DragTab }     from './tabs/DragTab'
 import { FilterIconTab } from './tabs/FilterIconTab'
+import { ToolbarTab }    from './tabs/ToolbarTab'
 
 const TABS = [
   { id: 'pagination',  label: 'Pagination',      content: <PaginationTab /> },
@@ -25,6 +26,7 @@ const TABS = [
   { id: 'tree',        label: 'Tree / Groups',   content: <TreeTab /> },
   { id: 'drag',        label: 'Row Drag',        content: <DragTab /> },
   { id: 'filter-icon', label: 'Filter Icon',     content: <FilterIconTab /> },
+  { id: 'toolbar',     label: 'Toolbar',         content: <ToolbarTab /> },
 ] as const
 
 type TabId = typeof TABS[number]['id']
