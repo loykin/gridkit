@@ -21,7 +21,7 @@
     "build": "tsup && node_modules/.bin/tailwindcss -i src/styles/index.css -o dist/styles.css --minify",
     "build:js": "tsup",
     "build:css": "node_modules/.bin/tailwindcss -i src/styles/index.css -o dist/styles.css",
-    "dev": "tsup --watch",
+    "dev": "concurrently \"tsup --watch\" \"cd playground && npm run dev\"",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -46,6 +46,7 @@
     "@tailwindcss/cli": "^4.2.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "concurrently": "^9.2.1",
     "tailwindcss": "^4.2.2",
     "tsup": "^8.4.0",
     "typescript": "^5.9.3"
