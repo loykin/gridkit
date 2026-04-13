@@ -1,9 +1,9 @@
-export { DataGrid } from './components/data-grid/DataGrid'
-export { DataGridInfinity } from './components/data-grid/DataGridInfinity'
-export { DataGridDrag } from './components/data-grid/DataGridDrag'
-export { ColumnVisibilityDropdown } from './components/data-grid/ColumnVisibilityDropdown'
-export { TreeCell } from './components/data-grid/TreeCell'
-export { DragHandleCell } from './components/data-grid/cells/DragHandleCell'
+export { DataGrid } from './DataGrid'
+export { DataGridInfinity } from './DataGridInfinity'
+export { DataGridDrag } from './DataGridDrag'
+export { ColumnVisibilityDropdown } from './core/ColumnVisibilityDropdown'
+export { TreeCell } from './features/expanding/TreeCell'
+export { DragHandleCell } from './features/reordering/DragHandleCell'
 export type {
   DataGridProps,
   DataGridInfinityProps,
@@ -14,4 +14,4 @@ export type {
   CheckboxConfig,
   TableViewConfig,
   DataGridBaseProps,
-} from './components/data-grid/types'
+} from './types'

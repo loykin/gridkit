@@ -1,8 +1,8 @@
 import { useMemo, useRef } from 'react'
-import type { DataGridBaseProps, DataGridColumnDef } from '../types'
-import { createCheckboxColumn } from '../CheckboxColumn'
-import { useDataGridCore } from './useDataGridCore'
-import { useColumnSizing } from './useColumnSizing'
+import type { DataGridBaseProps, DataGridColumnDef } from '@/types'
+import { createCheckboxColumn } from '@/features/selection/CheckboxColumn'
+import { useDataGridCore } from '@/core/hooks/useDataGridCore'
+import { useColumnSizing } from '@/core/hooks/useColumnSizing'
 
 interface UseDataGridBaseOptions<T extends object> extends DataGridBaseProps<T> {
   columns: DataGridColumnDef<T>[]

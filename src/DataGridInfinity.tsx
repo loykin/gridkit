@@ -1,7 +1,7 @@
-import type { DataGridInfinityProps } from './types'
-import { useDataGridBase } from './hooks/useDataGridBase'
-import { useInfiniteScroll } from './hooks/useInfiniteScroll'
-import { DataGridShell } from './DataGridShell'
+import type { DataGridInfinityProps } from '@/types'
+import { useDataGridBase } from '@/core/hooks/useDataGridBase'
+import { useInfiniteScroll } from '@/core/hooks/useInfiniteScroll'
+import { DataGridShell } from '@/core/DataGridShell'
 
 export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<T>) {
   const {

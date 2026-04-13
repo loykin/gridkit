@@ -2,7 +2,7 @@ import React from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Row } from '@tanstack/react-table'
-import { RowDragContext } from './RowDragContext'
+import { RowDragContext } from '@/features/reordering/RowDragContext'
 
 interface SortableRowProps {
   row: Row<any>

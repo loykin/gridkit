@@ -1,7 +1,7 @@
-import type { DataGridProps } from './types'
-import { useDataGridBase } from './hooks/useDataGridBase'
-import { DataGridPaginationBar } from './DataGridPaginationBar'
-import { DataGridShell } from './DataGridShell'
+import type { DataGridProps } from '@/types'
+import { useDataGridBase } from '@/core/hooks/useDataGridBase'
+import { DataGridPaginationBar } from '@/core/DataGridPaginationBar'
+import { DataGridShell } from '@/core/DataGridShell'
 
 export function DataGrid<T extends object>(props: DataGridProps<T>) {
   const {

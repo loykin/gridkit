@@ -14,11 +14,11 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable'
-import type { DataGridDragProps } from './types'
-import { useDataGridBase } from './hooks/useDataGridBase'
-import { DataGridShell } from './DataGridShell'
-import { RowWrapperContext } from './RowWrapperContext'
-import { SortableRow } from './features/reordering/SortableRow'
+import type { DataGridDragProps } from '@/types'
+import { useDataGridBase } from '@/core/hooks/useDataGridBase'
+import { DataGridShell } from '@/core/DataGridShell'
+import { RowWrapperContext } from '@/features/reordering/RowWrapperContext'
+import { SortableRow } from '@/features/reordering/SortableRow'
 
 export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
   const { data = [], onRowReorder, getRowId } = props

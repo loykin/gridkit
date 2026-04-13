@@ -1,7 +1,7 @@
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ColumnSizingState } from '@tanstack/react-table'
-import type { ColumnSizingMode, DataGridColumnDef } from '../types'
+import type { ColumnSizingMode, DataGridColumnDef } from '@/types'
 
 interface UseColumnSizingOptions<T extends object> {
   columns: DataGridColumnDef<T>[]

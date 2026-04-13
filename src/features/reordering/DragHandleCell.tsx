@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { GripVertical } from 'lucide-react'
-import { RowDragContext } from '../features/reordering/RowDragContext'
+import { RowDragContext } from '@/features/reordering/RowDragContext'
 
 /**
  * Drag handle cell — place in whichever column should act as the grab handle.

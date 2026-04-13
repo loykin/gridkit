@@ -15,8 +15,8 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import type { DataGridBaseProps, DataGridColumnDef } from '../types'
-import { useTableStore } from './useTableStore'
+import type { DataGridBaseProps, DataGridColumnDef } from '@/types'
+import { useTableStore } from '@/core/hooks/useTableStore'
 
 const defaultGlobalFilterFn: FilterFn<object> = (row, columnId, value: string) =>
   String(row.getValue(columnId) ?? '')

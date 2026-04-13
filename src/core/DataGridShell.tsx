@@ -1,9 +1,9 @@
 import type React from 'react'
 import type { Table, Row } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
-import { DataGridToolbar } from './DataGridToolbar'
-import { DataGridTableView } from './DataGridTableView'
-import type { TableViewConfig } from './types'
+import { DataGridToolbar } from '@/core/DataGridToolbar'
+import { DataGridTableView } from '@/core/DataGridTableView'
+import type { TableViewConfig } from '@/types'
 
 interface DataGridShellProps<T extends object> extends TableViewConfig<T> {
   wrapperRef: React.RefObject<HTMLDivElement | null>

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { ColumnDef, Row, Table } from '@tanstack/react-table'
-import type { CheckboxConfig } from './types'
+import type { CheckboxConfig } from '@/types'
 
 // ─── Indeterminate checkbox for the header ───────────────────────────────────
 
