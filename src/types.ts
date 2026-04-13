@@ -36,7 +36,7 @@ declare module '@tanstack/react-table' {
      * - 'number' : numeric range (min / max)
      * - false    : disable filter for this column
      */
-    filterType?: 'text' | 'select' | 'number' | false
+    filterType?: 'text' | 'select' | 'multi-select' | 'number' | false
     /**
      * Row action menu items. DataGrid renders a ⋯ trigger button in this
      * column and manages a single shared dropdown at the table level —

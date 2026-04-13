@@ -5,7 +5,7 @@ import { SMALL_DATA, type Employee } from '../data/employees'
 const columns: DataGridColumnDef<Employee>[] = [
   { accessorKey: 'id',         header: 'ID',         meta: { flex: 0.5, filterType: 'number' } },
   { accessorKey: 'name',       header: 'Name',       meta: { flex: 2,   filterType: 'text' } },
-  { accessorKey: 'department', header: 'Department', meta: { flex: 1.5, filterType: 'select' } },
+  { accessorKey: 'department', header: 'Department', meta: { flex: 1.5, filterType: 'multi-select' } },
   { accessorKey: 'role',       header: 'Role',       meta: { flex: 1.5, filterType: 'select' } },
   {
     accessorKey: 'salary',

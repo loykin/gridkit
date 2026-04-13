@@ -13,6 +13,7 @@ import { Menu as ActionMenu } from '@base-ui/react/menu'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollTable } from '@/core/ScrollTable'
@@ -218,6 +219,8 @@ function HeaderFilterPopover<T extends object>({ col, table }: { col: Column<T>;
             table={table}
             onSelect={() => setOpen(false)}
           />
+        ) : ft === 'multi-select' ? (
+          <MultiSelectContent col={col} table={table} />
         ) : ft === 'number' ? (
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
@@ -407,6 +410,85 @@ function SelectFilterCell<T extends object>({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// MultiSelectContent — shared checkbox list for multi-select filter
+// ─────────────────────────────────────────────────────────────────────────────
+
+function MultiSelectContent<T extends object>({ col, table }: { col: Column<T>; table: Table<T> }) {
+  const [options, setOptions] = useState<string[] | null>(null)
+  const selected = (col.getFilterValue() as string[] | undefined) ?? []
+
+  useEffect(() => {
+    const vals = new Set<string>()
+    table.getCoreRowModel().rows.forEach((row) => {
+      const v = row.getValue(col.id)
+      if (v != null) vals.add(String(v))
+    })
+    setOptions(Array.from(vals).sort())
+  }, [])
+
+  const toggle = (val: string) => {
+    const next = selected.includes(val)
+      ? selected.filter((v) => v !== val)
+      : [...selected, val]
+    col.setFilterValue(next.length > 0 ? next : undefined)
+  }
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <div className="max-h-48 overflow-y-auto flex flex-col gap-0.5">
+        {(options ?? []).map((opt) => (
+          <label
+            key={opt}
+            className="flex items-center gap-2 px-1 py-1 cursor-pointer hover:bg-muted rounded-sm text-xs select-none"
+          >
+            <Checkbox
+              checked={selected.includes(opt)}
+              onCheckedChange={() => toggle(opt)}
+              className="shrink-0"
+            />
+            <span className="truncate">{opt}</span>
+          </label>
+        ))}
+      </div>
+      {selected.length > 0 && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 text-xs mt-1"
+          onClick={() => col.setFilterValue(undefined)}
+        >
+          Clear ({selected.length})
+        </Button>
+      )}
+    </div>
+  )
+}
+
+// Multi-select trigger button for filter row mode
+function MultiSelectFilterCell<T extends object>({ col, table }: { col: Column<T>; table: Table<T> }) {
+  const selected = (col.getFilterValue() as string[] | undefined) ?? []
+  const label = selected.length > 0 ? `${selected.length} selected` : 'Filter…'
+
+  return (
+    <Popover>
+      <PopoverTrigger render={(props) => (
+        <Button
+          {...props}
+          variant={selected.length > 0 ? 'outline' : 'ghost'}
+          size="sm"
+          className="h-7 w-full justify-start text-xs font-normal"
+        >
+          <span className="truncate">{label}</span>
+        </Button>
+      )} />
+      <PopoverContent side="bottom" align="start" className="w-48">
+        <MultiSelectContent col={col} table={table} />
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // DataGridFilterRow
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -458,6 +540,8 @@ function DataGridFilterRow<T extends object>({
           >
             {ft === 'select' ? (
               <SelectFilterCell col={col} table={table} />
+            ) : ft === 'multi-select' ? (
+              <MultiSelectFilterCell col={col} table={table} />
             ) : ft === 'number' ? (
               <NumberFilterPopover col={col} />
             ) : (

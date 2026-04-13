@@ -5,7 +5,7 @@ import { SMALL_DATA, type Employee } from '../data/employees'
 const columns: DataGridColumnDef<Employee>[] = [
   { accessorKey: 'id',         header: 'ID',         meta: { flex: 0.5, filterType: 'number' } },
   { accessorKey: 'name',       header: 'Name',       meta: { flex: 2,   filterType: 'text' } },
-  { accessorKey: 'department', header: 'Department', meta: { flex: 1.5, filterType: 'select' } },
+  { accessorKey: 'department', header: 'Department', meta: { flex: 1.5, filterType: 'multi-select' } },
   { accessorKey: 'role',       header: 'Role',       meta: { flex: 1.5, filterType: 'select' } },
   {
     accessorKey: 'salary',
@@ -19,20 +19,40 @@ const columns: DataGridColumnDef<Employee>[] = [
 
 export function FilterIconTab() {
   return (
-    <section className="flex flex-col gap-2">
-      <p className="text-xs text-muted-foreground">
-        filterDisplay=&quot;icon&quot; · 필터 row 없이 헤더 셀 오른쪽 아이콘 클릭으로 필터
-      </p>
-      <DataGrid
-        data={SMALL_DATA}
-        columns={columns}
-        enableColumnFilters
-        filterDisplay="icon"
-        enableSorting
-        pageSizes={[10, 20, 50]}
-        emptyMessage="No employees found"
-        tableKey="filter-icon"
-      />
-    </section>
+    <div className="flex flex-col gap-8">
+      <section className="flex flex-col gap-2">
+        <p className="text-sm font-medium">filterDisplay=&quot;row&quot; (기본)</p>
+        <p className="text-xs text-muted-foreground">
+          text · select · multi-select · number — 헤더 아래 별도 필터 row
+        </p>
+        <DataGrid
+          data={SMALL_DATA}
+          columns={columns}
+          enableColumnFilters
+          filterDisplay="row"
+          enableSorting
+          pageSizes={[10, 20, 50]}
+          emptyMessage="No employees found"
+          tableKey="filter-row"
+        />
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <p className="text-sm font-medium">filterDisplay=&quot;icon&quot;</p>
+        <p className="text-xs text-muted-foreground">
+          text · select · multi-select · number — 헤더 셀 아이콘 클릭으로 필터
+        </p>
+        <DataGrid
+          data={SMALL_DATA}
+          columns={columns}
+          enableColumnFilters
+          filterDisplay="icon"
+          enableSorting
+          pageSizes={[10, 20, 50]}
+          emptyMessage="No employees found"
+          tableKey="filter-icon"
+        />
+      </section>
+    </div>
   )
 }

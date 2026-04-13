@@ -23,6 +23,11 @@ const defaultGlobalFilterFn: FilterFn<object> = (row, columnId, value: string) =
     .toLowerCase()
     .includes(value.toLowerCase())
 
+/** Used for meta.filterType === 'multi-select' — checks row value is in selected array */
+const multiSelectFilterFn: FilterFn<object> = (row, columnId, value: string[]) =>
+  value.includes(String(row.getValue(columnId) ?? ''))
+multiSelectFilterFn.autoRemove = (val: string[]) => !val || val.length === 0
+
 /** Used for meta.filterType === 'number' — range [min, max] */
 const betweenFilterFn: FilterFn<object> = (row, columnId, value: [string, string]) => {
   const raw = row.getValue<number>(columnId)
@@ -159,10 +164,13 @@ export function useDataGridCore<T extends object>({
       }
     : undefined
 
-  // Inject filterFn into columns that declare meta.filterType === 'number'
+  // Inject filterFn into columns that declare meta.filterType
   const enrichedColumns = columns.map((col) => {
     if (col.meta?.filterType === 'number' && !col.filterFn) {
       return { ...col, filterFn: betweenFilterFn as unknown as FilterFn<T> }
+    }
+    if (col.meta?.filterType === 'multi-select' && !col.filterFn) {
+      return { ...col, filterFn: multiSelectFilterFn as unknown as FilterFn<T> }
     }
     return col
   })
