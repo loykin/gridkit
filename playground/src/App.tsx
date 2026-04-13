@@ -8,6 +8,7 @@ import { PinningTab }    from './tabs/PinningTab'
 import { SelectionTab }  from './tabs/SelectionTab'
 import { BorderedTab }   from './tabs/BorderedTab'
 import { RowHeightTab } from './tabs/RowHeightTab'
+import { TreeTab }     from './tabs/TreeTab'
 
 const TABS = [
   { id: 'pagination',  label: 'Pagination',      content: <PaginationTab /> },
@@ -19,6 +20,7 @@ const TABS = [
   { id: 'selection',   label: 'Row Selection',   content: <SelectionTab /> },
   { id: 'bordered',    label: 'Bordered',        content: <BorderedTab /> },
   { id: 'row-height',  label: 'Row Height',      content: <RowHeightTab /> },
+  { id: 'tree',        label: 'Tree / Groups',   content: <TreeTab /> },
 ] as const
 
 type TabId = typeof TABS[number]['id']

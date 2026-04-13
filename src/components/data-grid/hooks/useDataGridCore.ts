@@ -5,9 +5,11 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
+  getExpandedRowModel,
   type ColumnFiltersState,
   type ColumnPinningState,
   type ColumnSizingState,
+  type ExpandedState,
   type FilterFn,
   type PaginationState,
   type SortingState,
@@ -52,6 +54,8 @@ interface UseDataGridCoreOptions<T extends object>
     | 'persistState'
     | 'onTableReady'
     | 'onColumnSizingChange'
+    | 'enableExpanding'
+    | 'getSubRows'
   > {
   columns: DataGridColumnDef<T>[]
   enablePagination?: boolean
@@ -85,12 +89,15 @@ export function useDataGridCore<T extends object>({
   onPageChange,
   onTableReady,
   onColumnSizingChange,
+  enableExpanding = false,
+  getSubRows,
   sizing,
   setSizing,
 }: UseDataGridCoreOptions<T>) {
   const { register, update, tables } = useTableStore()
   const persisted = tableKey ? tables[tableKey] : undefined
 
+  const [expanded, setExpanded] = useState<ExpandedState>({})
   const [sorting, setSorting] = useState<SortingState>(initialSorting ?? [])
   // Derive pinning from column meta.pin, merged with explicit initialPinning prop
   const [columnPinning] = useState<ColumnPinningState>(() => {
@@ -169,6 +176,7 @@ export function useDataGridCore<T extends object>({
       columnSizing: sizing,
       columnPinning,
       ...(enablePagination ? { pagination } : {}),
+      ...(enableExpanding ? { expanded } : {}),
     },
     manualSorting,
     manualPagination: totalCount !== undefined,
@@ -223,7 +231,21 @@ export function useDataGridCore<T extends object>({
         }
       : undefined,
 
+    onExpandedChange: enableExpanding ? setExpanded : undefined,
+    getSubRows,
+    autoResetExpanded: false,
+    // Explicitly derive canExpand from source data so depth-N rows show the
+    // toggle button even before their children have been loaded into subRows
+    // by the filtered/sorted row models.
+    getRowCanExpand: getSubRows
+      ? (row) => {
+          const subs = getSubRows(row.original as T, row.index)
+          return Array.isArray(subs) && subs.length > 0
+        }
+      : undefined,
+
     getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: enableExpanding ? getExpandedRowModel() : undefined,
     getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,

@@ -31,6 +31,8 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     initialPinning,
     columnSizingMode = 'flex',
     checkboxConfig,
+    enableExpanding,
+    getSubRows,
     tableKey,
     persistState,
     enablePagination = true,
@@ -79,6 +81,8 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     onPageChange,
     onTableReady,
     onColumnSizingChange,
+    enableExpanding,
+    getSubRows,
     sizing,
     setSizing,
   })

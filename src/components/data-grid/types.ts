@@ -135,6 +135,15 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   initialPinning?: ColumnPinningState
   columnSizingMode?: ColumnSizingMode
 
+  // Tree expanding
+  /** Enable row expansion (requires subRows in data or getSubRows) */
+  enableExpanding?: boolean
+  /**
+   * Extract sub-rows from a row for tree display.
+   * If omitted, TanStack Table looks for a 'subRows' key on each data item.
+   */
+  getSubRows?: (originalRow: T, index: number) => T[] | undefined
+
   // Selection
   checkboxConfig?: CheckboxConfig<T>
 
