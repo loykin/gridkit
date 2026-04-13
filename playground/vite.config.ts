@@ -8,7 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // Import directly from source — no rebuild needed during development
-      '@loykin/data-grid': resolve(__dirname, '../src/index.ts'),
+      '@loykin/gridkit': resolve(__dirname, '../src/index.ts'),
       '@': resolve(__dirname, '../src'),
     },
   },

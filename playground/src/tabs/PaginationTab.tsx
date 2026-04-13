@@ -1,5 +1,5 @@
-import { DataGrid, ColumnVisibilityDropdown } from '@loykin/data-grid'
-import type { DataGridColumnDef } from '@loykin/data-grid'
+import { DataGrid, ColumnVisibilityDropdown } from '@loykin/gridkit'
+import type { DataGridColumnDef } from '@loykin/gridkit'
 import { SMALL_DATA, type Employee } from '../data/employees'
 
 const columns: DataGridColumnDef<Employee>[] = [

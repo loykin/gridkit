@@ -1,5 +1,5 @@
-import { DataGrid, TreeCell } from '@loykin/data-grid'
-import type { DataGridColumnDef } from '@loykin/data-grid'
+import { DataGrid, TreeCell } from '@loykin/gridkit'
+import type { DataGridColumnDef } from '@loykin/gridkit'
 import { LayoutDashboard, Folder, Star, LayoutGrid } from 'lucide-react'
 import { DASHBOARD_TREE, type DashboardItem } from '../data/dashboards'
 

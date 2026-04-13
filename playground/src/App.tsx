@@ -36,7 +36,7 @@ export default function App() {
       {/* Header */}
       <div className="border-b border-border px-8 py-4">
         <h1 className="text-xl font-semibold">DataGrid Playground</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">@loykin/data-grid</p>
+        <p className="text-xs text-muted-foreground mt-0.5">@loykin/gridkit</p>
       </div>
 
       {/* Tab bar */}

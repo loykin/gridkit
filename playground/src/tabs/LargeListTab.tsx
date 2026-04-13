@@ -1,5 +1,5 @@
-import { DataGrid } from '@loykin/data-grid'
-import type { DataGridColumnDef } from '@loykin/data-grid'
+import { DataGrid } from '@loykin/gridkit'
+import type { DataGridColumnDef } from '@loykin/gridkit'
 import { RESOURCE_DATA, type Resource } from '../data/resources'
 
 const STATUS_STYLE: Record<Resource['status'], string> = {

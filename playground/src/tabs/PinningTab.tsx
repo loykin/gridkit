@@ -1,5 +1,5 @@
-import { DataGrid } from '@loykin/data-grid'
-import type { DataGridColumnDef } from '@loykin/data-grid'
+import { DataGrid } from '@loykin/gridkit'
+import type { DataGridColumnDef } from '@loykin/gridkit'
 import { ALL_DATA, type Employee } from '../data/employees'
 
 const columns: DataGridColumnDef<Employee>[] = [

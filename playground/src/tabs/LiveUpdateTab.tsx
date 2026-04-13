@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { DataGrid } from '@loykin/data-grid'
-import type { DataGridColumnDef } from '@loykin/data-grid'
+import { DataGrid } from '@loykin/gridkit'
+import type { DataGridColumnDef } from '@loykin/gridkit'
 import { generatePods, tickPods, type Pod } from '../data/pods'
 
 const STATUS_STYLE: Record<Pod['status'], string> = {

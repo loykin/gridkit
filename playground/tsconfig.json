@@ -8,7 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "paths": {
-      "@loykin/data-grid": ["../src/index.ts"],
+      "@loykin/gridkit": ["../src/index.ts"],
       "@/*": ["../src/*"]
     }
   },

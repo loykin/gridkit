@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { DataGridInfinity } from '@loykin/data-grid'
-import type { DataGridColumnDef } from '@loykin/data-grid'
+import { DataGridInfinity } from '@loykin/gridkit'
+import type { DataGridColumnDef } from '@loykin/gridkit'
 import { ALL_DATA, type Employee } from '../data/employees'
 
 const PAGE = 50

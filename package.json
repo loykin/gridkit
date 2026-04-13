@@ -1,5 +1,5 @@
 {
-  "name": "@loykin/data-grid",
+  "name": "@loykin/gridkit",
   "version": "0.1.0",
   "description": "A feature-rich React DataGrid component with virtualization, sorting, filtering, and pagination.",
   "type": "module",

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { DataGridDrag, DragHandleCell } from '@loykin/data-grid'
-import type { DataGridColumnDef } from '@loykin/data-grid'
+import { DataGridDrag, DragHandleCell } from '@loykin/gridkit'
+import type { DataGridColumnDef } from '@loykin/gridkit'
 import { SERVICES, type ServiceRow } from '../data/services'
 
 const STATUS_STYLE: Record<ServiceRow['status'], string> = {
