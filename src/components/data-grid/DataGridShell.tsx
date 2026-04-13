@@ -51,9 +51,7 @@ export function DataGridShell<T extends object>({
         rightFilters={rightFilters}
       />
 
-      <div className={cn('relative rounded-md min-w-0', !isSized && 'invisible')}>
-        {/* Visual border — absolute overlay so it doesn't affect layout/scroll */}
-        <div className="absolute inset-0 rounded-md border pointer-events-none z-20" />
+      <div className={cn('min-w-0', !isSized && 'invisible')}>
         <DataGridTableView
           table={table}
           rows={rows}

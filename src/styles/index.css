@@ -5,68 +5,79 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Map Tailwind color tokens → --dg-* variables.
+ * Component code uses standard Tailwind classes (bg-background, text-foreground, etc.)
+ * and those classes resolve through --dg-* — no component changes needed.
+ */
 @theme inline {
   --font-sans: sans-serif;
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
+  --color-background:          var(--dg-background);
+  --color-foreground:          var(--dg-foreground);
+  --color-popover:             var(--dg-popover);
+  --color-popover-foreground:  var(--dg-popover-foreground);
+  --color-primary:             var(--dg-primary);
+  --color-primary-foreground:  var(--dg-primary-foreground);
+  --color-secondary:           var(--dg-secondary);
+  --color-secondary-foreground: var(--dg-secondary-foreground);
+  --color-muted:               var(--dg-muted);
+  --color-muted-foreground:    var(--dg-muted-foreground);
+  --color-accent:              var(--dg-accent);
+  --color-accent-foreground:   var(--dg-accent-foreground);
+  --color-destructive:         var(--dg-destructive);
+  --color-border:              var(--dg-border);
+  --color-input:               var(--dg-input);
+  --color-ring:                var(--dg-ring);
+  --radius-sm: calc(var(--dg-radius) * 0.6);
+  --radius-md: calc(var(--dg-radius) * 0.8);
+  --radius-lg: var(--dg-radius);
 }
 
-/* Default light theme */
+/*
+ * Default light theme.
+ * --dg-* falls back to shadcn/ui variable names first, then hardcoded defaults.
+ * - shadcn/ui app  → uses the app's own CSS variables automatically
+ * - standalone app → uses the hardcoded fallback values below
+ * - custom theme   → override --dg-* directly without touching app globals
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.488 0.243 264.376);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --radius: 0rem;
+  --dg-background:           var(--background,          oklch(1 0 0));
+  --dg-foreground:           var(--foreground,          oklch(0.145 0 0));
+  --dg-popover:              var(--popover,             oklch(1 0 0));
+  --dg-popover-foreground:   var(--popover-foreground,  oklch(0.145 0 0));
+  --dg-primary:              var(--primary,             oklch(0.488 0.243 264.376));
+  --dg-primary-foreground:   var(--primary-foreground,  oklch(0.97 0.014 254.604));
+  --dg-secondary:            var(--secondary,           oklch(0.967 0.001 286.375));
+  --dg-secondary-foreground: var(--secondary-foreground, oklch(0.21 0.006 285.885));
+  --dg-muted:                var(--muted,               oklch(0.97 0 0));
+  --dg-muted-foreground:     var(--muted-foreground,    oklch(0.556 0 0));
+  --dg-accent:               var(--accent,              oklch(0.97 0 0));
+  --dg-accent-foreground:    var(--accent-foreground,   oklch(0.205 0 0));
+  --dg-destructive:          var(--destructive,         oklch(0.577 0.245 27.325));
+  --dg-border:               var(--border,              oklch(0.922 0 0));
+  --dg-input:                var(--input,               oklch(0.922 0 0));
+  --dg-ring:                 var(--ring,                oklch(0.708 0 0));
+  --dg-radius:               var(--radius,              0rem);
 }
 
-/* Default dark theme */
+/* Default dark theme fallbacks */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.424 0.199 265.638);
-  --primary-foreground: oklch(0.97 0.014 254.604);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --dg-background:           var(--background,          oklch(0.145 0 0));
+  --dg-foreground:           var(--foreground,          oklch(0.985 0 0));
+  --dg-popover:              var(--popover,             oklch(0.205 0 0));
+  --dg-popover-foreground:   var(--popover-foreground,  oklch(0.985 0 0));
+  --dg-primary:              var(--primary,             oklch(0.424 0.199 265.638));
+  --dg-primary-foreground:   var(--primary-foreground,  oklch(0.97 0.014 254.604));
+  --dg-secondary:            var(--secondary,           oklch(0.274 0.006 286.033));
+  --dg-secondary-foreground: var(--secondary-foreground, oklch(0.985 0 0));
+  --dg-muted:                var(--muted,               oklch(0.269 0 0));
+  --dg-muted-foreground:     var(--muted-foreground,    oklch(0.708 0 0));
+  --dg-accent:               var(--accent,              oklch(0.269 0 0));
+  --dg-accent-foreground:    var(--accent-foreground,   oklch(0.985 0 0));
+  --dg-destructive:          var(--destructive,         oklch(0.704 0.191 22.216));
+  --dg-border:               var(--border,              oklch(1 0 0 / 10%));
+  --dg-input:                var(--input,               oklch(1 0 0 / 15%));
+  --dg-ring:                 var(--ring,                oklch(0.556 0 0));
 }
 
 @layer base {
@@ -83,4 +94,3 @@
     }
   }
 }
-
