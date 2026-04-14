@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -17,6 +17,11 @@ import {
 } from '@tanstack/react-table'
 import type { DataGridBaseProps, DataGridColumnDef } from '@/types'
 import { useTableStore } from '@/core/hooks/useTableStore'
+import { gridKitFeatures, getDataStoreCoreRowModel } from '@/core/engine/gridKitFeatures'
+
+// Stable no-op fallbacks for useSyncExternalStore when dataStore is absent
+const _noopSubscribe = (_listener: () => void) => () => {}
+const _noopGetVersion = () => 0
 
 const defaultGlobalFilterFn: FilterFn<object> = (row, columnId, value: string) =>
   String(row.getValue(columnId) ?? '')
@@ -43,6 +48,7 @@ interface UseDataGridCoreOptions<T extends object>
   extends Pick<
     DataGridBaseProps<T>,
     | 'data'
+    | 'dataStore'
     | 'enableSorting'
     | 'initialSorting'
     | 'onSortingChange'
@@ -74,6 +80,7 @@ interface UseDataGridCoreOptions<T extends object>
 
 export function useDataGridCore<T extends object>({
   data = [],
+  dataStore,
   columns,
   enableSorting = true,
   initialSorting,
@@ -175,10 +182,24 @@ export function useDataGridCore<T extends object>({
     return col
   })
 
+  // Subscribe to DataStore changes — triggers re-render when a transaction fires.
+  // useSyncExternalStore must be called unconditionally, so noop stubs are used
+  // when dataStore is absent. The returned version is unused; we only need the
+  // subscription to cause the component to re-render so that the custom
+  // getCoreRowModel (which reads store.getVersion() internally) can re-evaluate.
+  useSyncExternalStore(
+    dataStore ? dataStore.subscribe : _noopSubscribe,
+    dataStore ? dataStore.getVersion : _noopGetVersion
+  )
+
   const table = useReactTable<T>({
-    data,
+    // When dataStore is active, data is irrelevant — getDataStoreCoreRowModel
+    // reads directly from the store. Pass empty array to satisfy the type.
+    data: dataStore ? ([] as T[]) : data,
     columns: enrichedColumns,
     getRowId,
+    _features: gridKitFeatures as any,
+    dataStore,
     state: {
       sorting,
       columnFilters: effectiveColumnFilters,
@@ -255,7 +276,8 @@ export function useDataGridCore<T extends object>({
         }
       : undefined,
 
-    getCoreRowModel: getCoreRowModel(),
+    // Phase 3: row-caching model when DataStore is present; stock model otherwise
+    getCoreRowModel: dataStore ? getDataStoreCoreRowModel<T>() : getCoreRowModel(),
     getExpandedRowModel: enableExpanding ? getExpandedRowModel() : undefined,
     getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

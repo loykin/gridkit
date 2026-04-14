@@ -12,6 +12,7 @@ import { TreeTab }        from './tabs/TreeTab'
 import { DragTab }        from './tabs/DragTab'
 import { FilterIconTab }  from './tabs/FilterIconTab'
 import { ToolbarTab }     from './tabs/ToolbarTab'
+import { DataStoreTab }  from './tabs/DataStoreTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
@@ -29,6 +30,7 @@ const TABS = [
   { id: 'drag',         label: 'Row Drag',        content: <DragTab /> },
   { id: 'filter-icon',  label: 'Filter Icon',     content: <FilterIconTab /> },
   { id: 'toolbar',      label: 'Toolbar',         content: <ToolbarTab /> },
+  { id: 'data-store',  label: 'DataStore',       content: <DataStoreTab /> },
 ] as const
 
 type TabId = typeof TABS[number]['id']

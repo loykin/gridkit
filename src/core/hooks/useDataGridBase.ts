@@ -18,6 +18,7 @@ interface UseDataGridBaseOptions<T extends object> extends DataGridBaseProps<T> 
 export function useDataGridBase<T extends object>(options: UseDataGridBaseOptions<T>) {
   const {
     data = [],
+    dataStore,
     columns,
     enableSorting = true,
     initialSorting,
@@ -63,6 +64,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
 
   const { table } = useDataGridCore({
     data,
+    dataStore,
     columns: columnsWithCheckbox,
     enableSorting,
     initialSorting,

@@ -1,4 +1,3 @@
-import type React from 'react'
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -9,48 +8,12 @@ import type {
   Table,
   VisibilityState,
 } from '@tanstack/react-table'
+import type { DataStore } from './core/engine/DataStore'
 
-// Augment TanStack Table ColumnMeta with our custom fields
-declare module '@tanstack/react-table' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData, TValue> {
-    /** CSS flex ratio — remaining container width distributed proportionally */
-    flex?: number
-    /** Auto-fit to content width via canvas text measurement */
-    autoSize?: boolean
-    minWidth?: number
-    maxWidth?: number
-    align?: 'left' | 'center' | 'right'
-    /** Pin this column to the left or right — fixed at column definition level */
-    pin?: 'left' | 'right'
-    /**
-     * Allow cell content to wrap to multiple lines.
-     * Row height adjusts automatically via the virtualizer's measureElement.
-     * When false (default) content is truncated with an ellipsis.
-     */
-    wrap?: boolean
-    /**
-     * Column-level filter type (renders filter row under the header).
-     * - 'text'   : free-text contains match (default when enableColumnFilters=true)
-     * - 'select' : dropdown of unique values from current data
-     * - 'number' : numeric range (min / max)
-     * - false    : disable filter for this column
-     */
-    filterType?: 'text' | 'select' | 'multi-select' | 'number' | false
-    /**
-     * Row action menu items. DataGrid renders a ⋯ trigger button in this
-     * column and manages a single shared dropdown at the table level —
-     * no per-row dropdown instances, popup survives data refreshes.
-     */
-    actions?: (row: TData) => Array<{
-      label: string
-      onClick: (row: TData) => void
-      variant?: 'default' | 'destructive'
-      disabled?: boolean
-      icon?: React.ReactNode
-    }>
-  }
-}
+// ColumnMeta and Table augmentations live in the Feature files:
+//   src/core/engine/features/ColumnFlexFeature.ts  — flex, autoSize, align, etc.
+//   src/core/engine/features/RowActionsFeature.ts  — actions
+//   src/core/engine/features/DataStoreFeature.ts   — applyTransaction, getRowNodeById
 
 export type DataGridColumnDef<T extends object> = ColumnDef<T, unknown>
 
@@ -118,6 +81,12 @@ export interface TableViewConfig<T extends object> {
 
 export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> {
   data?: T[]
+  /**
+   * Map-based external store for real-time / high-frequency updates.
+   * Use with useDataStore() and table.applyTransaction().
+   * Mutually exclusive with the `data` prop — set one or the other.
+   */
+  dataStore?: DataStore<T>
   columns: DataGridColumnDef<T>[]
   error?: Error | null
 
