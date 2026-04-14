@@ -749,7 +749,7 @@ function DataGridFlexBody<T extends object>({
 
   if (isLoading) {
     return (
-      <div role="rowgroup" style={{ display: 'block' }}>
+      <div role="rowgroup" style={{ display: 'block' }} className="[&>div:last-child]:border-b-0">
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             role="row"
@@ -791,7 +791,7 @@ function DataGridFlexBody<T extends object>({
   }
 
   return (
-    <div role="rowgroup" style={{ display: 'block' }}>
+    <div role="rowgroup" style={{ display: 'block' }} className="[&>div:last-child]:border-b-0">
       {rows.map((row) => {
         const bodyRow = (
           <DataGridBodyRow
