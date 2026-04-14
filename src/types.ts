@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -42,6 +43,13 @@ export interface CheckboxConfig<T extends object> {
 export interface TableViewConfig<T extends object> {
   isLoading?: boolean
   emptyMessage?: string
+  /**
+   * No data일 때 body 영역에 표시할 커스텀 UI.
+   * 제공 시 emptyMessage보다 우선 적용됨.
+   */
+  emptyContent?: ReactNode
+  /** 테이블 헤더 표시 여부. 기본값 true. */
+  showHeader?: boolean
   onRowClick?: (row: T) => void
   rowCursor?: boolean
   enableColumnResizing?: boolean

@@ -722,7 +722,7 @@ function DataGridVirtualBody<T extends object>({
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface DataGridFlexBodyProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'isLoading' | 'emptyMessage' | 'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'> {
+  extends Pick<TableViewConfig<T>, 'isLoading' | 'emptyMessage' | 'emptyContent' | 'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'> {
   rows: Row<T>[]
   table: Table<T>
   visibleLeafColumns: Column<T>[]
@@ -736,6 +736,7 @@ function DataGridFlexBody<T extends object>({
   visibleLeafColumns,
   isLoading,
   emptyMessage,
+  emptyContent,
   onRowClick,
   rowCursor,
   bordered,
@@ -782,8 +783,12 @@ function DataGridFlexBody<T extends object>({
     return (
       <div role="rowgroup" style={{ display: 'block' }}>
         <div role="row" className="flex w-full">
-          <div role="gridcell" className="flex-1 py-12 text-center text-muted-foreground text-sm">
-            {emptyMessage}
+          <div role="gridcell" className="flex-1">
+            {emptyContent ?? (
+              <div className="py-12 text-center text-muted-foreground text-sm">
+                {emptyMessage}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -825,6 +830,8 @@ export function DataGridTableView<T extends object>({
   containerRef,
   isLoading,
   emptyMessage = 'No data',
+  emptyContent,
+  showHeader = true,
   onRowClick,
   rowCursor,
   enableColumnResizing = true,
@@ -923,33 +930,35 @@ export function DataGridTableView<T extends object>({
         style={{ position: 'relative', width: '100%', minWidth: 0, isolation: 'isolate' }}
         className="rounded-md border border-border"
       >
-        {/* Header panel — overflow:hidden, scrollLeft mirrors body */}
-        <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className="bg-muted">
-          <div style={{ width: innerWidth, minWidth: '100%' }}>
-            {headerGroups.map((headerGroup) => (
-              <DataGridHeaderRow
-                key={headerGroup.id}
-                headerGroup={headerGroup}
-                table={table}
-                enableColumnResizing={enableColumnResizing}
-                enableColumnFilters={enableColumnFilters}
-                filterDisplay={filterDisplay}
-                virtual={virtual}
-                bordered={bordered}
-                tableWidthMode={tableWidthMode}
-              />
-            ))}
-            {enableColumnFilters && filterDisplay !== 'icon' && (
-              <DataGridFilterRow
-                visibleLeafColumns={visibleLeafColumns}
-                table={table}
-                virtual={virtual}
-                bordered={bordered}
-                tableWidthMode={tableWidthMode}
-              />
-            )}
+        {/* Header panel — conditionally rendered, overflow:hidden, scrollLeft mirrors body */}
+        {showHeader && (
+          <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className="bg-muted">
+            <div style={{ width: innerWidth, minWidth: '100%' }}>
+              {headerGroups.map((headerGroup) => (
+                <DataGridHeaderRow
+                  key={headerGroup.id}
+                  headerGroup={headerGroup}
+                  table={table}
+                  enableColumnResizing={enableColumnResizing}
+                  enableColumnFilters={enableColumnFilters}
+                  filterDisplay={filterDisplay}
+                  virtual={virtual}
+                  bordered={bordered}
+                  tableWidthMode={tableWidthMode}
+                />
+              ))}
+              {enableColumnFilters && filterDisplay !== 'icon' && (
+                <DataGridFilterRow
+                  visibleLeafColumns={visibleLeafColumns}
+                  table={table}
+                  virtual={virtual}
+                  bordered={bordered}
+                  tableWidthMode={tableWidthMode}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Body scroll container + scrollbars */}
         <div style={bodyWrapperStyle}>
@@ -974,6 +983,7 @@ export function DataGridTableView<T extends object>({
                   visibleLeafColumns={visibleLeafColumns}
                   isLoading={isLoading}
                   emptyMessage={emptyMessage}
+                  emptyContent={emptyContent}
                   onRowClick={onRowClick}
                   rowCursor={rowCursor}
                   bordered={bordered}
