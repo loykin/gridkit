@@ -62,7 +62,7 @@ interface UseDataGridCoreOptions<T extends object>
     | 'visibilityState'
     | 'initialPinning'
     | 'tableKey'
-    | 'persistState'
+    | 'syncState'
     | 'onTableReady'
     | 'onColumnSizingChange'
     | 'enableExpanding'
@@ -95,7 +95,7 @@ export function useDataGridCore<T extends object>({
   visibilityState,
   initialPinning,
   tableKey,
-  persistState = false,
+  syncState = false,
   enablePagination = true,
   paginationConfig,
   totalCount,
@@ -146,7 +146,7 @@ export function useDataGridCore<T extends object>({
 
   // Register for state persistence
   useEffect(() => {
-    if (tableKey && persistState) {
+    if (tableKey && syncState) {
       register(tableKey, {
         pagination: {
           pageIndex: paginationConfig?.initialPageIndex ?? 0,
@@ -154,7 +154,7 @@ export function useDataGridCore<T extends object>({
         },
       })
     }
-  }, [tableKey, persistState, register, paginationConfig])
+  }, [tableKey, syncState, register, paginationConfig])
 
   const effectiveGlobalFilter = externalGlobalFilter ?? internalGlobal
   const effectiveColumnFilters = externalColumnFilters ?? internalFilters
@@ -256,7 +256,7 @@ export function useDataGridCore<T extends object>({
           setPagination((prev) => {
             const next =
               typeof updater === 'function' ? updater(prev) : updater
-            if (tableKey && persistState) update(tableKey, { pagination: next })
+            if (tableKey && syncState) update(tableKey, { pagination: next })
             onPageChange?.(next.pageIndex, next.pageSize)
             return next
           })
@@ -299,9 +299,9 @@ export function useDataGridCore<T extends object>({
         setInternalGlobal(value)
         onGlobalFilterChange?.(value)
       }
-      if (tableKey && persistState) update(tableKey, { searchTerm: value })
+      if (tableKey && syncState) update(tableKey, { searchTerm: value })
     },
-    [table, externalGlobalFilter, onGlobalFilterChange, tableKey, persistState, update]
+    [table, externalGlobalFilter, onGlobalFilterChange, tableKey, syncState, update]
   )
 
   useEffect(() => {

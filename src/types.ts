@@ -11,10 +11,11 @@ import type {
 } from '@tanstack/react-table'
 import type { DataStore } from './core/engine/DataStore'
 
-// ColumnMeta and Table augmentations live in the Feature files:
-//   src/core/engine/features/ColumnFlexFeature.ts  — flex, autoSize, align, etc.
-//   src/core/engine/features/RowActionsFeature.ts  — actions
-//   src/core/engine/features/DataStoreFeature.ts   — applyTransaction, getRowNodeById
+// ColumnMeta and Table augmentations live in the extension files:
+//   src/core/engine/extensions/ColumnFlexFeature.ts    — flex, autoSize, align, wrap, etc.
+//   src/core/engine/extensions/ColumnFilterExtension.ts — filterType
+//   src/core/engine/extensions/RowActionsFeature.ts    — actions
+//   src/core/engine/extensions/DataStoreFeature.ts     — applyTransaction, getRowNodeById
 
 export type DataGridColumnDef<T extends object> = ColumnDef<T, unknown>
 
@@ -132,7 +133,12 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
 
   // State persistence (Zustand)
   tableKey?: string
-  persistState?: boolean
+  /**
+   * Sync table state (pagination, search) to the in-memory Zustand store so it
+   * survives re-renders within the same session. Requires tableKey to be set.
+   * Note: in-memory only — does not persist across page reloads.
+   */
+  syncState?: boolean
 
   // Callbacks
   onTableReady?: (table: Table<T>) => void

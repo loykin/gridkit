@@ -24,14 +24,6 @@ declare module '@tanstack/react-table' {
      * When false (default) content is truncated with an ellipsis.
      */
     wrap?: boolean
-    /**
-     * Column-level filter type (renders filter row under the header).
-     * - 'text'   : free-text contains match (default when enableColumnFilters=true)
-     * - 'select' : dropdown of unique values from current data
-     * - 'number' : numeric range (min / max)
-     * - false    : disable filter for this column
-     */
-    filterType?: 'text' | 'select' | 'multi-select' | 'number' | false
   }
 
   interface Table<TData extends RowData> {

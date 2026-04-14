@@ -1,13 +1,16 @@
-export { DataStoreFeature, getDataStoreCoreRowModel } from './features/DataStoreFeature'
-export { ColumnFlexFeature } from './features/ColumnFlexFeature'
-export { RowActionsFeature } from './features/RowActionsFeature'
+export { DataStoreFeature, getDataStoreCoreRowModel } from './extensions/DataStoreFeature'
+export { ColumnFlexFeature } from './extensions/ColumnFlexFeature'
+export { ColumnFilterExtension } from './extensions/ColumnFilterExtension'
+export { RowActionsFeature } from './extensions/RowActionsFeature'
 
-import { DataStoreFeature } from './features/DataStoreFeature'
-import { ColumnFlexFeature } from './features/ColumnFlexFeature'
-import { RowActionsFeature } from './features/RowActionsFeature'
+import { DataStoreFeature } from './extensions/DataStoreFeature'
+import { ColumnFlexFeature } from './extensions/ColumnFlexFeature'
+import { ColumnFilterExtension } from './extensions/ColumnFilterExtension'
+import { RowActionsFeature } from './extensions/RowActionsFeature'
 
 export const gridKitFeatures = [
   DataStoreFeature,
   ColumnFlexFeature,
+  ColumnFilterExtension,
   RowActionsFeature,
 ] as const
