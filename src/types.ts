@@ -41,6 +41,25 @@ export interface CheckboxConfig<T extends object> {
  * DataGridBaseProps and DataGridTableViewProps both extend this
  * so these are declared exactly once.
  */
+/**
+ * Slot-based class injection for DataGrid elements.
+ * Each key targets a specific part of the table structure.
+ * User-supplied classes are merged after library defaults via cn(),
+ * so Tailwind classes here will take precedence over library defaults.
+ */
+export interface DataGridClassNames {
+  /** Outermost wrapper div (border, rounded-md) */
+  container?: string
+  /** Header panel div (bg-muted, overflow:hidden) */
+  header?: string
+  /** Individual header cell div */
+  headerCell?: string
+  /** Body row div */
+  row?: string
+  /** Body cell div */
+  cell?: string
+}
+
 export interface TableViewConfig<T extends object> {
   isLoading?: boolean
   emptyMessage?: string
@@ -86,6 +105,8 @@ export interface TableViewConfig<T extends object> {
   estimateRowHeight?: number
   /** Rows to render outside the visible area (virtualizer overscan, default: 10) */
   overscan?: number
+  /** Slot-based class injection for individual table elements */
+  classNames?: DataGridClassNames
 }
 
 export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> {

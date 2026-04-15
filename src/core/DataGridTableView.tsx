@@ -34,7 +34,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ScrollTable } from '@/core/ScrollTable'
 import { CustomScrollbar } from '@/core/CustomScrollbar'
 import { RowWrapperContext } from '@/features/reordering/RowWrapperContext'
-import type { TableViewConfig, TableWidthMode } from '@/types'
+import type { DataGridClassNames, TableViewConfig, TableWidthMode } from '@/types'
 import { VIRTUAL_THRESHOLD } from '@/core/hooks/useColumnSizing'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,6 +104,7 @@ interface DataGridHeaderRowProps<T extends object> extends Pick<
   table: Table<T>
   virtual: boolean
   tableWidthMode?: TableWidthMode
+  classNames?: DataGridClassNames
 }
 
 function DataGridHeaderRow<T extends object>({
@@ -115,6 +116,7 @@ function DataGridHeaderRow<T extends object>({
   tableWidthMode = 'spacer',
   enableColumnFilters,
   filterDisplay = 'row',
+  classNames,
 }: DataGridHeaderRowProps<T>) {
   const headers = headerGroup.headers
   return (
@@ -140,6 +142,7 @@ function DataGridHeaderRow<T extends object>({
               bordered && 'border-r border-border',
               edge === 'left-edge' && 'shadow-[1px_0_0_0_hsl(var(--border))]',
               edge === 'right-edge' && 'shadow-[-1px_0_0_0_hsl(var(--border))]',
+              classNames?.headerCell,
             )}
             style={
               virtual
@@ -660,6 +663,7 @@ interface DataGridBodyRowProps<T extends object> extends Pick<
   fillLast?: boolean
   rowHeight?: number
   onActionTrigger?: (row: T, el: HTMLElement) => void
+  classNames?: DataGridClassNames
 }
 
 function DataGridBodyRow<T extends object>({
@@ -675,6 +679,7 @@ function DataGridBodyRow<T extends object>({
   bordered = false,
   rowHeight,
   onActionTrigger,
+  classNames,
 }: DataGridBodyRowProps<T>) {
   const visibleCells = row.getVisibleCells()
   return (
@@ -686,6 +691,7 @@ function DataGridBodyRow<T extends object>({
       className={cn(
         'flex w-full border-b border-border transition-colors',
         onRowClick || rowCursor ? 'cursor-pointer hover:bg-muted/50' : 'hover:bg-muted/30',
+        classNames?.row,
       )}
       style={{ minHeight: rowHeight, ...style }}
     >
@@ -707,6 +713,7 @@ function DataGridBodyRow<T extends object>({
               bordered && 'border-r border-border',
               edge === 'left-edge' && 'shadow-[1px_0_0_0_hsl(var(--border))]',
               edge === 'right-edge' && 'shadow-[-1px_0_0_0_hsl(var(--border))]',
+              classNames?.cell,
             )}
             style={{ ...colStyle(cell.column), ...(isFillCell && { flex: 1, width: 'auto' }) }}
           >
@@ -752,6 +759,7 @@ interface DataGridVirtualBodyProps<T extends object> extends Pick<
   rowVirtualizer: Virtualizer<HTMLDivElement, Element>
   onActionTrigger?: (row: T, el: HTMLElement) => void
   tableWidthMode?: TableWidthMode
+  classNames?: DataGridClassNames
 }
 
 function DataGridVirtualBody<T extends object>({
@@ -764,6 +772,7 @@ function DataGridVirtualBody<T extends object>({
   rowHeight,
   onActionTrigger,
   tableWidthMode = 'spacer',
+  classNames,
 }: DataGridVirtualBodyProps<T>) {
   const virtualItems = rowVirtualizer.getVirtualItems()
   const totalSize = rowVirtualizer.getTotalSize()
@@ -790,6 +799,7 @@ function DataGridVirtualBody<T extends object>({
             }}
             onActionTrigger={onActionTrigger}
             fillLast={tableWidthMode === 'fill-last'}
+            classNames={classNames}
           />
         )
       })}
@@ -816,6 +826,7 @@ interface DataGridFlexBodyProps<T extends object> extends Pick<
   visibleLeafColumns: Column<T>[]
   onActionTrigger?: (row: T, el: HTMLElement) => void
   tableWidthMode?: TableWidthMode
+  classNames?: DataGridClassNames
 }
 
 function DataGridFlexBody<T extends object>({
@@ -831,6 +842,7 @@ function DataGridFlexBody<T extends object>({
   rowHeight,
   onActionTrigger,
   tableWidthMode = 'spacer',
+  classNames,
 }: DataGridFlexBodyProps<T>) {
   const showSpacer = tableWidthMode === 'spacer'
   const fillLast = tableWidthMode === 'fill-last'
@@ -901,6 +913,7 @@ function DataGridFlexBody<T extends object>({
             showSpacer={showSpacer}
             fillLast={fillLast}
             onActionTrigger={onActionTrigger}
+            classNames={classNames}
           />
         )
         if (RowWrapper) {
@@ -942,6 +955,7 @@ export function DataGridTableView<T extends object>({
   isFetchingNextPage,
   bordered = false,
   onMeasureColumns,
+  classNames,
 }: DataGridTableViewProps<T>) {
   const effectiveEstimate = estimateRowHeight ?? rowHeight ?? 33
 
@@ -1030,11 +1044,11 @@ export function DataGridTableView<T extends object>({
           // which is required since the outer div's height is determined by its children.
           contain: 'layout paint',
         }}
-        className="rounded-md border border-border"
+        className={cn('rounded-md border border-border', classNames?.container)}
       >
         {/* Header panel — conditionally rendered, overflow:hidden, scrollLeft mirrors body */}
         {showHeader && (
-          <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className="bg-muted">
+          <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className={cn('bg-muted', classNames?.header)}>
             <div style={{ width: innerWidth, minWidth: '100%' }}>
               {headerGroups.map((headerGroup) => (
                 <DataGridHeaderRow
@@ -1047,6 +1061,7 @@ export function DataGridTableView<T extends object>({
                   virtual={virtual}
                   bordered={bordered}
                   tableWidthMode={tableWidthMode}
+                  classNames={classNames}
                 />
               ))}
               {enableColumnFilters && filterDisplay !== 'icon' && (
@@ -1082,6 +1097,7 @@ export function DataGridTableView<T extends object>({
                   rowHeight={rowHeight}
                   onActionTrigger={actionCol ? handleActionTrigger : undefined}
                   tableWidthMode={tableWidthMode}
+                  classNames={classNames}
                 />
               ) : (
                 <DataGridFlexBody
@@ -1097,6 +1113,7 @@ export function DataGridTableView<T extends object>({
                   rowHeight={rowHeight}
                   onActionTrigger={actionCol ? handleActionTrigger : undefined}
                   tableWidthMode={tableWidthMode}
+                  classNames={classNames}
                 />
               )}
             </ScrollTable>
