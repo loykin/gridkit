@@ -234,8 +234,8 @@ function HeaderFilterPopover<T extends object>({
   table: Table<T>
 }) {
   const [open, setOpen] = useState(false)
-  // useCallback으로 안정적인 ref 참조 유지 — 인라인 화살표 함수는 re-render마다
-  // 새 참조가 생성돼 React가 매번 null→el 순으로 호출, focus()가 반복 실행됨
+  // Stable ref callback via useCallback — an inline arrow would create a new reference
+  // on every render, causing React to call it as null→el each time, re-triggering focus()
   const focusRef = useCallback((el: HTMLInputElement | null) => {
     el?.focus({ preventScroll: true })
   }, [])

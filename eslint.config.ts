@@ -11,17 +11,17 @@ export default tseslint.config(
     },
     rules: {
       // ── React Hooks (classic rules only) ─────────────────────────────────────
-      // React Compiler 전용 규칙(refs, immutability, set-state-in-effect 등)은
-      // 라이브러리에서 쓰는 의도적 패턴(ref-to-latest-value, useLayoutEffect 초기 sync)을
-      // false positive로 잡으므로 비활성화.
+      // React Compiler-specific rules (refs, immutability, set-state-in-effect, etc.)
+      // produce false positives for intentional library patterns such as
+      // ref-to-latest-value and synchronous state init in useLayoutEffect.
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
 
       // ── TypeScript ────────────────────────────────────────────────────────────
-      // any 원칙적 금지 — TanStack 내부 필드 접근 등 불가피한 곳엔 disable 주석 사용
+      // Disallow `any` — use eslint-disable-next-line where unavoidable (e.g. TanStack internals)
       '@typescript-eslint/no-explicit-any': 'error',
 
-      // 미사용 변수 — _ prefix 허용 (TanStack 제네릭 파라미터 등)
+      // Unused variables allowed when prefixed with _ (e.g. TanStack generic params)
       '@typescript-eslint/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
