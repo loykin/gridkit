@@ -664,6 +664,7 @@ interface DataGridBodyRowProps<T extends object> extends Pick<
   rowHeight?: number
   onActionTrigger?: (row: T, el: HTMLElement) => void
   classNames?: DataGridClassNames
+  isLastRow?: boolean
 }
 
 function DataGridBodyRow<T extends object>({
@@ -680,6 +681,7 @@ function DataGridBodyRow<T extends object>({
   rowHeight,
   onActionTrigger,
   classNames,
+  isLastRow = false,
 }: DataGridBodyRowProps<T>) {
   const visibleCells = row.getVisibleCells()
   return (
@@ -689,7 +691,8 @@ function DataGridBodyRow<T extends object>({
       ref={measureRef}
       onClick={onRowClick ? () => onRowClick(row.original) : undefined}
       className={cn(
-        'flex w-full border-b border-border transition-colors',
+        'flex w-full transition-colors',
+        !isLastRow && 'border-b border-border',
         onRowClick || rowCursor ? 'cursor-pointer hover:bg-muted/50' : 'hover:bg-muted/30',
         classNames?.row,
       )}
@@ -800,6 +803,7 @@ function DataGridVirtualBody<T extends object>({
             onActionTrigger={onActionTrigger}
             fillLast={tableWidthMode === 'fill-last'}
             classNames={classNames}
+            isLastRow={virtualRow.index === rows.length - 1}
           />
         )
       })}
@@ -1020,6 +1024,7 @@ export function DataGridTableView<T extends object>({
   const bodyStyle: React.CSSProperties = {
     flex: 1,
     minHeight: 0,
+    height: '100%',
     overflow: 'auto',
   }
 
@@ -1083,7 +1088,7 @@ export function DataGridTableView<T extends object>({
             ref={bodyScrollRef}
             style={bodyStyle}
             onScroll={syncScroll}
-            className="scrollbar-none"
+            className="scrollbar-none bg-background"
           >
             <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
               {virtual ? (
@@ -1116,6 +1121,37 @@ export function DataGridTableView<T extends object>({
                   classNames={classNames}
                 />
               )}
+              {/* Fill row: expands to remaining space when rows don't fill tableHeight.
+                  Uses a CSS gradient for the top separator — gradient is invisible when
+                  height=0 (rows overflow), so no double border in paginated/full cases. */}
+              {!virtual && !isLoading && rows.length > 0 && (() => {
+                const fillLast = tableWidthMode === 'fill-last'
+                const showSpacer = tableWidthMode === 'spacer'
+                return (
+                  <div
+                    className="flex flex-1"
+                    style={{
+                      background:
+                        'linear-gradient(to bottom, var(--color-border) 0px, var(--color-border) 1px, transparent 1px)',
+                    }}
+                  >
+                    {visibleLeafColumns.map((col, colIdx) => {
+                      const isLast = colIdx === visibleLeafColumns.length - 1
+                      return (
+                        <div
+                          key={col.id}
+                          className={cn(bordered && 'border-r border-border')}
+                          style={{
+                            ...colStyle(col),
+                            ...(fillLast && isLast && { flex: 1, width: 'auto' }),
+                          }}
+                        />
+                      )
+                    })}
+                    {showSpacer && <div style={{ flex: 1, minWidth: 0 }} />}
+                  </div>
+                )
+              })()}
             </ScrollTable>
 
             {loadMoreRef && (

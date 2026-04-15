@@ -125,12 +125,12 @@ export function EmptyStateTab() {
           {showHeader ? '헤더 표시' : '헤더 숨김 (header-less 테이블)'}
         </p>
         <DataGrid
-          data={hasData ? ALL_DATA.slice(0, 8) : []}
+          data={hasData ? ALL_DATA.slice(0, 3) : []}
           columns={columns}
           showHeader={showHeader}
           emptyMessage="No employees"
           emptyContent={emptyMode === 'custom' ? customEmptyContent : undefined}
-          tableHeight={showHeader ? undefined : 'auto'}
+          tableHeight={200}
           tableKey="empty-state-demo"
         />
       </div>

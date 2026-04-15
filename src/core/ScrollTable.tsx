@@ -12,11 +12,12 @@ import * as React from 'react'
  * when both were inside a single overflow:auto container.
  */
 const ScrollTable = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+  ({ className, style, ...props }, ref) => (
     <div
       ref={ref}
       role="table"
       className={['text-sm', className].filter(Boolean).join(' ')}
+      style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', ...style }}
       {...props}
     />
   ),
