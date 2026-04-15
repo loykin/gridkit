@@ -22,4 +22,5 @@ export type {
   CheckboxConfig,
   TableViewConfig,
   DataGridBaseProps,
+  DataGridClassNames,
 } from './types'

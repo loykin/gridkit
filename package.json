@@ -1,6 +1,6 @@
 {
   "name": "@loykin/gridkit",
-  "version": "0.1.0",
+  "version": "0.0.1-beta.1",
   "description": "A feature-rich React DataGrid component with virtualization, sorting, filtering, and pagination.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -12,13 +12,16 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./styles": "./dist/styles.css"
+    "./styles": {
+      "types": "./dist/styles.d.ts",
+      "default": "./dist/styles.css"
+    }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup && node_modules/.bin/tailwindcss -i src/styles/index.css -o dist/styles.css --minify",
+    "build": "tsup && node_modules/.bin/tailwindcss -i src/styles/index.css -o dist/styles.css --minify && echo 'declare const styles: string; export default styles;' > dist/styles.d.ts",
     "build:js": "tsup",
     "build:css": "node_modules/.bin/tailwindcss -i src/styles/index.css -o dist/styles.css",
     "dev": "concurrently \"tsup --watch\" \"pnpm --filter data-grid-playground dev\"",
