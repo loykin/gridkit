@@ -750,72 +750,10 @@ function DataGridBodyRow<T extends object>({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DataGridVirtualBody
+// DataGridBody (unified flex + virtual)
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface DataGridVirtualBodyProps<T extends object> extends Pick<
-  TableViewConfig<T>,
-  'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'
-> {
-  rows: Row<T>[]
-  table: Table<T>
-  rowVirtualizer: Virtualizer<HTMLDivElement, Element>
-  onActionTrigger?: (row: T, el: HTMLElement) => void
-  tableWidthMode?: TableWidthMode
-  classNames?: DataGridClassNames
-}
-
-function DataGridVirtualBody<T extends object>({
-  rows,
-  table,
-  rowVirtualizer,
-  onRowClick,
-  rowCursor,
-  bordered,
-  rowHeight,
-  onActionTrigger,
-  tableWidthMode = 'spacer',
-  classNames,
-}: DataGridVirtualBodyProps<T>) {
-  const virtualItems = rowVirtualizer.getVirtualItems()
-  const totalSize = rowVirtualizer.getTotalSize()
-
-  return (
-    <div role="rowgroup" style={{ display: 'block', height: totalSize, position: 'relative' }}>
-      {virtualItems.map((virtualRow) => {
-        const row = rows[virtualRow.index]!
-        return (
-          <DataGridBodyRow
-            key={row.id}
-            row={row}
-            table={table}
-            onRowClick={onRowClick}
-            rowCursor={rowCursor}
-            bordered={bordered}
-            rowHeight={rowHeight}
-            dataIndex={virtualRow.index}
-            measureRef={rowVirtualizer.measureElement}
-            style={{
-              position: 'absolute',
-              width: '100%',
-              transform: `translateY(${virtualRow.start}px)`,
-            }}
-            onActionTrigger={onActionTrigger}
-            fillLast={tableWidthMode === 'fill-last'}
-            classNames={classNames}
-            isLastRow={virtualRow.index === rows.length - 1}
-          />
-        )
-      })}
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// DataGridFlexBody
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface DataGridFlexBodyProps<T extends object> extends Pick<
+interface DataGridBodyProps<T extends object> extends Pick<
   TableViewConfig<T>,
   | 'isLoading'
   | 'emptyMessage'
@@ -828,15 +766,17 @@ interface DataGridFlexBodyProps<T extends object> extends Pick<
   rows: Row<T>[]
   table: Table<T>
   visibleLeafColumns: Column<T>[]
+  rowVirtualizer?: Virtualizer<HTMLDivElement, Element>
   onActionTrigger?: (row: T, el: HTMLElement) => void
   tableWidthMode?: TableWidthMode
   classNames?: DataGridClassNames
 }
 
-function DataGridFlexBody<T extends object>({
+function DataGridBody<T extends object>({
   rows,
   table,
   visibleLeafColumns,
+  rowVirtualizer,
   isLoading,
   emptyMessage,
   emptyContent,
@@ -847,10 +787,11 @@ function DataGridFlexBody<T extends object>({
   onActionTrigger,
   tableWidthMode = 'spacer',
   classNames,
-}: DataGridFlexBodyProps<T>) {
+}: DataGridBodyProps<T>) {
   const showSpacer = tableWidthMode === 'spacer'
   const fillLast = tableWidthMode === 'fill-last'
   const RowWrapper = useContext(RowWrapperContext)
+  const virtual = !!rowVirtualizer
 
   if (isLoading) {
     return (
@@ -903,34 +844,89 @@ function DataGridFlexBody<T extends object>({
     )
   }
 
+  const virtualItems = rowVirtualizer?.getVirtualItems() ?? []
+  const totalSize = rowVirtualizer?.getTotalSize() ?? 0
+
+  const rowgroupStyle: React.CSSProperties = virtual
+    ? { display: 'block', height: totalSize, position: 'relative' }
+    : { display: 'block' }
+
+  const rowEntries = virtual
+    ? virtualItems.map((vRow) => ({
+        row: rows[vRow.index]!,
+        index: vRow.index,
+        rowStyle: { position: 'absolute' as const, width: '100%', transform: `translateY(${vRow.start}px)` },
+        dataIndex: vRow.index,
+        measureRef: rowVirtualizer!.measureElement,
+      }))
+    : rows.map((row, index) => ({
+        row,
+        index,
+        rowStyle: undefined as React.CSSProperties | undefined,
+        dataIndex: undefined as number | undefined,
+        measureRef: undefined as ((node: Element | null) => void) | undefined,
+      }))
+
   return (
-    <div role="rowgroup" style={{ display: 'block' }}>
-      {rows.map((row, index) => {
-        const bodyRow = (
-          <DataGridBodyRow
-            row={row}
-            table={table}
-            onRowClick={onRowClick}
-            rowCursor={rowCursor}
-            bordered={bordered}
-            rowHeight={rowHeight}
-            showSpacer={showSpacer}
-            fillLast={fillLast}
-            onActionTrigger={onActionTrigger}
-            classNames={classNames}
-            isLastRow={index === rows.length - 1}
-          />
-        )
-        if (RowWrapper) {
-          return (
-            <RowWrapper key={row.id} row={row}>
-              {bodyRow}
-            </RowWrapper>
+    <>
+      <div role="rowgroup" style={rowgroupStyle}>
+        {rowEntries.map(({ row, index, rowStyle, dataIndex, measureRef }) => {
+          const bodyRow = (
+            <DataGridBodyRow
+              key={row.id}
+              row={row}
+              table={table}
+              onRowClick={onRowClick}
+              rowCursor={rowCursor}
+              bordered={bordered}
+              rowHeight={rowHeight}
+              showSpacer={showSpacer}
+              fillLast={fillLast}
+              onActionTrigger={onActionTrigger}
+              classNames={classNames}
+              isLastRow={index === rows.length - 1}
+              style={rowStyle}
+              dataIndex={dataIndex}
+              measureRef={measureRef}
+            />
           )
-        }
-        return <React.Fragment key={row.id}>{bodyRow}</React.Fragment>
-      })}
-    </div>
+          if (!virtual && RowWrapper) {
+            return (
+              <RowWrapper key={row.id} row={row}>
+                {bodyRow}
+              </RowWrapper>
+            )
+          }
+          return <React.Fragment key={row.id}>{bodyRow}</React.Fragment>
+        })}
+      </div>
+      {/* Fill row: expands into remaining space when rows don't fill tableHeight.
+          gradient is invisible at height=0 (rows overflow), preventing double border. */}
+      {!virtual && (
+        <div
+          className="flex flex-1"
+          style={{
+            background:
+              'linear-gradient(to bottom, var(--color-border) 0px, var(--color-border) 1px, transparent 1px)',
+          }}
+        >
+          {visibleLeafColumns.map((col, colIdx) => {
+            const isLast = colIdx === visibleLeafColumns.length - 1
+            return (
+              <div
+                key={col.id}
+                className={cn(bordered && 'border-r border-border')}
+                style={{
+                  ...colStyle(col),
+                  ...(fillLast && isLast && { flex: 1, width: 'auto' }),
+                }}
+              />
+            )
+          })}
+          {showSpacer && <div style={{ flex: 1, minWidth: 0 }} />}
+        </div>
+      )}
+    </>
   )
 }
 
@@ -1092,67 +1088,22 @@ export function DataGridTableView<T extends object>({
             className="scrollbar-none bg-background"
           >
             <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
-              {virtual ? (
-                <DataGridVirtualBody
-                  rows={rows}
-                  table={table}
-                  rowVirtualizer={rowVirtualizer}
-                  onRowClick={onRowClick}
-                  rowCursor={rowCursor}
-                  bordered={bordered}
-                  rowHeight={rowHeight}
-                  onActionTrigger={actionCol ? handleActionTrigger : undefined}
-                  tableWidthMode={tableWidthMode}
-                  classNames={classNames}
-                />
-              ) : (
-                <DataGridFlexBody
-                  rows={rows}
-                  table={table}
-                  visibleLeafColumns={visibleLeafColumns}
-                  isLoading={isLoading}
-                  emptyMessage={emptyMessage}
-                  emptyContent={emptyContent}
-                  onRowClick={onRowClick}
-                  rowCursor={rowCursor}
-                  bordered={bordered}
-                  rowHeight={rowHeight}
-                  onActionTrigger={actionCol ? handleActionTrigger : undefined}
-                  tableWidthMode={tableWidthMode}
-                  classNames={classNames}
-                />
-              )}
-              {/* Fill row: expands to remaining space when rows don't fill tableHeight.
-                  Uses a CSS gradient for the top separator — gradient is invisible when
-                  height=0 (rows overflow), so no double border in paginated/full cases. */}
-              {!virtual && !isLoading && rows.length > 0 && (() => {
-                const fillLast = tableWidthMode === 'fill-last'
-                const showSpacer = tableWidthMode === 'spacer'
-                return (
-                  <div
-                    className="flex flex-1"
-                    style={{
-                      background:
-                        'linear-gradient(to bottom, var(--color-border) 0px, var(--color-border) 1px, transparent 1px)',
-                    }}
-                  >
-                    {visibleLeafColumns.map((col, colIdx) => {
-                      const isLast = colIdx === visibleLeafColumns.length - 1
-                      return (
-                        <div
-                          key={col.id}
-                          className={cn(bordered && 'border-r border-border')}
-                          style={{
-                            ...colStyle(col),
-                            ...(fillLast && isLast && { flex: 1, width: 'auto' }),
-                          }}
-                        />
-                      )
-                    })}
-                    {showSpacer && <div style={{ flex: 1, minWidth: 0 }} />}
-                  </div>
-                )
-              })()}
+              <DataGridBody
+                rows={rows}
+                table={table}
+                visibleLeafColumns={visibleLeafColumns}
+                rowVirtualizer={virtual ? rowVirtualizer : undefined}
+                isLoading={isLoading}
+                emptyMessage={emptyMessage}
+                emptyContent={emptyContent}
+                onRowClick={onRowClick}
+                rowCursor={rowCursor}
+                bordered={bordered}
+                rowHeight={rowHeight}
+                onActionTrigger={actionCol ? handleActionTrigger : undefined}
+                tableWidthMode={tableWidthMode}
+                classNames={classNames}
+              />
             </ScrollTable>
 
             {loadMoreRef && (
