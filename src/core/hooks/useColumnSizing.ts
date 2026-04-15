@@ -41,7 +41,7 @@ export function useColumnSizing<T extends object>({
         sizing: typeof updater === 'function' ? updater(prev.sizing) : updater,
       }))
     },
-    []
+    [],
   )
 
   // Stable refs so measure() doesn't need to re-subscribe ResizeObserver
@@ -123,7 +123,8 @@ export function useColumnSizing<T extends object>({
       const userResizedFlexWidth = flexCols
         .filter((col) => userResized.current.has(getColId(col)))
         .reduce((sum, col) => sum + (currentSizing[getColId(col)] ?? 0), 0)
-      const fixedWidthChanged = lastFlexFixedWidth.current !== null && lastFlexFixedWidth.current !== fixedWidth
+      const fixedWidthChanged =
+        lastFlexFixedWidth.current !== null && lastFlexFixedWidth.current !== fixedWidth
 
       if (anyUserResized && !containerWidthChanged) {
         // User manually resized a flex column and container unchanged: freeze flex sizes.

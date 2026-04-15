@@ -45,7 +45,8 @@ export function createCheckboxColumn<T extends object>(
     enableColumnFilter: false,
     header: ({ table }: { table: Table<T> }) => {
       const rows = table.getRowModel().rows
-      const allSelected = rows.length > 0 && rows.every((r) => selectedIds.has(getRowId(r.original)))
+      const allSelected =
+        rows.length > 0 && rows.every((r) => selectedIds.has(getRowId(r.original)))
       const someSelected = !allSelected && rows.some((r) => selectedIds.has(getRowId(r.original)))
 
       return (

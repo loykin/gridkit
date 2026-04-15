@@ -1,7 +1,7 @@
-import * as React from "react"
-import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area"
+import * as React from 'react'
+import { ScrollArea as ScrollAreaPrimitive } from '@base-ui/react/scroll-area'
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
 function ScrollArea({
   className,
@@ -18,7 +18,7 @@ function ScrollArea({
       // Root must have the same dimensions as the desired scroll container.
       // Do NOT add overflow:hidden — it clips the absolutely-positioned scrollbars.
       style={{ position: 'relative', ...style }}
-      className={cn("w-full", className)}
+      className={cn('w-full', className)}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
@@ -38,7 +38,7 @@ function ScrollArea({
 
 function ScrollBar({
   className,
-  orientation = "vertical",
+  orientation = 'vertical',
   ...props
 }: ScrollAreaPrimitive.Scrollbar.Props) {
   return (
@@ -47,10 +47,10 @@ function ScrollBar({
       orientation={orientation}
       className={cn(
         // z-[11]: above sticky thead (z-index:10) so the thumb is never hidden behind the header
-        "flex touch-none select-none p-px transition-opacity z-[11]",
-        orientation === "vertical" && "h-full w-2.5",
-        orientation === "horizontal" && "h-2.5 flex-col",
-        className
+        'flex touch-none select-none p-px transition-opacity z-[11]',
+        orientation === 'vertical' && 'h-full w-2.5',
+        orientation === 'horizontal' && 'h-2.5 flex-col',
+        className,
       )}
       {...props}
     >

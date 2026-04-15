@@ -45,11 +45,7 @@ export function DataGridShell<T extends object>({
 
   return (
     <div ref={wrapperRef} className="flex flex-col gap-3 w-full min-w-0 overflow-hidden">
-      <DataGridToolbar
-        table={table}
-        leftFilters={leftFilters}
-        rightFilters={rightFilters}
-      />
+      <DataGridToolbar table={table} leftFilters={leftFilters} rightFilters={rightFilters} />
 
       <div className={cn('min-w-0', !isSized && 'invisible')}>
         <DataGridTableView

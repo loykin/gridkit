@@ -30,7 +30,7 @@ export function useInfiniteScroll({
           fetchNextPage?.()
         }
       },
-      { rootMargin }
+      { rootMargin },
     )
 
     observer.observe(loadMoreRef.current)

@@ -11,7 +11,11 @@ interface Props<T extends object> {
   className?: string
 }
 
-export function GlobalSearch<T extends object>({ table, placeholder = 'Search…', className }: Props<T>) {
+export function GlobalSearch<T extends object>({
+  table,
+  placeholder = 'Search…',
+  className,
+}: Props<T>) {
   const [value, setValue] = useState(String(table.getState().globalFilter ?? ''))
 
   useEffect(() => {
@@ -32,7 +36,10 @@ export function GlobalSearch<T extends object>({ table, placeholder = 'Search…
         <Button
           variant="ghost"
           size="icon-xs"
-          onClick={() => { setValue(''); table.setGlobalFilter(undefined) }}
+          onClick={() => {
+            setValue('')
+            table.setGlobalFilter(undefined)
+          }}
           className="absolute right-0.5 top-1/2 -translate-y-1/2"
         >
           <X className="h-3 w-3" />

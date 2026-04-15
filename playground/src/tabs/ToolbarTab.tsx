@@ -1,12 +1,18 @@
-import { DataGrid, ColumnVisibilityDropdown, GlobalSearch, SelectFilter, MultiSelectFilter } from '@loykin/gridkit'
+import {
+  DataGrid,
+  ColumnVisibilityDropdown,
+  GlobalSearch,
+  SelectFilter,
+  MultiSelectFilter,
+} from '@loykin/gridkit'
 import type { DataGridColumnDef } from '@loykin/gridkit'
 import { SMALL_DATA, type Employee } from '../data/employees'
 
 const columns: DataGridColumnDef<Employee>[] = [
-  { accessorKey: 'id',        header: 'ID',         meta: { flex: 0.5 } },
-  { accessorKey: 'name',      header: 'Name',       meta: { flex: 2 } },
+  { accessorKey: 'id', header: 'ID', meta: { flex: 0.5 } },
+  { accessorKey: 'name', header: 'Name', meta: { flex: 2 } },
   { accessorKey: 'department', header: 'Department', meta: { flex: 1.5 } },
-  { accessorKey: 'role',      header: 'Role',       meta: { flex: 1.5 } },
+  { accessorKey: 'role', header: 'Role', meta: { flex: 1.5 } },
   {
     accessorKey: 'salary',
     header: 'Salary',
@@ -33,7 +39,7 @@ const columns: DataGridColumnDef<Employee>[] = [
     },
   },
   { accessorKey: 'startDate', header: 'Start Date', meta: { flex: 1 } },
-  { accessorKey: 'score',     header: 'Score',      meta: { flex: 0.8, align: 'right' } },
+  { accessorKey: 'score', header: 'Score', meta: { flex: 0.8, align: 'right' } },
 ]
 
 export function ToolbarTab() {
@@ -56,9 +62,7 @@ export function ToolbarTab() {
             <MultiSelectFilter table={table} columnId="department" label="Department" />
           </>
         )}
-        rightFilters={(table) => (
-          <ColumnVisibilityDropdown table={table} />
-        )}
+        rightFilters={(table) => <ColumnVisibilityDropdown table={table} />}
       />
     </section>
   )

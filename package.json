@@ -21,16 +21,16 @@
     "build": "tsup && node_modules/.bin/tailwindcss -i src/styles/index.css -o dist/styles.css --minify",
     "build:js": "tsup",
     "build:css": "node_modules/.bin/tailwindcss -i src/styles/index.css -o dist/styles.css",
-    "dev": "concurrently \"tsup --watch\" \"cd playground && npm run dev\"",
-    "type-check": "tsc --noEmit"
+    "dev": "concurrently \"tsup --watch\" \"pnpm --filter data-grid-playground dev\"",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@tanstack/react-table": "^8.21.3",
-    "@tanstack/react-virtual": "^3.13.23",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.546.0",
@@ -39,17 +39,24 @@
     "zustand": "^5.0.12"
   },
   "peerDependencies": {
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.23",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@tailwindcss/cli": "^4.2.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "concurrently": "^9.2.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "prettier": "^3.8.2",
     "tailwindcss": "^4.2.2",
     "tsup": "^8.4.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.2"
   },
   "keywords": [
     "react",

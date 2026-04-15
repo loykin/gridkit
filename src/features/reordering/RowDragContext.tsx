@@ -1,9 +1,9 @@
 import React from 'react'
-import type { DraggableSyntheticListeners } from '@dnd-kit/core'
+import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core'
 
 export interface RowDragContextValue {
   listeners: DraggableSyntheticListeners | undefined
-  attributes: Record<string, any>
+  attributes: DraggableAttributes
   isDragging: boolean
 }
 

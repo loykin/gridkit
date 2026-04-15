@@ -36,21 +36,25 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
 
   return (
     <Popover onOpenChange={handleOpenChange}>
-      <PopoverTrigger render={(props) => (
-        <Button
-          {...props}
-          variant={value ? 'secondary' : 'outline'}
-          size="sm"
-          className="h-8 gap-1.5 text-xs"
-        >
-          {value ? (
-            <><span className="font-normal text-muted-foreground">{label}:</span> {value}</>
-          ) : (
-            label
-          )}
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-        </Button>
-      )} />
+      <PopoverTrigger
+        render={(props) => (
+          <Button
+            {...props}
+            variant={value ? 'secondary' : 'outline'}
+            size="sm"
+            className="h-8 gap-1.5 text-xs"
+          >
+            {value ? (
+              <>
+                <span className="font-normal text-muted-foreground">{label}:</span> {value}
+              </>
+            ) : (
+              label
+            )}
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+          </Button>
+        )}
+      />
       <PopoverContent align="start" className="w-44 p-1">
         <div className="flex flex-col">
           {value && (
@@ -87,7 +91,11 @@ interface MultiSelectFilterProps<T extends object> {
   label: string
 }
 
-export function MultiSelectFilter<T extends object>({ table, columnId, label }: MultiSelectFilterProps<T>) {
+export function MultiSelectFilter<T extends object>({
+  table,
+  columnId,
+  label,
+}: MultiSelectFilterProps<T>) {
   const [options, setOptions] = useState<string[] | null>(null)
   const col = table.getColumn(columnId)
   const selected = (col?.getFilterValue() as string[] | undefined) ?? []
@@ -99,13 +107,12 @@ export function MultiSelectFilter<T extends object>({ table, columnId, label }: 
       if (v != null) vals.add(String(v))
     })
     setOptions(Array.from(vals).sort())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const toggle = (val: string) => {
     if (!col) return
-    const next = selected.includes(val)
-      ? selected.filter((v) => v !== val)
-      : [...selected, val]
+    const next = selected.includes(val) ? selected.filter((v) => v !== val) : [...selected, val]
     col.setFilterValue(next.length > 0 ? next : undefined)
   }
 
@@ -113,21 +120,26 @@ export function MultiSelectFilter<T extends object>({ table, columnId, label }: 
 
   return (
     <Popover>
-      <PopoverTrigger render={(props) => (
-        <Button
-          {...props}
-          variant={selected.length > 0 ? 'secondary' : 'outline'}
-          size="sm"
-          className="h-8 gap-1.5 text-xs"
-        >
-          {selected.length > 0 ? (
-            <><span className="font-normal text-muted-foreground">{label}:</span> {selected.length} selected</>
-          ) : (
-            label
-          )}
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-        </Button>
-      )} />
+      <PopoverTrigger
+        render={(props) => (
+          <Button
+            {...props}
+            variant={selected.length > 0 ? 'secondary' : 'outline'}
+            size="sm"
+            className="h-8 gap-1.5 text-xs"
+          >
+            {selected.length > 0 ? (
+              <>
+                <span className="font-normal text-muted-foreground">{label}:</span>{' '}
+                {selected.length} selected
+              </>
+            ) : (
+              label
+            )}
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+          </Button>
+        )}
+      />
       <PopoverContent align="start" className="w-48">
         <div className="flex flex-col gap-0.5">
           <div className="max-h-52 overflow-y-auto flex flex-col gap-0.5">

@@ -9,11 +9,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove,
-} from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import type { DataGridDragProps } from '@/types'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { DataGridShell } from '@/core/DataGridShell'
@@ -38,7 +34,7 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
     useSensor(PointerSensor, {
       // Require a small move before drag starts — prevents click from triggering drag
       activationConstraint: { distance: 5 },
-    })
+    }),
   )
 
   const rowIds = rows.map((r) => r.id)
@@ -52,11 +48,11 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
     if (!over || active.id === over.id) return
 
     const activeRow = rows.find((r) => r.id === String(active.id))
-    const overRow   = rows.find((r) => r.id === String(over.id))
+    const overRow = rows.find((r) => r.id === String(over.id))
     if (!activeRow || !overRow) return
 
     const fromIdx = data.indexOf(activeRow.original)
-    const toIdx   = data.indexOf(overRow.original)
+    const toIdx = data.indexOf(overRow.original)
     if (fromIdx === -1 || toIdx === -1) return
 
     onRowReorder(arrayMove(data, fromIdx, toIdx))

@@ -5,6 +5,7 @@ import type { Row } from '@tanstack/react-table'
 import { RowDragContext } from '@/features/reordering/RowDragContext'
 
 interface SortableRowProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   row: Row<any>
   children: React.ReactNode
 }
@@ -14,14 +15,9 @@ interface SortableRowProps {
  * Provides RowDragContext so DragHandleCell can attach listeners without props.
  */
 export function SortableRow({ row, children }: SortableRowProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: row.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: row.id,
+  })
 
   return (
     <RowDragContext.Provider value={{ listeners, attributes, isDragging }}>

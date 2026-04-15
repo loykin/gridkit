@@ -40,7 +40,7 @@ declare module '@tanstack/react-table' {
  *    in-place and `_valuesCache` is cleared so getValue() re-evaluates.
  */
 export function getDataStoreCoreRowModel<T extends RowData>(): (
-  table: Table<T>
+  table: Table<T>,
 ) => () => RowModel<T> {
   return (table: Table<T>) => {
     const rowCache = new Map<string, Row<T>>()
@@ -68,7 +68,9 @@ export function getDataStoreCoreRowModel<T extends RowData>(): (
           if (row) {
             if (row.original !== item) {
               // Data changed — swap original and bust the accessor value cache
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ;(row as any).original = item
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ;(row as any)._valuesCache = {}
             }
             // All memoized row methods (getVisibleCells etc.) remain stable
@@ -93,8 +95,9 @@ export function getDataStoreCoreRowModel<T extends RowData>(): (
         table.options,
         'debugTable',
         'getRowModel',
-        () => (table as any)._autoResetPageIndex?.()
-      )
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        () => (table as any)._autoResetPageIndex?.(),
+      ),
     )
   }
 }
@@ -104,16 +107,20 @@ export const DataStoreFeature: TableFeature = {
   createTable: (table) => {
     const store = table.options.dataStore
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(table as any)._dataStore = store
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(table as any).applyTransaction = (tx: Transaction<any>) => {
       if (!store) {
         console.warn('[GridKit] applyTransaction called without dataStore')
         return
       }
-      store.applyTransaction(tx)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      store.applyTransaction(tx as Transaction<any>)
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(table as any).getRowNodeById = (id: string) => store?.get(id)
   },
 }

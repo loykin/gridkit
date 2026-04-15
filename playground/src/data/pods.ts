@@ -12,8 +12,26 @@ export interface Pod {
 
 const NAMESPACES = ['default', 'kube-system', 'monitoring', 'data-platform', 'ml-serving']
 const NODES = ['node-01', 'node-02', 'node-03', 'node-04', 'node-05']
-const WORKLOADS = ['api', 'worker', 'scheduler', 'gateway', 'inference', 'collector', 'syncer', 'proxy']
-const STATUSES: Pod['status'][] = ['Running', 'Running', 'Running', 'Running', 'Pending', 'Failed', 'CrashLoopBackOff', 'Terminating']
+const WORKLOADS = [
+  'api',
+  'worker',
+  'scheduler',
+  'gateway',
+  'inference',
+  'collector',
+  'syncer',
+  'proxy',
+]
+const STATUSES: Pod['status'][] = [
+  'Running',
+  'Running',
+  'Running',
+  'Running',
+  'Pending',
+  'Failed',
+  'CrashLoopBackOff',
+  'Terminating',
+]
 
 function pick<T>(arr: T[], i: number): T {
   return arr[Math.abs(i) % arr.length]!
@@ -44,9 +62,10 @@ export function tickPods(pods: Pod[]): Pod[] {
         memory: Math.max(32, pod.memory + Math.floor((Math.random() - 0.5) * 512)),
       }
     } else if (roll < 0.55) {
-      const next: Pod['status'][] = pod.status === 'Running'
-        ? ['Running', 'Running', 'Pending', 'CrashLoopBackOff']
-        : ['Running', 'Running', 'Running', pod.status]
+      const next: Pod['status'][] =
+        pod.status === 'Running'
+          ? ['Running', 'Running', 'Pending', 'CrashLoopBackOff']
+          : ['Running', 'Running', 'Running', pod.status]
       return { ...pod, status: next[Math.floor(Math.random() * next.length)]! }
     } else if (roll < 0.75) {
       return { ...pod, restarts: pod.restarts + 1, status: 'Running' }

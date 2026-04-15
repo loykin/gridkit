@@ -39,10 +39,13 @@ export function CustomScrollbar({ scrollRef, direction, className, style }: Cust
 
     setThumbStart(scrollPos / scrollSize)
     setThumbEnd((scrollPos + clientSize) / scrollSize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollRef, isV])
 
   // Sync immediately on mount (layout effect avoids flash)
-  useLayoutEffect(() => { sync() }, [sync])
+  useLayoutEffect(() => {
+    sync()
+  }, [sync])
 
   useEffect(() => {
     const el = scrollRef.current

@@ -41,33 +41,31 @@ const betweenFilterFn: FilterFn<object> = (row, columnId, value: [string, string
   const max = maxStr !== '' ? Number(maxStr) : Infinity
   return raw >= min && raw <= max
 }
-betweenFilterFn.autoRemove = (val: [string, string]) =>
-  !val || (val[0] === '' && val[1] === '')
+betweenFilterFn.autoRemove = (val: [string, string]) => !val || (val[0] === '' && val[1] === '')
 
-interface UseDataGridCoreOptions<T extends object>
-  extends Pick<
-    DataGridBaseProps<T>,
-    | 'data'
-    | 'dataStore'
-    | 'enableSorting'
-    | 'initialSorting'
-    | 'onSortingChange'
-    | 'manualSorting'
-    | 'columnFilters'
-    | 'globalFilter'
-    | 'onGlobalFilterChange'
-    | 'searchableColumns'
-    | 'enableColumnResizing'
-    | 'enableColumnFilters'
-    | 'visibilityState'
-    | 'initialPinning'
-    | 'tableKey'
-    | 'syncState'
-    | 'onTableReady'
-    | 'onColumnSizingChange'
-    | 'enableExpanding'
-    | 'getSubRows'
-  > {
+interface UseDataGridCoreOptions<T extends object> extends Pick<
+  DataGridBaseProps<T>,
+  | 'data'
+  | 'dataStore'
+  | 'enableSorting'
+  | 'initialSorting'
+  | 'onSortingChange'
+  | 'manualSorting'
+  | 'columnFilters'
+  | 'globalFilter'
+  | 'onGlobalFilterChange'
+  | 'searchableColumns'
+  | 'enableColumnResizing'
+  | 'enableColumnFilters'
+  | 'visibilityState'
+  | 'initialPinning'
+  | 'tableKey'
+  | 'syncState'
+  | 'onTableReady'
+  | 'onColumnSizingChange'
+  | 'enableExpanding'
+  | 'getSubRows'
+> {
   columns: DataGridColumnDef<T>[]
   getRowId?: (originalRow: T, index: number) => string
   enablePagination?: boolean
@@ -130,16 +128,10 @@ export function useDataGridCore<T extends object>({
   })
   const [internalFilters, setInternalFilters] = useState<ColumnFiltersState>([])
   const [internalGlobal, setInternalGlobal] = useState(persisted?.searchTerm ?? '')
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    visibilityState ?? {}
-  )
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(visibilityState ?? {})
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex:
-      persisted?.pagination.pageIndex ??
-      paginationConfig?.initialPageIndex ??
-      0,
-    pageSize:
-      persisted?.pagination.pageSize ?? paginationConfig?.pageSize ?? 20,
+    pageIndex: persisted?.pagination.pageIndex ?? paginationConfig?.initialPageIndex ?? 0,
+    pageSize: persisted?.pagination.pageSize ?? paginationConfig?.pageSize ?? 20,
   })
 
   const tableReadyCalled = useRef(false)
@@ -166,7 +158,7 @@ export function useDataGridCore<T extends object>({
         return searchableColumns.some((colId) =>
           String(row.getValue(colId) ?? '')
             .toLowerCase()
-            .includes(search)
+            .includes(search),
         )
       }
     : undefined
@@ -189,7 +181,7 @@ export function useDataGridCore<T extends object>({
   // getCoreRowModel (which reads store.getVersion() internally) can re-evaluate.
   useSyncExternalStore(
     dataStore ? dataStore.subscribe : _noopSubscribe,
-    dataStore ? dataStore.getVersion : _noopGetVersion
+    dataStore ? dataStore.getVersion : _noopGetVersion,
   )
 
   const table = useReactTable<T>({
@@ -198,7 +190,7 @@ export function useDataGridCore<T extends object>({
     data: dataStore ? ([] as T[]) : data,
     columns: enrichedColumns,
     getRowId,
-    _features: gridKitFeatures as any,
+    _features: [...gridKitFeatures],
     dataStore,
     state: {
       sorting,
@@ -227,22 +219,17 @@ export function useDataGridCore<T extends object>({
     onColumnFiltersChange: externalColumnFilters
       ? undefined
       : (updater) => {
-          setInternalFilters((prev) =>
-            typeof updater === 'function' ? updater(prev) : updater
-          )
+          setInternalFilters((prev) => (typeof updater === 'function' ? updater(prev) : updater))
         },
     onGlobalFilterChange: externalGlobalFilter
       ? undefined
       : (updater) => {
-          const next =
-            typeof updater === 'function' ? updater(internalGlobal) : updater
+          const next = typeof updater === 'function' ? updater(internalGlobal) : updater
           setInternalGlobal(next as string)
           onGlobalFilterChange?.(next as string)
         },
     onColumnVisibilityChange: (updater) => {
-      setColumnVisibility((prev) =>
-        typeof updater === 'function' ? updater(prev) : updater
-      )
+      setColumnVisibility((prev) => (typeof updater === 'function' ? updater(prev) : updater))
     },
     onColumnSizingChange: (updater) => {
       setSizing((prev) => {
@@ -254,8 +241,7 @@ export function useDataGridCore<T extends object>({
     onPaginationChange: enablePagination
       ? (updater) => {
           setPagination((prev) => {
-            const next =
-              typeof updater === 'function' ? updater(prev) : updater
+            const next = typeof updater === 'function' ? updater(prev) : updater
             if (tableKey && syncState) update(tableKey, { pagination: next })
             onPageChange?.(next.pageIndex, next.pageSize)
             return next
@@ -301,7 +287,7 @@ export function useDataGridCore<T extends object>({
       }
       if (tableKey && syncState) update(tableKey, { searchTerm: value })
     },
-    [table, externalGlobalFilter, onGlobalFilterChange, tableKey, syncState, update]
+    [table, externalGlobalFilter, onGlobalFilterChange, tableKey, syncState, update],
   )
 
   useEffect(() => {

@@ -15,9 +15,7 @@ export interface DataStore<T> {
   subscribe(listener: () => void): () => void
 }
 
-export function createDataStore<T>(
-  getRowId: (item: T, index: number) => string
-): DataStore<T> {
+export function createDataStore<T>(getRowId: (item: T, index: number) => string): DataStore<T> {
   const map = new Map<string, T>()
   const orderedIds: string[] = []
   const listeners = new Set<() => void>()
@@ -29,15 +27,15 @@ export function createDataStore<T>(
 
   function notify() {
     version++
-    listeners.forEach(fn => fn())
+    listeners.forEach((fn) => fn())
   }
 
   return {
-    get: id => map.get(id),
+    get: (id) => map.get(id),
 
     getSnapshot: () => {
       if (cachedSnapshotVersion !== version) {
-        cachedSnapshot = orderedIds.map(id => map.get(id)!)
+        cachedSnapshot = orderedIds.map((id) => map.get(id)!)
         cachedSnapshotVersion = version
       }
       return cachedSnapshot
@@ -45,12 +43,12 @@ export function createDataStore<T>(
 
     getVersion: () => version,
 
-    subscribe: listener => {
+    subscribe: (listener) => {
       listeners.add(listener)
       return () => listeners.delete(listener)
     },
 
-    applyTransaction: tx => {
+    applyTransaction: (tx) => {
       let changed = false
 
       tx.add?.forEach((item, i) => {
@@ -69,7 +67,7 @@ export function createDataStore<T>(
         }
       })
 
-      tx.remove?.forEach(id => {
+      tx.remove?.forEach((id) => {
         if (map.delete(id)) {
           const idx = orderedIds.indexOf(id)
           if (idx !== -1) orderedIds.splice(idx, 1)

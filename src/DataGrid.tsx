@@ -21,8 +21,7 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
     tableRef,
   } = props
 
-  const { wrapperRef, containerRef, table, rows, isSized, measure } =
-    useDataGridBase(props)
+  const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase(props)
 
   useEffect(() => {
     if (tableRef) {
@@ -47,11 +46,7 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
       rightFilters={rightFilters}
       footer={
         enablePagination ? (
-          <DataGridPaginationBar
-            table={table}
-            pageSizes={pageSizes}
-            totalCount={totalCount}
-          />
+          <DataGridPaginationBar table={table} pageSizes={pageSizes} totalCount={totalCount} />
         ) : null
       }
     />

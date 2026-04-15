@@ -4,23 +4,29 @@ import type { DataGridColumnDef } from '@loykin/gridkit'
 import { generatePods, tickPods, type Pod } from '../data/pods'
 
 const STATUS_STYLE: Record<Pod['status'], string> = {
-  Running:          'bg-green-100 text-green-800',
-  Pending:          'bg-yellow-100 text-yellow-800',
-  Failed:           'bg-red-100 text-red-800',
+  Running: 'bg-green-100 text-green-800',
+  Pending: 'bg-yellow-100 text-yellow-800',
+  Failed: 'bg-red-100 text-red-800',
   CrashLoopBackOff: 'bg-orange-100 text-orange-800',
-  Terminating:      'bg-gray-100 text-gray-600',
+  Terminating: 'bg-gray-100 text-gray-600',
 }
 
 const columns: DataGridColumnDef<Pod>[] = [
-  { accessorKey: 'name',      header: 'Pod Name',     meta: { flex: 3,   filterType: 'text' } },
-  { accessorKey: 'namespace', header: 'Namespace',    meta: { flex: 1.2, filterType: 'select' } },
+  { accessorKey: 'name', header: 'Pod Name', meta: { flex: 3, filterType: 'text' } },
+  { accessorKey: 'namespace', header: 'Namespace', meta: { flex: 1.2, filterType: 'select' } },
   {
     accessorKey: 'status',
     header: 'Status',
     meta: { flex: 1.2, filterType: 'select' },
     cell: ({ row }) => {
       const s = row.original.status
-      return <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLE[s]}`}>{s}</span>
+      return (
+        <span
+          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLE[s]}`}
+        >
+          {s}
+        </span>
+      )
     },
   },
   {
@@ -45,7 +51,7 @@ const columns: DataGridColumnDef<Pod>[] = [
     },
   },
   { accessorKey: 'node', header: 'Node', meta: { flex: 1, filterType: 'select' } },
-  { accessorKey: 'age',  header: 'Age',  meta: { flex: 0.6, align: 'right' } },
+  { accessorKey: 'age', header: 'Age', meta: { flex: 0.6, align: 'right' } },
   {
     id: '__actions__',
     header: '',
@@ -56,15 +62,19 @@ const columns: DataGridColumnDef<Pod>[] = [
       filterType: false,
       actions: (p: Pod) => [
         { label: 'Describe', onClick: () => alert(`describe ${p.name}`) },
-        { label: 'Logs',     onClick: () => alert(`logs ${p.name}`) },
-        { label: 'Delete',   onClick: () => alert(`delete ${p.name}`), variant: 'destructive' as const },
+        { label: 'Logs', onClick: () => alert(`logs ${p.name}`) },
+        {
+          label: 'Delete',
+          onClick: () => alert(`delete ${p.name}`),
+          variant: 'destructive' as const,
+        },
       ],
     },
   },
 ]
 
 const INTERVALS = [500, 1000, 2000, 5000] as const
-type Interval = typeof INTERVALS[number]
+type Interval = (typeof INTERVALS)[number]
 
 export function LiveUpdateTab() {
   const [pods, setPods] = useState<Pod[]>(() => generatePods(120))
@@ -82,11 +92,13 @@ export function LiveUpdateTab() {
       setPods((prev) => tickPods(prev))
       setTickCount((n) => n + 1)
     }, interval)
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
   }, [running, interval])
 
   const runningCount = pods.filter((p) => p.status === 'Running').length
-  const crashCount   = pods.filter((p) => p.status === 'CrashLoopBackOff').length
+  const crashCount = pods.filter((p) => p.status === 'CrashLoopBackOff').length
 
   return (
     <section className="flex flex-col gap-3">
@@ -110,19 +122,31 @@ export function LiveUpdateTab() {
           {running ? 'Pause' : 'Resume'}
         </button>
         <button
-          onClick={() => { setPods(generatePods(120)); setTickCount(0) }}
+          onClick={() => {
+            setPods(generatePods(120))
+            setTickCount(0)
+          }}
           className="px-3 py-1 rounded text-xs font-medium bg-muted text-muted-foreground hover:bg-muted/80"
         >
           Reset
         </button>
         <div className="ml-auto flex items-center gap-3 text-xs text-muted-foreground">
-          <span>Ticks: <strong className="text-foreground">{tickCount}</strong></span>
-          <span className="text-green-700">Running: <strong>{runningCount}</strong></span>
-          {crashCount > 0 && <span className="text-orange-600">CrashLoop: <strong>{crashCount}</strong></span>}
+          <span>
+            Ticks: <strong className="text-foreground">{tickCount}</strong>
+          </span>
+          <span className="text-green-700">
+            Running: <strong>{runningCount}</strong>
+          </span>
+          {crashCount > 0 && (
+            <span className="text-orange-600">
+              CrashLoop: <strong>{crashCount}</strong>
+            </span>
+          )}
         </div>
       </div>
       <p className="text-xs text-muted-foreground">
-        120 pods · virtualizer auto-enabled · resize columns while updates run · sort/filter state preserved
+        120 pods · virtualizer auto-enabled · resize columns while updates run · sort/filter state
+        preserved
       </p>
       <DataGrid
         data={pods}

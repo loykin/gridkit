@@ -11,17 +11,53 @@ export interface Resource {
   age: string
 }
 
-const NAMESPACES = ['default', 'kube-system', 'monitoring', 'ingress-nginx', 'cert-manager', 'data-platform', 'ml-serving']
-const STATUSES: Resource['status'][] = ['Running', 'Running', 'Running', 'Pending', 'Failed', 'Completed', 'CrashLoopBackOff']
+const NAMESPACES = [
+  'default',
+  'kube-system',
+  'monitoring',
+  'ingress-nginx',
+  'cert-manager',
+  'data-platform',
+  'ml-serving',
+]
+const STATUSES: Resource['status'][] = [
+  'Running',
+  'Running',
+  'Running',
+  'Pending',
+  'Failed',
+  'Completed',
+  'CrashLoopBackOff',
+]
 
 const TAG_POOL = [
-  'production', 'staging', 'canary', 'v2', 'v3',
-  'gpu', 'high-memory', 'spot-instance', 'on-demand',
-  'team:infra', 'team:ml', 'team:data', 'team:backend', 'team:frontend',
-  'app:api', 'app:worker', 'app:scheduler', 'app:gateway',
-  'tier:critical', 'tier:standard', 'tier:batch',
-  'region:us-east', 'region:eu-west', 'region:ap-south',
-  'autoscale:enabled', 'debug:enabled', 'tracing:enabled',
+  'production',
+  'staging',
+  'canary',
+  'v2',
+  'v3',
+  'gpu',
+  'high-memory',
+  'spot-instance',
+  'on-demand',
+  'team:infra',
+  'team:ml',
+  'team:data',
+  'team:backend',
+  'team:frontend',
+  'app:api',
+  'app:worker',
+  'app:scheduler',
+  'app:gateway',
+  'tier:critical',
+  'tier:standard',
+  'tier:batch',
+  'region:us-east',
+  'region:eu-west',
+  'region:ap-south',
+  'autoscale:enabled',
+  'debug:enabled',
+  'tracing:enabled',
 ]
 
 const DESCRIPTIONS = [

@@ -18,12 +18,8 @@ export function DataGridToolbar<T extends object>({
 
   return (
     <div className="flex items-center justify-between gap-2 shrink-0">
-      <div className="flex items-center gap-2">
-        {leftFilters?.(table)}
-      </div>
-      <div className="flex items-center gap-2">
-        {rightFilters?.(table)}
-      </div>
+      <div className="flex items-center gap-2">{leftFilters?.(table)}</div>
+      <div className="flex items-center gap-2">{rightFilters?.(table)}</div>
     </div>
   )
 }

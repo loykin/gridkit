@@ -4,9 +4,9 @@ import type { DataGridColumnDef } from '@loykin/gridkit'
 import { SERVICES, type ServiceRow } from '../data/services'
 
 const STATUS_STYLE: Record<ServiceRow['status'], string> = {
-  healthy:  'bg-green-100 text-green-700',
+  healthy: 'bg-green-100 text-green-700',
   degraded: 'bg-yellow-100 text-yellow-700',
-  down:     'bg-red-100 text-red-700',
+  down: 'bg-red-100 text-red-700',
 }
 
 const columns: DataGridColumnDef<ServiceRow>[] = [
@@ -31,7 +31,9 @@ const columns: DataGridColumnDef<ServiceRow>[] = [
     header: 'Status',
     meta: { flex: 1 },
     cell: ({ row }) => (
-      <span className={`inline-flex rounded px-1.5 py-0.5 text-[11px] font-medium ${STATUS_STYLE[row.original.status]}`}>
+      <span
+        className={`inline-flex rounded px-1.5 py-0.5 text-[11px] font-medium ${STATUS_STYLE[row.original.status]}`}
+      >
         {row.original.status}
       </span>
     ),
@@ -53,9 +55,7 @@ const columns: DataGridColumnDef<ServiceRow>[] = [
     accessorKey: 'owner',
     header: 'Owner',
     meta: { flex: 1 },
-    cell: ({ row }) => (
-      <span className="text-muted-foreground text-xs">{row.original.owner}</span>
-    ),
+    cell: ({ row }) => <span className="text-muted-foreground text-xs">{row.original.owner}</span>,
   },
 ]
 

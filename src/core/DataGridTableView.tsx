@@ -7,14 +7,29 @@ import {
   type HeaderGroup,
 } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { ArrowDown, ArrowUp, ArrowUpDown, Filter, Loader2, MoreHorizontal, SlidersHorizontal, X } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Filter,
+  Loader2,
+  MoreHorizontal,
+  SlidersHorizontal,
+  X,
+} from 'lucide-react'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import { Menu as ActionMenu } from '@base-ui/react/menu'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollTable } from '@/core/ScrollTable'
 import { CustomScrollbar } from '@/core/CustomScrollbar'
@@ -61,7 +76,10 @@ function colStyle<T extends object>(col: Column<T>): React.CSSProperties {
   }
 }
 
-function isPinnedEdge<T extends object>(col: Column<T>, table: Table<T>): 'left-edge' | 'right-edge' | false {
+function isPinnedEdge<T extends object>(
+  col: Column<T>,
+  table: Table<T>,
+): 'left-edge' | 'right-edge' | false {
   const pinned = col.getIsPinned()
   if (pinned === 'left') {
     const leftCols = table.getLeftLeafColumns()
@@ -78,8 +96,10 @@ function isPinnedEdge<T extends object>(col: Column<T>, table: Table<T>): 'left-
 // DataGridHeaderRow
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface DataGridHeaderRowProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'enableColumnResizing' | 'bordered' | 'enableColumnFilters' | 'filterDisplay'> {
+interface DataGridHeaderRowProps<T extends object> extends Pick<
+  TableViewConfig<T>,
+  'enableColumnResizing' | 'bordered' | 'enableColumnFilters' | 'filterDisplay'
+> {
   headerGroup: HeaderGroup<T>
   table: Table<T>
   virtual: boolean
@@ -123,10 +143,23 @@ function DataGridHeaderRow<T extends object>({
             )}
             style={
               virtual
-                ? { display: 'flex', alignItems: 'center', width: isFillLast ? undefined : header.getSize(), ...(isFillLast && { flex: 1, minWidth: header.getSize() }) }
-                : { ...colStyle(header.column), display: 'flex', alignItems: 'center', overflow: 'hidden', ...(isFillLast && { flex: 1, width: 'auto' }) }
+                ? {
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: isFillLast ? undefined : header.getSize(),
+                    ...(isFillLast && { flex: 1, minWidth: header.getSize() }),
+                  }
+                : {
+                    ...colStyle(header.column),
+                    display: 'flex',
+                    alignItems: 'center',
+                    overflow: 'hidden',
+                    ...(isFillLast && { flex: 1, width: 'auto' }),
+                  }
             }
-            onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+            onClick={
+              header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined
+            }
           >
             <span className="flex items-center gap-1 min-w-0 overflow-hidden flex-1">
               <span className="truncate">
@@ -153,25 +186,37 @@ function DataGridHeaderRow<T extends object>({
 
             {enableColumnResizing && header.column.getCanResize() && (
               <div
-                onMouseDown={(e) => { e.stopPropagation(); header.getResizeHandler()(e) }}
-                onTouchStart={(e) => { e.stopPropagation(); header.getResizeHandler()(e) }}
+                onMouseDown={(e) => {
+                  e.stopPropagation()
+                  header.getResizeHandler()(e)
+                }}
+                onTouchStart={(e) => {
+                  e.stopPropagation()
+                  header.getResizeHandler()(e)
+                }}
                 onClick={(e) => e.stopPropagation()}
                 className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none touch-none"
               >
-                <div className={cn(
-                  'absolute right-1.5 top-2 bottom-2 w-px rounded-full transition-colors',
-                  'opacity-0 group-hover:opacity-100',
-                  header.column.getIsResizing()
-                    ? 'opacity-100 bg-primary'
-                    : 'bg-border hover:bg-primary',
-                )} />
+                <div
+                  className={cn(
+                    'absolute right-1.5 top-2 bottom-2 w-px rounded-full transition-colors',
+                    'opacity-0 group-hover:opacity-100',
+                    header.column.getIsResizing()
+                      ? 'opacity-100 bg-primary'
+                      : 'bg-border hover:bg-primary',
+                  )}
+                />
               </div>
             )}
           </div>
         )
       })}
       {!virtual && tableWidthMode === 'spacer' && (
-        <div role="columnheader" style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-muted" />
+        <div
+          role="columnheader"
+          style={{ flex: 1, minWidth: 0, padding: 0 }}
+          className="bg-muted"
+        />
       )}
     </div>
   )
@@ -181,8 +226,19 @@ function DataGridHeaderRow<T extends object>({
 // HeaderFilterPopover — icon mode filter trigger inside header cell
 // ─────────────────────────────────────────────────────────────────────────────
 
-function HeaderFilterPopover<T extends object>({ col, table }: { col: Column<T>; table: Table<T> }) {
+function HeaderFilterPopover<T extends object>({
+  col,
+  table,
+}: {
+  col: Column<T>
+  table: Table<T>
+}) {
   const [open, setOpen] = useState(false)
+  // useCallback으로 안정적인 ref 참조 유지 — 인라인 화살표 함수는 re-render마다
+  // 새 참조가 생성돼 React가 매번 null→el 순으로 호출, focus()가 반복 실행됨
+  const focusRef = useCallback((el: HTMLInputElement | null) => {
+    el?.focus({ preventScroll: true })
+  }, [])
   const ft = col.columnDef.meta?.filterType
   if (ft === false || ft === undefined) return null
 
@@ -194,94 +250,94 @@ function HeaderFilterPopover<T extends object>({ col, table }: { col: Column<T>;
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger render={(props) => (
-        <Button
-          {...props}
-          variant="ghost"
-          size="icon-xs"
-          className={cn(
-            'h-5 w-5 shrink-0',
-            hasFilter ? 'text-primary opacity-100' : 'opacity-0 group-hover:opacity-60',
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger
+          render={(props) => (
+            <Button
+              {...props}
+              variant="ghost"
+              size="icon-xs"
+              className={cn(
+                'h-5 w-5 shrink-0',
+                hasFilter ? 'text-primary opacity-100' : 'opacity-0 group-hover:opacity-60',
+              )}
+            >
+              <Filter className="h-3 w-3" />
+            </Button>
           )}
-        >
-          <Filter className="h-3 w-3" />
-        </Button>
-      )} />
-      <PopoverContent
-        side="bottom"
-        align="start"
-        className="w-52"
-      >
-        {ft === 'select' ? (
-          <SelectFilterCell
-            col={col}
-            table={table}
-            onSelect={() => setOpen(false)}
-          />
-        ) : ft === 'multi-select' ? (
-          <MultiSelectContent col={col} table={table} />
-        ) : ft === 'number' ? (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-muted-foreground">Min</span>
-              <Input
-                type="number"
-                placeholder="Min"
-                value={min}
-                onChange={(e) =>
-                  col.setFilterValue((old: [string, string] = ['', '']) => [e.target.value, old[1]])
-                }
-                className="h-7 text-xs"
-              />
+        />
+        <PopoverContent side="bottom" align="start" className="w-52">
+          {ft === 'select' ? (
+            <SelectFilterCell col={col} table={table} onSelect={() => setOpen(false)} />
+          ) : ft === 'multi-select' ? (
+            <MultiSelectContent col={col} table={table} />
+          ) : ft === 'number' ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-muted-foreground">Min</span>
+                <Input
+                  type="number"
+                  placeholder="Min"
+                  value={min}
+                  onChange={(e) =>
+                    col.setFilterValue((old: [string, string] = ['', '']) => [
+                      e.target.value,
+                      old[1],
+                    ])
+                  }
+                  className="h-7 text-xs"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-muted-foreground">Max</span>
+                <Input
+                  type="number"
+                  placeholder="Max"
+                  value={max}
+                  onChange={(e) =>
+                    col.setFilterValue((old: [string, string] = ['', '']) => [
+                      old[0],
+                      e.target.value,
+                    ])
+                  }
+                  className="h-7 text-xs"
+                />
+              </div>
+              {hasFilter && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => col.setFilterValue(undefined)}
+                >
+                  Clear
+                </Button>
+              )}
             </div>
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-muted-foreground">Max</span>
+          ) : (
+            <div className="relative">
               <Input
-                type="number"
-                placeholder="Max"
-                value={max}
-                onChange={(e) =>
-                  col.setFilterValue((old: [string, string] = ['', '']) => [old[0], e.target.value])
-                }
-                className="h-7 text-xs"
+                type="text"
+                placeholder="Filter…"
+                value={filterValue}
+                onChange={(e) => col.setFilterValue(e.target.value || undefined)}
+                className="h-7 text-xs pr-6"
+                ref={focusRef}
               />
+              {filterValue && (
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={() => col.setFilterValue(undefined)}
+                  className="absolute right-0.5 top-1/2 -translate-y-1/2"
+                >
+                  <X />
+                </Button>
+              )}
             </div>
-            {hasFilter && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => col.setFilterValue(undefined)}
-              >
-                Clear
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="Filter…"
-              value={filterValue}
-              onChange={(e) => col.setFilterValue(e.target.value || undefined)}
-              className="h-7 text-xs pr-6"
-              autoFocus
-            />
-            {filterValue && (
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                onClick={() => col.setFilterValue(undefined)}
-                className="absolute right-0.5 top-1/2 -translate-y-1/2"
-              >
-                <X />
-              </Button>
-            )}
-          </div>
-        )}
-      </PopoverContent>
-    </Popover>
+          )}
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }
@@ -302,17 +358,19 @@ function NumberFilterPopover<T extends object>({ col }: { col: Column<T> }) {
 
   return (
     <Popover>
-      <PopoverTrigger render={(props) => (
-        <Button
-          {...props}
-          variant={hasFilter ? 'outline' : 'ghost'}
-          size="sm"
-          className="h-7 w-full justify-start text-xs font-normal"
-        >
-          <SlidersHorizontal className="h-3 w-3 shrink-0" />
-          <span className="truncate">{label}</span>
-        </Button>
-      )} />
+      <PopoverTrigger
+        render={(props) => (
+          <Button
+            {...props}
+            variant={hasFilter ? 'outline' : 'ghost'}
+            size="sm"
+            className="h-7 w-full justify-start text-xs font-normal"
+          >
+            <SlidersHorizontal className="h-3 w-3 shrink-0" />
+            <span className="truncate">{label}</span>
+          </Button>
+        )}
+      />
       <PopoverContent side="bottom" align="start" className="w-48">
         <div className="flex flex-col gap-2">
           <div className="flex flex-col gap-1">
@@ -424,12 +482,11 @@ function MultiSelectContent<T extends object>({ col, table }: { col: Column<T>; 
       if (v != null) vals.add(String(v))
     })
     setOptions(Array.from(vals).sort())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const toggle = (val: string) => {
-    const next = selected.includes(val)
-      ? selected.filter((v) => v !== val)
-      : [...selected, val]
+    const next = selected.includes(val) ? selected.filter((v) => v !== val) : [...selected, val]
     col.setFilterValue(next.length > 0 ? next : undefined)
   }
 
@@ -465,22 +522,30 @@ function MultiSelectContent<T extends object>({ col, table }: { col: Column<T>; 
 }
 
 // Multi-select trigger button for filter row mode
-function MultiSelectFilterCell<T extends object>({ col, table }: { col: Column<T>; table: Table<T> }) {
+function MultiSelectFilterCell<T extends object>({
+  col,
+  table,
+}: {
+  col: Column<T>
+  table: Table<T>
+}) {
   const selected = (col.getFilterValue() as string[] | undefined) ?? []
   const label = selected.length > 0 ? `${selected.length} selected` : 'Filter…'
 
   return (
     <Popover>
-      <PopoverTrigger render={(props) => (
-        <Button
-          {...props}
-          variant={selected.length > 0 ? 'outline' : 'ghost'}
-          size="sm"
-          className="h-7 w-full justify-start text-xs font-normal"
-        >
-          <span className="truncate">{label}</span>
-        </Button>
-      )} />
+      <PopoverTrigger
+        render={(props) => (
+          <Button
+            {...props}
+            variant={selected.length > 0 ? 'outline' : 'ghost'}
+            size="sm"
+            className="h-7 w-full justify-start text-xs font-normal"
+          >
+            <span className="truncate">{label}</span>
+          </Button>
+        )}
+      />
       <PopoverContent side="bottom" align="start" className="w-48">
         <MultiSelectContent col={col} table={table} />
       </PopoverContent>
@@ -492,8 +557,7 @@ function MultiSelectFilterCell<T extends object>({ col, table }: { col: Column<T
 // DataGridFilterRow
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface DataGridFilterRowProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'bordered'> {
+interface DataGridFilterRowProps<T extends object> extends Pick<TableViewConfig<T>, 'bordered'> {
   visibleLeafColumns: Column<T>[]
   table: Table<T>
   virtual: boolean
@@ -569,7 +633,11 @@ function DataGridFilterRow<T extends object>({
         )
       })}
       {!virtual && tableWidthMode === 'spacer' && (
-        <div role="columnheader" style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-muted" />
+        <div
+          role="columnheader"
+          style={{ flex: 1, minWidth: 0, padding: 0 }}
+          className="bg-muted"
+        />
       )}
     </div>
   )
@@ -579,8 +647,10 @@ function DataGridFilterRow<T extends object>({
 // DataGridBodyRow
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface DataGridBodyRowProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'onRowClick' | 'rowCursor' | 'bordered'> {
+interface DataGridBodyRowProps<T extends object> extends Pick<
+  TableViewConfig<T>,
+  'onRowClick' | 'rowCursor' | 'bordered'
+> {
   row: Row<T>
   table: Table<T>
   style?: React.CSSProperties
@@ -659,7 +729,11 @@ function DataGridBodyRow<T extends object>({
         )
       })}
       {showSpacer && (
-        <div role="gridcell" style={{ flex: 1, minWidth: 0, padding: 0 }} className="bg-background" />
+        <div
+          role="gridcell"
+          style={{ flex: 1, minWidth: 0, padding: 0 }}
+          className="bg-background"
+        />
       )}
     </div>
   )
@@ -669,8 +743,10 @@ function DataGridBodyRow<T extends object>({
 // DataGridVirtualBody
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface DataGridVirtualBodyProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'> {
+interface DataGridVirtualBodyProps<T extends object> extends Pick<
+  TableViewConfig<T>,
+  'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'
+> {
   rows: Row<T>[]
   table: Table<T>
   rowVirtualizer: Virtualizer<HTMLDivElement, Element>
@@ -707,7 +783,11 @@ function DataGridVirtualBody<T extends object>({
             rowHeight={rowHeight}
             dataIndex={virtualRow.index}
             measureRef={rowVirtualizer.measureElement}
-            style={{ position: 'absolute', width: '100%', transform: `translateY(${virtualRow.start}px)` }}
+            style={{
+              position: 'absolute',
+              width: '100%',
+              transform: `translateY(${virtualRow.start}px)`,
+            }}
             onActionTrigger={onActionTrigger}
             fillLast={tableWidthMode === 'fill-last'}
           />
@@ -721,8 +801,16 @@ function DataGridVirtualBody<T extends object>({
 // DataGridFlexBody
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface DataGridFlexBodyProps<T extends object>
-  extends Pick<TableViewConfig<T>, 'isLoading' | 'emptyMessage' | 'emptyContent' | 'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'> {
+interface DataGridFlexBodyProps<T extends object> extends Pick<
+  TableViewConfig<T>,
+  | 'isLoading'
+  | 'emptyMessage'
+  | 'emptyContent'
+  | 'onRowClick'
+  | 'rowCursor'
+  | 'bordered'
+  | 'rowHeight'
+> {
   rows: Row<T>[]
   table: Table<T>
   visibleLeafColumns: Column<T>[]
@@ -765,8 +853,14 @@ function DataGridFlexBody<T extends object>({
                   role="gridcell"
                   key={col.id}
                   data-col-id={col.id}
-                  className={cn('flex items-center px-3 py-1', bordered && 'border-r border-border')}
-                  style={{ ...colStyle(col), ...(fillLast && isLast && { flex: 1, width: 'auto' }) }}
+                  className={cn(
+                    'flex items-center px-3 py-1',
+                    bordered && 'border-r border-border',
+                  )}
+                  style={{
+                    ...colStyle(col),
+                    ...(fillLast && isLast && { flex: 1, width: 'auto' }),
+                  }}
                 >
                   <div className="h-4 w-full animate-pulse rounded bg-muted" />
                 </div>
@@ -785,9 +879,7 @@ function DataGridFlexBody<T extends object>({
         <div role="row" className="flex w-full">
           <div role="gridcell" className="flex-1">
             {emptyContent ?? (
-              <div className="py-12 text-center text-muted-foreground text-sm">
-                {emptyMessage}
-              </div>
+              <div className="py-12 text-center text-muted-foreground text-sm">{emptyMessage}</div>
             )}
           </div>
         </div>
@@ -812,7 +904,11 @@ function DataGridFlexBody<T extends object>({
           />
         )
         if (RowWrapper) {
-          return <RowWrapper key={row.id} row={row}>{bodyRow}</RowWrapper>
+          return (
+            <RowWrapper key={row.id} row={row}>
+              {bodyRow}
+            </RowWrapper>
+          )
         }
         return <React.Fragment key={row.id}>{bodyRow}</React.Fragment>
       })}
@@ -877,7 +973,6 @@ export function DataGridTableView<T extends object>({
     }
   })
 
-
   // ── Separated header/body scroll refs ──────────────────────────────────────
   // headerScrollRef: overflow:hidden panel — scrollLeft is synced from body
   // bodyScrollRef:   actual scroll container — drives virtualizer + scroll events
@@ -904,9 +999,7 @@ export function DataGridTableView<T extends object>({
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    ...(tableHeight && tableHeight !== 'auto'
-      ? { height: tableHeight as string | number }
-      : {}),
+    ...(tableHeight && tableHeight !== 'auto' ? { height: tableHeight as string | number } : {}),
   }
 
   // Body scroll element: fills remaining space after hscroll takes its height
@@ -962,7 +1055,12 @@ export function DataGridTableView<T extends object>({
 
         {/* Body scroll container + scrollbars */}
         <div style={bodyWrapperStyle}>
-          <div ref={bodyScrollRef} style={bodyStyle} onScroll={syncScroll} className="scrollbar-none">
+          <div
+            ref={bodyScrollRef}
+            style={bodyStyle}
+            onScroll={syncScroll}
+            className="scrollbar-none"
+          >
             <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
               {virtual ? (
                 <DataGridVirtualBody
@@ -996,7 +1094,9 @@ export function DataGridTableView<T extends object>({
 
             {loadMoreRef && (
               <div ref={loadMoreRef} className="py-2 flex justify-center">
-                {isFetchingNextPage && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
+                {isFetchingNextPage && (
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                )}
               </div>
             )}
           </div>
@@ -1010,11 +1110,7 @@ export function DataGridTableView<T extends object>({
           />
 
           {/* Horizontal scrollbar — flex item, pushes rows up from inside */}
-          <CustomScrollbar
-            scrollRef={bodyScrollRef}
-            direction="horizontal"
-            style={{ height: 8 }}
-          />
+          <CustomScrollbar scrollRef={bodyScrollRef} direction="horizontal" style={{ height: 8 }} />
         </div>
       </div>
 

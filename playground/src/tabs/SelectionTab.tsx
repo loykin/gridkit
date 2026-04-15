@@ -4,18 +4,27 @@ import type { DataGridColumnDef } from '@loykin/gridkit'
 import { SMALL_DATA, type Employee } from '../data/employees'
 
 const columns: DataGridColumnDef<Employee>[] = [
-  { accessorKey: 'id',         header: 'ID',         meta: { flex: 0.5 } },
-  { accessorKey: 'name',       header: 'Name',       meta: { flex: 2 } },
+  { accessorKey: 'id', header: 'ID', meta: { flex: 0.5 } },
+  { accessorKey: 'name', header: 'Name', meta: { flex: 2 } },
   { accessorKey: 'department', header: 'Department', meta: { flex: 1.5 } },
-  { accessorKey: 'role',       header: 'Role',       meta: { flex: 1.5 } },
+  { accessorKey: 'role', header: 'Role', meta: { flex: 1.5 } },
   {
     accessorKey: 'status',
     header: 'Status',
     meta: { flex: 1 },
     cell: ({ row }) => {
       const s = row.original.status
-      const color = s === 'Active' ? 'bg-green-100 text-green-800' : s === 'On Leave' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-      return <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${color}`}>{s}</span>
+      const color =
+        s === 'Active'
+          ? 'bg-green-100 text-green-800'
+          : s === 'On Leave'
+            ? 'bg-yellow-100 text-yellow-800'
+            : 'bg-red-100 text-red-800'
+      return (
+        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${color}`}>
+          {s}
+        </span>
+      )
     },
   },
 ]

@@ -1,45 +1,55 @@
 import { useState } from 'react'
-import { PaginationTab }  from './tabs/PaginationTab'
-import { InfinityTab }    from './tabs/InfinityTab'
+import { PaginationTab } from './tabs/PaginationTab'
+import { InfinityTab } from './tabs/InfinityTab'
 import { FixedHeightTab } from './tabs/FixedHeightTab'
-import { LargeListTab }   from './tabs/LargeListTab'
-import { LiveUpdateTab }  from './tabs/LiveUpdateTab'
-import { PinningTab }     from './tabs/PinningTab'
-import { SelectionTab }   from './tabs/SelectionTab'
-import { BorderedTab }    from './tabs/BorderedTab'
-import { RowHeightTab }   from './tabs/RowHeightTab'
-import { TreeTab }        from './tabs/TreeTab'
-import { DragTab }        from './tabs/DragTab'
-import { FilterIconTab }  from './tabs/FilterIconTab'
-import { ToolbarTab }     from './tabs/ToolbarTab'
-import { DataStoreTab }  from './tabs/DataStoreTab'
+import { LargeListTab } from './tabs/LargeListTab'
+import { LiveUpdateTab } from './tabs/LiveUpdateTab'
+import { PinningTab } from './tabs/PinningTab'
+import { SelectionTab } from './tabs/SelectionTab'
+import { BorderedTab } from './tabs/BorderedTab'
+import { RowHeightTab } from './tabs/RowHeightTab'
+import { TreeTab } from './tabs/TreeTab'
+import { DragTab } from './tabs/DragTab'
+import { FilterIconTab } from './tabs/FilterIconTab'
+import { ToolbarTab } from './tabs/ToolbarTab'
+import { DataStoreTab } from './tabs/DataStoreTab'
 import { EmptyStateTab } from './tabs/EmptyStateTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
 const TABS = [
-  { id: 'pagination',   label: 'Pagination',      content: <PaginationTab /> },
-  { id: 'infinity',     label: 'Infinite Scroll', content: <InfinityTab /> },
-  { id: 'fixed',        label: 'Fixed Height',    content: <FixedHeightTab /> },
-  { id: 'large-list',   label: 'Large List',      content: <LargeListTab /> },
-  { id: 'live-update',  label: 'Live Update',     content: <LiveUpdateTab /> },
-  { id: 'pinning',      label: 'Column Pinning',  content: <PinningTab /> },
-  { id: 'selection',    label: 'Row Selection',   content: <SelectionTab /> },
-  { id: 'bordered',     label: 'Bordered',        content: <BorderedTab /> },
-  { id: 'row-height',   label: 'Row Height',      content: <RowHeightTab /> },
-  { id: 'tree',         label: 'Tree / Groups',   content: <TreeTab /> },
-  { id: 'drag',         label: 'Row Drag',        content: <DragTab /> },
-  { id: 'filter-icon',  label: 'Filter Icon',     content: <FilterIconTab /> },
-  { id: 'toolbar',      label: 'Toolbar',         content: <ToolbarTab /> },
-  { id: 'data-store',  label: 'DataStore',       content: <DataStoreTab /> },
-  { id: 'empty-state', label: 'Empty State',     content: <EmptyStateTab /> },
+  { id: 'pagination', label: 'Pagination', content: <PaginationTab /> },
+  { id: 'infinity', label: 'Infinite Scroll', content: <InfinityTab /> },
+  { id: 'fixed', label: 'Fixed Height', content: <FixedHeightTab /> },
+  { id: 'large-list', label: 'Large List', content: <LargeListTab /> },
+  { id: 'live-update', label: 'Live Update', content: <LiveUpdateTab /> },
+  { id: 'pinning', label: 'Column Pinning', content: <PinningTab /> },
+  { id: 'selection', label: 'Row Selection', content: <SelectionTab /> },
+  { id: 'bordered', label: 'Bordered', content: <BorderedTab /> },
+  { id: 'row-height', label: 'Row Height', content: <RowHeightTab /> },
+  { id: 'tree', label: 'Tree / Groups', content: <TreeTab /> },
+  { id: 'drag', label: 'Row Drag', content: <DragTab /> },
+  { id: 'filter-icon', label: 'Filter Icon', content: <FilterIconTab /> },
+  { id: 'toolbar', label: 'Toolbar', content: <ToolbarTab /> },
+  { id: 'data-store', label: 'DataStore', content: <DataStoreTab /> },
+  { id: 'empty-state', label: 'Empty State', content: <EmptyStateTab /> },
 ] as const
 
-type TabId = typeof TABS[number]['id']
+type TabId = (typeof TABS)[number]['id']
 
-function ThemeSwatch({ theme, active, onClick }: { theme: Theme; active: boolean; onClick: () => void }) {
-  const primary = theme.vars['--dg-primary'] ?? (theme.dark ? 'oklch(0.424 0.199 265.638)' : 'oklch(0.488 0.243 264.376)')
-  const bg      = theme.vars['--dg-background'] ?? (theme.dark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)')
+function ThemeSwatch({
+  theme,
+  active,
+  onClick,
+}: {
+  theme: Theme
+  active: boolean
+  onClick: () => void
+}) {
+  const primary =
+    theme.vars['--dg-primary'] ??
+    (theme.dark ? 'oklch(0.424 0.199 265.638)' : 'oklch(0.488 0.243 264.376)')
+  const bg = theme.vars['--dg-background'] ?? (theme.dark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)')
   return (
     <button
       onClick={onClick}
@@ -58,18 +68,18 @@ function ThemeSwatch({ theme, active, onClick }: { theme: Theme; active: boolean
 }
 
 const RADIUS_PRESETS = [
-  { label: 'None',  value: '0rem'    },
-  { label: 'SM',    value: '0.25rem' },
-  { label: 'MD',    value: '0.375rem'},
-  { label: 'LG',    value: '0.5rem'  },
-  { label: 'XL',    value: '0.75rem' },
+  { label: 'None', value: '0rem' },
+  { label: 'SM', value: '0.25rem' },
+  { label: 'MD', value: '0.375rem' },
+  { label: 'LG', value: '0.5rem' },
+  { label: 'XL', value: '0.75rem' },
 ] as const
 
-type RadiusValue = typeof RADIUS_PRESETS[number]['value']
+type RadiusValue = (typeof RADIUS_PRESETS)[number]['value']
 
 export default function App() {
   const [active, setActive] = useState<TabId>('pagination')
-  const [theme, setTheme]   = useState<Theme>(THEMES[0]!)
+  const [theme, setTheme] = useState<Theme>(THEMES[0]!)
   const [radius, setRadius] = useState<RadiusValue>('0rem')
   const current = TABS.find((t) => t.id === active)!
 
@@ -82,7 +92,6 @@ export default function App() {
     <PlaygroundContext value={{ rounded: radius !== '0rem' }}>
       <div className={theme.dark ? 'dark' : ''} style={themeStyle}>
         <div className="min-h-screen bg-background text-foreground">
-
           {/* Header */}
           <div className="border-b border-border px-8 py-3 flex items-center justify-between gap-4 flex-wrap">
             <div>
@@ -145,10 +154,7 @@ export default function App() {
           </div>
 
           {/* Content */}
-          <div className="px-8 py-6">
-            {current.content}
-          </div>
-
+          <div className="px-8 py-6">{current.content}</div>
         </div>
       </div>
     </PlaygroundContext>

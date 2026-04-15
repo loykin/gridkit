@@ -6,6 +6,6 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', '@tanstack/react-table', '@tanstack/react-virtual'],
   treeshake: true,
 })

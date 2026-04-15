@@ -11,17 +11,16 @@ import * as React from 'react'
  * This eliminates the scrollbar-track-over-header problem that occurred
  * when both were inside a single overflow:auto container.
  */
-const ScrollTable = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="table"
-    className={['text-sm', className].filter(Boolean).join(' ')}
-    {...props}
-  />
-))
+const ScrollTable = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      role="table"
+      className={['text-sm', className].filter(Boolean).join(' ')}
+      {...props}
+    />
+  ),
+)
 ScrollTable.displayName = 'ScrollTable'
 
 export { ScrollTable }

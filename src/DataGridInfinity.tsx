@@ -15,8 +15,10 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
     isLoading,
   } = props
 
-  const { wrapperRef, containerRef, table, rows, isSized, measure } =
-    useDataGridBase({ ...props, enablePagination: false })
+  const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase({
+    ...props,
+    enablePagination: false,
+  })
 
   const { loadMoreRef } = useInfiniteScroll({
     hasNextPage,

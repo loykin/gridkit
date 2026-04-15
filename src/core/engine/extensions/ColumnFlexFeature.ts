@@ -1,9 +1,4 @@
-import type {
-  ColumnSizingState,
-  RowData,
-  TableFeature,
-  Table,
-} from '@tanstack/react-table'
+import type { ColumnSizingState, RowData, TableFeature, Table } from '@tanstack/react-table'
 
 // ── Declaration merging ───────────────────────────────────────────────────────
 declare module '@tanstack/react-table' {
@@ -26,6 +21,7 @@ declare module '@tanstack/react-table' {
     wrap?: boolean
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Table<TData extends RowData> {
     /** Calculate flex/auto column widths relative to containerWidth */
     getFlexColumnSizing: (containerWidth: number) => ColumnSizingState
@@ -37,23 +33,20 @@ export const ColumnFlexFeature: TableFeature = {
   getDefaultColumnDef: () => ({ minSize: 60 }),
 
   createTable: (table) => {
-    ;(table as any).getFlexColumnSizing = (
-      containerWidth: number
-    ): ColumnSizingState => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(table as any).getFlexColumnSizing = (containerWidth: number): ColumnSizingState => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const columns = (table as unknown as Table<any>).getAllLeafColumns()
       const sizing: ColumnSizingState = {}
 
-      const flexCols = columns.filter(col => col.columnDef.meta?.flex != null)
+      const flexCols = columns.filter((col) => col.columnDef.meta?.flex != null)
       if (flexCols.length === 0) return sizing
 
       const fixedWidth = columns
-        .filter(col => col.columnDef.meta?.flex == null)
+        .filter((col) => col.columnDef.meta?.flex == null)
         .reduce((sum, col) => sum + col.getSize(), 0)
 
-      const totalFlex = flexCols.reduce(
-        (sum, col) => sum + col.columnDef.meta!.flex!,
-        0
-      )
+      const totalFlex = flexCols.reduce((sum, col) => sum + col.columnDef.meta!.flex!, 0)
       const available = Math.max(0, containerWidth - fixedWidth)
       let distributed = 0
 

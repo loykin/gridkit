@@ -4,13 +4,13 @@ import { LayoutDashboard, Folder, Star, LayoutGrid } from 'lucide-react'
 import { DASHBOARD_TREE, type DashboardItem } from '../data/dashboards'
 
 const TAG_COLORS: Record<string, string> = {
-  prod:    'bg-blue-100 text-blue-700',
+  prod: 'bg-blue-100 text-blue-700',
   staging: 'bg-yellow-100 text-yellow-700',
-  k8s:     'bg-purple-100 text-purple-700',
-  db:      'bg-orange-100 text-orange-700',
-  api:     'bg-green-100 text-green-700',
-  infra:   'bg-gray-100 text-gray-700',
-  alerts:  'bg-red-100 text-red-700',
+  k8s: 'bg-purple-100 text-purple-700',
+  db: 'bg-orange-100 text-orange-700',
+  api: 'bg-green-100 text-green-700',
+  infra: 'bg-gray-100 text-gray-700',
+  alerts: 'bg-red-100 text-red-700',
   metrics: 'bg-teal-100 text-teal-700',
 }
 
@@ -24,13 +24,12 @@ const columns: DataGridColumnDef<DashboardItem>[] = [
       const isGroup = row.original.type === 'group'
       return (
         <TreeCell row={row} indentSize={20}>
-          {isGroup
-            ? <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
-            : <LayoutDashboard className="h-4 w-4 shrink-0 text-muted-foreground/60" />
-          }
-          <span className={`truncate ${isGroup ? 'font-medium' : ''}`}>
-            {row.original.name}
-          </span>
+          {isGroup ? (
+            <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
+          ) : (
+            <LayoutDashboard className="h-4 w-4 shrink-0 text-muted-foreground/60" />
+          )}
+          <span className={`truncate ${isGroup ? 'font-medium' : ''}`}>{row.original.name}</span>
         </TreeCell>
       )
     },
@@ -62,9 +61,9 @@ const columns: DataGridColumnDef<DashboardItem>[] = [
     size: 72,
     meta: { align: 'center' },
     cell: ({ row }) =>
-      row.original.starred
-        ? <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-        : null,
+      row.original.starred ? (
+        <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+      ) : null,
   },
 
   {
@@ -99,7 +98,8 @@ export function TreeTab() {
   return (
     <section className="flex flex-col gap-2">
       <p className="text-xs text-muted-foreground">
-        3-depth tree: Group → Subgroup → Dashboard. Standalone dashboards appear at root level without a toggle.
+        3-depth tree: Group → Subgroup → Dashboard. Standalone dashboards appear at root level
+        without a toggle.
       </p>
       <DataGrid
         data={DASHBOARD_TREE}
