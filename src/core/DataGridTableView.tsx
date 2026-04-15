@@ -1020,7 +1020,16 @@ export function DataGridTableView<T extends object>({
       */}
       <div
         ref={containerRef}
-        style={{ position: 'relative', width: '100%', minWidth: 0, isolation: 'isolate' }}
+        style={{
+          position: 'relative',
+          width: '100%',
+          minWidth: 0,
+          isolation: 'isolate',
+          // Limit reflow scope to this subtree.
+          // 'layout paint' isolates layout and paint without size containment,
+          // which is required since the outer div's height is determined by its children.
+          contain: 'layout paint',
+        }}
         className="rounded-md border border-border"
       >
         {/* Header panel — conditionally rendered, overflow:hidden, scrollLeft mirrors body */}
