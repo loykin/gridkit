@@ -854,12 +854,12 @@ function DataGridFlexBody<T extends object>({
 
   if (isLoading) {
     return (
-      <div role="rowgroup" style={{ display: 'block' }} className="[&>div:last-child]:border-b-0">
+      <div role="rowgroup" style={{ display: 'block' }}>
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             role="row"
             key={i}
-            className="flex w-full border-b border-border"
+            className={cn('flex w-full', i < 5 && 'border-b border-border')}
             style={{ minHeight: rowHeight }}
           >
             {visibleLeafColumns.map((col, colIdx) => {
@@ -904,8 +904,8 @@ function DataGridFlexBody<T extends object>({
   }
 
   return (
-    <div role="rowgroup" style={{ display: 'block' }} className="[&>div:last-child]:border-b-0">
-      {rows.map((row) => {
+    <div role="rowgroup" style={{ display: 'block' }}>
+      {rows.map((row, index) => {
         const bodyRow = (
           <DataGridBodyRow
             row={row}
@@ -918,6 +918,7 @@ function DataGridFlexBody<T extends object>({
             fillLast={fillLast}
             onActionTrigger={onActionTrigger}
             classNames={classNames}
+            isLastRow={index === rows.length - 1}
           />
         )
         if (RowWrapper) {
