@@ -7,6 +7,7 @@ interface UseColumnSizingOptions<T extends object> {
   columns: DataGridColumnDef<T>[]
   containerRef: React.RefObject<HTMLDivElement | null>
   mode: ColumnSizingMode
+  initialSizing?: ColumnSizingState
 }
 
 interface SizingState {
@@ -24,13 +25,23 @@ export function useColumnSizing<T extends object>({
   columns,
   containerRef,
   mode,
+  initialSizing,
 }: UseColumnSizingOptions<T>) {
   const userResized = useRef(new Set<string>())
   const lastComputed = useRef<ColumnSizingState>({})
   const lastContainerWidth = useRef<number>(0)
   const lastFlexFixedWidth = useRef<number | null>(null)
   const hasSized = useRef(false)
-  const [state, setState] = useState<SizingState>({ sizing: {}, isSized: false })
+  const [state, setState] = useState<SizingState>(() => {
+    if (initialSizing && Object.keys(initialSizing).length > 0) {
+      // Mark externally provided columns as user-resized so measure() won't overwrite them
+      for (const colId of Object.keys(initialSizing)) {
+        userResized.current.add(colId)
+      }
+      return { sizing: initialSizing, isSized: false }
+    }
+    return { sizing: {}, isSized: false }
+  })
 
   // Expose a setSizing that matches Dispatch<SetStateAction<ColumnSizingState>>
   // so TanStack's onColumnSizingChange can call it directly.

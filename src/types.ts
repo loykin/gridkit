@@ -163,6 +163,13 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
 
   // Column sizing & visibility
   /**
+   * Initial column sizing state. When provided, these widths are used on mount
+   * and treated as user-set (auto-measurement will not overwrite them).
+   * Pair with onColumnSizingChange to persist widths externally:
+   *   localStorage, URL query, backend, etc.
+   */
+  columnSizing?: ColumnSizingState
+  /**
    * Controls when column resize updates are applied.
    * - 'onChange' (default): live update while dragging
    * - 'onEnd': update only when drag ends

@@ -35,6 +35,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     enableColumnFilters = false,
     visibilityState,
     initialPinning,
+    columnSizing,
     columnSizingMode = 'flex',
     checkboxConfig,
     enableExpanding,
@@ -64,6 +65,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     columns,
     containerRef,
     mode: columnSizingMode,
+    initialSizing: columnSizing,
   })
 
   const { table } = useDataGridCore({
