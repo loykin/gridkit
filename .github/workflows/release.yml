@@ -72,7 +72,15 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Publish to npm
-        run: pnpm publish --no-git-checks --access public
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" =~ -(alpha|beta|rc|next) ]]; then
+            TAG="${BASH_REMATCH[1]}"
+            pnpm publish --no-git-checks --access public --tag "$TAG"
+          else
+            pnpm publish --no-git-checks --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
