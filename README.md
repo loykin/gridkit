@@ -2,6 +2,8 @@
 
 A feature-rich React DataGrid component built on TanStack Table with virtualization, sorting, filtering, pagination, and real-time updates.
 
+**[Live Playground →](https://loykin.github.io/gridkit/playground/)** · **[GitHub →](https://github.com/loykin/gridkit)**
+
 ## Features
 
 - **Virtualization** — renders only visible rows via `@tanstack/react-virtual` for large datasets
