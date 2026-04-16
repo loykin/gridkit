@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      - name: Trivy Scan (npm dependencies)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          format: json
+          output: trivy-report.json
+
+      - name: Upload Trivy report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish-trivy-badge:
+    name: Publish Trivy Badge
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Trivy report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-report
+          path: .
+
+      - name: Prepare Trivy Shields JSON
+        shell: bash
+        run: |
+          mkdir -p shields
+          CRITICAL=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' trivy-report.json)
+          HIGH=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="HIGH")] | length' trivy-report.json)
+          MEDIUM=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="MEDIUM")] | length' trivy-report.json)
+          LOW=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity=="LOW")] | length' trivy-report.json)
+
+          TOTAL=$((CRITICAL + HIGH + MEDIUM + LOW))
+
+          if [ $((CRITICAL + HIGH)) -gt 0 ]; then
+            COLOR=red
+          elif [ $MEDIUM -gt 0 ]; then
+            COLOR=yellow
+          else
+            COLOR=brightgreen
+          fi
+
+          echo "{\"schemaVersion\":1,\"label\":\"Trivy\",\"message\":\"$TOTAL\",\"color\":\"$COLOR\"}" > shields/trivy.json
+
+      - name: Publish Trivy badge to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: shields
+          destination_dir: shields
+          keep_files: true
+          commit_message: "chore(ci): publish Trivy badge (Shields)"
