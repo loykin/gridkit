@@ -134,7 +134,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build playground
-        run: VITE_BASE_PATH=/gridkit/ pnpm --filter data-grid-playground build
+        run: VITE_BASE_PATH=/gridkit/playground/ pnpm --filter data-grid-playground build
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
