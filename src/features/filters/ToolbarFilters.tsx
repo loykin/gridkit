@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
+import { getColumnOptions } from '@/core/hooks/useColumnOptions'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SelectFilter — single value dropdown for toolbar
@@ -23,12 +24,7 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
 
   const handleOpenChange = (open: boolean) => {
     if (open && options === null) {
-      const vals = new Set<string>()
-      table.getCoreRowModel().rows.forEach((row) => {
-        const v = row.getValue(columnId)
-        if (v != null) vals.add(String(v))
-      })
-      setOptions(Array.from(vals).sort())
+      setOptions(getColumnOptions(table, columnId))
     }
   }
 
@@ -101,12 +97,7 @@ export function MultiSelectFilter<T extends object>({
   const selected = (col?.getFilterValue() as string[] | undefined) ?? []
 
   useEffect(() => {
-    const vals = new Set<string>()
-    table.getCoreRowModel().rows.forEach((row) => {
-      const v = row.getValue(columnId)
-      if (v != null) vals.add(String(v))
-    })
-    setOptions(Array.from(vals).sort())
+    setOptions(getColumnOptions(table, columnId))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

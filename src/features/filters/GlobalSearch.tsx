@@ -18,6 +18,12 @@ export function GlobalSearch<T extends object>({
 }: Props<T>) {
   const [value, setValue] = useState(String(table.getState().globalFilter ?? ''))
 
+  // Sync when external code changes globalFilter (e.g. clear-all button)
+  const externalFilter = String(table.getState().globalFilter ?? '')
+  useEffect(() => {
+    setValue(externalFilter)
+  }, [externalFilter])
+
   useEffect(() => {
     const timeout = setTimeout(() => table.setGlobalFilter(value || undefined), 200)
     return () => clearTimeout(timeout)
