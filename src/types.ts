@@ -7,6 +7,7 @@ import type {
   Row,
   SortingState,
   Table,
+  TableOptions,
   VisibilityState,
 } from '@tanstack/react-table'
 import type { DataStore } from './core/engine/DataStore'
@@ -18,6 +19,29 @@ import type { DataStore } from './core/engine/DataStore'
 //   src/core/engine/extensions/DataStoreFeature.ts     — applyTransaction, getRowNodeById
 
 export type DataGridColumnDef<T extends object> = ColumnDef<T, unknown>
+
+/**
+ * Safe pass-through for advanced TanStack Table options.
+ * State ownership, event handlers, row models, and manual-policy keys are
+ * excluded — those are managed internally or exposed as explicit props.
+ * Pass as `tableOptions` on any DataGrid component.
+ */
+export type PassthroughTableOptions<T extends object> = Omit<
+  TableOptions<T>,
+  // State ownership
+  | 'data' | 'columns' | 'state' | 'getRowId'
+  // Event handlers (owned internally)
+  | 'onSortingChange' | 'onColumnFiltersChange' | 'onGlobalFilterChange'
+  | 'onColumnVisibilityChange' | 'onColumnSizingChange' | 'onPaginationChange'
+  | 'onExpandedChange'
+  // Row models (built conditionally based on props)
+  | 'getCoreRowModel' | 'getSortedRowModel' | 'getFilteredRowModel'
+  | 'getPaginationRowModel' | 'getExpandedRowModel'
+  // Manual-policy keys exposed as individual props
+  | 'manualSorting' | 'manualPagination' | 'manualFiltering'
+  // Internal extension hook
+  | '_features'
+>
 
 export type ColumnSizingMode = 'auto' | 'flex' | 'fixed'
 
@@ -127,6 +151,8 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   manualSorting?: boolean
 
   // Server-side filtering
+  /** Set true when filtering is handled server-side. Disables client-side getFilteredRowModel. */
+  manualFiltering?: boolean
   columnFilters?: ColumnFiltersState
   globalFilter?: string
   onGlobalFilterChange?: (value: string) => void
@@ -135,6 +161,12 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   rightFilters?: (table: Table<T>) => React.ReactNode
 
   // Column sizing & visibility
+  /**
+   * Controls when column resize updates are applied.
+   * - 'onChange' (default): live update while dragging
+   * - 'onEnd': update only when drag ends
+   */
+  columnResizeMode?: 'onChange' | 'onEnd'
   visibilityState?: VisibilityState
   /** Initial column pinning — { left: ['id', ...], right: ['id', ...] } */
   initialPinning?: ColumnPinningState
@@ -164,6 +196,14 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   // Callbacks
   onTableReady?: (table: Table<T>) => void
   onColumnSizingChange?: (sizing: ColumnSizingState) => void
+
+  /**
+   * Escape hatch for advanced TanStack Table options not exposed as individual props.
+   * Commonly used: `meta`, `autoResetPageIndex`, `autoResetColumnFilters`,
+   * `autoResetGlobalFilter`, `autoResetSorting`, `defaultColumn`, `debugTable`.
+   * Explicit DataGrid props always take precedence over values passed here.
+   */
+  tableOptions?: PassthroughTableOptions<T>
 }
 
 export interface DataGridProps<T extends object> extends DataGridBaseProps<T> {

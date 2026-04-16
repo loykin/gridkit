@@ -51,11 +51,13 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'initialSorting'
   | 'onSortingChange'
   | 'manualSorting'
+  | 'manualFiltering'
   | 'columnFilters'
   | 'globalFilter'
   | 'onGlobalFilterChange'
   | 'searchableColumns'
   | 'enableColumnResizing'
+  | 'columnResizeMode'
   | 'enableColumnFilters'
   | 'visibilityState'
   | 'initialPinning'
@@ -65,6 +67,7 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'onColumnSizingChange'
   | 'enableExpanding'
   | 'getSubRows'
+  | 'tableOptions'
 > {
   columns: DataGridColumnDef<T>[]
   getRowId?: (originalRow: T, index: number) => string
@@ -84,11 +87,13 @@ export function useDataGridCore<T extends object>({
   initialSorting,
   onSortingChange,
   manualSorting = false,
+  manualFiltering = false,
   columnFilters: externalColumnFilters,
   globalFilter: externalGlobalFilter,
   onGlobalFilterChange,
   searchableColumns,
   enableColumnResizing = true,
+  columnResizeMode = 'onChange',
   enableColumnFilters = false,
   visibilityState,
   initialPinning,
@@ -103,6 +108,7 @@ export function useDataGridCore<T extends object>({
   enableExpanding = false,
   getSubRows,
   getRowId,
+  tableOptions,
   sizing,
   setSizing,
 }: UseDataGridCoreOptions<T>) {
@@ -185,6 +191,8 @@ export function useDataGridCore<T extends object>({
   )
 
   const table = useReactTable<T>({
+    // Escape hatch — spread first so explicit props below always win
+    ...tableOptions,
     // When dataStore is active, data is irrelevant — getDataStoreCoreRowModel
     // reads directly from the store. Pass empty array to satisfy the type.
     data: dataStore ? ([] as T[]) : data,
@@ -203,6 +211,7 @@ export function useDataGridCore<T extends object>({
       ...(enableExpanding ? { expanded } : {}),
     },
     manualSorting,
+    manualFiltering,
     manualPagination: totalCount !== undefined,
     pageCount:
       totalCount !== undefined && pagination.pageSize > 0
@@ -266,14 +275,14 @@ export function useDataGridCore<T extends object>({
     getCoreRowModel: dataStore ? getDataStoreCoreRowModel<T>() : getCoreRowModel(),
     getExpandedRowModel: enableExpanding ? getExpandedRowModel() : undefined,
     getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    getFilteredRowModel: manualFiltering ? undefined : getFilteredRowModel(),
     getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
 
     globalFilterFn:
       (searchableFilterFn as FilterFn<T> | undefined) ??
       (defaultGlobalFilterFn as unknown as FilterFn<T>),
     enableColumnResizing,
-    columnResizeMode: 'onChange',
+    columnResizeMode,
     enableSorting,
     enableColumnFilters,
   })
