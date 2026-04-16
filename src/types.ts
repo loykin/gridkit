@@ -154,6 +154,7 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   /** Set true when filtering is handled server-side. Disables client-side getFilteredRowModel. */
   manualFiltering?: boolean
   columnFilters?: ColumnFiltersState
+  onColumnFiltersChange?: (filters: ColumnFiltersState) => void
   globalFilter?: string
   onGlobalFilterChange?: (value: string) => void
   searchableColumns?: string[]

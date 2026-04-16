@@ -53,6 +53,7 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'manualSorting'
   | 'manualFiltering'
   | 'columnFilters'
+  | 'onColumnFiltersChange'
   | 'globalFilter'
   | 'onGlobalFilterChange'
   | 'searchableColumns'
@@ -89,6 +90,7 @@ export function useDataGridCore<T extends object>({
   manualSorting = false,
   manualFiltering = false,
   columnFilters: externalColumnFilters,
+  onColumnFiltersChange,
   globalFilter: externalGlobalFilter,
   onGlobalFilterChange,
   searchableColumns,
@@ -225,11 +227,12 @@ export function useDataGridCore<T extends object>({
         return next
       })
     },
-    onColumnFiltersChange: externalColumnFilters
-      ? undefined
-      : (updater) => {
-          setInternalFilters((prev) => (typeof updater === 'function' ? updater(prev) : updater))
-        },
+    onColumnFiltersChange: (updater) => {
+      const next =
+        typeof updater === 'function' ? updater(effectiveColumnFilters) : updater
+      if (externalColumnFilters === undefined) setInternalFilters(next)
+      onColumnFiltersChange?.(next)
+    },
     onGlobalFilterChange: externalGlobalFilter
       ? undefined
       : (updater) => {
