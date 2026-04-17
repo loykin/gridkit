@@ -10,7 +10,8 @@ export { DragHandleCell } from './features/reordering/DragHandleCell'
 // DataStore API
 export { useDataStore } from './core/engine/useDataStore'
 export { createDataStore } from './core/engine/DataStore'
-export type { DataStore, Transaction } from './core/engine/DataStore'
+export type { DataStore, Transaction, DataStoreOptions } from './core/engine/DataStore'
+export type { DataStoreBackend, QueryParams, QueryResult } from './core/engine/backends/DataStoreBackend'
 
 export type {
   DataGridProps,

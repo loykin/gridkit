@@ -1,9 +1,5 @@
 import { useMemo } from 'react'
-import { createDataStore, type DataStore } from './DataStore'
-
-interface UseDataStoreOptions<T> {
-  getRowId: (item: T, index: number) => string
-}
+import { createDataStore, type DataStore, type DataStoreOptions } from './DataStore'
 
 /**
  * Creates and memoizes a DataStore instance for use with <DataGrid dataStore={store} />.
@@ -12,19 +8,18 @@ interface UseDataStoreOptions<T> {
  * callback (e.g. defined outside render or wrapped in useCallback).
  *
  * @example
+ * // Basic usage
  * const store = useDataStore<Pod>({ getRowId: p => p.name })
  *
- * useEffect(() => {
- *   const watcher = watchPods(namespace, {
- *     onAdded:    pod  => store.applyTransaction({ add: [pod] }),
- *     onModified: pod  => store.applyTransaction({ update: [{ id: pod.name, data: pod }] }),
- *     onDeleted:  name => store.applyTransaction({ remove: [name] }),
- *   })
- *   return () => watcher.stop()
- * }, [namespace])
+ * @example
+ * // Ring buffer for log streaming (keeps latest 5000 rows in memory)
+ * const store = useDataStore<LogEntry>({ getRowId: l => l.id, maxSize: 5000 })
+ *
+ * @example
+ * // With a persistence backend
+ * const store = useDataStore<AuditEvent>({ getRowId: e => e.id, backend: myBackend })
  */
-export function useDataStore<T>(options: UseDataStoreOptions<T>): DataStore<T> {
-  const { getRowId } = options
+export function useDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => createDataStore<T>(getRowId), [])
+  return useMemo(() => createDataStore<T>(options), [])
 }

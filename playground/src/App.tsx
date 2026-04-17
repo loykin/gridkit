@@ -13,6 +13,8 @@ import { DragTab } from './tabs/DragTab'
 import { FilterIconTab } from './tabs/FilterIconTab'
 import { ToolbarTab } from './tabs/ToolbarTab'
 import { DataStoreTab } from './tabs/DataStoreTab'
+import { LogStreamTab } from './tabs/LogStreamTab'
+import { BackendTab } from './tabs/BackendTab'
 import { EmptyStateTab } from './tabs/EmptyStateTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
@@ -32,6 +34,8 @@ const TABS = [
   { id: 'filter-icon', label: 'Filter Icon', content: <FilterIconTab /> },
   { id: 'toolbar', label: 'Toolbar', content: <ToolbarTab /> },
   { id: 'data-store', label: 'DataStore', content: <DataStoreTab /> },
+  { id: 'log-stream', label: 'Log Stream', content: <LogStreamTab /> },
+  { id: 'backend', label: 'Backend', content: <BackendTab /> },
   { id: 'empty-state', label: 'Empty State', content: <EmptyStateTab /> },
 ] as const
 
