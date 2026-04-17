@@ -39,7 +39,7 @@ export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) 
               size="icon-xs"
               className={cn(
                 'h-5 w-5 shrink-0',
-                hasFilter ? 'text-primary opacity-100' : 'opacity-0 group-hover:opacity-60',
+                hasFilter ? 'text-[var(--dg-primary)] opacity-100' : 'opacity-0 group-hover:opacity-60',
               )}
             >
               <Filter className="h-3 w-3" />

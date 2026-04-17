@@ -128,11 +128,15 @@ export function DataGridTableView<T extends object>({
           // which is required since the outer div's height is determined by its children.
           contain: 'layout paint',
         }}
-        className={cn('rounded-md border border-border', classNames?.container)}
+        className={cn(
+          'dg-container',
+          'relative min-w-0 overflow-hidden border border-[var(--dg-border)] rounded-[--dg-radius]',
+          classNames?.container,
+        )}
       >
         {/* Header panel — conditionally rendered, overflow:hidden, scrollLeft mirrors body */}
         {showHeader && (
-          <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className={cn('bg-muted', classNames?.header)}>
+          <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className={cn('dg-header', 'bg-[var(--dg-muted)]', classNames?.header)}>
             <div style={{ width: innerWidth, minWidth: '100%' }}>
               {headerGroups.map((headerGroup) => (
                 <DataGridHeaderRow
@@ -167,7 +171,7 @@ export function DataGridTableView<T extends object>({
             ref={bodyScrollRef}
             style={bodyStyle}
             onScroll={syncScroll}
-            className="scrollbar-none bg-background"
+            className={cn('scrollbar-none', 'bg-[var(--dg-background)]')}
           >
             <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
               <DataGridBody
@@ -191,7 +195,7 @@ export function DataGridTableView<T extends object>({
             {loadMoreRef && (
               <div ref={loadMoreRef} className="py-2 flex justify-center">
                 {isFetchingNextPage && (
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-5 w-5 animate-spin text-[var(--dg-muted-foreground)]" />
                 )}
               </div>
             )}
@@ -221,7 +225,14 @@ export function DataGridTableView<T extends object>({
               sideOffset={4}
               className="isolate z-50 outline-none"
             >
-              <ActionMenu.Popup className="min-w-32 origin-(--transform-origin) overflow-hidden rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
+              <ActionMenu.Popup className={cn(
+                'dg-action-menu',
+                'min-w-32 origin-(--transform-origin) overflow-hidden',
+                'rounded-lg bg-[var(--dg-popover)] p-1 text-[var(--dg-popover-foreground)]',
+                'shadow-md ring-1 ring-[var(--dg-foreground)]/10 duration-100 outline-none',
+                'data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95',
+                'data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+              )}>
                 {actionItems.map((item, i) => (
                   <ActionMenu.Item
                     key={i}
@@ -231,7 +242,16 @@ export function DataGridTableView<T extends object>({
                       item.onClick(activeRow!)
                       setActionMenuOpen(false)
                     }}
-                    className="relative flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+                    className={cn(
+                      'dg-action-item',
+                      'relative flex cursor-default items-center gap-1.5 outline-hidden select-none',
+                      'rounded-md px-1.5 py-1 text-sm',
+                      'focus:bg-[var(--dg-accent)] focus:text-[var(--dg-accent-foreground)]',
+                      'data-[variant=destructive]:text-[var(--dg-destructive)]',
+                      'data-[variant=destructive]:focus:bg-[var(--dg-destructive)]/10',
+                      'data-disabled:pointer-events-none data-disabled:opacity-50',
+                      "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+                    )}
                   >
                     {item.icon}
                     {item.label}

@@ -6,31 +6,33 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Map Tailwind color tokens → --dg-* variables.
- * Component code uses standard Tailwind classes (bg-background, text-foreground, etc.)
- * and those classes resolve through --dg-* — no component changes needed.
+ * Map --dg-* variables to Tailwind v4 color tokens.
+ * Using @theme inline means utilities like bg-background compile to
+ * background-color: var(--dg-background) — dynamic at runtime.
+ *
+ * In the built CSS output this block is compiled away, so consumers
+ * importing the built package do NOT get their Tailwind tokens polluted.
+ * Only the playground (which imports library source directly) is affected,
+ * which is the intended behavior.
  */
 @theme inline {
-  --font-sans: sans-serif;
-  --color-background:          var(--dg-background);
-  --color-foreground:          var(--dg-foreground);
-  --color-popover:             var(--dg-popover);
-  --color-popover-foreground:  var(--dg-popover-foreground);
-  --color-primary:             var(--dg-primary);
-  --color-primary-foreground:  var(--dg-primary-foreground);
-  --color-secondary:           var(--dg-secondary);
+  --color-background:           var(--dg-background);
+  --color-foreground:           var(--dg-foreground);
+  --color-popover:              var(--dg-popover);
+  --color-popover-foreground:   var(--dg-popover-foreground);
+  --color-primary:              var(--dg-primary);
+  --color-primary-foreground:   var(--dg-primary-foreground);
+  --color-secondary:            var(--dg-secondary);
   --color-secondary-foreground: var(--dg-secondary-foreground);
-  --color-muted:               var(--dg-muted);
-  --color-muted-foreground:    var(--dg-muted-foreground);
-  --color-accent:              var(--dg-accent);
-  --color-accent-foreground:   var(--dg-accent-foreground);
-  --color-destructive:         var(--dg-destructive);
-  --color-border:              var(--dg-border);
-  --color-input:               var(--dg-input);
-  --color-ring:                var(--dg-ring);
-  --radius-sm: calc(var(--dg-radius) * 0.6);
-  --radius-md: calc(var(--dg-radius) * 0.8);
-  --radius-lg: var(--dg-radius);
+  --color-muted:                var(--dg-muted);
+  --color-muted-foreground:     var(--dg-muted-foreground);
+  --color-accent:               var(--dg-accent);
+  --color-accent-foreground:    var(--dg-accent-foreground);
+  --color-destructive:          var(--dg-destructive);
+  --color-border:               var(--dg-border);
+  --color-input:                var(--dg-input);
+  --color-ring:                 var(--dg-ring);
+  --radius:                     var(--dg-radius);
 }
 
 /*
@@ -87,4 +89,271 @@
       display: none;
     }
   }
+}
+
+/* ── DataGrid structural & visual rules ─────────────────────────────────── */
+
+.dg-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.dg-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  font-size: 14px;
+  color: var(--dg-destructive);
+}
+
+.dg-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dg-container {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--dg-border);
+  border-radius: var(--dg-radius);
+}
+
+.dg-header {
+  overflow: hidden;
+}
+
+.dg-header-row {
+  display: flex;
+  border-bottom: 1px solid var(--dg-border);
+}
+
+.dg-header-cell {
+  position: relative;
+  height: 100%;
+  user-select: none;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--dg-muted);
+  color: var(--dg-muted-foreground);
+}
+
+.dg-header-cell[data-sortable="true"] {
+  cursor: pointer;
+}
+
+.dg-header-cell[data-pinned="left"] {
+  box-shadow: 1px 0 0 0 var(--dg-border);
+}
+
+.dg-header-cell[data-pinned="right"] {
+  box-shadow: -1px 0 0 0 var(--dg-border);
+}
+
+.dg-header-cell[data-bordered="true"] {
+  border-right: 1px solid var(--dg-border);
+}
+
+.dg-sort-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.dg-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 1;
+}
+
+.dg-resize-bar {
+  position: absolute;
+  right: 6px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  border-radius: 9999px;
+  opacity: 0;
+  background: var(--dg-border);
+  transition: opacity 150ms, background 150ms;
+}
+
+.dg-header-cell:hover .dg-resize-bar,
+.dg-resize-bar[data-resizing="true"] {
+  opacity: 1;
+}
+
+.dg-resize-bar[data-resizing="true"] {
+  background: var(--dg-primary);
+}
+
+.dg-filter-row {
+  display: flex;
+  border-bottom: 1px solid var(--dg-border);
+}
+
+.dg-filter-cell {
+  padding: 4px 8px;
+}
+
+.dg-row {
+  display: flex;
+  width: 100%;
+  --_row-bg: var(--dg-background);
+}
+
+.dg-row:not([data-last="true"]) {
+  border-bottom: 1px solid var(--dg-border);
+}
+
+.dg-row[data-clickable="true"] {
+  cursor: pointer;
+}
+
+.dg-row:hover {
+  --_row-bg: color-mix(in oklab, var(--dg-muted) 50%, transparent);
+}
+
+.dg-row[data-clickable="true"]:hover {
+  --_row-bg: color-mix(in oklab, var(--dg-muted) 80%, transparent);
+}
+
+.dg-cell {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 4px 12px;
+  background: var(--_row-bg, var(--dg-background));
+}
+
+.dg-cell[data-align="right"] {
+  justify-content: flex-end;
+}
+
+.dg-cell[data-align="center"] {
+  justify-content: center;
+}
+
+.dg-cell[data-wrap="true"] {
+  align-items: flex-start;
+  white-space: normal;
+}
+
+.dg-cell[data-pinned="left"] {
+  box-shadow: 1px 0 0 0 var(--dg-border);
+}
+
+.dg-cell[data-pinned="right"] {
+  box-shadow: -1px 0 0 0 var(--dg-border);
+}
+
+.dg-cell[data-bordered="true"] {
+  border-right: 1px solid var(--dg-border);
+}
+
+.dg-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0;
+  font-size: 14px;
+  color: var(--dg-muted-foreground);
+}
+
+.dg-loading {
+  height: 16px;
+  border-radius: 4px;
+  background: var(--dg-muted);
+  animation: dg-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dg-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.dg-scrollbar-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--dg-muted);
+}
+
+.dg-scrollbar-thumb {
+  position: absolute;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--dg-muted-foreground);
+  opacity: 0.3;
+  transition: opacity 150ms;
+}
+
+.dg-scrollbar-thumb:hover {
+  opacity: 0.6;
+}
+
+.dg-action-menu {
+  min-width: 128px;
+  overflow: hidden;
+  border-radius: calc(var(--dg-radius) * 1.5);
+  background: var(--dg-popover);
+  color: var(--dg-popover-foreground);
+  padding: 4px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  outline: none;
+}
+
+.dg-action-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  font-size: 14px;
+  border-radius: calc(var(--dg-radius) * 1.2);
+  cursor: default;
+  outline: none;
+  user-select: none;
+}
+
+.dg-action-item:focus {
+  background: var(--dg-accent);
+  color: var(--dg-accent-foreground);
+}
+
+.dg-action-item[data-variant="destructive"] {
+  color: var(--dg-destructive);
+}
+
+.dg-action-item[data-variant="destructive"]:focus {
+  background: color-mix(in oklab, var(--dg-destructive) 10%, transparent);
+}
+
+.dg-action-item[data-disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.dg-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  font-size: 12px;
+  border-top: 1px solid var(--dg-border);
+  background: var(--dg-background);
+  color: var(--dg-muted-foreground);
 }

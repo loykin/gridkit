@@ -1,5 +1,6 @@
 import type { Table } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -26,7 +27,10 @@ export function DataGridPaginationBar<T extends object>({
   const pageSizeItems = pageSizes.map((size) => ({ label: String(size), value: size }))
 
   return (
-    <div className="flex items-center justify-between gap-4 px-1 py-1 text-sm text-muted-foreground">
+    <div className={cn(
+      'dg-pagination',
+      'flex items-center justify-between gap-4 px-1 py-1 text-sm text-[var(--dg-muted-foreground)]',
+    )}>
       <div className="flex items-center gap-2">
         <span>Rows per page</span>
         <Select

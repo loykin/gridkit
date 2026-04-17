@@ -15,7 +15,7 @@ export function NumberRangeFilterContent<T extends object>({ col }: Props<T>) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-muted-foreground">Min</span>
+        <span className="text-xs text-[var(--dg-muted-foreground)]">Min</span>
         <Input
           type="number"
           placeholder="Min"
@@ -27,7 +27,7 @@ export function NumberRangeFilterContent<T extends object>({ col }: Props<T>) {
         />
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-muted-foreground">Max</span>
+        <span className="text-xs text-[var(--dg-muted-foreground)]">Max</span>
         <Input
           type="number"
           placeholder="Max"

@@ -25,7 +25,7 @@ function IndeterminateCheckbox({ checked, indeterminate, onChange }: Indetermina
       type="checkbox"
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
-      className="size-4 cursor-pointer rounded border-input accent-primary"
+      className="size-4 cursor-pointer rounded border-[var(--dg-input)] accent-[var(--dg-primary)]"
     />
   )
 }
@@ -65,7 +65,7 @@ export function createCheckboxColumn<T extends object>(
           checked={selectedIds.has(id)}
           onChange={(e) => onSelectOne(id, e.target.checked)}
           onClick={(e) => e.stopPropagation()}
-          className="size-4 cursor-pointer rounded border-input accent-primary"
+          className="size-4 cursor-pointer rounded border-[var(--dg-input)] accent-[var(--dg-primary)]"
         />
       )
     },

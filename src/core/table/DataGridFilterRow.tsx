@@ -27,8 +27,11 @@ export function DataGridFilterRow<T extends object>({
   return (
     <div
       role="row"
-      className="border-b border-border bg-muted"
-      style={{ display: 'flex', width: '100%', height: '36px' }}
+      className={cn(
+        'dg-filter-row',
+        'flex border-b border-[var(--dg-border)] bg-[var(--dg-muted)]',
+      )}
+      style={{ width: '100%', height: '36px' }}
     >
       {visibleLeafColumns.map((col) => {
         const ft = col.columnDef.meta?.filterType
@@ -42,7 +45,11 @@ export function DataGridFilterRow<T extends object>({
             <div
               role="columnheader"
               key={col.id}
-              className={cn('px-2 py-1', bordered && 'border-r border-border')}
+              className={cn(
+                'dg-filter-cell',
+                'px-2 py-1',
+                bordered && 'border-r border-[var(--dg-border)]',
+              )}
               style={cellStyle}
             />
           )
@@ -52,7 +59,11 @@ export function DataGridFilterRow<T extends object>({
           <div
             role="columnheader"
             key={col.id}
-            className={cn('px-2 py-1 font-normal', bordered && 'border-r border-border')}
+            className={cn(
+              'dg-filter-cell',
+              'px-2 py-1 font-normal',
+              bordered && 'border-r border-[var(--dg-border)]',
+            )}
             style={cellStyle}
           >
             {ft === 'select' ? (
@@ -89,7 +100,7 @@ export function DataGridFilterRow<T extends object>({
         <div
           role="columnheader"
           style={{ flex: 1, minWidth: 0, padding: 0 }}
-          className="bg-muted"
+          className="bg-[var(--dg-muted)]"
         />
       )}
     </div>

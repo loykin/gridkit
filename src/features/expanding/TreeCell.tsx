@@ -37,9 +37,9 @@ export function TreeCell({ row, indentSize = 16, children }: TreeCellProps) {
           className="flex items-center justify-center w-5 h-5 shrink-0 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
         >
           {row.getIsExpanded() ? (
-            <ChevronDown className="h-3.5 w-3.5 text-foreground/60" />
+            <ChevronDown className="h-3.5 w-3.5 text-[var(--dg-foreground)]/60" />
           ) : (
-            <ChevronRight className="h-3.5 w-3.5 text-foreground/60" />
+            <ChevronRight className="h-3.5 w-3.5 text-[var(--dg-foreground)]/60" />
           )}
         </button>
       ) : (

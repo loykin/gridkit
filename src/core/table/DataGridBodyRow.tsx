@@ -17,9 +17,9 @@ interface DataGridBodyRowProps<T extends object>
   fillLast?: boolean
   rowHeight?: number
   onActionTrigger?: (row: T, el: HTMLElement) => void
-  classNames?: DataGridClassNames
   isLastRow?: boolean
   tableWidthMode?: TableWidthMode
+  classNames?: DataGridClassNames
 }
 
 export function DataGridBodyRow<T extends object>({
@@ -35,20 +35,26 @@ export function DataGridBodyRow<T extends object>({
   bordered = false,
   rowHeight,
   onActionTrigger,
-  classNames,
   isLastRow = false,
+  classNames,
 }: DataGridBodyRowProps<T>) {
   const visibleCells = row.getVisibleCells()
   return (
     <div
       role="row"
       data-index={dataIndex}
+      data-last={isLastRow ? 'true' : undefined}
+      data-clickable={(onRowClick || rowCursor) ? 'true' : undefined}
       ref={measureRef}
       onClick={onRowClick ? () => onRowClick(row.original) : undefined}
       className={cn(
+        'dg-row',
         'flex w-full transition-colors',
-        !isLastRow && 'border-b border-border',
-        onRowClick || rowCursor ? 'cursor-pointer hover:bg-muted/50' : 'hover:bg-muted/30',
+        (onRowClick || rowCursor) && 'cursor-pointer',
+        !isLastRow && 'border-b border-[var(--dg-border)]',
+        (onRowClick || rowCursor)
+          ? 'hover:bg-[var(--dg-muted)]/50'
+          : 'hover:bg-[var(--dg-muted)]/30',
         classNames?.row,
       )}
       style={{ minHeight: rowHeight, ...style }}
@@ -63,14 +69,20 @@ export function DataGridBodyRow<T extends object>({
             role="gridcell"
             key={cell.id}
             data-col-id={cell.column.id}
+            data-align={meta?.align ?? undefined}
+            data-wrap={meta?.wrap ? 'true' : undefined}
+            data-pinned={edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : undefined}
+            data-bordered={bordered ? 'true' : undefined}
             className={cn(
-              'flex items-center px-3 py-1 overflow-hidden bg-background',
+              'dg-cell',
+              'flex items-center overflow-hidden',
               meta?.align === 'right' && 'justify-end',
               meta?.align === 'center' && 'justify-center',
               meta?.wrap && 'items-start whitespace-normal',
-              bordered && 'border-r border-border',
-              edge === 'left-edge' && 'shadow-[1px_0_0_0_hsl(var(--border))]',
-              edge === 'right-edge' && 'shadow-[-1px_0_0_0_hsl(var(--border))]',
+              'px-3 py-1 bg-[var(--dg-background)]',
+              bordered && 'border-r border-[var(--dg-border)]',
+              edge === 'left-edge' && 'shadow-[1px_0_0_0_var(--dg-border)]',
+              edge === 'right-edge' && 'shadow-[-1px_0_0_0_var(--dg-border)]',
               classNames?.cell,
             )}
             style={{ ...colStyle(cell.column), ...(isFillCell && { flex: 1, width: 'auto' }) }}
@@ -97,7 +109,7 @@ export function DataGridBodyRow<T extends object>({
         <div
           role="gridcell"
           style={{ flex: 1, minWidth: 0, padding: 0 }}
-          className="bg-background"
+          className="bg-[var(--dg-background)]"
         />
       )}
     </div>

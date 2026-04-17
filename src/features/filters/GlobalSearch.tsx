@@ -31,7 +31,7 @@ export function GlobalSearch<T extends object>({
 
   return (
     <div className={cn('relative', className)}>
-      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--dg-muted-foreground)] pointer-events-none" />
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}

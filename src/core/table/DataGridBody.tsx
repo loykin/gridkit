@@ -49,7 +49,10 @@ export function DataGridBody<T extends object>({
           <div
             role="row"
             key={i}
-            className={cn('flex w-full', i < 5 && 'border-b border-border')}
+            className={cn(
+              'flex w-full',
+              i < 5 && 'border-b border-[var(--dg-border)]',
+            )}
             style={{ minHeight: rowHeight }}
           >
             {visibleLeafColumns.map((col, colIdx) => {
@@ -60,15 +63,16 @@ export function DataGridBody<T extends object>({
                   key={col.id}
                   data-col-id={col.id}
                   className={cn(
+                    'dg-loading',
                     'flex items-center px-3 py-1',
-                    bordered && 'border-r border-border',
+                    bordered && 'border-r border-[var(--dg-border)]',
                   )}
                   style={{
                     ...colStyle(col),
                     ...(fillLast && isLast && { flex: 1, width: 'auto' }),
                   }}
                 >
-                  <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                  <div className="h-4 w-full animate-pulse rounded bg-[var(--dg-muted)]" />
                 </div>
               )
             })}
@@ -85,7 +89,10 @@ export function DataGridBody<T extends object>({
         <div role="row" className="flex w-full">
           <div role="gridcell" className="flex-1">
             {emptyContent ?? (
-              <div className="py-12 text-center text-muted-foreground text-sm">{emptyMessage}</div>
+              <div className={cn(
+                'dg-empty',
+                'py-12 text-center text-sm text-[var(--dg-muted-foreground)]',
+              )}>{emptyMessage}</div>
             )}
           </div>
         </div>
@@ -136,11 +143,11 @@ export function DataGridBody<T extends object>({
               showSpacer={showSpacer}
               fillLast={fillLast}
               onActionTrigger={onActionTrigger}
-              classNames={classNames}
               isLastRow={index === rows.length - 1}
               style={rowStyle}
               dataIndex={dataIndex}
               measureRef={measureRef}
+              classNames={classNames}
             />
           )
           if (!virtual && RowWrapper) {
@@ -160,7 +167,7 @@ export function DataGridBody<T extends object>({
           className="flex flex-1"
           style={{
             background:
-              'linear-gradient(to bottom, var(--color-border) 0px, var(--color-border) 1px, transparent 1px)',
+              'linear-gradient(to bottom, var(--dg-border) 0px, var(--dg-border) 1px, transparent 1px)',
           }}
         >
           {visibleLeafColumns.map((col, colIdx) => {
@@ -168,7 +175,7 @@ export function DataGridBody<T extends object>({
             return (
               <div
                 key={col.id}
-                className={cn(bordered && 'border-r border-border')}
+                className={cn(bordered && 'border-r border-[var(--dg-border)]')}
                 style={{
                   ...colStyle(col),
                   ...(fillLast && isLast && { flex: 1, width: 'auto' }),

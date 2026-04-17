@@ -29,7 +29,7 @@ export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
         {(options ?? []).map((opt) => (
           <label
             key={opt}
-            className="flex items-center gap-2 px-1 py-1 cursor-pointer hover:bg-muted rounded-sm text-xs select-none"
+            className="flex items-center gap-2 px-1 py-1 cursor-pointer hover:bg-[var(--dg-muted)] rounded-sm text-xs select-none"
           >
             <Checkbox
               checked={selected.includes(opt)}

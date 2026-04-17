@@ -122,11 +122,14 @@ export function CustomScrollbar({ scrollRef, direction, className, style }: Cust
     <div
       ref={trackRef}
       onClick={handleTrackClick}
-      className={cn('relative', !visible && 'hidden', className)}
+      className={cn('dg-scrollbar-track', 'relative', !visible && 'hidden', className)}
       style={style}
     >
       <div
-        className="absolute rounded-full bg-foreground/20 hover:bg-foreground/35 transition-colors cursor-pointer"
+        className={cn(
+          'dg-scrollbar-thumb',
+          'absolute cursor-pointer rounded-full bg-foreground/20 hover:bg-foreground/35 transition-colors',
+        )}
         onMouseDown={handleThumbMouseDown}
         onClick={(e) => e.stopPropagation()}
         style={

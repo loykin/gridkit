@@ -19,7 +19,7 @@ export function DragHandleCell() {
       type="button"
       {...ctx?.listeners}
       {...ctx?.attributes}
-      className="flex items-center justify-center w-full h-full cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+      className="flex items-center justify-center w-full h-full cursor-grab active:cursor-grabbing text-[var(--dg-muted-foreground)]/40 hover:text-[var(--dg-muted-foreground)] transition-colors"
       style={{ touchAction: 'none' }}
     >
       <GripVertical className="h-4 w-4" />

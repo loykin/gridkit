@@ -42,12 +42,12 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
           >
             {value ? (
               <>
-                <span className="font-normal text-muted-foreground">{label}:</span> {value}
+                <span className="font-normal text-[var(--dg-muted-foreground)]">{label}:</span> {value}
               </>
             ) : (
               label
             )}
-            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+            <ChevronDown className="h-3.5 w-3.5 text-[var(--dg-muted-foreground)]" />
           </Button>
         )}
       />
@@ -56,7 +56,7 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
           {value && (
             <button
               onClick={() => col.setFilterValue(undefined)}
-              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-sm hover:bg-muted text-muted-foreground"
+              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-sm hover:bg-[var(--dg-muted)] text-[var(--dg-muted-foreground)]"
             >
               <X className="h-3 w-3" /> Clear
             </button>
@@ -65,7 +65,7 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
             <button
               key={opt}
               onClick={() => col.setFilterValue(opt === value ? undefined : opt)}
-              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-sm hover:bg-muted"
+              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-sm hover:bg-[var(--dg-muted)]"
             >
               <Check className={cn('h-3 w-3', opt === value ? 'opacity-100' : 'opacity-0')} />
               {opt}
@@ -121,13 +121,13 @@ export function MultiSelectFilter<T extends object>({
           >
             {selected.length > 0 ? (
               <>
-                <span className="font-normal text-muted-foreground">{label}:</span>{' '}
+                <span className="font-normal text-[var(--dg-muted-foreground)]">{label}:</span>{' '}
                 {selected.length} selected
               </>
             ) : (
               label
             )}
-            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+            <ChevronDown className="h-3.5 w-3.5 text-[var(--dg-muted-foreground)]" />
           </Button>
         )}
       />
@@ -137,7 +137,7 @@ export function MultiSelectFilter<T extends object>({
             {(options ?? []).map((opt) => (
               <label
                 key={opt}
-                className="flex items-center gap-2 px-1 py-1 cursor-pointer hover:bg-muted rounded-sm text-xs select-none"
+                className="flex items-center gap-2 px-1 py-1 cursor-pointer hover:bg-[var(--dg-muted)] rounded-sm text-xs select-none"
               >
                 <Checkbox
                   checked={selected.includes(opt)}
