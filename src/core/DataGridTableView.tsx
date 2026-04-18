@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import {
   type Row,
@@ -139,6 +139,24 @@ export function DataGridTableView<T extends object>({
     }
   })
 
+  // ── Track vertical scroll visibility to avoid phantom margin on h-scrollbar ──
+  const [hasVScroll, setHasVScroll] = useState(false)
+  const checkVScroll = useCallback(() => {
+    const el = bodyScrollRef.current
+    if (!el) return
+    setHasVScroll(el.scrollHeight > el.clientHeight)
+  }, [bodyScrollRef])
+
+  useEffect(() => {
+    const el = bodyScrollRef.current
+    if (!el) return
+    const ro = new ResizeObserver(checkVScroll)
+    ro.observe(el)
+    if (el.firstElementChild) ro.observe(el.firstElementChild)
+    checkVScroll()
+    return () => ro.disconnect()
+  }, [bodyScrollRef, checkVScroll])
+
   // Body wrapper: fixed height when tableHeight is set so hscroll stays inside
   const bodyWrapperStyle: React.CSSProperties = {
     display: 'flex',
@@ -249,7 +267,7 @@ export function DataGridTableView<T extends object>({
           />
 
           {/* Horizontal scrollbar — flex item; margin-right avoids overlap with vertical scrollbar */}
-          <CustomScrollbar scrollRef={bodyScrollRef} direction="horizontal" style={{ height: 8, marginRight: 8 }} />
+          <CustomScrollbar scrollRef={bodyScrollRef} direction="horizontal" style={{ height: 8, marginRight: hasVScroll ? 8 : 0 }} />
         </div>
       </div>
 

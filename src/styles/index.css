@@ -427,6 +427,7 @@
 .dg-scrollbar-thumb {
   position: absolute;
   border-radius: 9999px;
+  cursor: pointer;
   background: var(--dg-muted-foreground);
   opacity: 0.3;
   transition: opacity 150ms;

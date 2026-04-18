@@ -126,10 +126,7 @@ export function CustomScrollbar({ scrollRef, direction, className, style }: Cust
       style={isV ? { position: 'absolute', top: 0, right: 0, bottom: 0, width: 8, ...style } : { position: 'relative', ...style }}
     >
       <div
-        className={cn(
-          'dg-scrollbar-thumb',
-          'absolute cursor-pointer rounded-full bg-foreground/20 hover:bg-foreground/35 transition-colors',
-        )}
+        className="dg-scrollbar-thumb"
         onMouseDown={handleThumbMouseDown}
         onClick={(e) => e.stopPropagation()}
         style={
