@@ -1,4 +1,4 @@
-import React from 'react'
+import { createContext, type ComponentType, type ReactNode } from 'react'
 import type { Row } from '@tanstack/react-table'
 
 /**
@@ -10,7 +10,7 @@ import type { Row } from '@tanstack/react-table'
  * Row<any> is intentional — this context is generic and doesn't care about TData.
  * Row<unknown> is structurally incompatible due to contravariant accessorFn<TData>.
  */
-export const RowWrapperContext = React.createContext<
+export const RowWrapperContext = createContext<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  React.ComponentType<{ row: Row<any>; children: React.ReactNode }> | null
+  ComponentType<{ row: Row<any>; children: ReactNode }> | null
 >(null)

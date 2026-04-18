@@ -1,4 +1,3 @@
-import React from 'react'
 import { flexRender, type HeaderGroup, type Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'

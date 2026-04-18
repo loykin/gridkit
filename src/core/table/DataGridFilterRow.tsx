@@ -1,4 +1,4 @@
-import React from 'react'
+import type { CSSProperties } from 'react'
 import type { Column, Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -34,7 +34,7 @@ export function DataGridFilterRow<T extends object>({
       {visibleLeafColumns.map((col) => {
         const ft = col.columnDef.meta?.filterType
         const filterValue = (col.getFilterValue() ?? '') as string
-        const cellStyle: React.CSSProperties = virtual
+        const cellStyle: CSSProperties = virtual
           ? { display: 'flex', alignItems: 'center', width: col.getSize() }
           : { ...colStyle(col), display: 'flex', alignItems: 'center' }
 

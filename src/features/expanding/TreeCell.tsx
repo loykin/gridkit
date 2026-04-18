@@ -1,4 +1,4 @@
-import React from 'react'
+import type { ReactNode } from 'react'
 import type { Row } from '@tanstack/react-table'
 import { useIcons } from '@/core/IconsContext'
 
@@ -7,7 +7,7 @@ interface TreeCellProps {
   row: Row<any>
   /** Indent per depth level in px (default: 16) */
   indentSize?: number
-  children: React.ReactNode
+  children: ReactNode
 }
 
 /**

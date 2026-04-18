@@ -1,4 +1,4 @@
-import React from 'react'
+import type { CSSProperties } from 'react'
 import { flexRender, type Row, type Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -10,7 +10,7 @@ interface DataGridBodyRowProps<T extends object>
   extends Pick<TableViewConfig<T>, 'onRowClick' | 'rowCursor' | 'bordered'> {
   row: Row<T>
   table: Table<T>
-  style?: React.CSSProperties
+  style?: CSSProperties
   dataIndex?: number
   measureRef?: (node: Element | null) => void
   showSpacer?: boolean

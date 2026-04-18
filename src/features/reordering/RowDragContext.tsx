@@ -1,4 +1,4 @@
-import React from 'react'
+import { createContext } from 'react'
 import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core'
 
 export interface RowDragContextValue {
@@ -11,4 +11,4 @@ export interface RowDragContextValue {
  * Provides drag handle listeners/attributes to DragHandleCell.
  * Set by SortableRow for each row — DragHandleCell reads it via useContext.
  */
-export const RowDragContext = React.createContext<RowDragContextValue | null>(null)
+export const RowDragContext = createContext<RowDragContextValue | null>(null)

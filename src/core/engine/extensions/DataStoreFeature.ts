@@ -107,10 +107,7 @@ export const DataStoreFeature: TableFeature = {
     table._dataStore = store
 
     table.applyTransaction = (tx) => {
-      if (!store) {
-        console.warn('[GridKit] applyTransaction called without dataStore')
-        return
-      }
+      if (!store) return
       store.applyTransaction(tx)
     }
 
