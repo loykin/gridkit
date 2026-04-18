@@ -1,6 +1,7 @@
 packages:
   - '.'
   - 'playground'
+  - 'examples'
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
