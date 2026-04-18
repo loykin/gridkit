@@ -24,8 +24,9 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
     ...props,
     // Sorting changes visual order — incompatible with manual row reordering
     enableSorting: false,
-    // Pagination splits data — reorder applies within the loaded set only
-    enablePagination: false,
+    // Pagination splits data — reorder applies within the loaded set only.
+    // Omitting pagination prop disables it entirely.
+    pagination: undefined,
     getRowId,
   })
 
@@ -79,7 +80,6 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
             rows={rows}
             isSized={isSized}
             measure={measure}
-            footer={null}
           />
         </SortableContext>
 

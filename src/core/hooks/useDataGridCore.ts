@@ -15,7 +15,7 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import type { DataGridBaseProps, DataGridColumnDef } from '@/types'
+import type { DataGridBaseProps, DataGridColumnDef, DataGridPaginationConfig } from '@/types'
 import { useTableStore } from '@/core/hooks/useTableStore'
 import { gridKitFeatures, getDataStoreCoreRowModel } from '@/core/engine/gridKitFeatures'
 
@@ -75,10 +75,7 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
 > {
   columns: DataGridColumnDef<T>[]
   getRowId?: (originalRow: T, index: number) => string
-  enablePagination?: boolean
-  paginationConfig?: { pageSize?: number; initialPageIndex?: number }
-  totalCount?: number
-  onPageChange?: (pageIndex: number, pageSize: number) => void
+  pagination?: DataGridPaginationConfig
   sizing: ColumnSizingState
   setSizing: React.Dispatch<React.SetStateAction<ColumnSizingState>>
 }
@@ -104,10 +101,7 @@ export function useDataGridCore<T extends object>({
   initialPinning,
   tableKey,
   syncState = false,
-  enablePagination = true,
-  paginationConfig,
-  totalCount,
-  onPageChange,
+  pagination,
   onTableReady,
   onColumnSizingChange,
   enableExpanding = false,
@@ -117,6 +111,8 @@ export function useDataGridCore<T extends object>({
   sizing,
   setSizing,
 }: UseDataGridCoreOptions<T>) {
+  const enablePagination = !!pagination
+
   const { register, update, tables } = useTableStore()
   const persisted = tableKey ? tables[tableKey] : undefined
 
@@ -140,9 +136,9 @@ export function useDataGridCore<T extends object>({
   const [internalFilters, setInternalFilters] = useState<ColumnFiltersState>([])
   const [internalGlobal, setInternalGlobal] = useState(persisted?.searchTerm ?? '')
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(visibilityState ?? {})
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: persisted?.pagination.pageIndex ?? paginationConfig?.initialPageIndex ?? 0,
-    pageSize: persisted?.pagination.pageSize ?? paginationConfig?.pageSize ?? 20,
+  const [paginationState, setPaginationState] = useState<PaginationState>({
+    pageIndex: persisted?.pagination.pageIndex ?? pagination?.initialPageIndex ?? 0,
+    pageSize: persisted?.pagination.pageSize ?? pagination?.pageSize ?? 20,
   })
 
   const tableReadyCalled = useRef(false)
@@ -152,12 +148,12 @@ export function useDataGridCore<T extends object>({
     if (tableKey && syncState) {
       register(tableKey, {
         pagination: {
-          pageIndex: paginationConfig?.initialPageIndex ?? 0,
-          pageSize: paginationConfig?.pageSize ?? 20,
+          pageIndex: pagination?.initialPageIndex ?? 0,
+          pageSize: pagination?.pageSize ?? 20,
         },
       })
     }
-  }, [tableKey, syncState, register, paginationConfig])
+  }, [tableKey, syncState, register, pagination])
 
   const effectiveGlobalFilter = externalGlobalFilter ?? internalGlobal
   const effectiveColumnFilters = externalColumnFilters ?? internalFilters
@@ -212,16 +208,13 @@ export function useDataGridCore<T extends object>({
       columnVisibility,
       columnSizing: sizing,
       columnPinning,
-      ...(enablePagination ? { pagination } : {}),
+      ...(enablePagination ? { pagination: paginationState } : {}),
       ...(enableExpanding ? { expanded } : {}),
     },
     manualSorting,
     manualFiltering,
-    manualPagination: totalCount !== undefined,
-    pageCount:
-      totalCount !== undefined && pagination.pageSize > 0
-        ? Math.ceil(totalCount / pagination.pageSize)
-        : undefined,
+    manualPagination: !!pagination?.pageCount,
+    pageCount: pagination?.pageCount,
 
     onSortingChange: (updater) => {
       setSorting((prev) => {
@@ -255,10 +248,10 @@ export function useDataGridCore<T extends object>({
     },
     onPaginationChange: enablePagination
       ? (updater) => {
-          setPagination((prev) => {
+          setPaginationState((prev) => {
             const next = typeof updater === 'function' ? updater(prev) : updater
             if (tableKey && syncState) update(tableKey, { pagination: next })
-            onPageChange?.(next.pageIndex, next.pageSize)
+            pagination?.onPageChange?.(next.pageIndex, next.pageSize)
             return next
           })
         }
@@ -314,7 +307,7 @@ export function useDataGridCore<T extends object>({
 
   return {
     table,
-    pagination,
+    pagination: paginationState,
     globalFilter: effectiveGlobalFilter,
     handleGlobalFilterChange,
   }

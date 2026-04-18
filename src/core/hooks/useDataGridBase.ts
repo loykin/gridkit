@@ -1,16 +1,13 @@
 import { useMemo, useRef } from 'react'
-import type { DataGridBaseProps, DataGridColumnDef } from '@/types'
+import type { DataGridBaseProps, DataGridColumnDef, DataGridPaginationConfig } from '@/types'
 import { createCheckboxColumn } from '@/features/selection/CheckboxColumn'
 import { useDataGridCore } from '@/core/hooks/useDataGridCore'
 import { useColumnSizing } from '@/core/hooks/useColumnSizing'
 
 interface UseDataGridBaseOptions<T extends object> extends DataGridBaseProps<T> {
   columns: DataGridColumnDef<T>[]
-  // Pagination options (for DataGrid; Virtual/Infinity pass enablePagination: false)
-  enablePagination?: boolean
-  paginationConfig?: { pageSize?: number; initialPageIndex?: number }
-  totalCount?: number
-  onPageChange?: (pageIndex: number, pageSize: number) => void
+  /** Pagination config — presence enables pagination. Omit to disable. */
+  pagination?: DataGridPaginationConfig
   // Row identity — required for DataGridDrag stable reordering
   getRowId?: (originalRow: T, index: number) => string
 }
@@ -43,10 +40,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     getRowId,
     tableKey,
     syncState,
-    enablePagination = true,
-    paginationConfig,
-    totalCount,
-    onPageChange,
+    pagination,
     onTableReady,
     onColumnSizingChange,
     tableOptions,
@@ -89,10 +83,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     initialPinning,
     tableKey,
     syncState,
-    enablePagination,
-    paginationConfig,
-    totalCount,
-    onPageChange,
+    pagination,
     onTableReady,
     onColumnSizingChange,
     tableOptions,

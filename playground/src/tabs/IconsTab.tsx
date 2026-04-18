@@ -1,4 +1,4 @@
-import { DataGrid } from '@loykin/gridkit'
+import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
 import type { DataGridColumnDef, DataGridIcons } from '@loykin/gridkit'
 import {
   Star, StarOff, ChevronsUpDown,
@@ -48,7 +48,8 @@ export function IconsTab() {
           enableColumnFilters
           filterDisplay="icon"
           enableSorting
-          pageSizes={[5, 10, 20]}
+          pagination={{ pageSize: 5 }}
+          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[5, 10, 20]} />}
           tableKey="icons-default"
         />
       </section>
@@ -64,7 +65,8 @@ export function IconsTab() {
           enableColumnFilters
           filterDisplay="icon"
           enableSorting
-          pageSizes={[5, 10, 20]}
+          pagination={{ pageSize: 5 }}
+          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[5, 10, 20]} />}
           icons={customIcons}
           tableKey="icons-custom"
         />

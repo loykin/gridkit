@@ -5,13 +5,15 @@ import { useIcons } from '@/core/IconsContext'
 
 interface DataGridPaginationBarProps<T extends object> {
   table: Table<T>
-  pageSizes: number[]
+  /** Page size options shown in the dropdown. Default: [10, 20, 50, 100] */
+  pageSizes?: number[]
+  /** Total row count for server-side display: "1–20 of 500" */
   totalCount?: number
 }
 
 export function DataGridPaginationBar<T extends object>({
   table,
-  pageSizes,
+  pageSizes = [10, 20, 50, 100],
   totalCount,
 }: DataGridPaginationBarProps<T>) {
   const icons = useIcons()

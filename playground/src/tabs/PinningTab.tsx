@@ -1,4 +1,4 @@
-import {DataGrid} from '@loykin/gridkit'
+import {DataGrid, DataGridPaginationBar} from '@loykin/gridkit'
 import type {DataGridColumnDef} from '@loykin/gridkit'
 import {ALL_DATA, type Employee} from '../data/employees'
 
@@ -52,7 +52,8 @@ export function PinningTab() {
                 enableSorting
                 bordered
                 tableHeight={500}
-                pageSizes={[20, 50, 100]}
+                pagination={{ pageSize: 20 }}
+                footer={(table) => <DataGridPaginationBar table={table} pageSizes={[20, 50, 100]} />}
                 emptyMessage="No employees found"
                 tableKey="pinning"
             />

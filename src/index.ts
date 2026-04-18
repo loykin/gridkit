@@ -1,6 +1,7 @@
 export { DataGrid } from './DataGrid'
 export { DataGridInfinity } from './DataGridInfinity'
 export { DataGridDrag } from './DataGridDrag'
+export { DataGridPaginationBar } from './core/DataGridPaginationBar'
 export { ColumnVisibilityDropdown } from './core/ColumnVisibilityDropdown'
 export { GlobalSearch } from './features/filters/GlobalSearch'
 export { SelectFilter, MultiSelectFilter } from './features/filters/ToolbarFilters'
@@ -17,6 +18,7 @@ export type {
   DataGridProps,
   DataGridInfinityProps,
   DataGridDragProps,
+  DataGridPaginationConfig,
   DataGridColumnDef,
   ColumnSizingMode,
   TableWidthMode,

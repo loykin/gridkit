@@ -309,7 +309,6 @@ export function DataStoreTab() {
           <DataGrid
             dataStore={store}
             columns={columns}
-            enablePagination={false}
             enableSorting
             enableColumnFilters
             bordered

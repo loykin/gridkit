@@ -142,7 +142,6 @@ export function LogStreamTab() {
       <DataGrid
         dataStore={store}
         columns={columns}
-        enablePagination={false}
         enableSorting={false}
         tableHeight={500}
         emptyMessage="Waiting for logs..."

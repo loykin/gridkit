@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { DataGrid, useDataStore } from '@loykin/gridkit'
+import { DataGrid, DataGridPaginationBar, useDataStore } from '@loykin/gridkit'
 import type { DataGridColumnDef, DataStoreBackend, QueryParams } from '@loykin/gridkit'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -228,12 +228,14 @@ export function BackendTab() {
         dataStore={store}
         columns={columns}
         isLoading={isLoading}
-        enablePagination
-        paginationConfig={{ pageSize: PAGE_SIZE }}
-        totalCount={totalCount}
-        onPageChange={(pageIndex, size) => {
-          runQuery({ limit: size, offset: pageIndex * size, filter: filterRef.current })
+        pagination={{
+          pageSize: PAGE_SIZE,
+          pageCount: totalCount > 0 ? Math.ceil(totalCount / PAGE_SIZE) : undefined,
+          onPageChange: (pageIndex, size) => {
+            runQuery({ limit: size, offset: pageIndex * size, filter: filterRef.current })
+          },
         }}
+        footer={(table) => <DataGridPaginationBar table={table} totalCount={totalCount} />}
         enableSorting={false}
         tableHeight={460}
         emptyMessage="No records found"

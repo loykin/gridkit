@@ -1,4 +1,4 @@
-import { DataGrid } from '@loykin/gridkit'
+import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
 import type { DataGridColumnDef } from '@loykin/gridkit'
 import { ALL_DATA, type Employee } from '../data/employees'
 
@@ -44,7 +44,8 @@ export function BorderedTab() {
           columns={columns}
           enableSorting
           enableColumnFilters
-          pageSizes={[10, 20]}
+          pagination={{ pageSize: 20 }}
+          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20]} />}
           emptyMessage="No employees found"
           tableKey="bordered-default"
         />
@@ -59,7 +60,8 @@ export function BorderedTab() {
           enableSorting
           enableColumnFilters
           bordered
-          pageSizes={[10, 20]}
+          pagination={{ pageSize: 20 }}
+          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20]} />}
           emptyMessage="No employees found"
           tableKey="bordered-bordered"
         />

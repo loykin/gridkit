@@ -1,4 +1,4 @@
-import { DataGrid } from '@loykin/gridkit'
+import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
 import type { DataGridColumnDef } from '@loykin/gridkit'
 import { SMALL_DATA, type Employee } from '../data/employees'
 
@@ -39,7 +39,8 @@ export function FilterIconTab() {
           enableColumnFilters
           filterDisplay="row"
           enableSorting
-          pageSizes={[10, 20, 50]}
+          pagination={{ pageSize: 20 }}
+          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
           emptyMessage="No employees found"
           tableKey="filter-row"
         />
@@ -56,7 +57,8 @@ export function FilterIconTab() {
           enableColumnFilters
           filterDisplay="icon"
           enableSorting
-          pageSizes={[10, 20, 50]}
+          pagination={{ pageSize: 20 }}
+          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
           emptyMessage="No employees found"
           tableKey="filter-icon"
         />

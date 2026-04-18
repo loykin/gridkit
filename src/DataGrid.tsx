@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
+import type React from 'react'
 import type { Table } from '@tanstack/react-table'
 import type { DataGridProps } from '@/types'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'
-import { DataGridPaginationBar } from '@/core/DataGridPaginationBar'
 import { DataGridShell } from '@/core/DataGridShell'
 import { IconsProvider } from '@/core/IconsContext'
 
@@ -12,18 +12,12 @@ interface DataGridPropsWithRef<T extends object> extends DataGridProps<T> {
 }
 
 export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
-  const {
-    error,
-    leftFilters,
-    rightFilters,
-    enablePagination = true,
-    pageSizes = [10, 20, 50, 100],
-    totalCount,
-    tableRef,
-    icons,
-  } = props
+  const { error, leftFilters, rightFilters, footer, pagination, tableRef, icons } = props
 
-  const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase(props)
+  const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase({
+    ...props,
+    pagination,
+  })
 
   useEffect(() => {
     if (tableRef) {
@@ -47,11 +41,7 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
         error={error}
         leftFilters={leftFilters}
         rightFilters={rightFilters}
-        footer={
-          enablePagination ? (
-            <DataGridPaginationBar table={table} pageSizes={pageSizes} totalCount={totalCount} />
-          ) : null
-        }
+        footer={footer}
       />
     </IconsProvider>
   )

@@ -253,13 +253,44 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   tableOptions?: PassthroughTableOptions<T>
 }
 
-export interface DataGridProps<T extends object> extends DataGridBaseProps<T> {
-  enablePagination?: boolean
-  paginationConfig?: { pageSize?: number; initialPageIndex?: number }
-  pageSizes?: number[]
-  /** Server-side total row count for manual pagination */
-  totalCount?: number
+/**
+ * Pagination configuration. Presence of this prop enables TanStack pagination.
+ * Omit entirely to disable pagination (e.g. DataGridDrag, DataGridInfinity).
+ */
+export interface DataGridPaginationConfig {
+  /** Initial page size. Default: 20 */
+  pageSize?: number
+  /** Initial page index (0-based). Default: 0 */
+  initialPageIndex?: number
+  /**
+   * Total page count for server-side (manual) pagination.
+   * When set, TanStack Table runs in manualPagination mode and will not
+   * slice rows client-side — the caller is responsible for fetching the
+   * correct slice and calling onPageChange.
+   */
+  pageCount?: number
+  /** Called whenever the page index or page size changes */
   onPageChange?: (pageIndex: number, pageSize: number) => void
+}
+
+export interface DataGridProps<T extends object> extends DataGridBaseProps<T> {
+  /**
+   * Enables TanStack Table pagination. Presence of this prop activates the
+   * pagination row model. Omit to disable pagination entirely.
+   * @example
+   * // Client-side
+   * pagination={{ pageSize: 20 }}
+   * // Server-side
+   * pagination={{ pageSize: 20, pageCount: Math.ceil(total / 20), onPageChange: fetchPage }}
+   */
+  pagination?: DataGridPaginationConfig
+  /**
+   * Render the footer area (e.g. pagination bar).
+   * Receives the live TanStack Table instance — same pattern as leftFilters/rightFilters.
+   * @example
+   * footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
+   */
+  footer?: (table: Table<T>) => React.ReactNode
 }
 
 export interface DataGridDragProps<T extends object> extends DataGridBaseProps<T> {

@@ -19,7 +19,9 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
 
   const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase({
     ...props,
-    enablePagination: false,
+    // Infinite scroll handles page loading via IntersectionObserver — no pagination needed.
+    // Omitting pagination prop disables it entirely.
+    pagination: undefined,
   })
 
   const { loadMoreRef } = useInfiniteScroll({

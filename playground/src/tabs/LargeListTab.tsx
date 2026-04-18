@@ -79,7 +79,6 @@ export function LargeListTab() {
       <DataGrid
         data={RESOURCE_DATA}
         columns={columns}
-        enablePagination={false}
         enableSorting
         enableColumnFilters
         bordered

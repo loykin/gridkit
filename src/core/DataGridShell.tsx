@@ -17,7 +17,7 @@ interface DataGridShellProps<T extends object> extends TableViewConfig<T> {
   rightFilters?: (table: Table<T>) => React.ReactNode
   loadMoreRef?: React.RefObject<HTMLDivElement | null>
   isFetchingNextPage?: boolean
-  footer?: React.ReactNode
+  footer?: (table: Table<T>) => React.ReactNode
 }
 
 export function DataGridShell<T extends object>({
@@ -55,7 +55,7 @@ export function DataGridShell<T extends object>({
         />
       </div>
 
-      {footer}
+      {footer?.(table)}
     </div>
   )
 }
