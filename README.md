@@ -1,29 +1,32 @@
 # @loykin/gridkit
 
-A feature-rich React DataGrid component built on TanStack Table with virtualization, sorting, filtering, pagination, and real-time updates.
+A feature-rich React DataGrid built on TanStack Table — Tailwind-independent, fully themeable via CSS variables, with virtualization, sorting, filtering, pagination, and real-time updates.
 
 **[Live Playground →](https://loykin.github.io/gridkit/playground/)** · **[GitHub →](https://github.com/loykin/gridkit)**
 
+---
+
 ## Features
 
-- **Virtualization** — renders only visible rows via `@tanstack/react-virtual` for large datasets
-- **Sorting** — client-side and server-side (manual) sorting
-- **Column Filters** — per-column filter row or icon-mode with `text`, `select`, `multi-select`, `number` types
-- **Global Search** — searchable columns with a debounced toolbar search input
-- **Pagination** — built-in pagination bar with configurable page sizes
+- **No Tailwind required** — all styles ship as `dg-*` CSS classes. Works in any stack.
+- **Virtualization** — only visible rows are rendered via `@tanstack/react-virtual`
+- **Sorting** — client-side and server-side (manual)
+- **Column Filters** — filter row or icon-mode with `text`, `select`, `multi-select`, `number` types
+- **Global Search** — debounced toolbar search across configurable columns
+- **Pagination** — flexible placement: `footer`, toolbar, or fully external via `onTableReady`
 - **Infinite Scroll** — `DataGridInfinity` with IntersectionObserver-based next-page loading
 - **Row Drag Reorder** — `DataGridDrag` for sortable rows via dnd-kit
-- **Column Resizing** — drag-to-resize with `'onChange'` or `'onEnd'` policy
+- **Column Resizing** — drag-to-resize with `onChange` or `onEnd` policy
 - **Column Pinning** — pin columns left or right
 - **Column Visibility** — show/hide columns via toolbar dropdown
 - **Row Selection** — checkbox selection with select-all support
-- **Row Actions** — per-row action menu (`⋯` button) defined at column level
+- **Row Actions** — per-row action menu defined at column level
 - **Row Expansion** — tree rows with collapsible sub-rows
-- **DataStore** — map-based external store for real-time / high-frequency updates
-- **Column Sizing Persistence** — expose sizing via `onColumnSizingChange` and restore via `columnSizing`
-- **Server-Side Support** — sorting, pagination, filtering all controllable externally
-- **Escape Hatch** — `tableOptions` prop passes advanced TanStack Table options safely
-- **Custom Scrollbars** — consistent cross-platform scrollbars
+- **DataStore** — map-based external store for high-frequency real-time updates
+- **Server-Side Support** — sorting, filtering, and pagination all controllable externally
+- **CSS Theming** — override `--dg-*` variables to match any design system
+- **Icon Overrides** — replace any built-in icon via the `icons` prop
+- **Escape Hatch** — `tableOptions` passes advanced TanStack Table options safely
 
 ---
 
@@ -53,7 +56,7 @@ import '@loykin/gridkit/styles'
 
 **With shadcn/ui** — works out of the box. The `--dg-*` variables automatically fall back to your existing shadcn CSS variables.
 
-**Standalone** — hardcoded defaults are applied automatically.
+**Standalone** — hardcoded defaults are applied automatically. No configuration needed.
 
 **Custom theme** — override only what you need:
 
@@ -86,7 +89,7 @@ import '@loykin/gridkit/styles'
 | `--dg-foreground` | Default text color |
 | `--dg-popover` | Dropdown / popover background |
 | `--dg-popover-foreground` | Dropdown text color |
-| `--dg-primary` | Primary accent (checkboxes, active filters) |
+| `--dg-primary` | Primary accent (active page button, checkboxes) |
 | `--dg-primary-foreground` | Text on primary backgrounds |
 | `--dg-secondary` | Secondary background |
 | `--dg-secondary-foreground` | Secondary text |
@@ -104,8 +107,6 @@ import '@loykin/gridkit/styles'
 
 ## Basic Usage
 
-### DataGrid (with Pagination)
-
 ```tsx
 import { DataGrid } from '@loykin/gridkit'
 import '@loykin/gridkit/styles'
@@ -121,14 +122,118 @@ export function MyTable() {
     <DataGrid
       data={rows}
       columns={columns}
-      enablePagination
       tableHeight={400}
     />
   )
 }
 ```
 
-### DataGridInfinity (Infinite Scroll)
+---
+
+## Pagination
+
+Pagination is opt-in. The `pagination` prop activates TanStack Table's pagination logic; the UI is injected separately so you can place it anywhere.
+
+### Pagination Components
+
+| Component | Description | Best placement |
+|---|---|---|
+| `DataGridPaginationBar` | Full bar: rows-per-page dropdown + page info + nav buttons | `footer` |
+| `DataGridPaginationCompact` | Minimal: `< X / Y >` nav only | `rightFilters` (toolbar) |
+| `DataGridPaginationPages` | Numbered pages: `<< < 1 2 [3] … 20 > >>` | `footer` |
+
+### Placement Options
+
+**footer — below the grid**
+
+```tsx
+import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
+
+<DataGrid
+  data={rows}
+  columns={columns}
+  pagination={{ pageSize: 20 }}
+  footer={(table) => (
+    <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />
+  )}
+/>
+```
+
+**toolbar — inside the filter row**
+
+```tsx
+import { DataGrid, DataGridPaginationCompact } from '@loykin/gridkit'
+
+<DataGrid
+  data={rows}
+  columns={columns}
+  pagination={{ pageSize: 20 }}
+  rightFilters={(table) => <DataGridPaginationCompact table={table} />}
+/>
+```
+
+**numbered pages**
+
+```tsx
+import { DataGrid, DataGridPaginationPages } from '@loykin/gridkit'
+
+<DataGrid
+  data={rows}
+  columns={columns}
+  pagination={{ pageSize: 10 }}
+  footer={(table) => <DataGridPaginationPages table={table} siblingCount={2} />}
+/>
+```
+
+**external — outside the DataGrid**
+
+```tsx
+import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
+
+const [table, setTable] = useState(null)
+
+// Render anywhere — above, below, in a sidebar, etc.
+{table && <DataGridPaginationBar table={table} />}
+
+<DataGrid
+  data={rows}
+  columns={columns}
+  pagination={{ pageSize: 20 }}
+  onTableReady={(t) => setTable(t)}
+/>
+```
+
+### Server-Side Pagination
+
+```tsx
+<DataGrid
+  data={pageRows}           // current page data only
+  columns={columns}
+  pagination={{
+    pageSize: 20,
+    pageCount: Math.ceil(totalCount / 20),   // tells TanStack total pages
+    onPageChange: (pageIndex, pageSize) => {  // fetch on every page change
+      fetchPage(pageIndex, pageSize)
+    },
+  }}
+  footer={(table) => (
+    <DataGridPaginationBar table={table} totalCount={totalCount} />
+  )}
+/>
+```
+
+### `DataGridPaginationConfig`
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `pageSize` | `number` | `20` | Initial page size |
+| `initialPageIndex` | `number` | `0` | Initial page index (0-based) |
+| `pageCount` | `number` | — | Total page count for server-side (manual) pagination |
+| `onPageChange` | `(pageIndex, pageSize) => void` | — | Called on every page or size change |
+
+---
+
+## DataGridInfinity (Infinite Scroll)
 
 ```tsx
 import { DataGridInfinity } from '@loykin/gridkit'
@@ -149,7 +254,9 @@ export function MyInfiniteTable() {
 }
 ```
 
-### DataGridDrag (Row Reorder)
+---
+
+## DataGridDrag (Row Reorder)
 
 ```tsx
 import { DataGridDrag, DragHandleCell } from '@loykin/gridkit'
@@ -162,7 +269,6 @@ const columns = [
     cell: () => <DragHandleCell />,
   },
   { accessorKey: 'name', header: 'Name' },
-  // ...
 ]
 
 export function MyDraggableTable() {
@@ -179,7 +285,7 @@ export function MyDraggableTable() {
 }
 ```
 
-> Place `DragHandleCell` in the `cell` of whichever column should act as the grab handle. Only works inside `DataGridDrag`.
+> Place `DragHandleCell` in the `cell` of whichever column should act as the grab handle.
 
 ---
 
@@ -194,28 +300,13 @@ const columns: DataGridColumnDef<User>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
-    size: 200,
     meta: {
-      flex: 1,              // stretch to fill remaining width proportionally
+      flex: 1,              // stretch proportionally to fill remaining width
       minWidth: 100,
       align: 'left',        // 'left' | 'center' | 'right'
       pin: 'left',          // 'left' | 'right'
       wrap: true,           // allow multi-line cell content
       filterType: 'text',   // 'text' | 'select' | 'multi-select' | 'number' | false
-    },
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    meta: {
-      filterType: 'select', // dropdown of unique values (lazy-loaded on first open)
-    },
-  },
-  {
-    accessorKey: 'score',
-    header: 'Score',
-    meta: {
-      filterType: 'number', // min / max range filter
     },
   },
   {
@@ -231,98 +322,7 @@ const columns: DataGridColumnDef<User>[] = [
 ]
 ```
 
----
-
-## Props
-
-### Shared Props (`DataGrid`, `DataGridInfinity`, `DataGridDrag`)
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `data` | `T[]` | `[]` | Row data |
-| `dataStore` | `DataStore<T>` | — | Map-based external store for real-time updates. Mutually exclusive with `data` |
-| `columns` | `DataGridColumnDef<T>[]` | — | Column definitions |
-| `error` | `Error \| null` | — | Display error state |
-| `isLoading` | `boolean` | — | Show loading skeleton |
-| `emptyMessage` | `string` | `'No data'` | Message when data is empty |
-| `emptyContent` | `ReactNode` | — | Custom empty state UI (overrides `emptyMessage`) |
-| `showHeader` | `boolean` | `true` | Show/hide the header row |
-| `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Fixed height — enables internal scroll and virtualization |
-| `rowHeight` | `number` | `33` | Row height in px (also sets virtualizer estimate) |
-| `estimateRowHeight` | `number` | — | Override virtualizer estimate independently of `rowHeight` |
-| `overscan` | `number` | `10` | Rows to render outside the visible area |
-| `bordered` | `boolean` | `false` | Show vertical dividers between columns |
-| `tableWidthMode` | `'spacer' \| 'fill-last' \| 'independent'` | `'spacer'` | How remaining horizontal space is distributed |
-| `onRowClick` | `(row: T) => void` | — | Row click handler |
-| `rowCursor` | `boolean` | `false` | Show pointer cursor on rows without `onRowClick` |
-| `classNames` | `DataGridClassNames` | — | Slot-based class injection for table elements |
-| **Sorting** | | | |
-| `enableSorting` | `boolean` | `true` | Enable column sorting |
-| `initialSorting` | `SortingState` | — | Initial sort state |
-| `onSortingChange` | `(s: SortingState) => void` | — | Called on sort change |
-| `manualSorting` | `boolean` | `false` | Disable client-side sort — handle externally |
-| **Filtering** | | | |
-| `enableColumnFilters` | `boolean` | `false` | Show per-column filter UI |
-| `filterDisplay` | `'row' \| 'icon'` | `'row'` | Filter as a dedicated row or icon inside header cell |
-| `manualFiltering` | `boolean` | `false` | Disable client-side filtering — handle externally |
-| `columnFilters` | `ColumnFiltersState` | — | Controlled column filter state |
-| `onColumnFiltersChange` | `(f: ColumnFiltersState) => void` | — | Called on filter change |
-| `globalFilter` | `string` | — | Controlled global search value |
-| `onGlobalFilterChange` | `(v: string) => void` | — | Called on global search change |
-| `searchableColumns` | `string[]` | — | Column keys included in global search |
-| `leftFilters` | `(table) => ReactNode` | — | Custom toolbar UI on the left |
-| `rightFilters` | `(table) => ReactNode` | — | Custom toolbar UI on the right |
-| **Column Sizing** | | | |
-| `enableColumnResizing` | `boolean` | `true` | Enable drag-to-resize columns |
-| `columnResizeMode` | `'onChange' \| 'onEnd'` | `'onChange'` | When resize updates are applied |
-| `columnSizingMode` | `'auto' \| 'flex' \| 'fixed'` | `'flex'` | Column width strategy |
-| `columnSizing` | `ColumnSizingState` | — | Initial column widths — restore from localStorage, URL, backend, etc. |
-| `onColumnSizingChange` | `(s: ColumnSizingState) => void` | — | Called on column resize |
-| **Visibility & Pinning** | | | |
-| `visibilityState` | `VisibilityState` | — | Controlled column visibility |
-| `initialPinning` | `ColumnPinningState` | — | Initial pinned columns `{ left: [...], right: [...] }` |
-| **Row Expansion** | | | |
-| `enableExpanding` | `boolean` | `false` | Enable collapsible sub-rows |
-| `getSubRows` | `(row: T, index: number) => T[] \| undefined` | — | Extract sub-rows from a row item |
-| **Selection** | | | |
-| `checkboxConfig` | `CheckboxConfig<T>` | — | Row checkbox selection configuration |
-| **State Persistence** | | | |
-| `tableKey` | `string` | — | Key for in-memory Zustand state persistence |
-| `syncState` | `boolean` | `false` | Sync pagination and search to Zustand store (requires `tableKey`) |
-| **Callbacks** | | | |
-| `onTableReady` | `(table: Table<T>) => void` | — | Called when TanStack Table instance is ready |
-| **Advanced** | | | |
-| `tableOptions` | `PassthroughTableOptions<T>` | — | Escape hatch for advanced TanStack Table options (see below) |
-
-### `DataGrid`-only Props
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `enablePagination` | `boolean` | `true` | Show pagination bar |
-| `paginationConfig` | `{ pageSize?: number; initialPageIndex?: number }` | — | Pagination defaults |
-| `pageSizes` | `number[]` | — | Available page size options |
-| `totalCount` | `number` | — | Server-side total row count (enables manual pagination) |
-| `onPageChange` | `(pageIndex: number, pageSize: number) => void` | — | Called on page change |
-
-### `DataGridInfinity`-only Props
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `hasNextPage` | `boolean` | — | Whether more pages exist |
-| `isFetchingNextPage` | `boolean` | — | Show loading indicator at bottom |
-| `fetchNextPage` | `() => void` | — | Called to load next page |
-| `rootMargin` | `string` | — | IntersectionObserver `rootMargin` to trigger early loading |
-
-### `DataGridDrag`-only Props
-
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `getRowId` | `(row: T, index: number) => string` | — | **Required.** Stable unique id per row |
-| `onRowReorder` | `(newData: T[]) => void` | — | Called with the full reordered data array after each drag |
-
----
-
-## Column `meta` Reference
+### Column `meta` Reference
 
 | Field | Type | Description |
 |---|---|---|
@@ -338,9 +338,96 @@ const columns: DataGridColumnDef<User>[] = [
 
 ---
 
-## Toolbar Components
+## Props
 
-Import standalone toolbar components to compose your own toolbar:
+### Shared Props (`DataGrid`, `DataGridInfinity`, `DataGridDrag`)
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `data` | `T[]` | `[]` | Row data |
+| `dataStore` | `DataStore<T>` | — | Map-based store for real-time updates. Mutually exclusive with `data` |
+| `columns` | `DataGridColumnDef<T>[]` | — | Column definitions |
+| `error` | `Error \| null` | — | Display error state |
+| `isLoading` | `boolean` | — | Show loading skeleton |
+| `emptyMessage` | `string` | — | Message when data is empty |
+| `emptyContent` | `ReactNode` | — | Custom empty state UI (overrides `emptyMessage`) |
+| `showHeader` | `boolean` | `true` | Show/hide the header row |
+| `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Fixed height — enables internal scroll and virtualization |
+| `rowHeight` | `number` | `33` | Row height in px (also sets virtualizer estimate) |
+| `estimateRowHeight` | `number` | — | Override virtualizer estimate independently of `rowHeight` |
+| `overscan` | `number` | `10` | Rows to render outside the visible area |
+| `bordered` | `boolean` | `false` | Show vertical dividers between columns |
+| `tableWidthMode` | `'spacer' \| 'fill-last' \| 'independent'` | `'spacer'` | How remaining horizontal space is distributed |
+| `onRowClick` | `(row: T) => void` | — | Row click handler |
+| `rowCursor` | `boolean` | `false` | Show pointer cursor on rows |
+| `classNames` | `DataGridClassNames` | — | Slot-based class injection for table elements |
+| `icons` | `DataGridIcons` | — | Override any built-in icon slot |
+| **Sorting** ||||
+| `enableSorting` | `boolean` | `true` | Enable column sorting |
+| `initialSorting` | `SortingState` | — | Initial sort state |
+| `onSortingChange` | `(s: SortingState) => void` | — | Called on sort change |
+| `manualSorting` | `boolean` | `false` | Disable client-side sort — handle externally |
+| **Filtering** ||||
+| `enableColumnFilters` | `boolean` | `false` | Show per-column filter UI |
+| `filterDisplay` | `'row' \| 'icon'` | `'row'` | Filter as dedicated row or icon inside header cell |
+| `manualFiltering` | `boolean` | `false` | Disable client-side filtering — handle externally |
+| `columnFilters` | `ColumnFiltersState` | — | Controlled column filter state |
+| `onColumnFiltersChange` | `(f: ColumnFiltersState) => void` | — | Called on filter change |
+| `globalFilter` | `string` | — | Controlled global search value |
+| `onGlobalFilterChange` | `(v: string) => void` | — | Called on global search change |
+| `searchableColumns` | `string[]` | — | Column keys included in global search |
+| `leftFilters` | `(table: Table<T>) => ReactNode` | — | Custom toolbar UI on the left |
+| `rightFilters` | `(table: Table<T>) => ReactNode` | — | Custom toolbar UI on the right |
+| **Column Sizing** ||||
+| `enableColumnResizing` | `boolean` | `true` | Enable drag-to-resize columns |
+| `columnResizeMode` | `'onChange' \| 'onEnd'` | `'onChange'` | When resize updates are applied |
+| `columnSizingMode` | `'auto' \| 'flex' \| 'fixed'` | `'flex'` | Column width strategy |
+| `columnSizing` | `ColumnSizingState` | — | Initial column widths |
+| `onColumnSizingChange` | `(s: ColumnSizingState) => void` | — | Called on column resize |
+| **Visibility & Pinning** ||||
+| `visibilityState` | `VisibilityState` | — | Controlled column visibility |
+| `initialPinning` | `ColumnPinningState` | — | Initial pinned columns `{ left: [...], right: [...] }` |
+| **Row Expansion** ||||
+| `enableExpanding` | `boolean` | `false` | Enable collapsible sub-rows |
+| `getSubRows` | `(row: T, index: number) => T[] \| undefined` | — | Extract sub-rows from a row item |
+| **Selection** ||||
+| `checkboxConfig` | `CheckboxConfig<T>` | — | Row checkbox selection configuration |
+| **State Persistence** ||||
+| `tableKey` | `string` | — | Key for in-memory Zustand state persistence |
+| `syncState` | `boolean` | `false` | Sync pagination and search state (requires `tableKey`) |
+| **Callbacks** ||||
+| `onTableReady` | `(table: Table<T>) => void` | — | Called when TanStack Table instance is ready |
+| `onColumnSizingChange` | `(s: ColumnSizingState) => void` | — | Called on column resize |
+| **Advanced** ||||
+| `tableOptions` | `PassthroughTableOptions<T>` | — | Escape hatch for advanced TanStack Table options |
+
+### `DataGrid`-only Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `pagination` | `DataGridPaginationConfig` | — | Enables TanStack pagination. Omit to disable |
+| `footer` | `(table: Table<T>) => ReactNode` | — | Render slot below the grid (pagination bar, totals row, etc.) |
+| `tableRef` | `RefObject<Table<T> \| null>` | — | Ref populated with the TanStack Table instance |
+
+### `DataGridInfinity`-only Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `hasNextPage` | `boolean` | — | Whether more pages exist |
+| `isFetchingNextPage` | `boolean` | — | Show loading indicator at bottom |
+| `fetchNextPage` | `() => void` | — | Called to load the next page |
+| `rootMargin` | `string` | `'100px'` | IntersectionObserver `rootMargin` for early trigger |
+
+### `DataGridDrag`-only Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `getRowId` | `(row: T, index: number) => string` | — | **Required.** Stable unique id per row |
+| `onRowReorder` | `(newData: T[]) => void` | — | Called with the full reordered data array after each drag |
+
+---
+
+## Toolbar Components
 
 ```tsx
 import {
@@ -350,56 +437,60 @@ import {
   ColumnVisibilityDropdown,
 } from '@loykin/gridkit'
 
-function Toolbar({ table }) {
-  return (
-    <div className="flex items-center gap-2">
+<DataGrid
+  leftFilters={(table) => (
+    <>
       <GlobalSearch table={table} placeholder="Search…" />
       <SelectFilter table={table} columnId="status" label="Status" />
-      <MultiSelectFilter table={table} columnId="role" label="Role" />
-      <ColumnVisibilityDropdown table={table} />
-    </div>
-  )
-}
-
-// Pass as leftFilters / rightFilters
-<DataGrid
-  leftFilters={(table) => <Toolbar table={table} />}
+      <MultiSelectFilter table={table} columnId="department" label="Dept" />
+    </>
+  )}
+  rightFilters={(table) => <ColumnVisibilityDropdown table={table} />}
   ...
 />
 ```
 
 ---
 
-## Server-Side Filtering
+## Server-Side Sorting & Filtering
 
 ```tsx
-import { DataGrid } from '@loykin/gridkit'
+import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
 import type { ColumnFiltersState, SortingState } from '@tanstack/react-table'
 
-export function ServerFilteredGrid() {
+export function ServerGrid() {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [page, setPage] = useState({ index: 0, size: 20 })
+  const [pageRows, setPageRows] = useState([])
+  const [totalCount, setTotalCount] = useState(0)
 
-  const { data, total, isLoading } = useQuery({
-    queryKey: ['items', sorting, columnFilters, page],
-    queryFn: () => fetchItems({ sorting, columnFilters, ...page }),
-  })
+  const PAGE_SIZE = 20
+
+  async function load(pageIndex: number, pageSize: number) {
+    const { rows, total } = await fetchItems({ sorting, columnFilters, pageIndex, pageSize })
+    setPageRows(rows)
+    setTotalCount(total)
+  }
 
   return (
     <DataGrid
-      data={data?.items ?? []}
+      data={pageRows}
       columns={columns}
       isLoading={isLoading}
-      totalCount={total}
-      enablePagination
       manualSorting
       onSortingChange={setSorting}
       manualFiltering
       enableColumnFilters
       columnFilters={columnFilters}
       onColumnFiltersChange={setColumnFilters}
-      onPageChange={(index, size) => setPage({ index, size })}
+      pagination={{
+        pageSize: PAGE_SIZE,
+        pageCount: Math.ceil(totalCount / PAGE_SIZE),
+        onPageChange: (pageIndex, pageSize) => load(pageIndex, pageSize),
+      }}
+      footer={(table) => (
+        <DataGridPaginationBar table={table} totalCount={totalCount} />
+      )}
       tableHeight={500}
     />
   )
@@ -410,29 +501,13 @@ export function ServerFilteredGrid() {
 
 ## Column Sizing Persistence
 
-The library is storage-agnostic — use `columnSizing` + `onColumnSizingChange` to connect any storage layer:
-
 ```tsx
-// localStorage (with a hook like use-local-storage-state)
+// localStorage
 const [sizing, setSizing] = useLocalStorageState('my-table-sizing', { defaultValue: {} })
 
 <DataGrid
   columnSizing={sizing}
   onColumnSizingChange={setSizing}
-  ...
-/>
-
-// URL query params
-<DataGrid
-  columnSizing={parseSizingFromURL(searchParams)}
-  onColumnSizingChange={(s) => setSearchParams(encodeSizing(s))}
-  ...
-/>
-
-// Backend / user preferences
-<DataGrid
-  columnSizing={userPrefs?.columnSizing}
-  onColumnSizingChange={(s) => savePrefs({ columnSizing: s })}
   ...
 />
 ```
@@ -452,7 +527,6 @@ const columns = [
       <TreeCell row={row}>{getValue<string>()}</TreeCell>
     ),
   },
-  // ...
 ]
 
 <DataGrid
@@ -467,15 +541,13 @@ const columns = [
 
 ## DataStore (Real-Time Updates)
 
-For high-frequency updates (WebSocket, polling), use `DataStore` to avoid re-rendering the full dataset:
+For high-frequency updates (WebSocket, polling) — only changed rows are re-evaluated:
 
 ```tsx
-import { createDataStore, useDataStore, DataGrid } from '@loykin/gridkit'
+import { useDataStore, DataGrid } from '@loykin/gridkit'
 
-const store = createDataStore<Order>((order) => order.id)
-
-export function LiveOrdersTable() {
-  const dataStore = useDataStore(store)
+export function LiveTable() {
+  const store = useDataStore<Order>({ getRowId: (o) => o.id })
 
   useEffect(() => {
     ws.on('order', (order) => {
@@ -483,15 +555,52 @@ export function LiveOrdersTable() {
     })
   }, [])
 
-  return <DataGrid dataStore={dataStore} columns={columns} tableHeight={500} />
+  return <DataGrid dataStore={store} columns={columns} tableHeight={500} />
 }
 ```
 
 ---
 
-## Escape Hatch (`tableOptions`)
+## Icon Overrides
 
-For advanced TanStack Table options not exposed as individual props:
+Replace any built-in icon slot. All icons accept any React node.
+
+```tsx
+import { ChevronUp, ChevronDown, Filter } from 'lucide-react'
+
+<DataGrid
+  icons={{
+    sortAsc:  <ChevronUp size={12} />,
+    sortDesc: <ChevronDown size={12} />,
+    filter:   <Filter size={13} />,
+  }}
+  ...
+/>
+```
+
+| Slot | Default icon | Used in |
+|---|---|---|
+| `sortAsc` | ArrowUp | Sorted ascending header |
+| `sortDesc` | ArrowDown | Sorted descending header |
+| `sortNone` | ArrowUpDown | Sortable but unsorted header |
+| `filter` | Filter | Header filter icon button |
+| `filterRange` | SlidersHorizontal | Number range filter button |
+| `clearFilter` | X | Clear filter / search button |
+| `rowActions` | MoreHorizontal | Row actions trigger (⋯) |
+| `columnVisibility` | Columns3 | Column visibility dropdown button |
+| `loading` | Loader2 | Loading spinner |
+| `pageFirst` | ChevronsLeft | Go to first page |
+| `pagePrev` | ChevronLeft | Go to previous page |
+| `pageNext` | ChevronRight | Go to next page |
+| `pageLast` | ChevronsRight | Go to last page |
+| `search` | Search | Global search input prefix |
+| `treeExpand` | ChevronRight | Tree row expand |
+| `treeCollapse` | ChevronDown | Tree row collapse |
+| `dragHandle` | GripVertical | Row drag handle |
+
+---
+
+## Escape Hatch (`tableOptions`)
 
 ```tsx
 <DataGrid
@@ -526,8 +635,8 @@ interface CheckboxConfig<T> {
 
 ```ts
 interface DataGridClassNames {
-  container?: string  // outermost wrapper (border, rounded-md)
-  header?: string     // header panel (bg-muted)
+  container?: string  // scroll container
+  header?: string     // header panel
   headerCell?: string // individual header cell
   row?: string        // body row
   cell?: string       // body cell
