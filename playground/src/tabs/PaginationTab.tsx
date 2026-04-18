@@ -4,6 +4,7 @@ import {
   DataGrid,
   DataGridPaginationBar,
   DataGridPaginationCompact,
+  DataGridPaginationPages,
   ColumnVisibilityDropdown,
   GlobalSearch,
 } from '@loykin/gridkit'
@@ -141,13 +142,35 @@ export function PaginationTab() {
         />
       </section>
 
-      {/* ── D. Server-side (manual pagination) ─────────────────────────────────
+      {/* ── D. DataGridPaginationPages — numbered pages ───────────────────────
+           Shows individual page buttons with ellipsis: << < 1 2 [3] … 20 > >>
+           siblingCount controls how many pages appear on each side of current.  */}
+      <section className="flex flex-col gap-3">
+        <div>
+          <p className="text-sm font-semibold">D. DataGridPaginationPages — numbered pages</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {'<< < 1 2 [3] … 50 > >>'} · ellipsis collapses distant pages ·{' '}
+            <code className="bg-muted px-1 rounded text-[11px]">siblingCount</code> adjusts visible range
+          </p>
+        </div>
+        <DataGrid
+          data={ALL_DATA}
+          columns={columns}
+          enableSorting
+          pagination={{ pageSize: 10 }}
+          footer={(table) => <DataGridPaginationPages table={table} siblingCount={2} />}
+          emptyMessage="No employees"
+          tableKey="pg-d"
+        />
+      </section>
+
+      {/* ── E. Server-side (manual pagination) ─────────────────────────────────
            pageCount controls total pages — TanStack does not slice rows.
            onPageChange fires on every page/size change so the caller fetches
            the correct slice. totalCount drives the "X–Y of N" display.        */}
       <section className="flex flex-col gap-3">
         <div>
-          <p className="text-sm font-semibold">D. Server-side — manual pagination</p>
+          <p className="text-sm font-semibold">E. Server-side — manual pagination</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             <code className="bg-muted px-1 rounded text-[11px]">pageCount</code> +{' '}
             <code className="bg-muted px-1 rounded text-[11px]">onPageChange</code> ·{' '}
