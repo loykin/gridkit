@@ -151,7 +151,6 @@ export function DataGridTableView<T extends object>({
   const bodyStyle: React.CSSProperties = {
     flex: 1,
     minHeight: 0,
-    height: '100%',
     overflow: 'auto',
   }
 
@@ -247,12 +246,10 @@ export function DataGridTableView<T extends object>({
           <CustomScrollbar
             scrollRef={bodyScrollRef}
             direction="vertical"
-            className="absolute right-0 top-0 bottom-0"
-            style={{ width: 8 }}
           />
 
-          {/* Horizontal scrollbar — flex item, pushes rows up from inside */}
-          <CustomScrollbar scrollRef={bodyScrollRef} direction="horizontal" style={{ height: 8 }} />
+          {/* Horizontal scrollbar — flex item; margin-right avoids overlap with vertical scrollbar */}
+          <CustomScrollbar scrollRef={bodyScrollRef} direction="horizontal" style={{ height: 8, marginRight: 8 }} />
         </div>
       </div>
 

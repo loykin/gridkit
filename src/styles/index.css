@@ -421,17 +421,11 @@
 }
 
 .dg-scrollbar-track {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 8px;
   background: var(--dg-muted);
 }
 
 .dg-scrollbar-thumb {
   position: absolute;
-  height: 100%;
   border-radius: 9999px;
   background: var(--dg-muted-foreground);
   opacity: 0.3;

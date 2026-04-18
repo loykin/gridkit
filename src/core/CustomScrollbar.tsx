@@ -122,8 +122,8 @@ export function CustomScrollbar({ scrollRef, direction, className, style }: Cust
     <div
       ref={trackRef}
       onClick={handleTrackClick}
-      className={cn('dg-scrollbar-track', 'relative', !visible && 'hidden', className)}
-      style={style}
+      className={cn('dg-scrollbar-track', !visible && 'hidden', className)}
+      style={isV ? { position: 'absolute', top: 0, right: 0, bottom: 0, width: 8, ...style } : { position: 'relative', ...style }}
     >
       <div
         className={cn(

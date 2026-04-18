@@ -4,5 +4,6 @@ dist/
 *.local
 .idea/
 playground/node_modules/
+playground/.vite/
 test-npm/node_modules/
 *.tgz
