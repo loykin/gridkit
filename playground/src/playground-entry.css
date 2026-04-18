@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@import "../../src/styles/index.css";
+
+@source "../../src/**/*.{ts,tsx}";
+@source "./src/**/*.{ts,tsx}";
+@source "./**/*.{ts,tsx}";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background:           var(--dg-background);
+  --color-foreground:           var(--dg-foreground);
+  --color-popover:              var(--dg-popover);
+  --color-popover-foreground:   var(--dg-popover-foreground);
+  --color-primary:              var(--dg-primary);
+  --color-primary-foreground:   var(--dg-primary-foreground);
+  --color-secondary:            var(--dg-secondary);
+  --color-secondary-foreground: var(--dg-secondary-foreground);
+  --color-muted:                var(--dg-muted);
+  --color-muted-foreground:     var(--dg-muted-foreground);
+  --color-accent:               var(--dg-accent);
+  --color-accent-foreground:    var(--dg-accent-foreground);
+  --color-destructive:          var(--dg-destructive);
+  --color-border:               var(--dg-border);
+  --color-input:                var(--dg-input);
+  --color-ring:                 var(--dg-ring);
+  --radius:                     var(--dg-radius);
+}

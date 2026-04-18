@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { Table } from '@tanstack/react-table'
-import { Search, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { useIcons } from '@/core/IconsContext'
 
 interface Props<T extends object> {
   table: Table<T>
@@ -11,18 +10,12 @@ interface Props<T extends object> {
   className?: string
 }
 
-export function GlobalSearch<T extends object>({
-  table,
-  placeholder = 'Search…',
-  className,
-}: Props<T>) {
+export function GlobalSearch<T extends object>({ table, placeholder = 'Search…', className }: Props<T>) {
+  const icons = useIcons()
   const [value, setValue] = useState(String(table.getState().globalFilter ?? ''))
 
-  // Sync when external code changes globalFilter (e.g. clear-all button)
   const externalFilter = String(table.getState().globalFilter ?? '')
-  useEffect(() => {
-    setValue(externalFilter)
-  }, [externalFilter])
+  useEffect(() => { setValue(externalFilter) }, [externalFilter])
 
   useEffect(() => {
     const timeout = setTimeout(() => table.setGlobalFilter(value || undefined), 200)
@@ -30,25 +23,30 @@ export function GlobalSearch<T extends object>({
   }, [value, table])
 
   return (
-    <div className={cn('relative', className)}>
-      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--dg-muted-foreground)] pointer-events-none" />
+    <div className={className} style={{ position: 'relative' }}>
+      <span
+        style={{
+          position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)',
+          width: 14, height: 14, color: 'var(--dg-muted-foreground)', pointerEvents: 'none',
+          display: 'flex', alignItems: 'center',
+        }}
+      >
+        {icons.search}
+      </span>
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="h-8 pl-8 pr-7 text-xs w-52"
+        style={{ paddingLeft: 30, paddingRight: 28, width: 208 }}
       />
       {value && (
         <Button
           variant="ghost"
           size="icon-xs"
-          onClick={() => {
-            setValue('')
-            table.setGlobalFilter(undefined)
-          }}
-          className="absolute right-0.5 top-1/2 -translate-y-1/2"
+          onClick={() => { setValue(''); table.setGlobalFilter(undefined) }}
+          style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)' }}
         >
-          <X className="h-3 w-3" />
+          {icons.clearFilter}
         </Button>
       )}
     </div>

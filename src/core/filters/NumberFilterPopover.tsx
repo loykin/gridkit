@@ -1,6 +1,6 @@
 import type { Column } from '@tanstack/react-table'
-import { SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useIcons } from '@/core/IconsContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { NumberRangeFilterContent } from './NumberRangeFilterContent'
 
@@ -9,6 +9,7 @@ interface Props<T extends object> {
 }
 
 export function NumberFilterPopover<T extends object>({ col }: Props<T>) {
+  const icons = useIcons()
   const numFilter = col.getFilterValue() as [string, string] | undefined
   const min = numFilter?.[0] ?? ''
   const max = numFilter?.[1] ?? ''
@@ -26,14 +27,14 @@ export function NumberFilterPopover<T extends object>({ col }: Props<T>) {
             {...props}
             variant={hasFilter ? 'outline' : 'ghost'}
             size="sm"
-            className="h-7 w-full justify-start text-xs font-normal"
+            style={{ width: '100%', justifyContent: 'flex-start' }}
           >
-            <SlidersHorizontal className="h-3 w-3 shrink-0" />
-            <span className="truncate">{label}</span>
+            {icons.filterRange}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
           </Button>
         )}
       />
-      <PopoverContent side="bottom" align="start" className="w-48">
+      <PopoverContent side="bottom" align="start" style={{ width: 192 }}>
         <NumberRangeFilterContent col={col} />
       </PopoverContent>
     </Popover>

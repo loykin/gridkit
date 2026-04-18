@@ -2,6 +2,7 @@ import type { DataGridInfinityProps } from '@/types'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { useInfiniteScroll } from '@/core/hooks/useInfiniteScroll'
 import { DataGridShell } from '@/core/DataGridShell'
+import { IconsProvider } from '@/core/IconsContext'
 
 export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<T>) {
   const {
@@ -13,6 +14,7 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
     fetchNextPage,
     rootMargin = '100px',
     isLoading,
+    icons,
   } = props
 
   const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase({
@@ -29,6 +31,7 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
   })
 
   return (
+    <IconsProvider icons={icons}>
     <DataGridShell
       {...props}
       wrapperRef={wrapperRef}
@@ -43,5 +46,6 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
       loadMoreRef={loadMoreRef}
       isFetchingNextPage={isFetchingNextPage}
     />
+    </IconsProvider>
   )
 }

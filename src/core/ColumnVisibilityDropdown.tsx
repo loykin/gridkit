@@ -1,6 +1,6 @@
 import type { Table } from '@tanstack/react-table'
-import { Columns3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useIcons } from '@/core/IconsContext'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -9,25 +9,29 @@ interface Props<T extends object> {
 }
 
 export function ColumnVisibilityDropdown<T extends object>({ table }: Props<T>) {
+  const icons = useIcons()
   return (
     <Popover>
       <PopoverTrigger
         render={(props) => (
-          <Button {...props} variant="outline" size="sm" className="gap-1.5">
-            <Columns3 className="h-4 w-4" />
+          <Button {...props} variant="outline" size="sm">
+            {icons.columnVisibility}
             Columns
           </Button>
         )}
       />
-      <PopoverContent align="end" className="w-48">
-        <div className="flex flex-col gap-1.5">
+      <PopoverContent align="end" style={{ width: 192 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {table
             .getAllLeafColumns()
             .filter((col) => col.id !== '__select__')
             .map((col) => (
-              <label key={col.id} className="flex items-center gap-2 cursor-pointer text-sm">
+              <label
+                key={col.id}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}
+              >
                 <Checkbox checked={col.getIsVisible()} onCheckedChange={col.toggleVisibility} />
-                <span className="truncate">
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id}
                 </span>
               </label>

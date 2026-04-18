@@ -1,6 +1,6 @@
 import React from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
 import type { Row } from '@tanstack/react-table'
+import { useIcons } from '@/core/IconsContext'
 
 interface TreeCellProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,11 +22,20 @@ interface TreeCellProps {
  *   )
  */
 export function TreeCell({ row, indentSize = 16, children }: TreeCellProps) {
+  const icons = useIcons()
   const canExpand = row.getCanExpand()
   const indent = row.depth * indentSize
 
   return (
-    <div style={{ paddingLeft: indent }} className="flex items-center gap-1 min-w-0">
+    <div
+      style={{
+        paddingLeft: indent,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        minWidth: 0,
+      }}
+    >
       {canExpand ? (
         <button
           type="button"
@@ -34,17 +43,15 @@ export function TreeCell({ row, indentSize = 16, children }: TreeCellProps) {
             e.stopPropagation()
             row.toggleExpanded()
           }}
-          className="flex items-center justify-center w-5 h-5 shrink-0 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          className="dg-btn dg-btn--tree-toggle"
+          data-variant="ghost"
+          data-size="icon-xs"
+          style={{ color: 'color-mix(in oklab, var(--dg-foreground) 60%, transparent)' }}
         >
-          {row.getIsExpanded() ? (
-            <ChevronDown className="h-3.5 w-3.5 text-[var(--dg-foreground)]/60" />
-          ) : (
-            <ChevronRight className="h-3.5 w-3.5 text-[var(--dg-foreground)]/60" />
-          )}
+          {row.getIsExpanded() ? icons.treeCollapse : icons.treeExpand}
         </button>
       ) : (
-        // Leaf or non-expandable: spacer keeps content aligned with siblings
-        <span className="w-5 h-5 shrink-0" />
+        <span style={{ width: 20, height: 20, flexShrink: 0 }} />
       )}
       {children}
     </div>

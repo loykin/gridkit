@@ -29,9 +29,9 @@ export function FilterIconTab() {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-2">
-        <p className="text-sm font-medium">filterDisplay=&quot;row&quot; (기본)</p>
+        <p className="text-sm font-medium">filterDisplay=&quot;row&quot; (default)</p>
         <p className="text-xs text-muted-foreground">
-          text · select · multi-select · number — 헤더 아래 별도 필터 row
+          text · select · multi-select · number — dedicated filter row below the header
         </p>
         <DataGrid
           data={SMALL_DATA}
@@ -48,7 +48,7 @@ export function FilterIconTab() {
       <section className="flex flex-col gap-2">
         <p className="text-sm font-medium">filterDisplay=&quot;icon&quot;</p>
         <p className="text-xs text-muted-foreground">
-          text · select · multi-select · number — 헤더 셀 아이콘 클릭으로 필터
+          text · select · multi-select · number — filter popover on header cell icon click
         </p>
         <DataGrid
           data={SMALL_DATA}

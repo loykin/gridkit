@@ -1,8 +1,8 @@
 import React from 'react'
 import type { Column, Table } from '@tanstack/react-table'
-import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useIcons } from '@/core/IconsContext'
 import { Input } from '@/components/ui/input'
 import type { TableViewConfig, TableWidthMode } from '@/types'
 import { colStyle } from './tableUtils'
@@ -24,13 +24,11 @@ export function DataGridFilterRow<T extends object>({
   bordered,
   tableWidthMode = 'spacer',
 }: DataGridFilterRowProps<T>) {
+  const icons = useIcons()
   return (
     <div
       role="row"
-      className={cn(
-        'dg-filter-row',
-        'flex border-b border-[var(--dg-border)] bg-[var(--dg-muted)]',
-      )}
+      className={cn('dg-filter-row')}
       style={{ width: '100%', height: '36px' }}
     >
       {visibleLeafColumns.map((col) => {
@@ -47,8 +45,7 @@ export function DataGridFilterRow<T extends object>({
               key={col.id}
               className={cn(
                 'dg-filter-cell',
-                'px-2 py-1',
-                bordered && 'border-r border-[var(--dg-border)]',
+                bordered && 'dg-filter-cell--bordered',
               )}
               style={cellStyle}
             />
@@ -61,8 +58,7 @@ export function DataGridFilterRow<T extends object>({
             key={col.id}
             className={cn(
               'dg-filter-cell',
-              'px-2 py-1 font-normal',
-              bordered && 'border-r border-[var(--dg-border)]',
+              bordered && 'dg-filter-cell--bordered',
             )}
             style={cellStyle}
           >
@@ -73,22 +69,22 @@ export function DataGridFilterRow<T extends object>({
             ) : ft === 'number' ? (
               <NumberFilterPopover col={col} />
             ) : (
-              <div className="relative w-full">
+              <div style={{ position: 'relative', width: '100%' }}>
                 <Input
                   type="text"
                   placeholder="Filter…"
                   value={filterValue}
                   onChange={(e) => col.setFilterValue(e.target.value || undefined)}
-                  className="h-7 text-xs pr-6"
+                  style={{ paddingRight: 24 }}
                 />
                 {filterValue && (
                   <Button
                     variant="ghost"
                     size="icon-xs"
                     onClick={() => col.setFilterValue(undefined)}
-                    className="absolute right-0.5 top-1/2 -translate-y-1/2"
+                    style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)' }}
                   >
-                    <X />
+                    {icons.clearFilter}
                   </Button>
                 )}
               </div>
@@ -100,7 +96,6 @@ export function DataGridFilterRow<T extends object>({
         <div
           role="columnheader"
           style={{ flex: 1, minWidth: 0, padding: 0 }}
-          className="bg-[var(--dg-muted)]"
         />
       )}
     </div>

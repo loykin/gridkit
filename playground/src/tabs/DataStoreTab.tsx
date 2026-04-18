@@ -296,10 +296,10 @@ export function DataStoreTab() {
       {/* Description */}
       <p className="text-xs text-muted-foreground">
         <code className="bg-muted px-1 py-0.5 rounded text-[11px]">useDataStore</code> +{' '}
-        <code className="bg-muted px-1 py-0.5 rounded text-[11px]">applyTransaction</code> 패턴.{' '}
-        변경된 row만{' '}
-        <code className="bg-muted px-1 py-0.5 rounded text-[11px]">getDataStoreCoreRowModel</code>이
-        선택적으로 재평가 — 전체 배열 재생성 없이 Map 기반 O(1) add/update/delete.
+        <code className="bg-muted px-1 py-0.5 rounded text-[11px]">applyTransaction</code> pattern.{' '}
+        Only changed rows are re-evaluated by{' '}
+        <code className="bg-muted px-1 py-0.5 rounded text-[11px]">getDataStoreCoreRowModel</code> —
+        Map-based O(1) add/update/delete without full array reconstruction.
       </p>
 
       {/* Grid + Log side by side */}

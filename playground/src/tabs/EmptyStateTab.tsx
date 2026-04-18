@@ -122,7 +122,7 @@ export function EmptyStateTab() {
       <div className="flex flex-col gap-2">
         <p className="text-xs font-medium text-muted-foreground">
           showHeader={String(showHeader)} —{' '}
-          {showHeader ? '헤더 표시' : '헤더 숨김 (header-less 테이블)'}
+          {showHeader ? 'header visible' : 'header hidden (header-less table)'}
         </p>
         <DataGrid
           data={hasData ? ALL_DATA.slice(0, 3) : []}

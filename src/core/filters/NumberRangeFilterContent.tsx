@@ -13,9 +13,9 @@ export function NumberRangeFilterContent<T extends object>({ col }: Props<T>) {
   const hasFilter = min !== '' || max !== ''
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-[var(--dg-muted-foreground)]">Min</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ fontSize: 12, color: 'var(--dg-muted-foreground)' }}>Min</span>
         <Input
           type="number"
           placeholder="Min"
@@ -23,11 +23,10 @@ export function NumberRangeFilterContent<T extends object>({ col }: Props<T>) {
           onChange={(e) =>
             col.setFilterValue((old: [string, string] = ['', '']) => [e.target.value, old[1]])
           }
-          className="h-7 text-xs"
         />
       </div>
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-[var(--dg-muted-foreground)]">Max</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <span style={{ fontSize: 12, color: 'var(--dg-muted-foreground)' }}>Max</span>
         <Input
           type="number"
           placeholder="Max"
@@ -35,14 +34,12 @@ export function NumberRangeFilterContent<T extends object>({ col }: Props<T>) {
           onChange={(e) =>
             col.setFilterValue((old: [string, string] = ['', '']) => [old[0], e.target.value])
           }
-          className="h-7 text-xs"
         />
       </div>
       {hasFilter && (
         <Button
           variant="ghost"
           size="sm"
-          className="h-7 text-xs"
           onClick={() => col.setFilterValue(undefined)}
         >
           Clear

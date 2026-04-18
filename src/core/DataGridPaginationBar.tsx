@@ -1,14 +1,7 @@
 import type { Table } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { useIcons } from '@/core/IconsContext'
 
 interface DataGridPaginationBarProps<T extends object> {
   table: Table<T>
@@ -21,37 +14,28 @@ export function DataGridPaginationBar<T extends object>({
   pageSizes,
   totalCount,
 }: DataGridPaginationBarProps<T>) {
+  const icons = useIcons()
   const { pageIndex, pageSize } = table.getState().pagination
   const pageCount = table.getPageCount()
 
-  const pageSizeItems = pageSizes.map((size) => ({ label: String(size), value: size }))
-
   return (
-    <div className={cn(
-      'dg-pagination',
-      'flex items-center justify-between gap-4 px-1 py-1 text-sm text-[var(--dg-muted-foreground)]',
-    )}>
-      <div className="flex items-center gap-2">
+    <div className={cn('dg-pagination')}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span>Rows per page</span>
-        <Select
-          items={pageSizeItems}
+        <select
           value={pageSize}
-          onValueChange={(val) => table.setPageSize(val as number)}
+          onChange={(e) => table.setPageSize(Number(e.target.value))}
+          className="dg-select"
         >
-          <SelectTrigger size="sm" className="w-16">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {pageSizeItems.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          {pageSizes.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <span>
           {totalCount !== undefined
             ? `${pageIndex * pageSize + 1}–${Math.min((pageIndex + 1) * pageSize, totalCount)} of ${totalCount}`
@@ -63,7 +47,7 @@ export function DataGridPaginationBar<T extends object>({
           onClick={() => table.firstPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          <ChevronsLeft />
+          {icons.pageFirst}
         </Button>
         <Button
           variant="ghost"
@@ -71,7 +55,7 @@ export function DataGridPaginationBar<T extends object>({
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          <ChevronLeft />
+          {icons.pagePrev}
         </Button>
         <Button
           variant="ghost"
@@ -79,7 +63,7 @@ export function DataGridPaginationBar<T extends object>({
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
-          <ChevronRight />
+          {icons.pageNext}
         </Button>
         <Button
           variant="ghost"
@@ -87,7 +71,7 @@ export function DataGridPaginationBar<T extends object>({
           onClick={() => table.lastPage()}
           disabled={!table.getCanNextPage()}
         >
-          <ChevronsRight />
+          {icons.pageLast}
         </Button>
       </div>
     </div>

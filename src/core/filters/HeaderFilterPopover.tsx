@@ -1,10 +1,9 @@
 import { useCallback, useState } from 'react'
 import type { Column, Table } from '@tanstack/react-table'
-import { Filter, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useIcons } from '@/core/IconsContext'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
 import { SelectFilterCell } from './SelectFilterCell'
 import { MultiSelectContent } from './MultiSelectContent'
 import { NumberRangeFilterContent } from './NumberRangeFilterContent'
@@ -16,6 +15,7 @@ interface Props<T extends object> {
 
 export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) {
   const [open, setOpen] = useState(false)
+  const icons = useIcons()
   // Stable ref callback — an inline arrow would create a new reference on every render,
   // causing React to call it as null→el each time, re-triggering focus()
   const focusRef = useCallback((el: HTMLInputElement | null) => {
@@ -37,16 +37,13 @@ export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) 
               {...props}
               variant="ghost"
               size="icon-xs"
-              className={cn(
-                'h-5 w-5 shrink-0',
-                hasFilter ? 'text-[var(--dg-primary)] opacity-100' : 'opacity-0 group-hover:opacity-60',
-              )}
+              className={hasFilter ? 'dg-btn--filter-active' : 'dg-btn--filter-inactive'}
             >
-              <Filter className="h-3 w-3" />
+              {icons.filter}
             </Button>
           )}
         />
-        <PopoverContent side="bottom" align="start" className="w-52">
+        <PopoverContent side="bottom" align="start" style={{ width: 208 }}>
           {ft === 'select' ? (
             <SelectFilterCell col={col} table={table} onSelect={() => setOpen(false)} />
           ) : ft === 'multi-select' ? (
@@ -54,13 +51,13 @@ export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) 
           ) : ft === 'number' ? (
             <NumberRangeFilterContent col={col} />
           ) : (
-            <div className="relative">
+            <div style={{ position: 'relative' }}>
               <Input
                 type="text"
                 placeholder="Filter…"
                 value={filterValue}
                 onChange={(e) => col.setFilterValue(e.target.value || undefined)}
-                className="h-7 text-xs pr-6"
+                style={{ paddingRight: 24 }}
                 ref={focusRef}
               />
               {filterValue && (
@@ -68,9 +65,9 @@ export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) 
                   variant="ghost"
                   size="icon-xs"
                   onClick={() => col.setFilterValue(undefined)}
-                  className="absolute right-0.5 top-1/2 -translate-y-1/2"
+                  style={{ position: 'absolute', right: 2, top: '50%', transform: 'translateY(-50%)' }}
                 >
-                  <X />
+                  {icons.clearFilter}
                 </Button>
               )}
             </div>

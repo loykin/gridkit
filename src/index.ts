@@ -24,4 +24,5 @@ export type {
   TableViewConfig,
   DataGridBaseProps,
   DataGridClassNames,
+  DataGridIcons,
 } from './types'

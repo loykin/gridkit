@@ -20,13 +20,13 @@ export function MultiSelectFilterCell<T extends object>({ col, table }: Props<T>
             {...props}
             variant={selected.length > 0 ? 'outline' : 'ghost'}
             size="sm"
-            className="h-7 w-full justify-start text-xs font-normal"
+            style={{ width: '100%', justifyContent: 'flex-start' }}
           >
-            <span className="truncate">{label}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
           </Button>
         )}
       />
-      <PopoverContent side="bottom" align="start" className="w-48">
+      <PopoverContent side="bottom" align="start" style={{ width: 192 }}>
         <MultiSelectContent col={col} table={table} />
       </PopoverContent>
     </Popover>

@@ -1,6 +1,6 @@
 import { useContext } from 'react'
-import { GripVertical } from 'lucide-react'
 import { RowDragContext } from '@/features/reordering/RowDragContext'
+import { useIcons } from '@/core/IconsContext'
 
 /**
  * Drag handle cell — place in whichever column should act as the grab handle.
@@ -13,16 +13,24 @@ import { RowDragContext } from '@/features/reordering/RowDragContext'
  */
 export function DragHandleCell() {
   const ctx = useContext(RowDragContext)
+  const icons = useIcons()
 
   return (
     <button
       type="button"
       {...ctx?.listeners}
       {...ctx?.attributes}
-      className="flex items-center justify-center w-full h-full cursor-grab active:cursor-grabbing text-[var(--dg-muted-foreground)]/40 hover:text-[var(--dg-muted-foreground)] transition-colors"
-      style={{ touchAction: 'none' }}
+      className="dg-btn dg-btn--drag-handle"
+      data-variant="ghost"
+      style={{
+        width: '100%',
+        height: '100%',
+        cursor: 'grab',
+        touchAction: 'none',
+        color: 'color-mix(in oklab, var(--dg-muted-foreground) 40%, transparent)',
+      }}
     >
-      <GripVertical className="h-4 w-4" />
+      {icons.dragHandle}
     </button>
   )
 }

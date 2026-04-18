@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import type { Table } from '@tanstack/react-table'
-import { Check, ChevronDown, X } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useIcons } from '@/core/IconsContext'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
 import { getColumnOptions } from '@/core/hooks/useColumnOptions'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -18,6 +18,7 @@ interface SelectFilterProps<T extends object> {
 }
 
 export function SelectFilter<T extends object>({ table, columnId, label }: SelectFilterProps<T>) {
+  const icons = useIcons()
   const [options, setOptions] = useState<string[] | null>(null)
   const col = table.getColumn(columnId)
   const value = (col?.getFilterValue() ?? '') as string
@@ -38,36 +39,31 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
             {...props}
             variant={value ? 'secondary' : 'outline'}
             size="sm"
-            className="h-8 gap-1.5 text-xs"
           >
             {value ? (
-              <>
-                <span className="font-normal text-[var(--dg-muted-foreground)]">{label}:</span> {value}
-              </>
-            ) : (
-              label
-            )}
-            <ChevronDown className="h-3.5 w-3.5 text-[var(--dg-muted-foreground)]" />
+              <><span style={{ fontWeight: 400, color: 'var(--dg-muted-foreground)' }}>{label}:</span> {value}</>
+            ) : label}
+            <ChevronDown />
           </Button>
         )}
       />
-      <PopoverContent align="start" className="w-44 p-1">
-        <div className="flex flex-col">
+      <PopoverContent align="start" style={{ width: 176, padding: 4 }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {value && (
             <button
               onClick={() => col.setFilterValue(undefined)}
-              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-sm hover:bg-[var(--dg-muted)] text-[var(--dg-muted-foreground)]"
+              className="dg-popover-option"
             >
-              <X className="h-3 w-3" /> Clear
+              {icons.clearFilter} Clear
             </button>
           )}
           {(options ?? []).map((opt) => (
             <button
               key={opt}
               onClick={() => col.setFilterValue(opt === value ? undefined : opt)}
-              className="flex items-center gap-2 px-2 py-1.5 text-xs rounded-sm hover:bg-[var(--dg-muted)]"
+              className="dg-popover-option"
             >
-              <Check className={cn('h-3 w-3', opt === value ? 'opacity-100' : 'opacity-0')} />
+              <Check style={{ opacity: opt === value ? 1 : 0, width: 12, height: 12 }} />
               {opt}
             </button>
           ))}
@@ -117,34 +113,31 @@ export function MultiSelectFilter<T extends object>({
             {...props}
             variant={selected.length > 0 ? 'secondary' : 'outline'}
             size="sm"
-            className="h-8 gap-1.5 text-xs"
           >
             {selected.length > 0 ? (
-              <>
-                <span className="font-normal text-[var(--dg-muted-foreground)]">{label}:</span>{' '}
-                {selected.length} selected
-              </>
+              <><span style={{ fontWeight: 400, color: 'var(--dg-muted-foreground)' }}>{label}:</span>{' '}
+              {selected.length} selected</>
             ) : (
               label
             )}
-            <ChevronDown className="h-3.5 w-3.5 text-[var(--dg-muted-foreground)]" />
+            <ChevronDown />
           </Button>
         )}
       />
-      <PopoverContent align="start" className="w-48">
-        <div className="flex flex-col gap-0.5">
-          <div className="max-h-52 overflow-y-auto flex flex-col gap-0.5">
+      <PopoverContent align="start" style={{ width: 192 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div style={{ maxHeight: 208, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
             {(options ?? []).map((opt) => (
               <label
                 key={opt}
-                className="flex items-center gap-2 px-1 py-1 cursor-pointer hover:bg-[var(--dg-muted)] rounded-sm text-xs select-none"
+                className="dg-multi-option"
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 4px', cursor: 'pointer', fontSize: 12 }}
               >
                 <Checkbox
                   checked={selected.includes(opt)}
                   onCheckedChange={() => toggle(opt)}
-                  className="shrink-0"
                 />
-                <span className="truncate">{opt}</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt}</span>
               </label>
             ))}
           </div>
@@ -152,7 +145,7 @@ export function MultiSelectFilter<T extends object>({
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 text-xs mt-1"
+              style={{ marginTop: 4 }}
               onClick={() => col.setFilterValue(undefined)}
             >
               Clear ({selected.length})

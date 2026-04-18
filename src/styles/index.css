@@ -1,47 +1,14 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@source "../**/*.{ts,tsx}";
-
-@custom-variant dark (&:is(.dark *));
-
 /*
- * Map --dg-* variables to Tailwind v4 color tokens.
- * Using @theme inline means utilities like bg-background compile to
- * background-color: var(--dg-background) — dynamic at runtime.
+ * @loykin/gridkit — base styles
  *
- * In the built CSS output this block is compiled away, so consumers
- * importing the built package do NOT get their Tailwind tokens polluted.
- * Only the playground (which imports library source directly) is affected,
- * which is the intended behavior.
+ * This file ships no Tailwind dependency. All styles are plain CSS.
+ * Consumers can override anything via:
+ *   - CSS custom properties: --dg-*
+ *   - Semantic class names:  .dg-*
  */
-@theme inline {
-  --color-background:           var(--dg-background);
-  --color-foreground:           var(--dg-foreground);
-  --color-popover:              var(--dg-popover);
-  --color-popover-foreground:   var(--dg-popover-foreground);
-  --color-primary:              var(--dg-primary);
-  --color-primary-foreground:   var(--dg-primary-foreground);
-  --color-secondary:            var(--dg-secondary);
-  --color-secondary-foreground: var(--dg-secondary-foreground);
-  --color-muted:                var(--dg-muted);
-  --color-muted-foreground:     var(--dg-muted-foreground);
-  --color-accent:               var(--dg-accent);
-  --color-accent-foreground:    var(--dg-accent-foreground);
-  --color-destructive:          var(--dg-destructive);
-  --color-border:               var(--dg-border);
-  --color-input:                var(--dg-input);
-  --color-ring:                 var(--dg-ring);
-  --radius:                     var(--dg-radius);
-}
 
-/*
- * Default light theme.
- * --dg-* falls back to shadcn/ui variable names first, then hardcoded defaults.
- * - shadcn/ui app  → uses the app's own CSS variables automatically
- * - standalone app → uses the hardcoded fallback values below
- * - custom theme   → override --dg-* directly without touching app globals
- */
+/* ── CSS custom properties (theme tokens) ──────────────────────────────────── */
+
 :root {
   --dg-background:           var(--background,          oklch(1 0 0));
   --dg-foreground:           var(--foreground,          oklch(0.145 0 0));
@@ -62,7 +29,6 @@
   --dg-radius:               var(--radius,              0rem);
 }
 
-/* Default dark theme fallbacks */
 .dark {
   --dg-background:           var(--background,          oklch(0.145 0 0));
   --dg-foreground:           var(--foreground,          oklch(0.985 0 0));
@@ -82,16 +48,203 @@
   --dg-ring:                 var(--ring,                oklch(0.556 0 0));
 }
 
-@layer utilities {
-  .scrollbar-none {
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
+/* ── Scrollbar utility ──────────────────────────────────────────────────────── */
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
-/* ── DataGrid structural & visual rules ─────────────────────────────────── */
+/* ── Spinner animation ──────────────────────────────────────────────────────── */
+
+@keyframes dg-spin {
+  to { transform: rotate(360deg); }
+}
+
+.dg-spinner {
+  width: 20px;
+  height: 20px;
+  color: var(--dg-muted-foreground);
+  animation: dg-spin 1s linear infinite;
+}
+
+/* ── dg-btn ─────────────────────────────────────────────────────────────────── */
+
+.dg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  border-radius: var(--dg-radius);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms, border-color 150ms;
+  outline: none;
+  user-select: none;
+  background: none;
+  color: inherit;
+  padding: 0 10px;
+  height: 32px;
+}
+.dg-btn:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+.dg-btn:focus-visible {
+  border-color: var(--dg-ring);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--dg-ring) 50%, transparent);
+}
+.dg-btn svg {
+  pointer-events: none;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* Variants */
+.dg-btn[data-variant="default"] {
+  background: var(--dg-primary);
+  color: var(--dg-primary-foreground);
+}
+.dg-btn[data-variant="outline"] {
+  border-color: var(--dg-border);
+  background: var(--dg-background);
+  color: var(--dg-foreground);
+}
+.dg-btn[data-variant="outline"]:hover {
+  background: var(--dg-muted);
+}
+.dg-btn[data-variant="secondary"] {
+  background: var(--dg-secondary);
+  color: var(--dg-secondary-foreground);
+}
+.dg-btn[data-variant="secondary"]:hover {
+  background: color-mix(in oklab, var(--dg-secondary) 80%, transparent);
+}
+.dg-btn[data-variant="ghost"] {
+  background: transparent;
+}
+.dg-btn[data-variant="ghost"]:hover {
+  background: var(--dg-muted);
+  color: var(--dg-foreground);
+}
+.dg-btn[data-variant="destructive"] {
+  background: color-mix(in oklab, var(--dg-destructive) 10%, transparent);
+  color: var(--dg-destructive);
+}
+.dg-btn[data-variant="destructive"]:hover {
+  background: color-mix(in oklab, var(--dg-destructive) 20%, transparent);
+}
+
+/* Sizes */
+.dg-btn[data-size="sm"]      { height: 28px; padding: 0 10px; font-size: 12px; }
+.dg-btn[data-size="xs"]      { height: 24px; padding: 0 8px;  font-size: 12px; }
+.dg-btn[data-size="lg"]      { height: 36px; padding: 0 10px; }
+.dg-btn[data-size="icon"]    { width: 32px; height: 32px; padding: 0; }
+.dg-btn[data-size="icon-xs"] { width: 24px; height: 24px; padding: 0; }
+.dg-btn[data-size="icon-xs"] svg { width: 12px; height: 12px; }
+.dg-btn[data-size="icon-sm"] { width: 28px; height: 28px; padding: 0; }
+.dg-btn[data-size="icon-sm"] svg { width: 14px; height: 14px; }
+.dg-btn[data-size="icon-lg"] { width: 36px; height: 36px; padding: 0; }
+
+/* Filter button states */
+.dg-btn--filter-active   { color: var(--dg-primary); opacity: 1; }
+.dg-btn--filter-inactive { opacity: 0; }
+.dg-btn--filter-inactive:hover,
+.dg-header-cell:hover .dg-btn--filter-inactive { opacity: 0.6; }
+
+/* ── dg-input ───────────────────────────────────────────────────────────────── */
+
+.dg-input {
+  height: 32px;
+  width: 100%;
+  min-width: 0;
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid var(--dg-input);
+  border-radius: var(--dg-radius);
+  background: transparent;
+  color: var(--dg-foreground);
+  outline: none;
+  transition: border-color 150ms;
+}
+.dg-input::placeholder { color: var(--dg-muted-foreground); }
+.dg-input:focus-visible {
+  border-color: var(--dg-ring);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--dg-ring) 50%, transparent);
+}
+.dg-input:disabled { opacity: 0.5; pointer-events: none; }
+
+/* ── dg-checkbox ────────────────────────────────────────────────────────────── */
+
+.dg-checkbox {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: var(--dg-radius);
+  border: 1px solid var(--dg-input);
+  accent-color: var(--dg-primary);
+}
+
+/* ── dg-select ──────────────────────────────────────────────────────────────── */
+
+.dg-select {
+  height: 28px;
+  padding: 0 24px 0 8px;
+  font-size: 12px;
+  border: 1px solid var(--dg-input);
+  border-radius: var(--dg-radius);
+  background: var(--dg-background);
+  color: var(--dg-foreground);
+  outline: none;
+  cursor: pointer;
+  appearance: auto;
+  transition: border-color 150ms;
+}
+.dg-select:focus-visible {
+  border-color: var(--dg-ring);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--dg-ring) 50%, transparent);
+}
+
+/* ── dg-popover-content ─────────────────────────────────────────────────────── */
+
+.dg-popover-content {
+  background: var(--dg-popover);
+  color: var(--dg-popover-foreground);
+  border-radius: var(--dg-radius);
+  padding: 8px;
+  font-size: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border: 1px solid color-mix(in oklab, var(--dg-foreground) 10%, transparent);
+  min-width: 160px;
+}
+
+.dg-popover-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--dg-popover-foreground);
+  cursor: pointer;
+  border-radius: calc(var(--dg-radius) * 0.8);
+}
+.dg-popover-option:hover {
+  background: var(--dg-muted);
+}
+
+/* ── DataGrid structural & visual rules ─────────────────────────────────────── */
 
 .dg-shell {
   display: flex;
@@ -123,10 +276,12 @@
   overflow: hidden;
   border: 1px solid var(--dg-border);
   border-radius: var(--dg-radius);
+  background: var(--dg-background);
 }
 
 .dg-header {
   overflow: hidden;
+  background: var(--dg-muted);
 }
 
 .dg-header-row {
@@ -136,6 +291,8 @@
 
 .dg-header-cell {
   position: relative;
+  display: flex;
+  align-items: center;
   height: 100%;
   user-select: none;
   padding: 0 12px;
@@ -143,28 +300,34 @@
   font-weight: 500;
   background: var(--dg-muted);
   color: var(--dg-muted-foreground);
+  overflow: hidden;
 }
 
 .dg-header-cell[data-sortable="true"] {
   cursor: pointer;
 }
+.dg-header-cell[data-pinned="left"]  { box-shadow: 1px 0 0 0 var(--dg-border); }
+.dg-header-cell[data-pinned="right"] { box-shadow: -1px 0 0 0 var(--dg-border); }
+.dg-header-cell[data-bordered="true"] { border-right: 1px solid var(--dg-border); }
 
-.dg-header-cell[data-pinned="left"] {
-  box-shadow: 1px 0 0 0 var(--dg-border);
-}
-
-.dg-header-cell[data-pinned="right"] {
-  box-shadow: -1px 0 0 0 var(--dg-border);
-}
-
-.dg-header-cell[data-bordered="true"] {
-  border-right: 1px solid var(--dg-border);
+.dg-header-cell-content {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  flex: 1;
 }
 
 .dg-sort-icon {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
+  margin-left: 4px;
 }
+.dg-sort-icon svg { opacity: 0.4; }
+.dg-header-cell:hover .dg-sort-icon svg { opacity: 1; }
+.dg-header-cell[data-sortable="true"][aria-sort] .dg-sort-icon svg { opacity: 1; }
 
 .dg-resize-handle {
   position: absolute;
@@ -188,12 +351,10 @@
   background: var(--dg-border);
   transition: opacity 150ms, background 150ms;
 }
-
 .dg-header-cell:hover .dg-resize-bar,
 .dg-resize-bar[data-resizing="true"] {
   opacity: 1;
 }
-
 .dg-resize-bar[data-resizing="true"] {
   background: var(--dg-primary);
 }
@@ -201,66 +362,42 @@
 .dg-filter-row {
   display: flex;
   border-bottom: 1px solid var(--dg-border);
+  background: var(--dg-muted);
 }
 
 .dg-filter-cell {
+  display: flex;
+  align-items: center;
   padding: 4px 8px;
 }
+.dg-filter-cell--bordered { border-right: 1px solid var(--dg-border); }
 
 .dg-row {
   display: flex;
   width: 100%;
   --_row-bg: var(--dg-background);
 }
-
 .dg-row:not([data-last="true"]) {
   border-bottom: 1px solid var(--dg-border);
 }
-
-.dg-row[data-clickable="true"] {
-  cursor: pointer;
-}
-
-.dg-row:hover {
-  --_row-bg: color-mix(in oklab, var(--dg-muted) 50%, transparent);
-}
-
-.dg-row[data-clickable="true"]:hover {
-  --_row-bg: color-mix(in oklab, var(--dg-muted) 80%, transparent);
-}
+.dg-row[data-clickable="true"] { cursor: pointer; }
+.dg-row:hover { --_row-bg: color-mix(in oklab, var(--dg-muted) 50%, transparent); }
+.dg-row[data-clickable="true"]:hover { --_row-bg: color-mix(in oklab, var(--dg-muted) 80%, transparent); }
 
 .dg-cell {
   display: flex;
   align-items: center;
   overflow: hidden;
   padding: 4px 12px;
+  font-size: 13px;
   background: var(--_row-bg, var(--dg-background));
 }
-
-.dg-cell[data-align="right"] {
-  justify-content: flex-end;
-}
-
-.dg-cell[data-align="center"] {
-  justify-content: center;
-}
-
-.dg-cell[data-wrap="true"] {
-  align-items: flex-start;
-  white-space: normal;
-}
-
-.dg-cell[data-pinned="left"] {
-  box-shadow: 1px 0 0 0 var(--dg-border);
-}
-
-.dg-cell[data-pinned="right"] {
-  box-shadow: -1px 0 0 0 var(--dg-border);
-}
-
-.dg-cell[data-bordered="true"] {
-  border-right: 1px solid var(--dg-border);
-}
+.dg-cell[data-align="right"]  { justify-content: flex-end; }
+.dg-cell[data-align="center"] { justify-content: center; }
+.dg-cell[data-wrap="true"]    { align-items: flex-start; white-space: normal; }
+.dg-cell[data-pinned="left"]  { box-shadow: 1px 0 0 0 var(--dg-border); }
+.dg-cell[data-pinned="right"] { box-shadow: -1px 0 0 0 var(--dg-border); }
+.dg-cell[data-bordered="true"] { border-right: 1px solid var(--dg-border); }
 
 .dg-empty {
   display: flex;
@@ -280,7 +417,7 @@
 
 @keyframes dg-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50%       { opacity: 0.4; }
 }
 
 .dg-scrollbar-track {
@@ -300,10 +437,7 @@
   opacity: 0.3;
   transition: opacity 150ms;
 }
-
-.dg-scrollbar-thumb:hover {
-  opacity: 0.6;
-}
+.dg-scrollbar-thumb:hover { opacity: 0.6; }
 
 .dg-action-menu {
   min-width: 128px;
@@ -313,6 +447,7 @@
   color: var(--dg-popover-foreground);
   padding: 4px;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border: 1px solid color-mix(in oklab, var(--dg-foreground) 10%, transparent);
   outline: none;
 }
 
@@ -327,24 +462,32 @@
   cursor: default;
   outline: none;
   user-select: none;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  color: inherit;
+  transition: background-color 100ms;
 }
-
-.dg-action-item:focus {
+.dg-action-item:focus,
+.dg-action-item:hover {
   background: var(--dg-accent);
   color: var(--dg-accent-foreground);
 }
-
-.dg-action-item[data-variant="destructive"] {
-  color: var(--dg-destructive);
-}
-
-.dg-action-item[data-variant="destructive"]:focus {
+.dg-action-item[data-variant="destructive"] { color: var(--dg-destructive); }
+.dg-action-item[data-variant="destructive"]:focus,
+.dg-action-item[data-variant="destructive"]:hover {
   background: color-mix(in oklab, var(--dg-destructive) 10%, transparent);
 }
-
-.dg-action-item[data-disabled] {
+.dg-action-item:disabled {
   pointer-events: none;
   opacity: 0.5;
+}
+.dg-action-item svg {
+  pointer-events: none;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
 }
 
 .dg-pagination {
@@ -356,4 +499,10 @@
   border-top: 1px solid var(--dg-border);
   background: var(--dg-background);
   color: var(--dg-muted-foreground);
+}
+
+/* ── Multi-option hover state ───────────────────────────────────────────────── */
+.dg-multi-option:hover {
+  background: var(--dg-muted);
+  border-radius: calc(var(--dg-radius) * 0.8);
 }

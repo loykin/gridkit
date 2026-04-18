@@ -16,6 +16,7 @@ import { DataStoreTab } from './tabs/DataStoreTab'
 import { LogStreamTab } from './tabs/LogStreamTab'
 import { BackendTab } from './tabs/BackendTab'
 import { EmptyStateTab } from './tabs/EmptyStateTab'
+import { IconsTab } from './tabs/IconsTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
@@ -37,6 +38,7 @@ const TABS = [
   { id: 'log-stream', label: 'Log Stream', content: <LogStreamTab /> },
   { id: 'backend', label: 'Backend', content: <BackendTab /> },
   { id: 'empty-state', label: 'Empty State', content: <EmptyStateTab /> },
+  { id: 'icons', label: 'Custom Icons', content: <IconsTab /> },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']

@@ -15,9 +15,10 @@ import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { DataGridShell } from '@/core/DataGridShell'
 import { RowWrapperContext } from '@/features/reordering/RowWrapperContext'
 import { SortableRow } from '@/features/reordering/SortableRow'
+import { IconsProvider } from '@/core/IconsContext'
 
 export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
-  const { data = [], onRowReorder, getRowId } = props
+  const { data = [], onRowReorder, getRowId, icons } = props
 
   const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase({
     ...props,
@@ -61,6 +62,7 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
   const activeRow = activeRowId ? rows.find((r) => r.id === activeRowId) : null
 
   return (
+    <IconsProvider icons={icons}>
     <RowWrapperContext.Provider value={SortableRow}>
       <DndContext
         sensors={sensors}
@@ -92,5 +94,6 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
         </DragOverlay>
       </DndContext>
     </RowWrapperContext.Provider>
+    </IconsProvider>
   )
 }

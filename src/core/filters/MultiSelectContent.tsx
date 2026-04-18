@@ -24,29 +24,21 @@ export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
   }
 
   return (
-    <div className="flex flex-col gap-0.5">
-      <div className="max-h-48 overflow-y-auto flex flex-col gap-0.5">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div style={{ maxHeight: 192, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
         {(options ?? []).map((opt) => (
           <label
             key={opt}
-            className="flex items-center gap-2 px-1 py-1 cursor-pointer hover:bg-[var(--dg-muted)] rounded-sm text-xs select-none"
+            className="dg-multi-option"
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 4px', cursor: 'pointer', fontSize: 12 }}
           >
-            <Checkbox
-              checked={selected.includes(opt)}
-              onCheckedChange={() => toggle(opt)}
-              className="shrink-0"
-            />
-            <span className="truncate">{opt}</span>
+            <Checkbox checked={selected.includes(opt)} onCheckedChange={() => toggle(opt)} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt}</span>
           </label>
         ))}
       </div>
       {selected.length > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 text-xs mt-1"
-          onClick={() => col.setFilterValue(undefined)}
-        >
+        <Button variant="ghost" size="sm" style={{ marginTop: 4 }} onClick={() => col.setFilterValue(undefined)}>
           Clear ({selected.length})
         </Button>
       )}

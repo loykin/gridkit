@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type React from 'react'
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -19,6 +20,48 @@ import type { DataStore } from './core/engine/DataStore'
 //   src/core/engine/extensions/DataStoreFeature.ts     — applyTransaction, getRowNodeById
 
 export type DataGridColumnDef<T extends object> = ColumnDef<T, unknown>
+
+/**
+ * Icon overrides for DataGrid.
+ * Each slot accepts any React node — an SVG component, img, span, etc.
+ * Omitted slots fall back to the default lucide-react icons.
+ */
+export interface DataGridIcons {
+  /** Sort ascending indicator (column sorted A→Z / low→high) */
+  sortAsc?: React.ReactNode
+  /** Sort descending indicator (column sorted Z→A / high→low) */
+  sortDesc?: React.ReactNode
+  /** Neutral sort indicator shown on sortable columns with no sort applied */
+  sortNone?: React.ReactNode
+  /** Icon inside the header filter icon button (filterDisplay="icon") */
+  filter?: React.ReactNode
+  /** Icon for the number-range filter button */
+  filterRange?: React.ReactNode
+  /** Icon for clear-filter / clear-search buttons */
+  clearFilter?: React.ReactNode
+  /** Icon for the row-actions trigger button (3-dot menu) */
+  rowActions?: React.ReactNode
+  /** Icon for the column-visibility toggle button */
+  columnVisibility?: React.ReactNode
+  /** Loading / fetching-next-page spinner */
+  loading?: React.ReactNode
+  /** Pagination: go to first page */
+  pageFirst?: React.ReactNode
+  /** Pagination: go to previous page */
+  pagePrev?: React.ReactNode
+  /** Pagination: go to next page */
+  pageNext?: React.ReactNode
+  /** Pagination: go to last page */
+  pageLast?: React.ReactNode
+  /** Global search input prefix icon */
+  search?: React.ReactNode
+  /** Tree row expand icon */
+  treeExpand?: React.ReactNode
+  /** Tree row collapse icon */
+  treeCollapse?: React.ReactNode
+  /** Row drag-handle icon */
+  dragHandle?: React.ReactNode
+}
 
 /**
  * Safe pass-through for advanced TanStack Table options.
@@ -193,6 +236,13 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   // Callbacks
   onTableReady?: (table: Table<T>) => void
   onColumnSizingChange?: (sizing: ColumnSizingState) => void
+
+  /**
+   * Icon overrides. Any omitted slot falls back to the default lucide-react icon.
+   * @example
+   * icons={{ sortAsc: <MyArrowUp />, rowActions: <MyDotsIcon /> }}
+   */
+  icons?: DataGridIcons
 
   /**
    * Escape hatch for advanced TanStack Table options not exposed as individual props.

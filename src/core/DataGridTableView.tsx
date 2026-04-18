@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import {
   type Row,
   type Table,
 } from '@tanstack/react-table'
-import { Loader2 } from 'lucide-react'
-import { Menu as ActionMenu } from '@base-ui/react/menu'
 import { cn } from '@/lib/utils'
+import { useIcons } from '@/core/IconsContext'
 import { ScrollTable } from '@/core/ScrollTable'
 import { CustomScrollbar } from '@/core/CustomScrollbar'
 import type { TableViewConfig } from '@/types'
@@ -31,6 +31,52 @@ export interface DataGridTableViewProps<T extends object> extends TableViewConfi
    * based on newly rendered (possibly virtual) rows.
    */
   onMeasureColumns?: () => void
+}
+
+// ── ActionMenuPopup ────────────────────────────────────────────────────────────
+
+interface ActionMenuPopupProps {
+  anchor: HTMLElement
+  onClose: () => void
+  children: React.ReactNode
+}
+
+function ActionMenuPopup({ anchor, onClose, children }: ActionMenuPopupProps) {
+  const popupRef = React.useRef<HTMLDivElement>(null)
+  const [pos, setPos] = React.useState<React.CSSProperties>({ visibility: 'hidden' })
+
+  React.useEffect(() => {
+    const r = anchor.getBoundingClientRect()
+    setPos({
+      visibility: 'visible',
+      top: r.bottom + 4,
+      right: window.innerWidth - r.right,
+    })
+  }, [anchor])
+
+  React.useEffect(() => {
+    const handle = (e: MouseEvent) => {
+      if (!popupRef.current?.contains(e.target as Node) && !anchor.contains(e.target as Node)) {
+        onClose()
+      }
+    }
+    const timer = setTimeout(() => document.addEventListener('mousedown', handle), 0)
+    return () => {
+      clearTimeout(timer)
+      document.removeEventListener('mousedown', handle)
+    }
+  }, [anchor, onClose])
+
+  return createPortal(
+    <div
+      ref={popupRef}
+      className="dg-action-menu"
+      style={{ position: 'fixed', zIndex: 50, outline: 'none', ...pos }}
+    >
+      {children}
+    </div>,
+    document.body,
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -65,6 +111,8 @@ export function DataGridTableView<T extends object>({
 
   const headerGroups = table.getHeaderGroups()
   const visibleLeafColumns = table.getVisibleLeafColumns()
+
+  const icons = useIcons()
 
   // ── Action menu ────────────────────────────────────────────────────────────
   const { open: actionMenuOpen, setOpen: setActionMenuOpen, activeRow, anchorRef, trigger: handleActionTrigger } = useActionMenu<T>()
@@ -128,15 +176,11 @@ export function DataGridTableView<T extends object>({
           // which is required since the outer div's height is determined by its children.
           contain: 'layout paint',
         }}
-        className={cn(
-          'dg-container',
-          'relative min-w-0 overflow-hidden border border-[var(--dg-border)] rounded-[--dg-radius]',
-          classNames?.container,
-        )}
+        className={cn('dg-container', classNames?.container)}
       >
         {/* Header panel — conditionally rendered, overflow:hidden, scrollLeft mirrors body */}
         {showHeader && (
-          <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className={cn('dg-header', 'bg-[var(--dg-muted)]', classNames?.header)}>
+          <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className={cn('dg-header', classNames?.header)}>
             <div style={{ width: innerWidth, minWidth: '100%' }}>
               {headerGroups.map((headerGroup) => (
                 <DataGridHeaderRow
@@ -171,7 +215,7 @@ export function DataGridTableView<T extends object>({
             ref={bodyScrollRef}
             style={bodyStyle}
             onScroll={syncScroll}
-            className={cn('scrollbar-none', 'bg-[var(--dg-background)]')}
+            className="scrollbar-none"
           >
             <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
               <DataGridBody
@@ -193,10 +237,8 @@ export function DataGridTableView<T extends object>({
             </ScrollTable>
 
             {loadMoreRef && (
-              <div ref={loadMoreRef} className="py-2 flex justify-center">
-                {isFetchingNextPage && (
-                  <Loader2 className="h-5 w-5 animate-spin text-[var(--dg-muted-foreground)]" />
-                )}
+              <div ref={loadMoreRef} style={{ padding: '8px 0', display: 'flex', justifyContent: 'center' }}>
+                {isFetchingNextPage && icons.loading}
               </div>
             )}
           </div>
@@ -214,53 +256,28 @@ export function DataGridTableView<T extends object>({
         </div>
       </div>
 
-      {/* Single shared action menu — anchored to the clicked trigger button */}
-      {actionCol && (
-        <ActionMenu.Root open={actionMenuOpen} onOpenChange={setActionMenuOpen}>
-          <ActionMenu.Portal>
-            <ActionMenu.Positioner
-              anchor={anchorRef.current}
-              side="bottom"
-              align="end"
-              sideOffset={4}
-              className="isolate z-50 outline-none"
+      {/* Single shared action menu — custom positioned, no base-ui dependency */}
+      {actionCol && actionMenuOpen && anchorRef.current && (
+        <ActionMenuPopup
+          anchor={anchorRef.current}
+          onClose={() => setActionMenuOpen(false)}
+        >
+          {actionItems.map((item, i) => (
+            <button
+              key={i}
+              disabled={item.disabled}
+              data-variant={item.variant ?? 'default'}
+              onClick={() => {
+                item.onClick(activeRow!)
+                setActionMenuOpen(false)
+              }}
+              className="dg-action-item"
             >
-              <ActionMenu.Popup className={cn(
-                'dg-action-menu',
-                'min-w-32 origin-(--transform-origin) overflow-hidden',
-                'rounded-lg bg-[var(--dg-popover)] p-1 text-[var(--dg-popover-foreground)]',
-                'shadow-md ring-1 ring-[var(--dg-foreground)]/10 duration-100 outline-none',
-                'data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95',
-                'data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
-              )}>
-                {actionItems.map((item, i) => (
-                  <ActionMenu.Item
-                    key={i}
-                    disabled={item.disabled}
-                    data-variant={item.variant ?? 'default'}
-                    onClick={() => {
-                      item.onClick(activeRow!)
-                      setActionMenuOpen(false)
-                    }}
-                    className={cn(
-                      'dg-action-item',
-                      'relative flex cursor-default items-center gap-1.5 outline-hidden select-none',
-                      'rounded-md px-1.5 py-1 text-sm',
-                      'focus:bg-[var(--dg-accent)] focus:text-[var(--dg-accent-foreground)]',
-                      'data-[variant=destructive]:text-[var(--dg-destructive)]',
-                      'data-[variant=destructive]:focus:bg-[var(--dg-destructive)]/10',
-                      'data-disabled:pointer-events-none data-disabled:opacity-50',
-                      "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-                    )}
-                  >
-                    {item.icon}
-                    {item.label}
-                  </ActionMenu.Item>
-                ))}
-              </ActionMenu.Popup>
-            </ActionMenu.Positioner>
-          </ActionMenu.Portal>
-        </ActionMenu.Root>
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+        </ActionMenuPopup>
       )}
     </>
   )
