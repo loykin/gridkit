@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { Check, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { getColumnOptions } from '@/core/hooks/useColumnOptions'
+import { MultiSelectContent } from '@/core/filters/MultiSelectContent'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SelectFilter — single value dropdown for toolbar
@@ -41,13 +41,13 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
             size="sm"
           >
             {value ? (
-              <><span style={{ fontWeight: 400, color: 'var(--dg-muted-foreground)' }}>{label}:</span> {value}</>
+              <><span className="dg-filter-label">{label}:</span> {value}</>
             ) : label}
             <ChevronDown />
           </Button>
         )}
       />
-      <PopoverContent align="start" style={{ width: 176, padding: 4 }}>
+      <PopoverContent align="start" style={{ width: 192, padding: 4 }}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {value && (
             <button
@@ -88,20 +88,8 @@ export function MultiSelectFilter<T extends object>({
   columnId,
   label,
 }: MultiSelectFilterProps<T>) {
-  const [options, setOptions] = useState<string[] | null>(null)
   const col = table.getColumn(columnId)
   const selected = (col?.getFilterValue() as string[] | undefined) ?? []
-
-  useEffect(() => {
-    setOptions(getColumnOptions(table, columnId))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const toggle = (val: string) => {
-    if (!col) return
-    const next = selected.includes(val) ? selected.filter((v) => v !== val) : [...selected, val]
-    col.setFilterValue(next.length > 0 ? next : undefined)
-  }
 
   if (!col) return null
 
@@ -115,8 +103,7 @@ export function MultiSelectFilter<T extends object>({
             size="sm"
           >
             {selected.length > 0 ? (
-              <><span style={{ fontWeight: 400, color: 'var(--dg-muted-foreground)' }}>{label}:</span>{' '}
-              {selected.length} selected</>
+              <><span className="dg-filter-label">{label}:</span>{' '}{selected.length} selected</>
             ) : (
               label
             )}
@@ -125,33 +112,7 @@ export function MultiSelectFilter<T extends object>({
         )}
       />
       <PopoverContent align="start" style={{ width: 192 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <div style={{ maxHeight: 208, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {(options ?? []).map((opt) => (
-              <label
-                key={opt}
-                className="dg-multi-option"
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 4px', cursor: 'pointer', fontSize: 12 }}
-              >
-                <Checkbox
-                  checked={selected.includes(opt)}
-                  onCheckedChange={() => toggle(opt)}
-                />
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt}</span>
-              </label>
-            ))}
-          </div>
-          {selected.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              style={{ marginTop: 4 }}
-              onClick={() => col.setFilterValue(undefined)}
-            >
-              Clear ({selected.length})
-            </Button>
-          )}
-        </div>
+        <MultiSelectContent col={col} table={table} />
       </PopoverContent>
     </Popover>
   )

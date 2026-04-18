@@ -1,4 +1,4 @@
-import type { ColumnSizingState, RowData, TableFeature, Table } from '@tanstack/react-table'
+import type { ColumnSizingState, RowData, TableFeature } from '@tanstack/react-table'
 
 // ── Declaration merging ───────────────────────────────────────────────────────
 declare module '@tanstack/react-table' {
@@ -33,10 +33,8 @@ export const ColumnFlexFeature: TableFeature = {
   getDefaultColumnDef: () => ({ minSize: 60 }),
 
   createTable: (table) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(table as any).getFlexColumnSizing = (containerWidth: number): ColumnSizingState => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const columns = (table as unknown as Table<any>).getAllLeafColumns()
+    table.getFlexColumnSizing = (containerWidth: number): ColumnSizingState => {
+      const columns = table.getAllLeafColumns()
       const sizing: ColumnSizingState = {}
 
       const flexCols = columns.filter((col) => col.columnDef.meta?.flex != null)

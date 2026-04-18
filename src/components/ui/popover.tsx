@@ -76,8 +76,14 @@ export function PopoverTrigger({ render, children, className }: PopoverTriggerPr
 
   if (render) return render(triggerProps)
 
+  const { ref, ...rest } = triggerProps
   return (
-    <button type="button" {...triggerProps} className={cn('dg-btn', className)}>
+    <button
+      type="button"
+      {...rest}
+      ref={ref as React.Ref<HTMLButtonElement>}
+      className={cn('dg-btn', className)}
+    >
       {children}
     </button>
   )

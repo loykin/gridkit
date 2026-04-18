@@ -506,3 +506,9 @@
   background: var(--dg-muted);
   border-radius: calc(var(--dg-radius) * 0.8);
 }
+
+/* ── Toolbar filter label prefix (e.g. "Status: Active") ───────────────────── */
+.dg-filter-label {
+  font-weight: 400;
+  color: var(--dg-muted-foreground);
+}

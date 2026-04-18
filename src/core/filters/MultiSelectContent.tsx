@@ -15,6 +15,8 @@ export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
 
   useEffect(() => {
     setOptions(getColumnOptions(table, col.id))
+    // intentional empty deps: options are derived from static column facet data,
+    // computed once on mount to avoid re-scanning the full dataset on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

@@ -68,10 +68,8 @@ export function getDataStoreCoreRowModel<T extends RowData>(): (
           if (row) {
             if (row.original !== item) {
               // Data changed — swap original and bust the accessor value cache
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ;(row as any).original = item
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ;(row as any)._valuesCache = {}
+              row.original = item
+              row._valuesCache = {}
             }
             // All memoized row methods (getVisibleCells etc.) remain stable
           } else {
@@ -95,8 +93,7 @@ export function getDataStoreCoreRowModel<T extends RowData>(): (
         table.options,
         'debugTable',
         'getRowModel',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        () => (table as any)._autoResetPageIndex?.(),
+        () => table._autoResetPageIndex?.(),
       ),
     )
   }
@@ -107,20 +104,16 @@ export const DataStoreFeature: TableFeature = {
   createTable: (table) => {
     const store = table.options.dataStore
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(table as any)._dataStore = store
+    table._dataStore = store
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(table as any).applyTransaction = (tx: Transaction<any>) => {
+    table.applyTransaction = (tx) => {
       if (!store) {
         console.warn('[GridKit] applyTransaction called without dataStore')
         return
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      store.applyTransaction(tx as Transaction<any>)
+      store.applyTransaction(tx)
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(table as any).getRowNodeById = (id: string) => store?.get(id)
+    table.getRowNodeById = (id: string) => store?.get(id)
   },
 }

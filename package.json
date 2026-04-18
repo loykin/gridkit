@@ -21,7 +21,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup && node scripts/build-css.mjs && echo 'declare const styles: string; export default styles;' > dist/styles.d.ts",
+    "build": "tsc --noEmit && eslint src --ext .ts,.tsx && tsup && node scripts/build-css.mjs && echo 'declare const styles: string; export default styles;' > dist/styles.d.ts",
     "build:js": "tsup",
     "build:css": "node scripts/build-css.mjs",
     "dev": "concurrently \"tsup --watch\" \"pnpm --filter data-grid-playground dev\"",

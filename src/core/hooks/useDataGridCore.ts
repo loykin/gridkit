@@ -23,18 +23,21 @@ import { gridKitFeatures, getDataStoreCoreRowModel } from '@/core/engine/gridKit
 const _noopSubscribe = (_listener: () => void) => () => {}
 const _noopGetVersion = () => 0
 
-const defaultGlobalFilterFn: FilterFn<object> = (row, columnId, value: string) =>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const defaultGlobalFilterFn: FilterFn<any> = (row, columnId, value: string) =>
   String(row.getValue(columnId) ?? '')
     .toLowerCase()
     .includes(value.toLowerCase())
 
 /** Used for meta.filterType === 'multi-select' — checks row value is in selected array */
-const multiSelectFilterFn: FilterFn<object> = (row, columnId, value: string[]) =>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const multiSelectFilterFn: FilterFn<any> = (row, columnId, value: string[]) =>
   value.includes(String(row.getValue(columnId) ?? ''))
 multiSelectFilterFn.autoRemove = (val: string[]) => !val || val.length === 0
 
 /** Used for meta.filterType === 'number' — range [min, max] */
-const betweenFilterFn: FilterFn<object> = (row, columnId, value: [string, string]) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const betweenFilterFn: FilterFn<any> = (row, columnId, value: [string, string]) => {
   const raw = row.getValue<number>(columnId)
   const [minStr, maxStr] = value
   const min = minStr !== '' ? Number(minStr) : -Infinity
@@ -174,10 +177,10 @@ export function useDataGridCore<T extends object>({
   // Inject filterFn into columns that declare meta.filterType
   const enrichedColumns = columns.map((col) => {
     if (col.meta?.filterType === 'number' && !col.filterFn) {
-      return { ...col, filterFn: betweenFilterFn as unknown as FilterFn<T> }
+      return { ...col, filterFn: betweenFilterFn as FilterFn<T> }
     }
     if (col.meta?.filterType === 'multi-select' && !col.filterFn) {
-      return { ...col, filterFn: multiSelectFilterFn as unknown as FilterFn<T> }
+      return { ...col, filterFn: multiSelectFilterFn as FilterFn<T> }
     }
     return col
   })

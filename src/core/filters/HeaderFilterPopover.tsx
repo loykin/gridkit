@@ -43,7 +43,7 @@ export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) 
             </Button>
           )}
         />
-        <PopoverContent side="bottom" align="start" style={{ width: 208 }}>
+        <PopoverContent side="bottom" align="start" style={{ width: 192 }}>
           {ft === 'select' ? (
             <SelectFilterCell col={col} table={table} onSelect={() => setOpen(false)} />
           ) : ft === 'multi-select' ? (
