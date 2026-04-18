@@ -155,9 +155,9 @@
 
 /* Filter button states */
 .dg-btn--filter-active   { color: var(--dg-primary); opacity: 1; }
-.dg-btn--filter-inactive { opacity: 0; }
+.dg-btn--filter-inactive { opacity: 0.35; }
 .dg-btn--filter-inactive:hover,
-.dg-header-cell:hover .dg-btn--filter-inactive { opacity: 0.6; }
+.dg-header-cell:hover .dg-btn--filter-inactive { opacity: 0.7; }
 
 /* ── dg-input ───────────────────────────────────────────────────────────────── */
 
