@@ -20,9 +20,9 @@ export function DataGridToolbar<T extends object>({
   }
 
   return (
-    <div className={cn('dg-toolbar', 'flex items-center justify-between gap-2 shrink-0', className)}>
-      <div className="flex items-center gap-2">{leftFilters?.(table)}</div>
-      <div className="flex items-center gap-2">{rightFilters?.(table)}</div>
+    <div className={cn('dg-toolbar', className)}>
+      <div className="dg-toolbar-left">{leftFilters?.(table)}</div>
+      <div className="dg-toolbar-right">{rightFilters?.(table)}</div>
     </div>
   )
 }

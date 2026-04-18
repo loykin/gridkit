@@ -36,21 +36,14 @@ export function DataGridShell<T extends object>({
   ...viewConfig
 }: DataGridShellProps<T>) {
   if (error) {
-    return (
-      <div className={cn(
-        'dg-error',
-        'flex items-center justify-center py-12 text-sm text-[var(--dg-destructive)]',
-      )}>
-        {error.message}
-      </div>
-    )
+    return <div className="dg-error">{error.message}</div>
   }
 
   return (
-    <div ref={wrapperRef} className={cn('dg-shell', 'flex flex-col gap-3 w-full min-w-0 overflow-hidden')}>
+    <div ref={wrapperRef} className="dg-shell">
       <DataGridToolbar table={table} leftFilters={leftFilters} rightFilters={rightFilters} />
 
-      <div className={cn('min-w-0', !isSized && 'invisible')}>
+      <div className={cn('dg-table-wrapper', !isSized && 'dg-table-wrapper--hidden')}>
         <DataGridTableView
           table={table}
           rows={rows}

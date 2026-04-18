@@ -49,10 +49,8 @@ export function DataGridBody<T extends object>({
           <div
             role="row"
             key={i}
-            className={cn(
-              'flex w-full',
-              i < 5 && 'border-b border-[var(--dg-border)]',
-            )}
+            className="dg-row"
+            data-last={i === 5 ? 'true' : undefined}
             style={{ minHeight: rowHeight }}
           >
             {visibleLeafColumns.map((col, colIdx) => {
@@ -62,17 +60,13 @@ export function DataGridBody<T extends object>({
                   role="gridcell"
                   key={col.id}
                   data-col-id={col.id}
-                  className={cn(
-                    'dg-loading',
-                    'flex items-center px-3 py-1',
-                    bordered && 'border-r border-[var(--dg-border)]',
-                  )}
+                  className={cn('dg-loading-cell', bordered && 'dg-loading-cell--bordered')}
                   style={{
                     ...colStyle(col),
                     ...(fillLast && isLast && { flex: 1, width: 'auto' }),
                   }}
                 >
-                  <div className="h-4 w-full animate-pulse rounded bg-[var(--dg-muted)]" />
+                  <div className="dg-loading-pulse" />
                 </div>
               )
             })}
@@ -86,14 +80,9 @@ export function DataGridBody<T extends object>({
   if (rows.length === 0) {
     return (
       <div role="rowgroup" style={{ display: 'block' }}>
-        <div role="row" className="flex w-full">
-          <div role="gridcell" className="flex-1">
-            {emptyContent ?? (
-              <div className={cn(
-                'dg-empty',
-                'py-12 text-center text-sm text-[var(--dg-muted-foreground)]',
-              )}>{emptyMessage}</div>
-            )}
+        <div role="row" className="dg-empty-row">
+          <div role="gridcell" className="dg-empty-cell">
+            {emptyContent ?? <div className="dg-empty">{emptyMessage}</div>}
           </div>
         </div>
       </div>
@@ -164,7 +153,7 @@ export function DataGridBody<T extends object>({
           gradient is invisible at height=0 (rows overflow), preventing double border. */}
       {!virtual && (
         <div
-          className="flex flex-1"
+          className="dg-fill-row"
           style={{
             background:
               'linear-gradient(to bottom, var(--dg-border) 0px, var(--dg-border) 1px, transparent 1px)',
@@ -175,7 +164,7 @@ export function DataGridBody<T extends object>({
             return (
               <div
                 key={col.id}
-                className={cn(bordered && 'border-r border-[var(--dg-border)]')}
+                className={cn(bordered && 'dg-fill-cell--bordered')}
                 style={{
                   ...colStyle(col),
                   ...(fillLast && isLast && { flex: 1, width: 'auto' }),
