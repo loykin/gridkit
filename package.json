@@ -1,6 +1,6 @@
 {
   "name": "@loykin/gridkit",
-  "version": "0.0.1-beta.5",
+  "version": "0.0.1-beta.6",
   "description": "A feature-rich React DataGrid component with virtualization, sorting, filtering, and pagination.",
   "type": "module",
   "main": "./dist/index.cjs",
