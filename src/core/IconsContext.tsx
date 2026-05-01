@@ -13,6 +13,8 @@ import {
   GripVertical,
   Loader2,
   MoreHorizontal,
+  PinOff,
+  PinIcon,
   Search,
   SlidersHorizontal,
   X,
@@ -39,6 +41,11 @@ export const defaultIcons: Required<DataGridIcons> = {
   treeExpand:       <ChevronRight size={14} />,
   treeCollapse:     <ChevronDown size={14} />,
   dragHandle:       <GripVertical size={14} />,
+  detailExpand:     <ChevronRight size={14} />,
+  detailCollapse:   <ChevronDown size={14} />,
+  pinLeft:          <PinIcon size={13} />,
+  pinRight:         <PinIcon size={13} style={{ transform: 'scaleX(-1)' }} />,
+  pinOff:           <PinOff size={13} />,
 }
 
 // ── Context ────────────────────────────────────────────────────────────────────

@@ -1,4 +1,13 @@
-import type { ColumnSizingState, RowData, TableFeature } from '@tanstack/react-table'
+import type { CellContext, ColumnSizingState, RowData, TableFeature } from '@tanstack/react-table'
+import type { ReactNode } from 'react'
+
+export interface EditCellProps<TData extends RowData, TValue = unknown> {
+  value: TValue
+  row: TData
+  context: CellContext<TData, TValue>
+  onCommit: (value: unknown) => void
+  onCancel: () => void
+}
 
 // ── Declaration merging ───────────────────────────────────────────────────────
 declare module '@tanstack/react-table' {
@@ -13,6 +22,13 @@ declare module '@tanstack/react-table' {
     align?: 'left' | 'center' | 'right'
     /** Pin this column to the left or right — fixed at column definition level */
     pin?: 'left' | 'right'
+    /**
+     * Render an inline editor when the cell is double-clicked.
+     * The editor is responsible for calling onCommit(value) or onCancel().
+     * Requires onCellValueChange prop on the DataGrid.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    editCell?: (props: EditCellProps<any, any>) => ReactNode
     /**
      * Allow cell content to wrap to multiple lines.
      * Row height adjusts automatically via the virtualizer's measureElement.

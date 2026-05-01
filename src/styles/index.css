@@ -555,3 +555,21 @@
   font-weight: 400;
   color: var(--dg-muted-foreground);
 }
+
+/* ── Master-Detail row ──────────────────────────────────────────────────────── */
+.dg-detail-row {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid var(--dg-border);
+  background: color-mix(in oklab, var(--dg-muted) 30%, var(--dg-background));
+}
+.dg-detail-row > [role="gridcell"] {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 13px;
+}
+
+/* ── Editing cell ───────────────────────────────────────────────────────────── */
+.dg-cell[data-editing="true"] {
+  padding: 2px 4px;
+}

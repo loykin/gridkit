@@ -61,6 +61,16 @@ export interface DataGridIcons {
   treeCollapse?: React.ReactNode
   /** Row drag-handle icon */
   dragHandle?: React.ReactNode
+  /** Master-detail row expand icon */
+  detailExpand?: React.ReactNode
+  /** Master-detail row collapse icon */
+  detailCollapse?: React.ReactNode
+  /** Pin column to the left */
+  pinLeft?: React.ReactNode
+  /** Pin column to the right */
+  pinRight?: React.ReactNode
+  /** Unpin column */
+  pinOff?: React.ReactNode
 }
 
 /**
@@ -76,7 +86,7 @@ export type PassthroughTableOptions<T extends object> = Omit<
   // Event handlers (owned internally)
   | 'onSortingChange' | 'onColumnFiltersChange' | 'onGlobalFilterChange'
   | 'onColumnVisibilityChange' | 'onColumnSizingChange' | 'onPaginationChange'
-  | 'onExpandedChange' | 'onColumnOrderChange'
+  | 'onExpandedChange' | 'onColumnOrderChange' | 'onColumnPinningChange'
   // Row models (built conditionally based on props)
   | 'getCoreRowModel' | 'getSortedRowModel' | 'getFilteredRowModel'
   | 'getPaginationRowModel' | 'getExpandedRowModel'
@@ -142,6 +152,15 @@ export interface TableViewConfig<T extends object> {
   bordered?: boolean
   /** Enable drag-to-reorder columns by dragging the header */
   enableColumnReordering?: boolean
+  /**
+   * Render a custom detail panel below each row.
+   * Use ExpandToggleCell in a column to let users open/close the panel.
+   */
+  renderDetailRow?: (row: Row<unknown>) => ReactNode
+  /** Show a pin/unpin menu button inside each column header */
+  enableColumnPinning?: boolean
+  /** Called when the user commits an inline cell edit */
+  onCellValueChange?: (rowId: string, columnId: string, value: unknown) => void
   /**
    * Table width handling strategy:
    * - 'spacer': Each column independent px + spacer cell fills remaining space (default)
@@ -226,6 +245,14 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   // Selection
   checkboxConfig?: CheckboxConfig<T>
 
+  /**
+   * Return a stable unique string ID for each row.
+   * Defaults to row index — override this when your data has a natural ID field
+   * so that inline edits, selection, and detail rows target the correct record.
+   * @example getRowId={(row) => String(row.id)}
+   */
+  getRowId?: (originalRow: T, index: number) => string
+
   // State persistence (Zustand)
   tableKey?: string
   /**
@@ -240,6 +267,8 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   onColumnSizingChange?: (sizing: ColumnSizingState) => void
   /** Called when the user drags a column header to a new position */
   onColumnOrderChange?: (order: string[]) => void
+  /** Called when column pinning changes at runtime via the pin menu */
+  onColumnPinningChange?: (pinning: ColumnPinningState) => void
 
   /**
    * Icon overrides. Any omitted slot falls back to the default lucide-react icon.

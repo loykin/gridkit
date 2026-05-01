@@ -75,6 +75,8 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'tableOptions'
   | 'enableColumnReordering'
   | 'onColumnOrderChange'
+  | 'enableColumnPinning'
+  | 'onColumnPinningChange'
 > {
   columns: DataGridColumnDef<T>[]
   getRowId?: (originalRow: T, index: number) => string
@@ -113,6 +115,7 @@ export function useDataGridCore<T extends object>({
   tableOptions,
   enableColumnReordering = false,
   onColumnOrderChange,
+  onColumnPinningChange,
   sizing,
   setSizing,
 }: UseDataGridCoreOptions<T>) {
@@ -125,7 +128,7 @@ export function useDataGridCore<T extends object>({
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [sorting, setSorting] = useState<SortingState>(initialSorting ?? [])
   // Derive pinning from column meta.pin, merged with explicit initialPinning prop
-  const [columnPinning] = useState<ColumnPinningState>(() => {
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(() => {
     const fromMeta: ColumnPinningState = { left: [], right: [] }
     for (const col of columns) {
       const pin = col.meta?.pin
@@ -264,6 +267,13 @@ export function useDataGridCore<T extends object>({
         }
       : undefined,
 
+    onColumnPinningChange: (updater) => {
+      setColumnPinning((prev) => {
+        const next = typeof updater === 'function' ? updater(prev) : updater
+        onColumnPinningChange?.(next)
+        return next
+      })
+    },
     onColumnOrderChange: enableColumnReordering
       ? (updater) => {
           setColumnOrder((prev) => {

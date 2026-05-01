@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import {
   type Row,
@@ -15,6 +15,8 @@ import { useActionMenu } from '@/core/hooks/useActionMenu'
 import { DataGridHeaderRow } from '@/core/table/DataGridHeaderRow'
 import { DataGridFilterRow } from '@/core/table/DataGridFilterRow'
 import { DataGridBody } from '@/core/table/DataGridBody'
+import { DetailRowContext } from '@/features/expanding/DetailRowContext'
+import { EditingCellContext } from '@/features/editing/EditingCellContext'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -105,6 +107,9 @@ export function DataGridTableView<T extends object>({
   isFetchingNextPage,
   bordered = false,
   enableColumnReordering = false,
+  enableColumnPinning = false,
+  renderDetailRow,
+  onCellValueChange,
   onMeasureColumns,
   classNames,
 }: DataGridTableViewProps<T>) {
@@ -112,6 +117,30 @@ export function DataGridTableView<T extends object>({
 
   const headerGroups = table.getHeaderGroups()
   const visibleLeafColumns = table.getVisibleLeafColumns()
+
+  // ── Master-Detail state ─────────────────────────────────────────────────
+  const [expandedDetailRows, setExpandedDetailRows] = useState<Set<string>>(new Set())
+  const detailRowCtx = useMemo(() => ({
+    expandedRows: expandedDetailRows,
+    toggleRow: (rowId: string) => setExpandedDetailRows((prev) => {
+      const next = new Set(prev)
+      if (next.has(rowId)) next.delete(rowId)
+      else next.add(rowId)
+      return next
+    }),
+  }), [expandedDetailRows])
+
+  // ── Inline editing state ────────────────────────────────────────────────
+  const [editingCellId, setEditingCellId] = useState<string | null>(null)
+  const editingCtx = useMemo(() => ({
+    editingCellId,
+    startEdit: (cellId: string) => setEditingCellId(cellId),
+    stopEdit: () => setEditingCellId(null),
+    commitEdit: (rowId: string, columnId: string, value: unknown) => {
+      onCellValueChange?.(rowId, columnId, value)
+      setEditingCellId(null)
+    },
+  }), [editingCellId, onCellValueChange])
 
   const icons = useIcons()
 
@@ -212,6 +241,7 @@ export function DataGridTableView<T extends object>({
                   bordered={bordered}
                   tableWidthMode={tableWidthMode}
                   enableColumnReordering={enableColumnReordering}
+                  enableColumnPinning={enableColumnPinning}
                   classNames={classNames}
                 />
               ))}
@@ -237,22 +267,27 @@ export function DataGridTableView<T extends object>({
             className="scrollbar-none"
           >
             <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
-              <DataGridBody
-                rows={rows}
-                table={table}
-                visibleLeafColumns={visibleLeafColumns}
-                rowVirtualizer={virtual ? rowVirtualizer : undefined}
-                isLoading={isLoading}
-                emptyMessage={emptyMessage}
-                emptyContent={emptyContent}
-                onRowClick={onRowClick}
-                rowCursor={rowCursor}
-                bordered={bordered}
-                rowHeight={rowHeight}
-                onActionTrigger={actionCol ? handleActionTrigger : undefined}
-                tableWidthMode={tableWidthMode}
-                classNames={classNames}
-              />
+              <DetailRowContext value={detailRowCtx}>
+                <EditingCellContext value={editingCtx}>
+                  <DataGridBody
+                    rows={rows}
+                    table={table}
+                    visibleLeafColumns={visibleLeafColumns}
+                    rowVirtualizer={virtual ? rowVirtualizer : undefined}
+                    isLoading={isLoading}
+                    emptyMessage={emptyMessage}
+                    emptyContent={emptyContent}
+                    onRowClick={onRowClick}
+                    rowCursor={rowCursor}
+                    bordered={bordered}
+                    rowHeight={rowHeight}
+                    onActionTrigger={actionCol ? handleActionTrigger : undefined}
+                    tableWidthMode={tableWidthMode}
+                    renderDetailRow={renderDetailRow}
+                    classNames={classNames}
+                  />
+                </EditingCellContext>
+              </DetailRowContext>
             </ScrollTable>
 
             {loadMoreRef && (

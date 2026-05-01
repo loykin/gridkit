@@ -47,6 +47,8 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     bordered,
     enableColumnReordering,
     onColumnOrderChange,
+    enableColumnPinning,
+    onColumnPinningChange,
   } = options
 
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -94,6 +96,8 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     getRowId,
     enableColumnReordering,
     onColumnOrderChange,
+    enableColumnPinning,
+    onColumnPinningChange,
     sizing,
     setSizing,
   })

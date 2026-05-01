@@ -19,6 +19,7 @@ import { useIcons } from '@/core/IconsContext'
 import type { DataGridClassNames, TableViewConfig, TableWidthMode } from '@/types'
 import { colStyle, isPinnedEdge } from './tableUtils'
 import { HeaderFilterPopover } from '@/core/filters/HeaderFilterPopover'
+import { ColumnPinPopover } from './ColumnPinPopover'
 
 interface DataGridHeaderRowProps<T extends object>
   extends Pick<
@@ -28,6 +29,7 @@ interface DataGridHeaderRowProps<T extends object>
     | 'enableColumnFilters'
     | 'filterDisplay'
     | 'enableColumnReordering'
+    | 'enableColumnPinning'
   > {
   headerGroup: HeaderGroup<T>
   table: Table<T>
@@ -44,6 +46,7 @@ interface HeaderCellContentProps<T extends object> {
   enableColumnResizing?: boolean
   enableColumnFilters?: boolean
   filterDisplay?: 'row' | 'icon'
+  enableColumnPinning?: boolean
 }
 
 function HeaderCellContent<T extends object>({
@@ -52,6 +55,7 @@ function HeaderCellContent<T extends object>({
   enableColumnResizing,
   enableColumnFilters,
   filterDisplay = 'row',
+  enableColumnPinning,
 }: HeaderCellContentProps<T>) {
   const icons = useIcons()
   return (
@@ -75,6 +79,10 @@ function HeaderCellContent<T extends object>({
 
       {enableColumnFilters && filterDisplay === 'icon' && (
         <HeaderFilterPopover col={header.column} table={table} />
+      )}
+
+      {enableColumnPinning && (
+        <ColumnPinPopover col={header.column} table={table} />
       )}
 
       {enableColumnResizing && header.column.getCanResize() && (
@@ -110,6 +118,7 @@ interface SortableHeaderCellProps<T extends object> extends HeaderCellContentPro
   isLast: boolean
   edge: 'left-edge' | 'right-edge' | false
   classNames?: DataGridClassNames
+  // inherited from HeaderCellContentProps: enableColumnPinning
 }
 
 function SortableHeaderCell<T extends object>({
@@ -196,6 +205,7 @@ export function DataGridHeaderRow<T extends object>({
   enableColumnFilters,
   filterDisplay = 'row',
   enableColumnReordering = false,
+  enableColumnPinning = false,
   classNames,
 }: DataGridHeaderRowProps<T>) {
   const headers = headerGroup.headers
@@ -245,6 +255,7 @@ export function DataGridHeaderRow<T extends object>({
                   enableColumnResizing={enableColumnResizing}
                   enableColumnFilters={enableColumnFilters}
                   filterDisplay={filterDisplay}
+                  enableColumnPinning={enableColumnPinning}
                 />
               )
             })}
@@ -309,6 +320,7 @@ export function DataGridHeaderRow<T extends object>({
               enableColumnResizing={enableColumnResizing}
               enableColumnFilters={enableColumnFilters}
               filterDisplay={filterDisplay}
+              enableColumnPinning={enableColumnPinning}
             />
           </div>
         )

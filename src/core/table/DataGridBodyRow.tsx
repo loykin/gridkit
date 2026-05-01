@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
 import type { DataGridClassNames, TableViewConfig, TableWidthMode } from '@/types'
 import { colStyle, isPinnedEdge } from './tableUtils'
+import { useEditingCell } from '@/features/editing/EditingCellContext'
 
 interface DataGridBodyRowProps<T extends object>
   extends Pick<TableViewConfig<T>, 'onRowClick' | 'rowCursor' | 'bordered'> {
@@ -40,6 +41,7 @@ export function DataGridBodyRow<T extends object>({
 }: DataGridBodyRowProps<T>) {
   const icons = useIcons()
   const visibleCells = row.getVisibleCells()
+  const editingCtx = useEditingCell()
   return (
     <div
       role="row"
@@ -59,6 +61,9 @@ export function DataGridBodyRow<T extends object>({
         const edge = isPinnedEdge(cell.column, table)
         const isLast = idx === visibleCells.length - 1
         const isFillCell = fillLast && isLast
+        const isEditing = editingCtx?.editingCellId === cell.id
+        const canEdit = !!meta?.editCell
+
         return (
           <div
             role="gridcell"
@@ -68,13 +73,23 @@ export function DataGridBodyRow<T extends object>({
             data-wrap={meta?.wrap ? 'true' : undefined}
             data-pinned={edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : undefined}
             data-bordered={bordered ? 'true' : undefined}
+            data-editing={isEditing ? 'true' : undefined}
             className={cn(
               'dg-cell',
               classNames?.cell,
             )}
             style={{ ...colStyle(cell.column), ...(isFillCell && { flex: 1, width: 'auto' }) }}
+            onDoubleClick={canEdit && !isEditing ? (e) => { e.stopPropagation(); editingCtx?.startEdit(cell.id) } : undefined}
           >
-            {meta?.actions != null ? (
+            {isEditing && meta?.editCell ? (
+              meta.editCell({
+                value: row.getValue(cell.column.id),
+                row: row.original,
+                context: cell.getContext(),
+                onCommit: (value) => editingCtx?.commitEdit(row.id, cell.column.id, value),
+                onCancel: () => editingCtx?.stopEdit(),
+              })
+            ) : meta?.actions != null ? (
               <Button
                 variant="ghost"
                 size="icon-xs"

@@ -4,13 +4,14 @@ import type { Virtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import type { DataGridClassNames, TableViewConfig, TableWidthMode } from '@/types'
 import { RowWrapperContext } from '@/features/reordering/RowWrapperContext'
+import { useDetailRow } from '@/features/expanding/DetailRowContext'
 import { colStyle } from './tableUtils'
 import { DataGridBodyRow } from './DataGridBodyRow'
 
 interface DataGridBodyProps<T extends object>
   extends Pick<
     TableViewConfig<T>,
-    'isLoading' | 'emptyMessage' | 'emptyContent' | 'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight'
+    'isLoading' | 'emptyMessage' | 'emptyContent' | 'onRowClick' | 'rowCursor' | 'bordered' | 'rowHeight' | 'renderDetailRow'
   > {
   rows: Row<T>[]
   table: Table<T>
@@ -35,12 +36,14 @@ export function DataGridBody<T extends object>({
   rowHeight,
   onActionTrigger,
   tableWidthMode = 'spacer',
+  renderDetailRow,
   classNames,
 }: DataGridBodyProps<T>) {
   const showSpacer = tableWidthMode === 'spacer'
   const fillLast = tableWidthMode === 'fill-last'
   const RowWrapper = useContext(RowWrapperContext)
   const virtual = !!rowVirtualizer
+  const detailRowCtx = useDetailRow()
 
   if (isLoading) {
     return (
@@ -120,33 +123,69 @@ export function DataGridBody<T extends object>({
     <>
       <div role="rowgroup" style={rowgroupStyle}>
         {rowEntries.map(({ row, index, rowStyle, dataIndex, measureRef }) => {
+          const isDetailExpanded = renderDetailRow && detailRowCtx?.expandedRows.has(row.id)
+          const detailPanel = isDetailExpanded ? (
+            <div role="row" className="dg-detail-row">
+              <div role="gridcell" style={{ width: '100%' }}>
+                {renderDetailRow(row as Row<unknown>)}
+              </div>
+            </div>
+          ) : null
+
+          // Virtual mode: wrap row + optional detail panel so measureRef captures combined height
+          if (virtual) {
+            return (
+              <div
+                key={row.id}
+                ref={measureRef}
+                data-index={dataIndex}
+                style={rowStyle}
+              >
+                <DataGridBodyRow
+                  row={row}
+                  table={table}
+                  onRowClick={onRowClick}
+                  rowCursor={rowCursor}
+                  bordered={bordered}
+                  rowHeight={rowHeight}
+                  showSpacer={showSpacer}
+                  fillLast={fillLast}
+                  onActionTrigger={onActionTrigger}
+                  isLastRow={index === rows.length - 1}
+                  classNames={classNames}
+                />
+                {detailPanel}
+              </div>
+            )
+          }
+
           const bodyRow = (
-            <DataGridBodyRow
-              key={row.id}
-              row={row}
-              table={table}
-              onRowClick={onRowClick}
-              rowCursor={rowCursor}
-              bordered={bordered}
-              rowHeight={rowHeight}
-              showSpacer={showSpacer}
-              fillLast={fillLast}
-              onActionTrigger={onActionTrigger}
-              isLastRow={index === rows.length - 1}
-              style={rowStyle}
-              dataIndex={dataIndex}
-              measureRef={measureRef}
-              classNames={classNames}
-            />
+            <React.Fragment key={row.id}>
+              <DataGridBodyRow
+                row={row}
+                table={table}
+                onRowClick={onRowClick}
+                rowCursor={rowCursor}
+                bordered={bordered}
+                rowHeight={rowHeight}
+                showSpacer={showSpacer}
+                fillLast={fillLast}
+                onActionTrigger={onActionTrigger}
+                isLastRow={index === rows.length - 1}
+                classNames={classNames}
+              />
+              {detailPanel}
+            </React.Fragment>
           )
-          if (!virtual && RowWrapper) {
+
+          if (RowWrapper) {
             return (
               <RowWrapper key={row.id} row={row}>
                 {bodyRow}
               </RowWrapper>
             )
           }
-          return <React.Fragment key={row.id}>{bodyRow}</React.Fragment>
+          return bodyRow
         })}
       </div>
       {/* Fill row: expands into remaining space when rows don't fill tableHeight.
