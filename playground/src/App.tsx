@@ -17,6 +17,7 @@ import { LogStreamTab } from './tabs/LogStreamTab'
 import { BackendTab } from './tabs/BackendTab'
 import { EmptyStateTab } from './tabs/EmptyStateTab'
 import { IconsTab } from './tabs/IconsTab'
+import { ColumnReorderTab } from './tabs/ColumnReorderTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
@@ -39,6 +40,7 @@ const TABS = [
   { id: 'backend', label: 'Backend', content: <BackendTab /> },
   { id: 'empty-state', label: 'Empty State', content: <EmptyStateTab /> },
   { id: 'icons', label: 'Custom Icons', content: <IconsTab /> },
+  { id: 'column-reorder', label: 'Column Reorder', content: <ColumnReorderTab /> },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']

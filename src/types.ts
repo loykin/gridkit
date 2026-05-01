@@ -76,7 +76,7 @@ export type PassthroughTableOptions<T extends object> = Omit<
   // Event handlers (owned internally)
   | 'onSortingChange' | 'onColumnFiltersChange' | 'onGlobalFilterChange'
   | 'onColumnVisibilityChange' | 'onColumnSizingChange' | 'onPaginationChange'
-  | 'onExpandedChange'
+  | 'onExpandedChange' | 'onColumnOrderChange'
   // Row models (built conditionally based on props)
   | 'getCoreRowModel' | 'getSortedRowModel' | 'getFilteredRowModel'
   | 'getPaginationRowModel' | 'getExpandedRowModel'
@@ -140,6 +140,8 @@ export interface TableViewConfig<T extends object> {
   tableHeight?: string | number | 'auto'
   /** Show vertical dividers between columns */
   bordered?: boolean
+  /** Enable drag-to-reorder columns by dragging the header */
+  enableColumnReordering?: boolean
   /**
    * Table width handling strategy:
    * - 'spacer': Each column independent px + spacer cell fills remaining space (default)
@@ -236,6 +238,8 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   // Callbacks
   onTableReady?: (table: Table<T>) => void
   onColumnSizingChange?: (sizing: ColumnSizingState) => void
+  /** Called when the user drags a column header to a new position */
+  onColumnOrderChange?: (order: string[]) => void
 
   /**
    * Icon overrides. Any omitted slot falls back to the default lucide-react icon.

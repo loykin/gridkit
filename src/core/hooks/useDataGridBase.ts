@@ -45,6 +45,8 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     onColumnSizingChange,
     tableOptions,
     bordered,
+    enableColumnReordering,
+    onColumnOrderChange,
   } = options
 
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -90,6 +92,8 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     enableExpanding,
     getSubRows,
     getRowId,
+    enableColumnReordering,
+    onColumnOrderChange,
     sizing,
     setSizing,
   })

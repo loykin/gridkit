@@ -104,6 +104,7 @@ export function DataGridTableView<T extends object>({
   loadMoreRef,
   isFetchingNextPage,
   bordered = false,
+  enableColumnReordering = false,
   onMeasureColumns,
   classNames,
 }: DataGridTableViewProps<T>) {
@@ -210,6 +211,7 @@ export function DataGridTableView<T extends object>({
                   virtual={virtual}
                   bordered={bordered}
                   tableWidthMode={tableWidthMode}
+                  enableColumnReordering={enableColumnReordering}
                   classNames={classNames}
                 />
               ))}

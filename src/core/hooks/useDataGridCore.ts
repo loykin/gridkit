@@ -7,6 +7,7 @@ import {
   getPaginationRowModel,
   getExpandedRowModel,
   type ColumnFiltersState,
+  type ColumnOrderState,
   type ColumnPinningState,
   type ColumnSizingState,
   type ExpandedState,
@@ -72,6 +73,8 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'enableExpanding'
   | 'getSubRows'
   | 'tableOptions'
+  | 'enableColumnReordering'
+  | 'onColumnOrderChange'
 > {
   columns: DataGridColumnDef<T>[]
   getRowId?: (originalRow: T, index: number) => string
@@ -108,6 +111,8 @@ export function useDataGridCore<T extends object>({
   getSubRows,
   getRowId,
   tableOptions,
+  enableColumnReordering = false,
+  onColumnOrderChange,
   sizing,
   setSizing,
 }: UseDataGridCoreOptions<T>) {
@@ -116,6 +121,7 @@ export function useDataGridCore<T extends object>({
   const { register, update, tables } = useTableStore()
   const persisted = tableKey ? tables[tableKey] : undefined
 
+  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([])
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [sorting, setSorting] = useState<SortingState>(initialSorting ?? [])
   // Derive pinning from column meta.pin, merged with explicit initialPinning prop
@@ -208,6 +214,7 @@ export function useDataGridCore<T extends object>({
       columnVisibility,
       columnSizing: sizing,
       columnPinning,
+      ...(enableColumnReordering ? { columnOrder } : {}),
       ...(enablePagination ? { pagination: paginationState } : {}),
       ...(enableExpanding ? { expanded } : {}),
     },
@@ -257,6 +264,15 @@ export function useDataGridCore<T extends object>({
         }
       : undefined,
 
+    onColumnOrderChange: enableColumnReordering
+      ? (updater) => {
+          setColumnOrder((prev) => {
+            const next = typeof updater === 'function' ? updater(prev) : updater
+            onColumnOrderChange?.(next)
+            return next
+          })
+        }
+      : undefined,
     onExpandedChange: enableExpanding ? setExpanded : undefined,
     getSubRows,
     autoResetExpanded: false,
