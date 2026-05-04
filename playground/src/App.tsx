@@ -23,6 +23,7 @@ import { ColumnPinningTab } from './tabs/ColumnPinningTab'
 import { InlineEditTab } from './tabs/InlineEditTab'
 import { ExportTab } from './tabs/ExportTab'
 import { CardTab } from './tabs/CardTab'
+import { CardListTab } from './tabs/CardListTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
@@ -50,7 +51,8 @@ const TABS = [
   { id: 'column-pinning', label: 'Column Pinning UI', content: <ColumnPinningTab /> },
   { id: 'inline-edit', label: 'Inline Edit', content: <InlineEditTab /> },
   { id: 'export', label: 'Export CSV', content: <ExportTab /> },
-  { id: 'card', label: 'Card View', content: <CardTab /> },
+  { id: 'card', label: 'Card Grid', content: <CardTab /> },
+  { id: 'card-list', label: 'Card List', content: <CardListTab /> },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
