@@ -340,3 +340,30 @@ export interface DataGridInfinityProps<T extends object> extends DataGridBasePro
   /** IntersectionObserver rootMargin to trigger next page load */
   rootMargin?: string
 }
+
+export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T> {
+  /** Render function for each card. Receives the TanStack Row — use row.original for data. */
+  renderCard: (row: Row<T>) => ReactNode
+  /**
+   * Fixed column count. When set, minCardWidth and minColumns are ignored.
+   * @example cardColumns={4} → always 4 columns
+   */
+  cardColumns?: number
+  /**
+   * Minimum card width in px for responsive auto-fill layout.
+   * Columns are calculated automatically: floor(containerWidth / minCardWidth).
+   * Default: 240
+   */
+  minCardWidth?: number
+  /**
+   * Minimum number of columns — cards will never collapse below this count.
+   * Default: 1
+   * @example minColumns={2} → always at least 2 columns even on mobile
+   */
+  minColumns?: number
+  hasNextPage?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
+  /** IntersectionObserver rootMargin to trigger next page load */
+  rootMargin?: string
+}

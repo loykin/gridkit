@@ -1,6 +1,7 @@
 export { DataGrid } from './DataGrid'
 export { DataGridInfinity } from './DataGridInfinity'
 export { DataGridDrag } from './DataGridDrag'
+export { DataGridCard } from './DataGridCard'
 export { DataGridPaginationBar } from './core/DataGridPaginationBar'
 export { DataGridPaginationCompact } from './core/DataGridPaginationCompact'
 export { DataGridPaginationPages } from './core/DataGridPaginationPages'
@@ -24,6 +25,7 @@ export type {
   DataGridProps,
   DataGridInfinityProps,
   DataGridDragProps,
+  DataGridCardProps,
   DataGridPaginationConfig,
   DataGridColumnDef,
   ColumnSizingMode,

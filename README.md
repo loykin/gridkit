@@ -15,6 +15,7 @@ A feature-rich React DataGrid built on TanStack Table — Tailwind-independent, 
 - **Global Search** — debounced toolbar search across configurable columns
 - **Pagination** — flexible placement: `footer`, toolbar, or fully external via `onTableReady`
 - **Infinite Scroll** — `DataGridInfinity` with IntersectionObserver-based next-page loading
+- **Card View** — `DataGridCard` renders rows as a responsive card grid — same filtering, sorting, and infinite scroll as the table view
 - **Row Drag Reorder** — `DataGridDrag` for sortable rows via dnd-kit
 - **Column Resizing** — drag-to-resize with `onChange` or `onEnd` policy
 - **Column Pinning** — pin columns left or right
@@ -256,6 +257,89 @@ export function MyInfiniteTable() {
 
 ---
 
+## DataGridCard (Card / Gallery View)
+
+Renders rows as a responsive card grid instead of a table. All filtering, sorting, global search, and infinite scroll work identically to `DataGridInfinity` — only the visual output changes.
+
+### Basic usage
+
+```tsx
+import { DataGridCard, GlobalSearch } from '@loykin/gridkit'
+
+const columns = [
+  { accessorKey: 'name' },
+  { accessorKey: 'category', meta: { filterType: 'select' } },
+  { accessorKey: 'price' },
+]
+
+export function ProductGrid() {
+  return (
+    <DataGridCard
+      data={products}
+      columns={columns}
+      minCardWidth={240}
+      minColumns={2}
+      enableSorting
+      rightFilters={(table) => <GlobalSearch table={table} placeholder="Search…" />}
+      renderCard={(row) => (
+        <div className="rounded-lg border p-4">
+          <h3 className="font-semibold">{row.original.name}</h3>
+          <p className="text-sm text-muted-foreground">{row.original.category}</p>
+          <p className="mt-2 font-medium">${row.original.price}</p>
+        </div>
+      )}
+    />
+  )
+}
+```
+
+### With infinite scroll
+
+```tsx
+<DataGridCard
+  data={data}
+  columns={columns}
+  renderCard={(row) => <ProductCard product={row.original} />}
+  minCardWidth={240}
+  minColumns={2}
+  hasNextPage={hasNextPage}
+  isFetchingNextPage={isFetchingNextPage}
+  fetchNextPage={fetchNextPage}
+/>
+```
+
+### Layout modes
+
+| Props | CSS generated | Behaviour |
+|---|---|---|
+| `minCardWidth={240}` | `repeat(auto-fill, minmax(240px, 1fr))` | Responsive — 1 col on mobile, 4+ on desktop |
+| `minCardWidth={240} minColumns={2}` | `repeat(auto-fill, minmax(min(240px, 50%), 1fr))` | Responsive, but never fewer than 2 columns |
+| `cardColumns={4}` | `repeat(4, 1fr)` | Always exactly 4 columns |
+
+### `DataGridCard`-only Props
+
+All [shared props](#shared-props-datagrid-datagridinfinity-datagriddag-datagridcard) apply. Additional props:
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `renderCard` | `(row: Row<T>) => ReactNode` | — | **Required.** Render function for each card |
+| `minCardWidth` | `number` | `240` | Minimum card width in px — column count adjusts automatically |
+| `minColumns` | `number` | `1` | The grid never collapses below this number of columns |
+| `cardColumns` | `number` | — | Fixed column count — overrides `minCardWidth` and `minColumns` |
+| `hasNextPage` | `boolean` | — | Whether more pages exist |
+| `isFetchingNextPage` | `boolean` | — | Show loading indicator at the bottom |
+| `fetchNextPage` | `() => void` | — | Called when the sentinel enters the viewport |
+| `rootMargin` | `string` | `'100px'` | IntersectionObserver `rootMargin` for early trigger |
+
+### Card CSS variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `--dg-card-gap` | `16px` | Gap between cards |
+| `--dg-card-padding` | `16px` | Padding around the grid |
+
+---
+
 ## DataGridDrag (Row Reorder)
 
 ```tsx
@@ -340,7 +424,7 @@ const columns: DataGridColumnDef<User>[] = [
 
 ## Props
 
-### Shared Props (`DataGrid`, `DataGridInfinity`, `DataGridDrag`)
+### Shared Props (`DataGrid`, `DataGridInfinity`, `DataGridDrag`, `DataGridCard`)
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -397,7 +481,8 @@ const columns: DataGridColumnDef<User>[] = [
 | `syncState` | `boolean` | `false` | Sync pagination and search state (requires `tableKey`) |
 | **Callbacks** ||||
 | `onTableReady` | `(table: Table<T>) => void` | — | Called when TanStack Table instance is ready |
-| `onColumnSizingChange` | `(s: ColumnSizingState) => void` | — | Called on column resize |
+| `onColumnOrderChange` | `(order: string[]) => void` | — | Called when column order changes via drag |
+| `onColumnPinningChange` | `(pinning: ColumnPinningState) => void` | — | Called when column pinning changes |
 | **Advanced** ||||
 | `tableOptions` | `PassthroughTableOptions<T>` | — | Escape hatch for advanced TanStack Table options |
 

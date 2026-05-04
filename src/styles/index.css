@@ -573,3 +573,23 @@
 .dg-cell[data-editing="true"] {
   padding: 2px 4px;
 }
+
+/* ── Card View ──────────────────────────────────────────────────────────────── */
+.dg-card-container {
+  width: 100%;
+}
+
+.dg-card-grid {
+  display: grid;
+  /* grid-template-columns set inline via resolveGridColumns() */
+  gap: var(--dg-card-gap, 16px);
+  padding: var(--dg-card-padding, 16px);
+}
+
+.dg-card {
+  min-width: 0;
+}
+
+.dg-card--clickable {
+  cursor: pointer;
+}
