@@ -65,6 +65,9 @@ jobs:
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Set version from tag
+        run: npm version ${GITHUB_REF_NAME#v} --no-git-tag-version
+
       - name: Download dist artifact
         uses: actions/download-artifact@v8
         with:
