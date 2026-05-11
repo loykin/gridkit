@@ -126,6 +126,23 @@ export interface DataGridClassNames {
   cell?: string
 }
 
+export interface DataGridListClassNames {
+  container?: string
+  item?: string
+  loadMore?: string
+  empty?: string
+}
+
+export interface DataGridChatClassNames {
+  container?: string
+  messageWrapper?: string
+  daySeparator?: string
+  unreadMarker?: string
+  typingIndicator?: string
+  loadPrevious?: string
+  empty?: string
+}
+
 export interface TableViewConfig<T extends object> {
   isLoading?: boolean
   emptyMessage?: string
@@ -366,4 +383,106 @@ export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T
   fetchNextPage?: () => void
   /** IntersectionObserver rootMargin to trigger next page load */
   rootMargin?: string
+}
+
+export interface DataGridListProps<T extends object>
+  extends Omit<
+    DataGridBaseProps<T>,
+    | 'showHeader'
+    | 'enableColumnResizing'
+    | 'enableColumnFilters'
+    | 'filterDisplay'
+    | 'bordered'
+    | 'enableColumnReordering'
+    | 'renderDetailRow'
+    | 'enableColumnPinning'
+    | 'onCellValueChange'
+    | 'tableWidthMode'
+    | 'rowHeight'
+    | 'estimateRowHeight'
+    | 'overscan'
+    | 'classNames'
+    | 'columnSizing'
+    | 'columnResizeMode'
+    | 'initialPinning'
+    | 'columnSizingMode'
+    | 'onColumnSizingChange'
+    | 'onColumnOrderChange'
+    | 'onColumnPinningChange'
+  > {
+  /** Render function for each list item. Receives the TanStack Row — use row.original for data. */
+  renderItem: (row: Row<T>) => ReactNode
+  /** Override the React key for each rendered item. Defaults to row.id. */
+  itemKey?: (row: Row<T>) => string
+  /** Gap in px between list items. Defaults to 0. */
+  itemGap?: number
+  /** Padding in px around the list body. Defaults to 0. */
+  itemPadding?: number
+  /** Preferred name for the scroll/list container height. tableHeight is kept as a compatibility alias. */
+  containerHeight?: string | number | 'auto'
+  /** Compatibility alias for containerHeight. */
+  tableHeight?: string | number | 'auto'
+  /** Static content rendered on the left side of the shared toolbar area. */
+  headerLeft?: ReactNode
+  /** Static content rendered on the right side of the shared toolbar area. */
+  headerRight?: ReactNode
+  /** Static footer content rendered below the list container. */
+  footer?: ReactNode
+  hasNextPage?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
+  /** IntersectionObserver rootMargin to trigger next page load */
+  rootMargin?: string
+  /** Slot-based class injection for list elements */
+  classNames?: DataGridListClassNames
+}
+
+export interface DataGridChatProps<T extends object>
+  extends Omit<
+    DataGridBaseProps<T>,
+    | 'showHeader'
+    | 'enableColumnResizing'
+    | 'enableColumnFilters'
+    | 'filterDisplay'
+    | 'bordered'
+    | 'enableColumnReordering'
+    | 'renderDetailRow'
+    | 'enableColumnPinning'
+    | 'onCellValueChange'
+    | 'tableWidthMode'
+    | 'rowHeight'
+    | 'estimateRowHeight'
+    | 'overscan'
+    | 'classNames'
+    | 'columnSizing'
+    | 'columnResizeMode'
+    | 'initialPinning'
+    | 'columnSizingMode'
+    | 'onColumnSizingChange'
+    | 'onColumnOrderChange'
+    | 'onColumnPinningChange'
+    | 'checkboxConfig'
+  > {
+  /** Render function for each message row. Receives the TanStack Row — use row.original for data. */
+  renderMessage: (row: Row<T>) => ReactNode
+  renderDaySeparator?: (row: Row<T>, previousRow: Row<T> | undefined) => ReactNode
+  renderUnreadMarker?: (row: Row<T>) => ReactNode
+  renderTypingIndicator?: () => ReactNode
+  hasPreviousPage?: boolean
+  isFetchingPreviousPage?: boolean
+  fetchPreviousPage?: () => void
+  rootMargin?: string
+  stickToBottom?: boolean
+  bottomThreshold?: number
+  onAtBottomChange?: (atBottom: boolean) => void
+  containerHeight?: string | number | 'auto'
+  /** Compatibility alias for containerHeight. */
+  tableHeight?: string | number | 'auto'
+  /** Static content rendered on the left side of the shared toolbar area. */
+  headerLeft?: ReactNode
+  /** Static content rendered on the right side of the shared toolbar area. */
+  headerRight?: ReactNode
+  /** Static footer content rendered below the chat container. */
+  footer?: ReactNode
+  classNames?: DataGridChatClassNames
 }

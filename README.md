@@ -16,6 +16,8 @@ A feature-rich React DataGrid built on TanStack Table — Tailwind-independent, 
 - **Pagination** — flexible placement: `footer`, toolbar, or fully external via `onTableReady`
 - **Infinite Scroll** — `DataGridInfinity` with IntersectionObserver-based next-page loading
 - **Card View** — `DataGridCard` renders rows as a responsive card grid — same filtering, sorting, and infinite scroll as the table view
+- **List View** — `DataGridList` renders each row with a custom item renderer while keeping sorting, filtering, search, DataStore, and infinite loading
+- **Chat View** — `DataGridChat` renders threaded/timeline-style messages with top loading, scroll offset preservation, and stick-to-bottom behavior
 - **Row Drag Reorder** — `DataGridDrag` for sortable rows via dnd-kit
 - **Column Resizing** — drag-to-resize with `onChange` or `onEnd` policy
 - **Column Pinning** — pin columns left or right
@@ -257,6 +259,131 @@ export function MyInfiniteTable() {
 
 ---
 
+## DataGridList (Custom Row/List View)
+
+Renders rows with your own item component instead of table markup. Columns still define the row schema for sorting, filtering, and global search; they do not have to be visible.
+
+```tsx
+import { DataGridList, GlobalSearch, SelectFilter } from '@loykin/gridkit'
+
+const columns = [
+  { accessorKey: 'name' },
+  { accessorKey: 'department', meta: { filterType: 'select' } },
+  { accessorKey: 'status', meta: { filterType: 'select' } },
+]
+
+export function EmployeeList() {
+  return (
+    <DataGridList
+      data={employees}
+      columns={columns}
+      containerHeight={560}
+      itemGap={8}
+      itemPadding={12}
+      leftFilters={(table) => (
+        <SelectFilter table={table} columnId="department" label="Department" />
+      )}
+      rightFilters={(table) => <GlobalSearch table={table} placeholder="Search…" />}
+      renderItem={(row) => (
+        <div className="rounded border p-3">
+          <strong>{row.original.name}</strong>
+          <span>{row.original.status}</span>
+        </div>
+      )}
+    />
+  )
+}
+```
+
+### With infinite scroll
+
+```tsx
+<DataGridList
+  data={data}
+  columns={columns}
+  renderItem={(row) => <InboxRow item={row.original} />}
+  hasNextPage={hasNextPage}
+  isFetchingNextPage={isFetchingNextPage}
+  fetchNextPage={fetchNextPage}
+/>
+```
+
+### `DataGridList`-only Props
+
+List views use the shared row/data/filtering props, but omit table-only options such as column resizing, pinning, headers, and table width modes.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `renderItem` | `(row: Row<T>) => ReactNode` | — | **Required.** Render function for each list item |
+| `itemKey` | `(row: Row<T>) => string` | `row.id` | Override the React key for each item |
+| `itemGap` | `number` | `0` | Gap in px between list items |
+| `itemPadding` | `number` | `0` | Padding in px around the list body |
+| `containerHeight` | `string \| number \| 'auto'` | `'auto'` | Preferred list container height |
+| `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Compatibility alias for `containerHeight` |
+| `headerLeft` | `ReactNode` | — | Static content on the left side of the toolbar area |
+| `headerRight` | `ReactNode` | — | Static content on the right side of the toolbar area |
+| `footer` | `ReactNode` | — | Static content below the list |
+| `hasNextPage` | `boolean` | — | Whether more pages exist |
+| `isFetchingNextPage` | `boolean` | — | Show loading indicator at the bottom |
+| `fetchNextPage` | `() => void` | — | Called when the sentinel enters the viewport |
+| `rootMargin` | `string` | `'100px'` | IntersectionObserver `rootMargin` for early trigger |
+| `classNames` | `DataGridListClassNames` | — | Slot-based class injection for list elements |
+
+---
+
+## DataGridChat (Message Timeline View)
+
+Renders row data as a message timeline. It supports loading older rows from the top, preserving scroll offset after prepends, and automatically staying at the bottom when the user is already near the latest message.
+
+```tsx
+import { DataGridChat } from '@loykin/gridkit'
+
+const columns = [
+  { accessorKey: 'author' },
+  { accessorKey: 'body' },
+  { accessorKey: 'createdAt' },
+]
+
+export function MessageTimeline() {
+  return (
+    <DataGridChat
+      data={messages}
+      columns={columns}
+      getRowId={(message) => message.id}
+      containerHeight={640}
+      hasPreviousPage={hasPreviousPage}
+      isFetchingPreviousPage={isFetchingPreviousPage}
+      fetchPreviousPage={fetchPreviousPage}
+      renderMessage={(row) => <MessageBubble message={row.original} />}
+      renderTypingIndicator={() => <TypingIndicator />}
+    />
+  )
+}
+```
+
+### `DataGridChat`-only Props
+
+Chat views use the shared row/data/filtering props, but omit table-only options such as column resizing, pinning, headers, table width modes, and checkbox selection.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `renderMessage` | `(row: Row<T>) => ReactNode` | — | **Required.** Render function for each message |
+| `renderDaySeparator` | `(row, previousRow) => ReactNode` | — | Optional non-row separator before a message |
+| `renderUnreadMarker` | `(row) => ReactNode` | — | Optional non-row marker before a message |
+| `renderTypingIndicator` | `() => ReactNode` | — | Optional content after the latest message |
+| `hasPreviousPage` | `boolean` | — | Whether older rows exist |
+| `isFetchingPreviousPage` | `boolean` | — | Show loading indicator at the top |
+| `fetchPreviousPage` | `() => void` | — | Called when the top sentinel enters the viewport |
+| `rootMargin` | `string` | `'100px'` | IntersectionObserver `rootMargin` for early trigger |
+| `stickToBottom` | `boolean` | `true` | Auto-scroll when the user is already near the bottom |
+| `bottomThreshold` | `number` | `48` | Distance in px considered “at bottom” |
+| `onAtBottomChange` | `(atBottom: boolean) => void` | — | Called when bottom state changes |
+| `containerHeight` | `string \| number \| 'auto'` | `'auto'` | Preferred chat container height |
+| `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Compatibility alias for `containerHeight` |
+| `classNames` | `DataGridChatClassNames` | — | Slot-based class injection for chat elements |
+
+---
+
 ## DataGridCard (Card / Gallery View)
 
 Renders rows as a responsive card grid instead of a table. All filtering, sorting, global search, and infinite scroll work identically to `DataGridInfinity` — only the visual output changes.
@@ -411,6 +538,7 @@ const columns: DataGridColumnDef<User>[] = [
 | Field | Type | Description |
 |---|---|---|
 | `flex` | `number` | Flex ratio — distributes remaining container width proportionally |
+| `width` | `number` | Fixed preferred column width in px |
 | `autoSize` | `boolean` | Auto-fit column width to content via canvas text measurement |
 | `minWidth` | `number` | Minimum column width in px |
 | `maxWidth` | `number` | Maximum column width in px |

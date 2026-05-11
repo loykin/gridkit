@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -168,27 +168,35 @@ export function useDataGridCore<T extends object>({
   const effectiveColumnFilters = externalColumnFilters ?? internalFilters
 
   // Build search filter for specified columns
-  const searchableFilterFn: FilterFn<T> | undefined = searchableColumns?.length
-    ? (row, _, value: string) => {
-        const search = String(value).toLowerCase()
-        return searchableColumns.some((colId) =>
-          String(row.getValue(colId) ?? '')
-            .toLowerCase()
-            .includes(search),
-        )
-      }
-    : undefined
+  const searchableFilterFn: FilterFn<T> | undefined = useMemo(
+    () =>
+      searchableColumns?.length
+        ? (row, _, value: string) => {
+            const search = String(value).toLowerCase()
+            return searchableColumns.some((colId) =>
+              String(row.getValue(colId) ?? '')
+                .toLowerCase()
+                .includes(search),
+            )
+          }
+        : undefined,
+    [searchableColumns],
+  )
 
   // Inject filterFn into columns that declare meta.filterType
-  const enrichedColumns = columns.map((col) => {
-    if (col.meta?.filterType === 'number' && !col.filterFn) {
-      return { ...col, filterFn: betweenFilterFn as FilterFn<T> }
-    }
-    if (col.meta?.filterType === 'multi-select' && !col.filterFn) {
-      return { ...col, filterFn: multiSelectFilterFn as FilterFn<T> }
-    }
-    return col
-  })
+  const enrichedColumns = useMemo(
+    () =>
+      columns.map((col) => {
+        if (col.meta?.filterType === 'number' && !col.filterFn) {
+          return { ...col, filterFn: betweenFilterFn as FilterFn<T> }
+        }
+        if (col.meta?.filterType === 'multi-select' && !col.filterFn) {
+          return { ...col, filterFn: multiSelectFilterFn as FilterFn<T> }
+        }
+        return col
+      }),
+    [columns],
+  )
 
   // Subscribe to DataStore changes — triggers re-render when a transaction fires.
   // useSyncExternalStore must be called unconditionally, so noop stubs are used

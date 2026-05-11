@@ -15,6 +15,8 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
     /** CSS flex ratio — remaining container width distributed proportionally */
     flex?: number
+    /** Fixed preferred column width in px. Mirrors TanStack's column size metadata used by examples. */
+    width?: number
     /** Auto-fit to content width via canvas text measurement */
     autoSize?: boolean
     minWidth?: number

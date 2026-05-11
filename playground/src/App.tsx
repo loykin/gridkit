@@ -24,6 +24,10 @@ import { InlineEditTab } from './tabs/InlineEditTab'
 import { ExportTab } from './tabs/ExportTab'
 import { CardTab } from './tabs/CardTab'
 import { CardListTab } from './tabs/CardListTab'
+import { ListTab } from './tabs/ListTab'
+import { ChatTab } from './tabs/ChatTab'
+import { AgentTraceTab } from './tabs/AgentTraceTab'
+import { EvalReviewTab } from './tabs/EvalReviewTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
@@ -53,6 +57,10 @@ const TABS = [
   { id: 'export', label: 'Export CSV', content: <ExportTab /> },
   { id: 'card', label: 'Card Grid', content: <CardTab /> },
   { id: 'card-list', label: 'Card List', content: <CardListTab /> },
+  { id: 'list', label: 'List', content: <ListTab /> },
+  { id: 'chat', label: 'Chat', content: <ChatTab /> },
+  { id: 'agent-trace', label: 'Agent Trace', content: <AgentTraceTab /> },
+  { id: 'eval-review', label: 'Eval Review', content: <EvalReviewTab /> },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']

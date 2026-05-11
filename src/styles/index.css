@@ -593,3 +593,67 @@
 .dg-card--clickable {
   cursor: pointer;
 }
+
+/* ── List View ─────────────────────────────────────────────────────────────── */
+.dg-list-container {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--dg-border);
+  border-radius: var(--dg-radius);
+  background: var(--dg-background);
+}
+
+.dg-list-items {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dg-list-item {
+  min-width: 0;
+}
+
+.dg-list-item--clickable {
+  cursor: pointer;
+}
+
+.dg-list-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+/* ── Chat View ─────────────────────────────────────────────────────────────── */
+.dg-chat-container {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--dg-border);
+  border-radius: var(--dg-radius);
+  background: var(--dg-background);
+}
+
+.dg-chat-load-previous {
+  display: flex;
+  justify-content: center;
+  min-height: 1px;
+  padding: 8px 0;
+}
+
+.dg-chat-messages {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: var(--dg-chat-gap, 8px);
+  padding: var(--dg-chat-padding, 12px);
+}
+
+.dg-chat-row,
+.dg-chat-message-wrapper {
+  min-width: 0;
+}
+
+.dg-chat-day-separator,
+.dg-chat-unread-marker,
+.dg-chat-typing-indicator {
+  min-width: 0;
+}

@@ -107,7 +107,6 @@ export function TreeTab() {
         enableExpanding
         getSubRows={(row) => row.children}
         enableSorting={false}
-        enablePagination={false}
         emptyMessage="No dashboards"
         tableWidthMode="fill-last"
         rowHeight={36}

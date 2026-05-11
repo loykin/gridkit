@@ -2,6 +2,8 @@ export { DataGrid } from './DataGrid'
 export { DataGridInfinity } from './DataGridInfinity'
 export { DataGridDrag } from './DataGridDrag'
 export { DataGridCard } from './DataGridCard'
+export { DataGridList } from './DataGridList'
+export { DataGridChat } from './DataGridChat'
 export { DataGridPaginationBar } from './core/DataGridPaginationBar'
 export { DataGridPaginationCompact } from './core/DataGridPaginationCompact'
 export { DataGridPaginationPages } from './core/DataGridPaginationPages'
@@ -26,6 +28,8 @@ export type {
   DataGridInfinityProps,
   DataGridDragProps,
   DataGridCardProps,
+  DataGridListProps,
+  DataGridChatProps,
   DataGridPaginationConfig,
   DataGridColumnDef,
   ColumnSizingMode,
@@ -34,5 +38,7 @@ export type {
   TableViewConfig,
   DataGridBaseProps,
   DataGridClassNames,
+  DataGridListClassNames,
+  DataGridChatClassNames,
   DataGridIcons,
 } from './types'
