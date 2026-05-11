@@ -2,6 +2,7 @@ import type React from 'react'
 import type { ReactNode } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { DataGridToolbar } from '@/core/DataGridToolbar'
+import type { GridKitHeaderSlot } from '@/types'
 
 export function resolveContainerHeight(
   height: string | number | 'auto' | undefined,
@@ -17,10 +18,8 @@ interface GridKitShellProps<T extends object> {
   wrapperRef: React.RefObject<HTMLDivElement | null>
   containerRef: React.RefObject<HTMLDivElement | null>
   table: Table<T>
-  leftFilters?: (table: Table<T>) => ReactNode
-  rightFilters?: (table: Table<T>) => ReactNode
-  headerLeft?: ReactNode
-  headerRight?: ReactNode
+  headerLeft?: GridKitHeaderSlot<T>
+  headerRight?: GridKitHeaderSlot<T>
   containerHeight?: string | number | 'auto'
   tableHeight?: string | number | 'auto'
   containerClassName?: string
@@ -32,8 +31,6 @@ export function GridKitShell<T extends object>({
   wrapperRef,
   containerRef,
   table,
-  leftFilters,
-  rightFilters,
   headerLeft,
   headerRight,
   containerHeight,
@@ -44,29 +41,9 @@ export function GridKitShell<T extends object>({
 }: GridKitShellProps<T>) {
   const heightStyle = resolveContainerHeight(containerHeight ?? tableHeight)
 
-  const toolbarLeft =
-    leftFilters || headerLeft
-      ? (currentTable: Table<T>) => (
-          <>
-            {headerLeft}
-            {leftFilters?.(currentTable)}
-          </>
-        )
-      : undefined
-
-  const toolbarRight =
-    rightFilters || headerRight
-      ? (currentTable: Table<T>) => (
-          <>
-            {rightFilters?.(currentTable)}
-            {headerRight}
-          </>
-        )
-      : undefined
-
   return (
     <div ref={wrapperRef} className="dg-shell">
-      <DataGridToolbar table={table} leftFilters={toolbarLeft} rightFilters={toolbarRight} />
+      <DataGridToolbar table={table} headerLeft={headerLeft} headerRight={headerRight} />
 
       <div ref={containerRef} className={containerClassName} style={heightStyle}>
         {children}

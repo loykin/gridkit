@@ -90,13 +90,13 @@ export function PaginationTab() {
 
       {/* ── B. DataGridPaginationCompact — toolbar ─────────────────────────────
            Minimal: prev/next buttons + "X / Y" only — fits the toolbar row.
-           Injected via rightFilters alongside other toolbar controls.          */}
+           Injected via headerRight alongside other toolbar controls.          */}
       <section className="flex flex-col gap-3">
         <div>
           <p className="text-sm font-semibold">B. DataGridPaginationCompact — toolbar</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             Compact bar · no dropdown · toolbar-height-friendly ·{' '}
-            <code className="bg-muted px-1 rounded text-[11px]">rightFilters</code> render prop
+            <code className="bg-muted px-1 rounded text-[11px]">headerRight</code> render prop
           </p>
         </div>
         <DataGrid
@@ -104,13 +104,13 @@ export function PaginationTab() {
           columns={columns}
           enableSorting
           pagination={{ pageSize: 10 }}
-          leftFilters={(table) => (
+          headerLeft={(table) => (
             <>
               <GlobalSearch table={table} placeholder="Search…" />
               <ColumnVisibilityDropdown table={table} />
             </>
           )}
-          rightFilters={(table) => <DataGridPaginationCompact table={table} />}
+          headerRight={(table) => <DataGridPaginationCompact table={table} />}
           emptyMessage="No employees"
           tableKey="pg-b"
         />
@@ -124,7 +124,7 @@ export function PaginationTab() {
           <p className="text-sm font-semibold">C. External placement — onTableReady</p>
           <p className="text-xs text-muted-foreground mt-0.5">
             <code className="bg-muted px-1 rounded text-[11px]">onTableReady</code> exposes the
-            table instance · pagination bar rendered above the grid · no footer / rightFilters
+            table instance · pagination bar rendered above the grid · no footer / headerRight
           </p>
         </div>
         {/* Pagination bar rendered above the grid, completely outside DataGrid */}

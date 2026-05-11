@@ -7,8 +7,8 @@ import { IconsProvider } from '@/core/IconsContext'
 export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<T>) {
   const {
     error,
-    leftFilters,
-    rightFilters,
+    headerLeft,
+    headerRight,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
@@ -43,8 +43,8 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
       isSized={isSized}
       measure={measure}
       error={error}
-      leftFilters={leftFilters}
-      rightFilters={rightFilters}
+      headerLeft={headerLeft}
+      headerRight={headerRight}
       loadMoreRef={loadMoreRef}
       isFetchingNextPage={isFetchingNextPage}
     />

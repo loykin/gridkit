@@ -20,8 +20,6 @@ interface DataGridListViewProps<T extends object>
     | 'containerHeight'
     | 'tableHeight'
     | 'isFetchingNextPage'
-    | 'leftFilters'
-    | 'rightFilters'
     | 'headerLeft'
     | 'headerRight'
     | 'footer'
@@ -39,8 +37,6 @@ export function DataGridListView<T extends object>({
   containerRef,
   table,
   rows,
-  leftFilters,
-  rightFilters,
   headerLeft,
   headerRight,
   footer,
@@ -107,8 +103,6 @@ export function DataGridListView<T extends object>({
       wrapperRef={wrapperRef}
       containerRef={containerRef}
       table={table}
-      leftFilters={leftFilters}
-      rightFilters={rightFilters}
       headerLeft={headerLeft}
       headerRight={headerRight}
       containerHeight={containerHeight}

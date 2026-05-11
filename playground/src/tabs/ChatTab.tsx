@@ -106,7 +106,7 @@ export function ChatTab() {
         hasPreviousPage={hasPreviousPage}
         isFetchingPreviousPage={isFetchingPrevious}
         fetchPreviousPage={fetchPreviousPage}
-        rightFilters={(table) => <GlobalSearch table={table} placeholder="Search messages..." />}
+        headerRight={(table) => <GlobalSearch table={table} placeholder="Search messages..." />}
         renderDaySeparator={(row, previousRow) => {
           if (previousRow?.original.day === row.original.day) return null
           return (

@@ -78,14 +78,14 @@ export function EvalReviewTab() {
         containerHeight={520}
         enableSorting
         initialSorting={[{ id: 'score', desc: false }]}
-        leftFilters={(table) => (
+        headerLeft={(table) => (
           <>
             <SelectFilter table={table} columnId="status" label="Status" />
             <SelectFilter table={table} columnId="model" label="Model" />
             <SelectFilter table={table} columnId="category" label="Category" />
           </>
         )}
-        rightFilters={(table) => <GlobalSearch table={table} placeholder="Search..." />}
+        headerRight={(table) => <GlobalSearch table={table} placeholder="Search..." />}
         emptyMessage="No eval entries found"
         renderItem={(row) => {
           const entry = row.original

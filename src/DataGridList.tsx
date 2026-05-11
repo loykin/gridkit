@@ -51,8 +51,6 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
         containerRef={containerRef}
         table={table}
         rows={rows}
-        leftFilters={props.leftFilters}
-        rightFilters={props.rightFilters}
         headerLeft={headerLeft}
         headerRight={headerRight}
         footer={footer}

@@ -72,7 +72,7 @@ export function ExportTab() {
         footer={(table) => <DataGridPaginationBar table={table} pageSizes={[20, 50, 100]} />}
         tableWidthMode="fill-last"
         emptyMessage="No employees found"
-        rightFilters={(table) => <ExportButton table={table as Table<Employee>} />}
+        headerRight={(table) => <ExportButton table={table as Table<Employee>} />}
       />
     </section>
   )

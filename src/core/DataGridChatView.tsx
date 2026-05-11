@@ -16,8 +16,6 @@ interface DataGridChatViewProps<T extends object>
     | 'renderUnreadMarker'
     | 'renderTypingIndicator'
     | 'isFetchingPreviousPage'
-    | 'leftFilters'
-    | 'rightFilters'
     | 'headerLeft'
     | 'headerRight'
     | 'footer'
@@ -38,8 +36,6 @@ export function DataGridChatView<T extends object>({
   table,
   rows,
   loadPreviousRef,
-  leftFilters,
-  rightFilters,
   headerLeft,
   headerRight,
   footer,
@@ -116,8 +112,6 @@ export function DataGridChatView<T extends object>({
       wrapperRef={wrapperRef}
       containerRef={containerRef}
       table={table}
-      leftFilters={leftFilters}
-      rightFilters={rightFilters}
       headerLeft={headerLeft}
       headerRight={headerRight}
       containerHeight={containerHeight}

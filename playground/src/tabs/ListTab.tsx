@@ -51,13 +51,13 @@ export function ListTab() {
         fetchNextPage={fetchNextPage}
         emptyMessage="No employees found"
         rowCursor
-        leftFilters={(table) => (
+        headerLeft={(table) => (
           <>
             <SelectFilter table={table} columnId="department" label="Department" />
             <SelectFilter table={table} columnId="status" label="Status" />
           </>
         )}
-        rightFilters={(table) => <GlobalSearch table={table} placeholder="Search..." />}
+        headerRight={(table) => <GlobalSearch table={table} placeholder="Search..." />}
         renderItem={(row) => {
           const employee = row.original
           return (

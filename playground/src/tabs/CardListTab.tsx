@@ -58,13 +58,13 @@ export function CardListTab() {
         fetchNextPage={fetchNextPage}
         emptyMessage="No employees found"
         rowCursor
-        leftFilters={(table) => (
+        headerLeft={(table) => (
           <>
             <SelectFilter table={table} columnId="department" label="Department" />
             <SelectFilter table={table} columnId="status" label="Status" />
           </>
         )}
-        rightFilters={(table) => <GlobalSearch table={table} placeholder="Search..." />}
+        headerRight={(table) => <GlobalSearch table={table} placeholder="Search..." />}
         renderCard={(row) => {
           const e = row.original
           return (

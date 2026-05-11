@@ -162,7 +162,7 @@ export function ServerSideExample() {
       globalFilter={globalFilter}
       onGlobalFilterChange={(v) => setFilter(v)}
       // Toolbar
-      leftFilters={(table) => (
+      headerLeft={(table) => (
         <>
           <GlobalSearch table={table} placeholder="Search orders…" />
           <select

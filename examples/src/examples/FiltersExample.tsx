@@ -87,14 +87,14 @@ export function FiltersExample() {
           enableColumnFilters
           filterDisplay="row"
           pagination={{ pageSize: 10 }}
-          leftFilters={(table) => (
+          headerLeft={(table) => (
             <>
               <GlobalSearch table={table} placeholder="Search employees…" />
               <SelectFilter table={table} columnId="status" label="Status" />
               <MultiSelectFilter table={table} columnId="department" label="Department" />
             </>
           )}
-          rightFilters={(table) => <ColumnVisibilityDropdown table={table} />}
+          headerRight={(table) => <ColumnVisibilityDropdown table={table} />}
           footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
           tableHeight={420}
           emptyMessage="No employees found"
@@ -112,7 +112,7 @@ export function FiltersExample() {
           enableColumnFilters
           filterDisplay="icon"
           pagination={{ pageSize: 10 }}
-          rightFilters={(table) => <ColumnVisibilityDropdown table={table} />}
+          headerRight={(table) => <ColumnVisibilityDropdown table={table} />}
           footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
           tableHeight={380}
           emptyMessage="No employees found"

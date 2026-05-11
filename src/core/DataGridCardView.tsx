@@ -18,8 +18,8 @@ interface DataGridCardViewProps<T extends object>
     | 'minCardWidth'
     | 'minColumns'
     | 'isFetchingNextPage'
-    | 'leftFilters'
-    | 'rightFilters'
+    | 'headerLeft'
+    | 'headerRight'
     | 'classNames'
   > {
   wrapperRef: React.RefObject<HTMLDivElement | null>
@@ -42,8 +42,8 @@ export function DataGridCardView<T extends object>({
   containerRef,
   table,
   rows,
-  leftFilters,
-  rightFilters,
+  headerLeft,
+  headerRight,
   loadMoreRef,
   isFetchingNextPage,
   isLoading,
@@ -102,7 +102,7 @@ export function DataGridCardView<T extends object>({
 
   return (
     <div ref={wrapperRef} className="dg-shell">
-      <DataGridToolbar table={table} leftFilters={leftFilters} rightFilters={rightFilters} />
+      <DataGridToolbar table={table} headerLeft={headerLeft} headerRight={headerRight} />
 
       <div ref={containerRef} className={cn('dg-card-container', classNames?.container)}>
         {renderContent()}

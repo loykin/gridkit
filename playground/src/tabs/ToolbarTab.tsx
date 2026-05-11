@@ -57,14 +57,14 @@ export function ToolbarTab() {
         footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
         emptyMessage="No employees found"
         tableKey="toolbar"
-        leftFilters={(table) => (
+        headerLeft={(table) => (
           <>
             <GlobalSearch table={table} placeholder="Search employees…" />
             <SelectFilter table={table} columnId="status" label="Status" />
             <MultiSelectFilter table={table} columnId="department" label="Department" />
           </>
         )}
-        rightFilters={(table) => <ColumnVisibilityDropdown table={table} />}
+        headerRight={(table) => <ColumnVisibilityDropdown table={table} />}
       />
     </section>
   )

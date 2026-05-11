@@ -7,8 +7,8 @@ import { IconsProvider } from '@/core/IconsContext'
 export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
   const {
     error,
-    leftFilters,
-    rightFilters,
+    headerLeft,
+    headerRight,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
@@ -46,8 +46,8 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
         containerRef={containerRef}
         table={table}
         rows={rows}
-        leftFilters={leftFilters}
-        rightFilters={rightFilters}
+        headerLeft={headerLeft}
+        headerRight={headerRight}
         loadMoreRef={loadMoreRef}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={isLoading}

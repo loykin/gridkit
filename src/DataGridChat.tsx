@@ -84,8 +84,6 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
         containerRef={containerRef}
         table={table}
         rows={rows}
-        leftFilters={props.leftFilters}
-        rightFilters={props.rightFilters}
         headerLeft={headerLeft}
         headerRight={headerRight}
         footer={footer}

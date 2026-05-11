@@ -98,7 +98,7 @@ export function PaginationExample() {
           columns={columns}
           enableSorting
           pagination={{ pageSize: 10 }}
-          rightFilters={(table) => <DataGridPaginationCompact table={table} />}
+          headerRight={(table) => <DataGridPaginationCompact table={table} />}
           tableHeight={320}
           emptyMessage="No products"
           tableKey="ex-pg-compact"

@@ -25,6 +25,7 @@ export type { EditCellProps } from './core/engine/extensions/ColumnFlexFeature'
 
 export type {
   DataGridProps,
+  DataGridTableProps,
   DataGridInfinityProps,
   DataGridDragProps,
   DataGridCardProps,
@@ -35,6 +36,9 @@ export type {
   ColumnSizingMode,
   TableWidthMode,
   CheckboxConfig,
+  GridKitCoreProps,
+  GridKitRowsContext,
+  GridKitTableContext,
   TableViewConfig,
   DataGridBaseProps,
   DataGridClassNames,

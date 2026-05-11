@@ -12,7 +12,15 @@ interface DataGridPropsWithRef<T extends object> extends DataGridProps<T> {
 }
 
 export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
-  const { error, leftFilters, rightFilters, footer, pagination, tableRef, icons } = props
+  const {
+    error,
+    headerLeft,
+    headerRight,
+    footer,
+    pagination,
+    tableRef,
+    icons,
+  } = props
 
   const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase({
     ...props,
@@ -39,8 +47,8 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
         isSized={isSized}
         measure={measure}
         error={error}
-        leftFilters={leftFilters}
-        rightFilters={rightFilters}
+        headerLeft={headerLeft}
+        headerRight={headerRight}
         footer={footer}
       />
     </IconsProvider>

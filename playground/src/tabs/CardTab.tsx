@@ -49,7 +49,7 @@ export function CardTab() {
         isFetchingNextPage={isFetching}
         fetchNextPage={fetchNextPage}
         emptyMessage="No employees found"
-        rightFilters={(table) => <GlobalSearch table={table} placeholder="Search..." />}
+        headerRight={(table) => <GlobalSearch table={table} placeholder="Search..." />}
         renderCard={(row) => {
           const e = row.original
           return (

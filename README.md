@@ -142,7 +142,7 @@ Pagination is opt-in. The `pagination` prop activates TanStack Table's paginatio
 | Component | Description | Best placement |
 |---|---|---|
 | `DataGridPaginationBar` | Full bar: rows-per-page dropdown + page info + nav buttons | `footer` |
-| `DataGridPaginationCompact` | Minimal: `< X / Y >` nav only | `rightFilters` (toolbar) |
+| `DataGridPaginationCompact` | Minimal: `< X / Y >` nav only | `headerRight` (toolbar) |
 | `DataGridPaginationPages` | Numbered pages: `<< < 1 2 [3] … 20 > >>` | `footer` |
 
 ### Placement Options
@@ -171,7 +171,7 @@ import { DataGrid, DataGridPaginationCompact } from '@loykin/gridkit'
   data={rows}
   columns={columns}
   pagination={{ pageSize: 20 }}
-  rightFilters={(table) => <DataGridPaginationCompact table={table} />}
+  headerRight={(table) => <DataGridPaginationCompact table={table} />}
 />
 ```
 
@@ -280,10 +280,10 @@ export function EmployeeList() {
       containerHeight={560}
       itemGap={8}
       itemPadding={12}
-      leftFilters={(table) => (
+      headerLeft={(table) => (
         <SelectFilter table={table} columnId="department" label="Department" />
       )}
-      rightFilters={(table) => <GlobalSearch table={table} placeholder="Search…" />}
+      headerRight={(table) => <GlobalSearch table={table} placeholder="Search…" />}
       renderItem={(row) => (
         <div className="rounded border p-3">
           <strong>{row.original.name}</strong>
@@ -407,7 +407,7 @@ export function ProductGrid() {
       minCardWidth={240}
       minColumns={2}
       enableSorting
-      rightFilters={(table) => <GlobalSearch table={table} placeholder="Search…" />}
+      headerRight={(table) => <GlobalSearch table={table} placeholder="Search…" />}
       renderCard={(row) => (
         <div className="rounded-lg border p-4">
           <h3 className="font-semibold">{row.original.name}</h3>
@@ -588,8 +588,8 @@ const columns: DataGridColumnDef<User>[] = [
 | `globalFilter` | `string` | — | Controlled global search value |
 | `onGlobalFilterChange` | `(v: string) => void` | — | Called on global search change |
 | `searchableColumns` | `string[]` | — | Column keys included in global search |
-| `leftFilters` | `(table: Table<T>) => ReactNode` | — | Custom toolbar UI on the left |
-| `rightFilters` | `(table: Table<T>) => ReactNode` | — | Custom toolbar UI on the right |
+| `headerLeft` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the left. Function form receives the table instance |
+| `headerRight` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the right. Function form receives the table instance |
 | **Column Sizing** ||||
 | `enableColumnResizing` | `boolean` | `true` | Enable drag-to-resize columns |
 | `columnResizeMode` | `'onChange' \| 'onEnd'` | `'onChange'` | When resize updates are applied |
@@ -651,14 +651,14 @@ import {
 } from '@loykin/gridkit'
 
 <DataGrid
-  leftFilters={(table) => (
+  headerLeft={(table) => (
     <>
       <GlobalSearch table={table} placeholder="Search…" />
       <SelectFilter table={table} columnId="status" label="Status" />
       <MultiSelectFilter table={table} columnId="department" label="Dept" />
     </>
   )}
-  rightFilters={(table) => <ColumnVisibilityDropdown table={table} />}
+  headerRight={(table) => <ColumnVisibilityDropdown table={table} />}
   ...
 />
 ```

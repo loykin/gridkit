@@ -20,6 +20,9 @@ import type { DataStore } from './core/engine/DataStore'
 //   src/core/engine/extensions/DataStoreFeature.ts     — applyTransaction, getRowNodeById
 
 export type DataGridColumnDef<T extends object> = ColumnDef<T, unknown>
+export type GridKitHeaderSlot<T extends object> =
+  | ReactNode
+  | ((table: Table<T>) => ReactNode)
 
 /**
  * Icon overrides for DataGrid.
@@ -143,6 +146,89 @@ export interface DataGridChatClassNames {
   empty?: string
 }
 
+export interface GridKitRowsContext<T extends object> {
+  rows: Row<T>[]
+  containerRef: React.RefObject<HTMLElement | null>
+  wrapperRef: React.RefObject<HTMLElement | null>
+  isLoading?: boolean
+  error?: Error | null
+}
+
+export interface GridKitTableContext<T extends object> extends GridKitRowsContext<T> {
+  table: Table<T>
+}
+
+export interface GridKitCoreProps<T extends object> {
+  data?: T[]
+  /**
+   * Map-based external store for real-time / high-frequency updates.
+   * Mutually exclusive with the `data` prop — set one or the other.
+   */
+  dataStore?: DataStore<T>
+  columns: DataGridColumnDef<T>[]
+  error?: Error | null
+  isLoading?: boolean
+  emptyMessage?: string
+  /**
+   * Custom UI rendered in the body area when there is no data.
+   * Takes precedence over emptyMessage when provided.
+   */
+  emptyContent?: ReactNode
+  onRowClick?: (row: T) => void
+  rowCursor?: boolean
+
+  // Sorting
+  enableSorting?: boolean
+  initialSorting?: SortingState
+  onSortingChange?: (sorting: SortingState) => void
+  manualSorting?: boolean
+
+  // Filtering and search
+  /** Set true when filtering is handled server-side. Disables client-side getFilteredRowModel. */
+  manualFiltering?: boolean
+  columnFilters?: ColumnFiltersState
+  onColumnFiltersChange?: (filters: ColumnFiltersState) => void
+  globalFilter?: string
+  onGlobalFilterChange?: (value: string) => void
+  searchableColumns?: string[]
+
+  /** Content rendered on the left side of the shared toolbar area. */
+  headerLeft?: GridKitHeaderSlot<T>
+  /** Content rendered on the right side of the shared toolbar area. */
+  headerRight?: GridKitHeaderSlot<T>
+
+  tableHeight?: string | number | 'auto'
+  /** Preferred name for non-table view scroll container height. */
+  containerHeight?: string | number | 'auto'
+
+  /**
+   * Return a stable unique string ID for each row.
+   * Defaults to row index — override this when your data has a natural ID field.
+   */
+  getRowId?: (originalRow: T, index: number) => string
+
+  // State persistence (Zustand)
+  tableKey?: string
+  /**
+   * Sync table state (pagination, search) to the in-memory Zustand store so it
+   * survives re-renders within the same session. Requires tableKey to be set.
+   */
+  syncState?: boolean
+
+  // Callbacks
+  onTableReady?: (table: Table<T>) => void
+
+  /**
+   * Icon overrides. Any omitted slot falls back to the default lucide-react icon.
+   */
+  icons?: DataGridIcons
+
+  /**
+   * Escape hatch for advanced TanStack Table options not exposed as individual props.
+   */
+  tableOptions?: PassthroughTableOptions<T>
+}
+
 export interface TableViewConfig<T extends object> {
   isLoading?: boolean
   emptyMessage?: string
@@ -203,34 +289,7 @@ export interface TableViewConfig<T extends object> {
   classNames?: DataGridClassNames
 }
 
-export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> {
-  data?: T[]
-  /**
-   * Map-based external store for real-time / high-frequency updates.
-   * Use with useDataStore() and table.applyTransaction().
-   * Mutually exclusive with the `data` prop — set one or the other.
-   */
-  dataStore?: DataStore<T>
-  columns: DataGridColumnDef<T>[]
-  error?: Error | null
-
-  // Sorting
-  enableSorting?: boolean
-  initialSorting?: SortingState
-  onSortingChange?: (sorting: SortingState) => void
-  manualSorting?: boolean
-
-  // Server-side filtering
-  /** Set true when filtering is handled server-side. Disables client-side getFilteredRowModel. */
-  manualFiltering?: boolean
-  columnFilters?: ColumnFiltersState
-  onColumnFiltersChange?: (filters: ColumnFiltersState) => void
-  globalFilter?: string
-  onGlobalFilterChange?: (value: string) => void
-  searchableColumns?: string[]
-  leftFilters?: (table: Table<T>) => React.ReactNode
-  rightFilters?: (table: Table<T>) => React.ReactNode
-
+export interface DataGridBaseProps<T extends object> extends GridKitCoreProps<T>, TableViewConfig<T> {
   // Column sizing & visibility
   /**
    * Initial column sizing state. When provided, these widths are used on mount
@@ -262,45 +321,12 @@ export interface DataGridBaseProps<T extends object> extends TableViewConfig<T> 
   // Selection
   checkboxConfig?: CheckboxConfig<T>
 
-  /**
-   * Return a stable unique string ID for each row.
-   * Defaults to row index — override this when your data has a natural ID field
-   * so that inline edits, selection, and detail rows target the correct record.
-   * @example getRowId={(row) => String(row.id)}
-   */
-  getRowId?: (originalRow: T, index: number) => string
-
-  // State persistence (Zustand)
-  tableKey?: string
-  /**
-   * Sync table state (pagination, search) to the in-memory Zustand store so it
-   * survives re-renders within the same session. Requires tableKey to be set.
-   * Note: in-memory only — does not persist across page reloads.
-   */
-  syncState?: boolean
-
   // Callbacks
-  onTableReady?: (table: Table<T>) => void
   onColumnSizingChange?: (sizing: ColumnSizingState) => void
   /** Called when the user drags a column header to a new position */
   onColumnOrderChange?: (order: string[]) => void
   /** Called when column pinning changes at runtime via the pin menu */
   onColumnPinningChange?: (pinning: ColumnPinningState) => void
-
-  /**
-   * Icon overrides. Any omitted slot falls back to the default lucide-react icon.
-   * @example
-   * icons={{ sortAsc: <MyArrowUp />, rowActions: <MyDotsIcon /> }}
-   */
-  icons?: DataGridIcons
-
-  /**
-   * Escape hatch for advanced TanStack Table options not exposed as individual props.
-   * Commonly used: `meta`, `autoResetPageIndex`, `autoResetColumnFilters`,
-   * `autoResetGlobalFilter`, `autoResetSorting`, `defaultColumn`, `debugTable`.
-   * Explicit DataGrid props always take precedence over values passed here.
-   */
-  tableOptions?: PassthroughTableOptions<T>
 }
 
 /**
@@ -336,12 +362,14 @@ export interface DataGridProps<T extends object> extends DataGridBaseProps<T> {
   pagination?: DataGridPaginationConfig
   /**
    * Render the footer area (e.g. pagination bar).
-   * Receives the live TanStack Table instance — same pattern as leftFilters/rightFilters.
+   * Receives the live TanStack Table instance — same pattern as function-valued header slots.
    * @example
    * footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
    */
   footer?: (table: Table<T>) => React.ReactNode
 }
+
+export type DataGridTableProps<T extends object> = DataGridProps<T>
 
 export interface DataGridDragProps<T extends object> extends DataGridBaseProps<T> {
   /** Required: stable unique id per data item — used to track row identity across reorders */
@@ -385,31 +413,7 @@ export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T
   rootMargin?: string
 }
 
-export interface DataGridListProps<T extends object>
-  extends Omit<
-    DataGridBaseProps<T>,
-    | 'showHeader'
-    | 'enableColumnResizing'
-    | 'enableColumnFilters'
-    | 'filterDisplay'
-    | 'bordered'
-    | 'enableColumnReordering'
-    | 'renderDetailRow'
-    | 'enableColumnPinning'
-    | 'onCellValueChange'
-    | 'tableWidthMode'
-    | 'rowHeight'
-    | 'estimateRowHeight'
-    | 'overscan'
-    | 'classNames'
-    | 'columnSizing'
-    | 'columnResizeMode'
-    | 'initialPinning'
-    | 'columnSizingMode'
-    | 'onColumnSizingChange'
-    | 'onColumnOrderChange'
-    | 'onColumnPinningChange'
-  > {
+export interface DataGridListProps<T extends object> extends GridKitCoreProps<T> {
   /** Render function for each list item. Receives the TanStack Row — use row.original for data. */
   renderItem: (row: Row<T>) => ReactNode
   /** Override the React key for each rendered item. Defaults to row.id. */
@@ -418,14 +422,6 @@ export interface DataGridListProps<T extends object>
   itemGap?: number
   /** Padding in px around the list body. Defaults to 0. */
   itemPadding?: number
-  /** Preferred name for the scroll/list container height. tableHeight is kept as a compatibility alias. */
-  containerHeight?: string | number | 'auto'
-  /** Compatibility alias for containerHeight. */
-  tableHeight?: string | number | 'auto'
-  /** Static content rendered on the left side of the shared toolbar area. */
-  headerLeft?: ReactNode
-  /** Static content rendered on the right side of the shared toolbar area. */
-  headerRight?: ReactNode
   /** Static footer content rendered below the list container. */
   footer?: ReactNode
   hasNextPage?: boolean
@@ -437,32 +433,7 @@ export interface DataGridListProps<T extends object>
   classNames?: DataGridListClassNames
 }
 
-export interface DataGridChatProps<T extends object>
-  extends Omit<
-    DataGridBaseProps<T>,
-    | 'showHeader'
-    | 'enableColumnResizing'
-    | 'enableColumnFilters'
-    | 'filterDisplay'
-    | 'bordered'
-    | 'enableColumnReordering'
-    | 'renderDetailRow'
-    | 'enableColumnPinning'
-    | 'onCellValueChange'
-    | 'tableWidthMode'
-    | 'rowHeight'
-    | 'estimateRowHeight'
-    | 'overscan'
-    | 'classNames'
-    | 'columnSizing'
-    | 'columnResizeMode'
-    | 'initialPinning'
-    | 'columnSizingMode'
-    | 'onColumnSizingChange'
-    | 'onColumnOrderChange'
-    | 'onColumnPinningChange'
-    | 'checkboxConfig'
-  > {
+export interface DataGridChatProps<T extends object> extends GridKitCoreProps<T> {
   /** Render function for each message row. Receives the TanStack Row — use row.original for data. */
   renderMessage: (row: Row<T>) => ReactNode
   renderDaySeparator?: (row: Row<T>, previousRow: Row<T> | undefined) => ReactNode
@@ -475,13 +446,6 @@ export interface DataGridChatProps<T extends object>
   stickToBottom?: boolean
   bottomThreshold?: number
   onAtBottomChange?: (atBottom: boolean) => void
-  containerHeight?: string | number | 'auto'
-  /** Compatibility alias for containerHeight. */
-  tableHeight?: string | number | 'auto'
-  /** Static content rendered on the left side of the shared toolbar area. */
-  headerLeft?: ReactNode
-  /** Static content rendered on the right side of the shared toolbar area. */
-  headerRight?: ReactNode
   /** Static footer content rendered below the chat container. */
   footer?: ReactNode
   classNames?: DataGridChatClassNames

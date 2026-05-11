@@ -3,7 +3,7 @@ import type { Table, Row } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { DataGridToolbar } from '@/core/DataGridToolbar'
 import { DataGridTableView } from '@/core/DataGridTableView'
-import type { TableViewConfig } from '@/types'
+import type { GridKitHeaderSlot, TableViewConfig } from '@/types'
 
 interface DataGridShellProps<T extends object> extends TableViewConfig<T> {
   wrapperRef: React.RefObject<HTMLDivElement | null>
@@ -13,8 +13,8 @@ interface DataGridShellProps<T extends object> extends TableViewConfig<T> {
   isSized: boolean
   measure: () => void
   error?: Error | null
-  leftFilters?: (table: Table<T>) => React.ReactNode
-  rightFilters?: (table: Table<T>) => React.ReactNode
+  headerLeft?: GridKitHeaderSlot<T>
+  headerRight?: GridKitHeaderSlot<T>
   loadMoreRef?: React.RefObject<HTMLDivElement | null>
   isFetchingNextPage?: boolean
   footer?: (table: Table<T>) => React.ReactNode
@@ -28,8 +28,8 @@ export function DataGridShell<T extends object>({
   isSized,
   measure,
   error,
-  leftFilters,
-  rightFilters,
+  headerLeft,
+  headerRight,
   loadMoreRef,
   isFetchingNextPage,
   footer,
@@ -41,7 +41,7 @@ export function DataGridShell<T extends object>({
 
   return (
     <div ref={wrapperRef} className="dg-shell">
-      <DataGridToolbar table={table} leftFilters={leftFilters} rightFilters={rightFilters} />
+      <DataGridToolbar table={table} headerLeft={headerLeft} headerRight={headerRight} />
 
       <div className={cn('dg-table-wrapper', !isSized && 'dg-table-wrapper--hidden')}>
         <DataGridTableView

@@ -118,7 +118,7 @@ export function AgentTraceTab() {
         getRowId={(e) => e.id}
         containerHeight={520}
         enableSorting={false}
-        leftFilters={(table) => (
+        headerLeft={(table) => (
           <>
             <SelectFilter table={table} columnId="type" label="Type" />
             <SelectFilter table={table} columnId="status" label="Status" />
