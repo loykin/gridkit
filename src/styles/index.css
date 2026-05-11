@@ -617,6 +617,15 @@
   padding: var(--dg-list-padding, 0px);
 }
 
+.dg-list-items[data-virtualized="true"] {
+  display: block;
+}
+
+.dg-list-virtual-spacer {
+  position: relative;
+  width: 100%;
+}
+
 .dg-list-item {
   min-width: 0;
 }

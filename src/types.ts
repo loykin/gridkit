@@ -422,6 +422,12 @@ export interface DataGridListProps<T extends object> extends GridKitCoreProps<T>
   itemGap?: number
   /** Padding in px around the list body. Defaults to 0. */
   itemPadding?: number
+  /** Enable item virtualization. Requires containerHeight or tableHeight to be fixed. */
+  enableVirtualization?: boolean
+  /** Estimated item height in px for list virtualization. Defaults to 48. */
+  estimateRowHeight?: number
+  /** Items to render outside the visible area when virtualized. Defaults to 10. */
+  overscan?: number
   /** Static footer content rendered below the list container. */
   footer?: ReactNode
   hasNextPage?: boolean

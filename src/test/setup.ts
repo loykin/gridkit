@@ -7,3 +7,18 @@ class ResizeObserverMock {
 }
 
 globalThis.ResizeObserver ??= ResizeObserverMock as typeof ResizeObserver
+
+class IntersectionObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords() {
+    return []
+  }
+  root = null
+  rootMargin = ''
+  thresholds = []
+}
+
+globalThis.IntersectionObserver ??=
+  IntersectionObserverMock as unknown as typeof IntersectionObserver

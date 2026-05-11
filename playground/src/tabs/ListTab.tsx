@@ -46,6 +46,9 @@ export function ListTab() {
         enableSorting
         containerHeight={560}
         itemGap={0}
+        enableVirtualization
+        estimateRowHeight={58}
+        overscan={6}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetching}
         fetchNextPage={fetchNextPage}

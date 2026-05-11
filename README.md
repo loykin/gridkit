@@ -149,7 +149,7 @@ const columns = useMemo<DataGridColumnDef<User>[]>(
 const data = useMemo(() => rowsFromQuery ?? [], [rowsFromQuery])
 ```
 
-For large table views, set a fixed `tableHeight` so virtualization can keep DOM work bounded to the visible rows plus overscan. `DataGridList` and `DataGridChat` are currently non-virtualized and are intended for moderate row counts until row virtualization is added.
+For large table views, set a fixed `tableHeight` so virtualization can keep DOM work bounded to the visible rows plus overscan. `DataGridList` also supports opt-in virtualization with `enableVirtualization` and a fixed `containerHeight`. `DataGridChat` is currently non-virtualized because prepend anchoring and bottom stickiness need stricter scroll handling.
 
 ---
 
@@ -322,6 +322,9 @@ export function EmployeeList() {
   data={data}
   columns={columns}
   renderItem={(row) => <InboxRow item={row.original} />}
+  containerHeight={600}
+  enableVirtualization
+  estimateRowHeight={56}
   hasNextPage={hasNextPage}
   isFetchingNextPage={isFetchingNextPage}
   fetchNextPage={fetchNextPage}
@@ -340,8 +343,11 @@ List views use the shared row/data/filtering props, but omit table-only options 
 | `itemPadding` | `number` | `0` | Padding in px around the list body |
 | `containerHeight` | `string \| number \| 'auto'` | `'auto'` | Preferred list container height |
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Compatibility alias for `containerHeight` |
-| `headerLeft` | `ReactNode` | — | Static content on the left side of the toolbar area |
-| `headerRight` | `ReactNode` | — | Static content on the right side of the toolbar area |
+| `enableVirtualization` | `boolean` | `false` | Render only the visible item window. Requires a fixed `containerHeight` or `tableHeight` |
+| `estimateRowHeight` | `number` | `48` | Estimated item height in px for virtualization |
+| `overscan` | `number` | `10` | Items rendered outside the visible window when virtualized |
+| `headerLeft` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the left. Function form receives the table instance |
+| `headerRight` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the right. Function form receives the table instance |
 | `footer` | `ReactNode` | — | Static content below the list |
 | `hasNextPage` | `boolean` | — | Whether more pages exist |
 | `isFetchingNextPage` | `boolean` | — | Show loading indicator at the bottom |

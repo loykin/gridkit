@@ -1,5 +1,6 @@
 import type React from 'react'
 import type { Row, Table } from '@tanstack/react-table'
+import type { Virtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { GridKitShell } from '@/core/GridKitShell'
@@ -30,6 +31,11 @@ interface DataGridListViewProps<T extends object>
   table: Table<T>
   rows: Row<T>[]
   loadMoreRef?: React.RefObject<HTMLDivElement | null>
+  virtual?: boolean
+  rowVirtualizer?: Virtualizer<HTMLElement, Element>
+  virtualEstimateSize?: number
+  virtualInitialHeight?: number
+  virtualOverscan?: number
 }
 
 export function DataGridListView<T extends object>({
@@ -54,12 +60,39 @@ export function DataGridListView<T extends object>({
   onRowClick,
   rowCursor,
   classNames,
+  virtual,
+  rowVirtualizer,
+  virtualEstimateSize = 48,
+  virtualInitialHeight = 480,
+  virtualOverscan = 10,
 }: DataGridListViewProps<T>) {
   const icons = useIcons()
   const listStyle = {
     '--dg-list-gap': `${itemGap}px`,
     '--dg-list-padding': `${itemPadding}px`,
   } as React.CSSProperties
+
+  const renderItemWrapper = (
+    row: Row<T>,
+    style?: React.CSSProperties,
+    measureRef?: (node: Element | null) => void,
+    dataIndex?: number,
+  ) => (
+    <div
+      key={itemKey?.(row) ?? row.id}
+      ref={measureRef}
+      data-index={dataIndex}
+      className={cn(
+        'dg-list-item',
+        rowCursor && onRowClick && 'dg-list-item--clickable',
+        classNames?.item,
+      )}
+      style={style}
+      onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+    >
+      {renderItem(row)}
+    </div>
+  )
 
   const renderContent = () => {
     if (isLoading) {
@@ -82,21 +115,52 @@ export function DataGridListView<T extends object>({
       )
     }
 
+    if (virtual && rowVirtualizer) {
+      const virtualItems = rowVirtualizer.getVirtualItems()
+      const fallbackCount = Math.min(
+        rows.length,
+        Math.ceil(virtualInitialHeight / virtualEstimateSize) + virtualOverscan,
+      )
+      const itemEntries = virtualItems.length > 0
+        ? virtualItems.map((virtualRow) => ({
+            index: virtualRow.index,
+            start: virtualRow.start,
+            measureRef: rowVirtualizer.measureElement,
+          }))
+        : Array.from({ length: fallbackCount }, (_, index) => ({
+            index,
+            start: index * virtualEstimateSize,
+            measureRef: rowVirtualizer.measureElement,
+          }))
+
+      return (
+        <div className="dg-list-items" style={listStyle} data-virtualized="true">
+          <div
+            className="dg-list-virtual-spacer"
+            style={{ height: rowVirtualizer.getTotalSize() || rows.length * virtualEstimateSize }}
+          >
+            {itemEntries.map((virtualRow) => {
+              const row = rows[virtualRow.index]!
+              return renderItemWrapper(
+                row,
+                {
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  transform: `translateY(${virtualRow.start}px)`,
+                },
+                virtualRow.measureRef,
+                virtualRow.index,
+              )
+            })}
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="dg-list-items" style={listStyle}>
-        {rows.map((row) => (
-          <div
-            key={itemKey?.(row) ?? row.id}
-            className={cn(
-              'dg-list-item',
-              rowCursor && onRowClick && 'dg-list-item--clickable',
-              classNames?.item,
-            )}
-            onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-          >
-            {renderItem(row)}
-          </div>
-        ))}
+        {rows.map((row) => renderItemWrapper(row))}
       </div>
     )
   }
