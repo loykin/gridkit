@@ -2,7 +2,7 @@ import React from 'react'
 import type { Row, Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
-import { DataGridToolbar } from '@/core/DataGridToolbar'
+import { GridKitShell } from '@/core/GridKitShell'
 import type { DataGridCardProps } from '@/types'
 
 interface DataGridCardViewProps<T extends object>
@@ -101,18 +101,21 @@ export function DataGridCardView<T extends object>({
   }
 
   return (
-    <div ref={wrapperRef} className="dg-shell">
-      <DataGridToolbar table={table} headerLeft={headerLeft} headerRight={headerRight} />
+    <GridKitShell
+      wrapperRef={wrapperRef}
+      containerRef={containerRef}
+      table={table}
+      headerLeft={headerLeft}
+      headerRight={headerRight}
+      containerClassName={cn('dg-card-container', classNames?.container)}
+    >
+      {renderContent()}
 
-      <div ref={containerRef} className={cn('dg-card-container', classNames?.container)}>
-        {renderContent()}
-
-        {loadMoreRef && (
-          <div ref={loadMoreRef} style={{ padding: '8px 0', display: 'flex', justifyContent: 'center' }}>
-            {isFetchingNextPage && icons.loading}
-          </div>
-        )}
-      </div>
-    </div>
+      {loadMoreRef && (
+        <div ref={loadMoreRef} className="dg-card-load-more">
+          {isFetchingNextPage && icons.loading}
+        </div>
+      )}
+    </GridKitShell>
   )
 }

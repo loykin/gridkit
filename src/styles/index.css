@@ -594,6 +594,12 @@
   cursor: pointer;
 }
 
+.dg-card-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
 /* ── List View ─────────────────────────────────────────────────────────────── */
 .dg-list-container {
   width: 100%;
@@ -607,6 +613,8 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  gap: var(--dg-list-gap, 0px);
+  padding: var(--dg-list-padding, 0px);
 }
 
 .dg-list-item {

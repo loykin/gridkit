@@ -56,7 +56,10 @@ export function DataGridListView<T extends object>({
   classNames,
 }: DataGridListViewProps<T>) {
   const icons = useIcons()
-  const listStyle: React.CSSProperties = { gap: itemGap, padding: itemPadding }
+  const listStyle = {
+    '--dg-list-gap': `${itemGap}px`,
+    '--dg-list-padding': `${itemPadding}px`,
+  } as React.CSSProperties
 
   const renderContent = () => {
     if (isLoading) {

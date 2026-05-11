@@ -1,7 +1,7 @@
 import type React from 'react'
 import type { Table, Row } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
-import { DataGridToolbar } from '@/core/DataGridToolbar'
+import { GridKitShell } from '@/core/GridKitShell'
 import { DataGridTableView } from '@/core/DataGridTableView'
 import type { GridKitHeaderSlot, TableViewConfig } from '@/types'
 
@@ -40,22 +40,23 @@ export function DataGridShell<T extends object>({
   }
 
   return (
-    <div ref={wrapperRef} className="dg-shell">
-      <DataGridToolbar table={table} headerLeft={headerLeft} headerRight={headerRight} />
-
-      <div className={cn('dg-table-wrapper', !isSized && 'dg-table-wrapper--hidden')}>
-        <DataGridTableView
-          table={table}
-          rows={rows}
-          containerRef={containerRef}
-          loadMoreRef={loadMoreRef}
-          isFetchingNextPage={isFetchingNextPage}
-          onMeasureColumns={measure}
-          {...viewConfig}
-        />
-      </div>
-
-      {footer?.(table)}
-    </div>
+    <GridKitShell
+      wrapperRef={wrapperRef}
+      table={table}
+      headerLeft={headerLeft}
+      headerRight={headerRight}
+      containerClassName={cn('dg-table-wrapper', !isSized && 'dg-table-wrapper--hidden')}
+      footer={footer?.(table)}
+    >
+      <DataGridTableView
+        table={table}
+        rows={rows}
+        containerRef={containerRef}
+        loadMoreRef={loadMoreRef}
+        isFetchingNextPage={isFetchingNextPage}
+        onMeasureColumns={measure}
+        {...viewConfig}
+      />
+    </GridKitShell>
   )
 }

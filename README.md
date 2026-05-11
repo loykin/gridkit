@@ -133,6 +133,26 @@ export function MyTable() {
 
 ---
 
+## Performance
+
+Keep `data` and `columns` references stable when the values are derived during render. TanStack Table recalculates row models when these references change, and sorting/filtering operate over the full row set even when the DOM is virtualized.
+
+```tsx
+const columns = useMemo<DataGridColumnDef<User>[]>(
+  () => [
+    { accessorKey: 'name' },
+    { accessorKey: 'status', meta: { filterType: 'select' } },
+  ],
+  [],
+)
+
+const data = useMemo(() => rowsFromQuery ?? [], [rowsFromQuery])
+```
+
+For large table views, set a fixed `tableHeight` so virtualization can keep DOM work bounded to the visible rows plus overscan. `DataGridList` and `DataGridChat` are currently non-virtualized and are intended for moderate row counts until row virtualization is added.
+
+---
+
 ## Pagination
 
 Pagination is opt-in. The `pagination` prop activates TanStack Table's pagination logic; the UI is injected separately so you can place it anywhere.
@@ -328,6 +348,13 @@ List views use the shared row/data/filtering props, but omit table-only options 
 | `fetchNextPage` | `() => void` | — | Called when the sentinel enters the viewport |
 | `rootMargin` | `string` | `'100px'` | IntersectionObserver `rootMargin` for early trigger |
 | `classNames` | `DataGridListClassNames` | — | Slot-based class injection for list elements |
+
+### List CSS variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `--dg-list-gap` | `0px` | Gap between list items |
+| `--dg-list-padding` | `0px` | Padding around the list body |
 
 ---
 

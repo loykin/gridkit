@@ -16,7 +16,7 @@ export function resolveContainerHeight(
 
 interface GridKitShellProps<T extends object> {
   wrapperRef: React.RefObject<HTMLDivElement | null>
-  containerRef: React.RefObject<HTMLDivElement | null>
+  containerRef?: React.RefObject<HTMLDivElement | null>
   table: Table<T>
   headerLeft?: GridKitHeaderSlot<T>
   headerRight?: GridKitHeaderSlot<T>
