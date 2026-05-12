@@ -31,7 +31,7 @@ function generateLog(): LogEntry {
   const msgs = MESSAGES[level]
   return {
     id: String(++seq),
-    timestamp: new Date().toISOString().slice(11, 23),
+    timestamp: new Date().toISOString().slice(0, 19),
     level,
     pod: PODS[Math.floor(Math.random() * PODS.length)]!,
     message: msgs[Math.floor(Math.random() * msgs.length)]!,
@@ -48,7 +48,12 @@ const LEVEL_STYLE: Record<LogEntry['level'], string> = {
 }
 
 const columns: DataGridColumnDef<LogEntry>[] = [
-  { accessorKey: 'timestamp', header: 'Time', meta: { width: 110 } },
+  {
+    accessorKey: 'timestamp',
+    header: 'Time',
+    meta: { width: 180, filterType: 'datetime-range' },
+    cell: ({ row }) => row.original.timestamp.replace('T', ' '),
+  },
   {
     accessorKey: 'level',
     header: 'Level',
@@ -143,6 +148,8 @@ export function LogStreamTab() {
         dataStore={store}
         columns={columns}
         enableSorting={false}
+        enableColumnFilters
+        filterDisplay="icon"
         tableHeight={500}
         emptyMessage="Waiting for logs..."
         tableKey="log-stream"

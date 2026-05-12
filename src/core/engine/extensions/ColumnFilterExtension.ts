@@ -10,9 +10,24 @@ declare module '@tanstack/react-table' {
      * - 'select'       : dropdown of unique values from current data
      * - 'multi-select' : multiple values dropdown
      * - 'number'       : numeric range (min / max)
+     * - 'date'         : exact date match
+     * - 'date-range'   : date range (start / end)
+     * - 'datetime'     : exact date-time match
+     * - 'datetime-range': date-time range (start / end)
+     * - 'custom'       : use a registered customFilterComponents entry
      * - false          : disable filter for this column
      */
-    filterType?: 'text' | 'select' | 'multi-select' | 'number' | false
+    filterType?:
+      | 'text'
+      | 'select'
+      | 'multi-select'
+      | 'number'
+      | 'date'
+      | 'date-range'
+      | 'datetime'
+      | 'datetime-range'
+      | 'custom'
+      | false
   }
 }
 

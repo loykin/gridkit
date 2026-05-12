@@ -7,13 +7,16 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { SelectFilterCell } from './SelectFilterCell'
 import { MultiSelectContent } from './MultiSelectContent'
 import { NumberRangeFilterContent } from './NumberRangeFilterContent'
+import { DateFilterContent } from './DateFilterContent'
+import type { CustomFilterComponents } from '@/types'
 
 interface Props<T extends object> {
   col: Column<T>
   table: Table<T>
+  customFilterComponents?: CustomFilterComponents<T>
 }
 
-export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) {
+export function HeaderFilterPopover<T extends object>({ col, table, customFilterComponents }: Props<T>) {
   const [open, setOpen] = useState(false)
   const icons = useIcons()
   // Stable ref callback — an inline arrow would create a new reference on every render,
@@ -27,6 +30,8 @@ export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) 
 
   const hasFilter = col.getIsFiltered()
   const filterValue = (col.getFilterValue() ?? '') as string
+  const CustomFilter = customFilterComponents?.[ft]
+  const popoverWidth = ft === 'datetime' || ft === 'datetime-range' ? 280 : 192
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -43,13 +48,23 @@ export function HeaderFilterPopover<T extends object>({ col, table }: Props<T>) 
             </Button>
           )}
         />
-        <PopoverContent side="bottom" align="start" style={{ width: 192 }}>
-          {ft === 'select' ? (
+        <PopoverContent side="bottom" align="start" style={{ width: popoverWidth }}>
+          {CustomFilter ? (
+            <CustomFilter
+              column={col}
+              table={table}
+              value={col.getFilterValue()}
+              onChange={(value) => col.setFilterValue(value)}
+              close={() => setOpen(false)}
+            />
+          ) : ft === 'select' ? (
             <SelectFilterCell col={col} table={table} onSelect={() => setOpen(false)} />
           ) : ft === 'multi-select' ? (
             <MultiSelectContent col={col} table={table} />
           ) : ft === 'number' ? (
             <NumberRangeFilterContent col={col} />
+          ) : ft === 'date' || ft === 'date-range' || ft === 'datetime' || ft === 'datetime-range' ? (
+            <DateFilterContent col={col} mode={ft} />
           ) : (
             <div style={{ position: 'relative' }}>
               <Input

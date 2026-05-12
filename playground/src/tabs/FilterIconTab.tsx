@@ -17,7 +17,7 @@ const columns: DataGridColumnDef<Employee>[] = [
     meta: { flex: 1, align: 'right', filterType: 'number' },
     cell: ({ row }) => `$${row.original.salary.toLocaleString()}`,
   },
-  { accessorKey: 'startDate', header: 'Start Date', meta: { flex: 1, filterType: 'text' } },
+  { accessorKey: 'startDate', header: 'Start Date', meta: { flex: 1, filterType: 'date-range' } },
   {
     accessorKey: 'score',
     header: 'Score',
@@ -31,7 +31,7 @@ export function FilterIconTab() {
       <section className="flex flex-col gap-2">
         <p className="text-sm font-medium">filterDisplay=&quot;row&quot; (default)</p>
         <p className="text-xs text-muted-foreground">
-          text · select · multi-select · number — dedicated filter row below the header
+          text · select · multi-select · number · date-range — dedicated filter row below the header
         </p>
         <DataGrid
           data={SMALL_DATA}
@@ -49,7 +49,7 @@ export function FilterIconTab() {
       <section className="flex flex-col gap-2">
         <p className="text-sm font-medium">filterDisplay=&quot;icon&quot;</p>
         <p className="text-xs text-muted-foreground">
-          text · select · multi-select · number — filter popover on header cell icon click
+          text · select · multi-select · number · date-range — filter popover on header cell icon click
         </p>
         <DataGrid
           data={SMALL_DATA}

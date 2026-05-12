@@ -5,11 +5,13 @@ import type {
   ColumnFiltersState,
   ColumnPinningState,
   ColumnSizingState,
+  Column,
   Row,
   SortingState,
   Table,
   TableOptions,
   VisibilityState,
+  PaginationState,
 } from '@tanstack/react-table'
 import type { DataStore } from './core/engine/DataStore'
 
@@ -158,6 +160,48 @@ export interface GridKitTableContext<T extends object> extends GridKitRowsContex
   table: Table<T>
 }
 
+export interface CustomFilterProps<T extends object> {
+  column: Column<T, unknown>
+  table: Table<T>
+  value: unknown
+  onChange: (value: unknown) => void
+  close?: () => void
+}
+
+export type CustomFilterComponents<T extends object> = Record<
+  string,
+  React.ComponentType<CustomFilterProps<T>>
+>
+
+export type GridKitPersistedStateKey =
+  | 'columnSizing'
+  | 'columnOrder'
+  | 'columnPinning'
+  | 'columnVisibility'
+  | 'sorting'
+  | 'columnFilters'
+  | 'globalFilter'
+  | 'pageSize'
+
+export interface GridKitPersistedState {
+  columnSizing?: ColumnSizingState
+  columnOrder?: string[]
+  columnPinning?: ColumnPinningState
+  columnVisibility?: VisibilityState
+  sorting?: SortingState
+  columnFilters?: ColumnFiltersState
+  globalFilter?: string
+  pageSize?: number
+  pagination?: Partial<PaginationState>
+}
+
+export interface GridKitStatePersistence {
+  load?: (tableKey: string) => Promise<Partial<GridKitPersistedState> | null | undefined> | Partial<GridKitPersistedState> | null | undefined
+  save: (tableKey: string, state: Partial<GridKitPersistedState>) => Promise<void> | void
+  debounce?: number
+  include?: GridKitPersistedStateKey[]
+}
+
 export interface GridKitCoreProps<T extends object> {
   data?: T[]
   /**
@@ -179,6 +223,10 @@ export interface GridKitCoreProps<T extends object> {
 
   // Sorting
   enableSorting?: boolean
+  /** Enable Shift+click multi-column sorting. Defaults to false. */
+  enableMultiSort?: boolean
+  /** Maximum number of columns that can be sorted at once when multi-sort is enabled. */
+  maxMultiSortColCount?: number
   initialSorting?: SortingState
   onSortingChange?: (sorting: SortingState) => void
   manualSorting?: boolean
@@ -214,6 +262,11 @@ export interface GridKitCoreProps<T extends object> {
    * survives re-renders within the same session. Requires tableKey to be set.
    */
   syncState?: boolean
+  /**
+   * Persist user grid preferences to an external adapter such as localStorage
+   * or a backend API. Requires tableKey to be set.
+   */
+  statePersistence?: GridKitStatePersistence
 
   // Callbacks
   onTableReady?: (table: Table<T>) => void
@@ -244,6 +297,11 @@ export interface TableViewConfig<T extends object> {
   enableColumnResizing?: boolean
   /** Show per-column filter row below the header (AG Grid style) */
   enableColumnFilters?: boolean
+  /**
+   * Register custom filter UIs by filterType. Built-in filterFns still run
+   * unless the column supplies its own filterFn.
+   */
+  customFilterComponents?: CustomFilterComponents<T>
   /**
    * Controls how column filters are displayed when enableColumnFilters=true.
    * - 'row' (default): dedicated filter row below the header

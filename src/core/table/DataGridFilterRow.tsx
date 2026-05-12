@@ -9,8 +9,9 @@ import { colStyle } from './tableUtils'
 import { SelectFilterCell } from '@/core/filters/SelectFilterCell'
 import { MultiSelectFilterCell } from '@/core/filters/MultiSelectFilterCell'
 import { NumberFilterPopover } from '@/core/filters/NumberFilterPopover'
+import { DateFilterContent } from '@/core/filters/DateFilterContent'
 
-interface DataGridFilterRowProps<T extends object> extends Pick<TableViewConfig<T>, 'bordered'> {
+interface DataGridFilterRowProps<T extends object> extends Pick<TableViewConfig<T>, 'bordered' | 'customFilterComponents'> {
   visibleLeafColumns: Column<T>[]
   table: Table<T>
   virtual: boolean
@@ -23,6 +24,7 @@ export function DataGridFilterRow<T extends object>({
   virtual,
   bordered,
   tableWidthMode = 'spacer',
+  customFilterComponents,
 }: DataGridFilterRowProps<T>) {
   const icons = useIcons()
   return (
@@ -33,6 +35,7 @@ export function DataGridFilterRow<T extends object>({
     >
       {visibleLeafColumns.map((col) => {
         const ft = col.columnDef.meta?.filterType
+        const CustomFilter = ft ? customFilterComponents?.[ft] : undefined
         const filterValue = (col.getFilterValue() ?? '') as string
         const cellStyle: CSSProperties = virtual
           ? { display: 'flex', alignItems: 'center', width: col.getSize() }
@@ -62,12 +65,21 @@ export function DataGridFilterRow<T extends object>({
             )}
             style={cellStyle}
           >
-            {ft === 'select' ? (
+            {CustomFilter ? (
+              <CustomFilter
+                column={col}
+                table={table}
+                value={col.getFilterValue()}
+                onChange={(value) => col.setFilterValue(value)}
+              />
+            ) : ft === 'select' ? (
               <SelectFilterCell col={col} table={table} />
             ) : ft === 'multi-select' ? (
               <MultiSelectFilterCell col={col} table={table} />
             ) : ft === 'number' ? (
               <NumberFilterPopover col={col} />
+            ) : ft === 'date' || ft === 'date-range' || ft === 'datetime' || ft === 'datetime-range' ? (
+              <DateFilterContent col={col} mode={ft} />
             ) : (
               <div style={{ position: 'relative', width: '100%' }}>
                 <Input

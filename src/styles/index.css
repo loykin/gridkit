@@ -329,6 +329,14 @@
 .dg-header-cell[data-sortable="true"] {
   cursor: pointer;
 }
+.dg-header-cell[data-header-group="true"] {
+  justify-content: center;
+  color: var(--dg-foreground);
+  font-weight: 600;
+}
+.dg-header-cell[data-placeholder="true"] {
+  pointer-events: none;
+}
 .dg-header-cell[data-pinned="left"]  { box-shadow: 1px 0 0 0 var(--dg-border); }
 .dg-header-cell[data-pinned="right"] { box-shadow: -1px 0 0 0 var(--dg-border); }
 .dg-header-cell[data-bordered="true"] { border-right: 1px solid var(--dg-border); }
@@ -340,6 +348,12 @@
   min-width: 0;
   overflow: hidden;
   flex: 1;
+}
+.dg-header-cell-content[data-reorder-handle="true"] {
+  cursor: grab;
+}
+.dg-header-cell-content[data-reorder-handle="true"]:active {
+  cursor: grabbing;
 }
 
 .dg-sort-icon {

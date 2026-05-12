@@ -28,6 +28,8 @@ import { ListTab } from './tabs/ListTab'
 import { ChatTab } from './tabs/ChatTab'
 import { AgentTraceTab } from './tabs/AgentTraceTab'
 import { EvalReviewTab } from './tabs/EvalReviewTab'
+import { HeaderGroupsTab } from './tabs/HeaderGroupsTab'
+import { StatePersistenceTab } from './tabs/StatePersistenceTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
@@ -51,6 +53,8 @@ const TABS = [
   { id: 'empty-state', label: 'Empty State', content: <EmptyStateTab /> },
   { id: 'icons', label: 'Custom Icons', content: <IconsTab /> },
   { id: 'column-reorder', label: 'Column Reorder', content: <ColumnReorderTab /> },
+  { id: 'header-groups', label: 'Header Groups', content: <HeaderGroupsTab /> },
+  { id: 'state-persistence', label: 'State Persistence', content: <StatePersistenceTab /> },
   { id: 'master-detail', label: 'Master-Detail', content: <MasterDetailTab /> },
   { id: 'column-pinning', label: 'Column Pinning UI', content: <ColumnPinningTab /> },
   { id: 'inline-edit', label: 'Inline Edit', content: <InlineEditTab /> },

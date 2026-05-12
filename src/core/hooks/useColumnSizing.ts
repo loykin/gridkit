@@ -15,6 +15,15 @@ interface SizingState {
   isSized: boolean
 }
 
+function getLeafColumnDefs<T extends object>(
+  columns: DataGridColumnDef<T>[],
+): DataGridColumnDef<T>[] {
+  return columns.flatMap((col) => {
+    const childColumns = (col as { columns?: DataGridColumnDef<T>[] }).columns
+    return childColumns?.length ? getLeafColumnDefs(childColumns) : [col]
+  })
+}
+
 /**
  * Row count threshold above which the virtualizer is automatically enabled,
  * when the table has a fixed height (tableHeight is set).
@@ -49,7 +58,13 @@ export function useColumnSizing<T extends object>({
     (updater) => {
       setState((prev) => ({
         ...prev,
-        sizing: typeof updater === 'function' ? updater(prev.sizing) : updater,
+        sizing: (() => {
+          const next = typeof updater === 'function' ? updater(prev.sizing) : updater
+          for (const colId of Object.keys(next)) {
+            userResized.current.add(colId)
+          }
+          return next
+        })(),
       }))
     },
     [],
@@ -83,7 +98,7 @@ export function useColumnSizing<T extends object>({
     const prevContainerWidth = lastContainerWidth.current
     lastContainerWidth.current = containerWidth
 
-    const cols = columnsRef.current
+    const cols = getLeafColumnDefs(columnsRef.current)
     const currentSizing = sizingRef.current
     const m = modeRef.current
 

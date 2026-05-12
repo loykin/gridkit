@@ -16,13 +16,28 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import type { DataGridBaseProps, DataGridColumnDef, DataGridPaginationConfig } from '@/types'
+import type {
+  DataGridBaseProps,
+  DataGridColumnDef,
+  DataGridPaginationConfig,
+  GridKitPersistedState,
+  GridKitPersistedStateKey,
+} from '@/types'
 import { useTableStore } from '@/core/hooks/useTableStore'
 import { gridKitFeatures, getDataStoreCoreRowModel } from '@/core/engine/gridKitFeatures'
 
 // Stable no-op fallbacks for useSyncExternalStore when dataStore is absent
 const _noopSubscribe = (_listener: () => void) => () => {}
 const _noopGetVersion = () => 0
+
+const DEFAULT_PERSISTED_STATE_KEYS: GridKitPersistedStateKey[] = [
+  'columnSizing',
+  'columnOrder',
+  'columnPinning',
+  'columnVisibility',
+  'sorting',
+  'pageSize',
+]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const defaultGlobalFilterFn: FilterFn<any> = (row, columnId, value: string) =>
@@ -47,11 +62,80 @@ const betweenFilterFn: FilterFn<any> = (row, columnId, value: [string, string]) 
 }
 betweenFilterFn.autoRemove = (val: [string, string]) => !val || (val[0] === '' && val[1] === '')
 
+function toDateKey(value: unknown): string {
+  if (value instanceof Date) return value.toISOString().slice(0, 10)
+  const raw = String(value ?? '')
+  const isoDate = /^\d{4}-\d{2}-\d{2}/.exec(raw)
+  if (isoDate) return isoDate[0]
+  const time = Date.parse(raw)
+  return Number.isNaN(time) ? '' : new Date(time).toISOString().slice(0, 10)
+}
+
+function toDateTimeMs(value: unknown): number | undefined {
+  if (value instanceof Date) {
+    const time = value.getTime()
+    return Number.isNaN(time) ? undefined : time
+  }
+  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined
+
+  const raw = String(value ?? '').trim()
+  if (!raw) return undefined
+
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(raw)
+    ? raw.replace(' ', 'T')
+    : raw
+  const time = Date.parse(normalized)
+  return Number.isNaN(time) ? undefined : time
+}
+
+/** Used for meta.filterType === 'date' — exact date match */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dateFilterFn: FilterFn<any> = (row, columnId, value: string) => {
+  if (!value) return true
+  return toDateKey(row.getValue(columnId)) === value
+}
+dateFilterFn.autoRemove = (val: string) => !val
+
+/** Used for meta.filterType === 'date-range' — inclusive [start, end] date range */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dateRangeFilterFn: FilterFn<any> = (row, columnId, value: [string, string]) => {
+  const [start, end] = value
+  if (!start && !end) return true
+  const current = toDateKey(row.getValue(columnId))
+  if (!current) return false
+  return (!start || current >= start) && (!end || current <= end)
+}
+dateRangeFilterFn.autoRemove = (val: [string, string]) => !val || (val[0] === '' && val[1] === '')
+
+/** Used for meta.filterType === 'datetime' — exact date-time match */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dateTimeFilterFn: FilterFn<any> = (row, columnId, value: string) => {
+  const target = toDateTimeMs(value)
+  const current = toDateTimeMs(row.getValue(columnId))
+  return target === undefined || current === target
+}
+dateTimeFilterFn.autoRemove = (val: string) => !val
+
+/** Used for meta.filterType === 'datetime-range' — inclusive [start, end] range */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dateTimeRangeFilterFn: FilterFn<any> = (row, columnId, value: [string, string]) => {
+  const [startValue, endValue] = value
+  const start = toDateTimeMs(startValue)
+  const end = toDateTimeMs(endValue)
+  if (start === undefined && end === undefined) return true
+  const current = toDateTimeMs(row.getValue(columnId))
+  if (current === undefined) return false
+  return (start === undefined || current >= start) && (end === undefined || current <= end)
+}
+dateTimeRangeFilterFn.autoRemove = (val: [string, string]) => !val || (val[0] === '' && val[1] === '')
+
 interface UseDataGridCoreOptions<T extends object> extends Pick<
   DataGridBaseProps<T>,
   | 'data'
   | 'dataStore'
   | 'enableSorting'
+  | 'enableMultiSort'
+  | 'maxMultiSortColCount'
   | 'initialSorting'
   | 'onSortingChange'
   | 'manualSorting'
@@ -68,6 +152,7 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'initialPinning'
   | 'tableKey'
   | 'syncState'
+  | 'statePersistence'
   | 'onTableReady'
   | 'onColumnSizingChange'
   | 'enableExpanding'
@@ -90,6 +175,8 @@ export function useDataGridCore<T extends object>({
   dataStore,
   columns,
   enableSorting = true,
+  enableMultiSort = false,
+  maxMultiSortColCount = 3,
   initialSorting,
   onSortingChange,
   manualSorting = false,
@@ -106,6 +193,7 @@ export function useDataGridCore<T extends object>({
   initialPinning,
   tableKey,
   syncState = false,
+  statePersistence,
   pagination,
   onTableReady,
   onColumnSizingChange,
@@ -151,6 +239,13 @@ export function useDataGridCore<T extends object>({
   })
 
   const tableReadyCalled = useRef(false)
+  const persistenceReadyRef = useRef(false)
+  const persistenceSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const persistenceKeys = statePersistence?.include ?? DEFAULT_PERSISTED_STATE_KEYS
+  const shouldPersist = useCallback(
+    (key: GridKitPersistedStateKey) => persistenceKeys.includes(key),
+    [persistenceKeys],
+  )
 
   // Register for state persistence
   useEffect(() => {
@@ -163,6 +258,74 @@ export function useDataGridCore<T extends object>({
       })
     }
   }, [tableKey, syncState, register, pagination])
+
+  useEffect(() => {
+    if (!tableKey || !statePersistence) {
+      persistenceReadyRef.current = false
+      return
+    }
+
+    let cancelled = false
+    persistenceReadyRef.current = false
+
+    Promise.resolve(statePersistence.load?.(tableKey))
+      .then((loaded) => {
+        if (cancelled) return
+        if (!loaded) {
+          persistenceReadyRef.current = true
+          return
+        }
+
+        if (shouldPersist('columnSizing') && loaded.columnSizing) {
+          setSizing(loaded.columnSizing)
+        }
+        if (shouldPersist('columnOrder') && loaded.columnOrder) {
+          setColumnOrder(loaded.columnOrder)
+        }
+        if (shouldPersist('columnPinning') && loaded.columnPinning) {
+          setColumnPinning(loaded.columnPinning)
+        }
+        if (shouldPersist('columnVisibility') && loaded.columnVisibility) {
+          setColumnVisibility(loaded.columnVisibility)
+        }
+        if (shouldPersist('sorting') && loaded.sorting) {
+          setSorting(loaded.sorting)
+          onSortingChange?.(loaded.sorting)
+        }
+        if (shouldPersist('columnFilters') && loaded.columnFilters && externalColumnFilters === undefined) {
+          setInternalFilters(loaded.columnFilters)
+          onColumnFiltersChange?.(loaded.columnFilters)
+        }
+        if (shouldPersist('globalFilter') && loaded.globalFilter !== undefined && externalGlobalFilter === undefined) {
+          setInternalGlobal(loaded.globalFilter)
+          onGlobalFilterChange?.(loaded.globalFilter)
+        }
+        const loadedPageSize = loaded.pageSize ?? loaded.pagination?.pageSize
+        if (shouldPersist('pageSize') && loadedPageSize && enablePagination) {
+          setPaginationState((prev) => ({ ...prev, pageIndex: 0, pageSize: loadedPageSize }))
+        }
+
+        persistenceReadyRef.current = true
+      })
+      .catch(() => {
+        if (!cancelled) persistenceReadyRef.current = true
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [
+    tableKey,
+    statePersistence,
+    shouldPersist,
+    setSizing,
+    onSortingChange,
+    onColumnFiltersChange,
+    onGlobalFilterChange,
+    externalColumnFilters,
+    externalGlobalFilter,
+    enablePagination,
+  ])
 
   const effectiveGlobalFilter = externalGlobalFilter ?? internalGlobal
   const effectiveColumnFilters = externalColumnFilters ?? internalFilters
@@ -185,16 +348,36 @@ export function useDataGridCore<T extends object>({
 
   // Inject filterFn into columns that declare meta.filterType
   const enrichedColumns = useMemo(
-    () =>
-      columns.map((col) => {
+    () => {
+      const enrichColumn = (col: DataGridColumnDef<T>): DataGridColumnDef<T> => {
+        const childColumns = (col as { columns?: DataGridColumnDef<T>[] }).columns
+        const withChildren = childColumns
+          ? { ...col, columns: childColumns.map(enrichColumn) }
+          : col
+
         if (col.meta?.filterType === 'number' && !col.filterFn) {
-          return { ...col, filterFn: betweenFilterFn as FilterFn<T> }
+          return { ...withChildren, filterFn: betweenFilterFn as FilterFn<T> }
         }
         if (col.meta?.filterType === 'multi-select' && !col.filterFn) {
-          return { ...col, filterFn: multiSelectFilterFn as FilterFn<T> }
+          return { ...withChildren, filterFn: multiSelectFilterFn as FilterFn<T> }
         }
-        return col
-      }),
+        if (col.meta?.filterType === 'date' && !col.filterFn) {
+          return { ...withChildren, filterFn: dateFilterFn as FilterFn<T> }
+        }
+        if (col.meta?.filterType === 'date-range' && !col.filterFn) {
+          return { ...withChildren, filterFn: dateRangeFilterFn as FilterFn<T> }
+        }
+        if (col.meta?.filterType === 'datetime' && !col.filterFn) {
+          return { ...withChildren, filterFn: dateTimeFilterFn as FilterFn<T> }
+        }
+        if (col.meta?.filterType === 'datetime-range' && !col.filterFn) {
+          return { ...withChildren, filterFn: dateTimeRangeFilterFn as FilterFn<T> }
+        }
+        return withChildren
+      }
+
+      return columns.map(enrichColumn)
+    },
     [columns],
   )
 
@@ -317,8 +500,46 @@ export function useDataGridCore<T extends object>({
     enableColumnResizing,
     columnResizeMode,
     enableSorting,
+    enableMultiSort,
+    maxMultiSortColCount,
     enableColumnFilters,
   })
+
+  useEffect(() => {
+    if (!tableKey || !statePersistence || !persistenceReadyRef.current) return
+
+    const nextState: Partial<GridKitPersistedState> = {}
+    if (shouldPersist('columnSizing')) nextState.columnSizing = sizing
+    if (shouldPersist('columnOrder')) nextState.columnOrder = columnOrder
+    if (shouldPersist('columnPinning')) nextState.columnPinning = columnPinning
+    if (shouldPersist('columnVisibility')) nextState.columnVisibility = columnVisibility
+    if (shouldPersist('sorting')) nextState.sorting = sorting
+    if (shouldPersist('columnFilters')) nextState.columnFilters = effectiveColumnFilters
+    if (shouldPersist('globalFilter')) nextState.globalFilter = effectiveGlobalFilter
+    if (shouldPersist('pageSize') && enablePagination) nextState.pageSize = paginationState.pageSize
+
+    if (persistenceSaveTimer.current) clearTimeout(persistenceSaveTimer.current)
+    persistenceSaveTimer.current = setTimeout(() => {
+      void statePersistence.save(tableKey, nextState)
+    }, statePersistence.debounce ?? 500)
+
+    return () => {
+      if (persistenceSaveTimer.current) clearTimeout(persistenceSaveTimer.current)
+    }
+  }, [
+    tableKey,
+    statePersistence,
+    shouldPersist,
+    sizing,
+    columnOrder,
+    columnPinning,
+    columnVisibility,
+    sorting,
+    effectiveColumnFilters,
+    effectiveGlobalFilter,
+    enablePagination,
+    paginationState.pageSize,
+  ])
 
   const handleGlobalFilterChange = useCallback(
     (value: string) => {

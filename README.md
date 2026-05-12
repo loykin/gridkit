@@ -550,7 +550,7 @@ const columns: DataGridColumnDef<User>[] = [
       align: 'left',        // 'left' | 'center' | 'right'
       pin: 'left',          // 'left' | 'right'
       wrap: true,           // allow multi-line cell content
-      filterType: 'text',   // 'text' | 'select' | 'multi-select' | 'number' | false
+      filterType: 'text',   // 'text' | 'select' | 'multi-select' | 'number' | 'date' | 'date-range' | 'datetime' | 'datetime-range' | 'custom' | false
     },
   },
   {
@@ -562,6 +562,29 @@ const columns: DataGridColumnDef<User>[] = [
         { label: 'Delete', onClick: (row) => deleteRow(row), variant: 'destructive' },
       ],
     },
+  },
+]
+```
+
+Grouped headers use TanStack's nested `columns` shape:
+
+```tsx
+const columns: DataGridColumnDef<User>[] = [
+  {
+    id: 'identity',
+    header: 'Identity',
+    columns: [
+      { accessorKey: 'name', header: 'Name' },
+      { accessorKey: 'email', header: 'Email' },
+    ],
+  },
+  {
+    id: 'activity',
+    header: 'Activity',
+    columns: [
+      { accessorKey: 'status', header: 'Status' },
+      { accessorKey: 'lastSeen', header: 'Last Seen' },
+    ],
   },
 ]
 ```
@@ -578,7 +601,7 @@ const columns: DataGridColumnDef<User>[] = [
 | `align` | `'left' \| 'center' \| 'right'` | Cell text alignment |
 | `pin` | `'left' \| 'right'` | Pin column at definition level |
 | `wrap` | `boolean` | Allow multi-line content; row height adjusts automatically |
-| `filterType` | `'text' \| 'select' \| 'multi-select' \| 'number' \| false` | Filter input type for this column |
+| `filterType` | `'text' \| 'select' \| 'multi-select' \| 'number' \| 'date' \| 'date-range' \| 'datetime' \| 'datetime-range' \| 'custom' \| false` | Filter input type for this column |
 | `actions` | `(row: T) => Action[]` | Row action menu items |
 
 ---
@@ -609,12 +632,15 @@ const columns: DataGridColumnDef<User>[] = [
 | `icons` | `DataGridIcons` | — | Override any built-in icon slot |
 | **Sorting** ||||
 | `enableSorting` | `boolean` | `true` | Enable column sorting |
+| `enableMultiSort` | `boolean` | `false` | Enable Shift+click multi-column sorting |
+| `maxMultiSortColCount` | `number` | `3` | Maximum sorted columns when multi-sort is enabled |
 | `initialSorting` | `SortingState` | — | Initial sort state |
 | `onSortingChange` | `(s: SortingState) => void` | — | Called on sort change |
 | `manualSorting` | `boolean` | `false` | Disable client-side sort — handle externally |
 | **Filtering** ||||
 | `enableColumnFilters` | `boolean` | `false` | Show per-column filter UI |
 | `filterDisplay` | `'row' \| 'icon'` | `'row'` | Filter as dedicated row or icon inside header cell |
+| `customFilterComponents` | `Record<string, ComponentType<CustomFilterProps<T>>>` | — | Register custom filter UI by `filterType` |
 | `manualFiltering` | `boolean` | `false` | Disable client-side filtering — handle externally |
 | `columnFilters` | `ColumnFiltersState` | — | Controlled column filter state |
 | `onColumnFiltersChange` | `(f: ColumnFiltersState) => void` | — | Called on filter change |
@@ -623,6 +649,41 @@ const columns: DataGridColumnDef<User>[] = [
 | `searchableColumns` | `string[]` | — | Column keys included in global search |
 | `headerLeft` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the left. Function form receives the table instance |
 | `headerRight` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the right. Function form receives the table instance |
+
+Custom filter UI can replace any built-in filter type, including date/time filters:
+
+```tsx
+import type { CustomFilterProps } from '@loykin/gridkit'
+
+function MyDateTimeRangeFilter<T extends object>({
+  value,
+  onChange,
+  close,
+}: CustomFilterProps<T>) {
+  const [start = '', end = ''] = Array.isArray(value) ? value as [string, string] : ['', '']
+
+  return (
+    <DateTimeRangePicker
+      start={start}
+      end={end}
+      onChange={(nextStart, nextEnd) => onChange([nextStart, nextEnd])}
+      onApply={close}
+    />
+  )
+}
+
+<DataGrid
+  columns={[
+    { accessorKey: 'timestamp', header: 'Time', meta: { filterType: 'datetime-range' } },
+  ]}
+  enableColumnFilters
+  filterDisplay="icon"
+  customFilterComponents={{
+    'datetime-range': MyDateTimeRangeFilter,
+  }}
+/>
+```
+
 | **Column Sizing** ||||
 | `enableColumnResizing` | `boolean` | `true` | Enable drag-to-resize columns |
 | `columnResizeMode` | `'onChange' \| 'onEnd'` | `'onChange'` | When resize updates are applied |
@@ -640,12 +701,34 @@ const columns: DataGridColumnDef<User>[] = [
 | **State Persistence** ||||
 | `tableKey` | `string` | — | Key for in-memory Zustand state persistence |
 | `syncState` | `boolean` | `false` | Sync pagination and search state (requires `tableKey`) |
+| `statePersistence` | `GridKitStatePersistence` | — | Load/save grid preferences through localStorage, backend APIs, etc. Requires `tableKey` |
 | **Callbacks** ||||
 | `onTableReady` | `(table: Table<T>) => void` | — | Called when TanStack Table instance is ready |
 | `onColumnOrderChange` | `(order: string[]) => void` | — | Called when column order changes via drag |
 | `onColumnPinningChange` | `(pinning: ColumnPinningState) => void` | — | Called when column pinning changes |
 | **Advanced** ||||
 | `tableOptions` | `PassthroughTableOptions<T>` | — | Escape hatch for advanced TanStack Table options |
+
+```tsx
+<DataGrid
+  tableKey="users-grid"
+  statePersistence={{
+    load: async (tableKey) => api.get(`/grid-preferences/${tableKey}`),
+    save: async (tableKey, state) => {
+      await api.put(`/grid-preferences/${tableKey}`, state)
+    },
+    debounce: 500,
+    include: [
+      'columnSizing',
+      'columnOrder',
+      'columnPinning',
+      'columnVisibility',
+      'sorting',
+      'pageSize',
+    ],
+  }}
+/>
+```
 
 ### `DataGrid`-only Props
 

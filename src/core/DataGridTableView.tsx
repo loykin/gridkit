@@ -97,6 +97,7 @@ export function DataGridTableView<T extends object>({
   rowCursor,
   enableColumnResizing = true,
   enableColumnFilters = false,
+  customFilterComponents,
   filterDisplay = 'row',
   tableHeight,
   tableWidthMode = 'spacer',
@@ -236,6 +237,7 @@ export function DataGridTableView<T extends object>({
                   table={table}
                   enableColumnResizing={enableColumnResizing}
                   enableColumnFilters={enableColumnFilters}
+                  customFilterComponents={customFilterComponents}
                   filterDisplay={filterDisplay}
                   virtual={virtual}
                   bordered={bordered}
@@ -252,6 +254,7 @@ export function DataGridTableView<T extends object>({
                   virtual={virtual}
                   bordered={bordered}
                   tableWidthMode={tableWidthMode}
+                  customFilterComponents={customFilterComponents}
                 />
               )}
             </div>
