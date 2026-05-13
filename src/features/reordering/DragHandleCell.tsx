@@ -18,6 +18,7 @@ export function DragHandleCell() {
   return (
     <button
       type="button"
+      aria-label="Drag row"
       {...ctx?.listeners}
       {...ctx?.attributes}
       className="dg-btn dg-btn--drag-handle"

@@ -8,9 +8,10 @@ interface IndeterminateCheckboxProps {
   checked: boolean
   indeterminate: boolean
   onChange: (checked: boolean) => void
+  label: string
 }
 
-function IndeterminateCheckbox({ checked, indeterminate, onChange }: IndeterminateCheckboxProps) {
+function IndeterminateCheckbox({ checked, indeterminate, onChange, label }: IndeterminateCheckboxProps) {
   const ref = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -23,6 +24,7 @@ function IndeterminateCheckbox({ checked, indeterminate, onChange }: Indetermina
     <input
       ref={ref}
       type="checkbox"
+      aria-label={label}
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
       className="size-4 cursor-pointer rounded border-[var(--dg-input)] accent-[var(--dg-primary)]"
@@ -53,6 +55,7 @@ export function createCheckboxColumn<T extends object>(
         <IndeterminateCheckbox
           checked={allSelected}
           indeterminate={someSelected}
+          label="Select all rows"
           onChange={(checked) => onSelectAll(rows as Row<T>[], checked)}
         />
       )
@@ -62,6 +65,7 @@ export function createCheckboxColumn<T extends object>(
       return (
         <input
           type="checkbox"
+          aria-label={`Select row ${id}`}
           checked={selectedIds.has(id)}
           onChange={(e) => onSelectOne(id, e.target.checked)}
           onClick={(e) => e.stopPropagation()}

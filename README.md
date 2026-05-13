@@ -151,6 +151,25 @@ const data = useMemo(() => rowsFromQuery ?? [], [rowsFromQuery])
 
 For large table views, set a fixed `tableHeight` so virtualization can keep DOM work bounded to the visible rows plus overscan. `DataGridList` also supports opt-in virtualization with `enableVirtualization` and a fixed `containerHeight`. `DataGridChat` is currently non-virtualized because prepend anchoring and bottom stickiness need stricter scroll handling.
 
+### Current Limits
+
+- `DataGridCard` is not virtualized. Use it for small/medium card collections, or add app-level paging/infinite loading for large data sets.
+- Inline editing is basic cell editing: double-click enters `meta.editCell`, and the editor must call `onCommit` or `onCancel`. Validation, row edit mode, async save states, and undo/redo are not built in.
+- Accessibility is partial. Table roles, `aria-sort`, and popover semantics are present, but full keyboard grid navigation and screen-reader workflow testing are not complete.
+- Performance guidance is threshold-based rather than benchmark-based. Table virtualization turns on for fixed-height tables at 100+ rows; real app performance still depends on cell render cost, filter/sort cost, and data stability.
+
+### Test Coverage
+
+Unit/integration tests cover sorting, header groups, date/datetime filters, chat scroll behavior, list virtualization, reverse infinite scroll, stick-to-bottom, and state persistence.
+
+Browser E2E coverage is intentionally focused on regressions that jsdom cannot catch:
+
+```bash
+pnpm test:e2e
+```
+
+The E2E suite starts the playground and verifies column resize vs reorder separation, header group alignment, datetime filter popover clipping, state persistence after reload, column visibility, runtime pinning, row actions, row selection, inline editing, tree expansion, and master-detail expansion.
+
 ---
 
 ## Pagination

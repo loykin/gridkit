@@ -44,6 +44,7 @@ export function DataGridPaginationBar<T extends object>({
             : `Page ${pageIndex + 1} of ${Math.max(pageCount, 1)}`}
         </span>
         <Button
+          aria-label="Go to first page"
           variant="ghost"
           size="icon-sm"
           onClick={() => table.firstPage()}
@@ -52,6 +53,7 @@ export function DataGridPaginationBar<T extends object>({
           {icons.pageFirst}
         </Button>
         <Button
+          aria-label="Go to previous page"
           variant="ghost"
           size="icon-sm"
           onClick={() => table.previousPage()}
@@ -60,6 +62,7 @@ export function DataGridPaginationBar<T extends object>({
           {icons.pagePrev}
         </Button>
         <Button
+          aria-label="Go to next page"
           variant="ghost"
           size="icon-sm"
           onClick={() => table.nextPage()}
@@ -68,6 +71,7 @@ export function DataGridPaginationBar<T extends object>({
           {icons.pageNext}
         </Button>
         <Button
+          aria-label="Go to last page"
           variant="ghost"
           size="icon-sm"
           onClick={() => table.lastPage()}

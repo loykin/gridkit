@@ -55,6 +55,7 @@ export function DataGridPaginationPages<T extends object>({
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, width: '100%', padding: '0 12px' }}>
       <Button
+        aria-label="Go to first page"
         variant="ghost"
         size="icon-xs"
         onClick={() => table.firstPage()}
@@ -63,6 +64,7 @@ export function DataGridPaginationPages<T extends object>({
         {icons.pageFirst}
       </Button>
       <Button
+        aria-label="Go to previous page"
         variant="ghost"
         size="icon-xs"
         onClick={() => table.previousPage()}
@@ -81,6 +83,7 @@ export function DataGridPaginationPages<T extends object>({
           </span>
         ) : (
           <Button
+            aria-label={`Go to page ${item}`}
             key={item}
             variant={item - 1 === pageIndex ? 'default' : 'ghost'}
             size="icon-xs"
@@ -93,6 +96,7 @@ export function DataGridPaginationPages<T extends object>({
       )}
 
       <Button
+        aria-label="Go to next page"
         variant="ghost"
         size="icon-xs"
         onClick={() => table.nextPage()}
@@ -101,6 +105,7 @@ export function DataGridPaginationPages<T extends object>({
         {icons.pageNext}
       </Button>
       <Button
+        aria-label="Go to last page"
         variant="ghost"
         size="icon-xs"
         onClick={() => table.lastPage()}

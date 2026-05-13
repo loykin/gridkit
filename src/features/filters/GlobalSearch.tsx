@@ -41,6 +41,7 @@ export function GlobalSearch<T extends object>({ table, placeholder = 'Search…
       />
       {value && (
         <Button
+          aria-label="Clear search"
           variant="ghost"
           size="icon-xs"
           onClick={() => { setValue(''); table.setGlobalFilter(undefined) }}

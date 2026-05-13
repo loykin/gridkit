@@ -38,6 +38,7 @@ export function NumberRangeFilterContent<T extends object>({ col }: Props<T>) {
       </div>
       {hasFilter && (
         <Button
+          aria-label="Clear number range filter"
           variant="ghost"
           size="sm"
           onClick={() => col.setFilterValue(undefined)}

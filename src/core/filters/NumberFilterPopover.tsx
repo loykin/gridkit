@@ -25,6 +25,7 @@ export function NumberFilterPopover<T extends object>({ col }: Props<T>) {
         render={(props) => (
           <Button
             {...props}
+            aria-label={`Filter ${col.id} by number range`}
             variant={hasFilter ? 'outline' : 'ghost'}
             size="sm"
             style={{ width: '100%', justifyContent: 'flex-start' }}

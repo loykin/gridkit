@@ -39,6 +39,8 @@ export function TreeCell({ row, indentSize = 16, children }: TreeCellProps) {
       {canExpand ? (
         <button
           type="button"
+          aria-label={row.getIsExpanded() ? 'Collapse row' : 'Expand row'}
+          aria-expanded={row.getIsExpanded()}
           onClick={(e) => {
             e.stopPropagation()
             row.toggleExpanded()

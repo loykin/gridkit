@@ -6,9 +6,16 @@ interface CheckboxProps {
   indeterminate?: boolean
   onCheckedChange?: (checked: boolean) => void
   className?: string
+  'aria-label'?: string
 }
 
-export function Checkbox({ checked, indeterminate, onCheckedChange, className }: CheckboxProps) {
+export function Checkbox({
+  checked,
+  indeterminate,
+  onCheckedChange,
+  className,
+  'aria-label': ariaLabel,
+}: CheckboxProps) {
   const ref = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -19,6 +26,7 @@ export function Checkbox({ checked, indeterminate, onCheckedChange, className }:
     <input
       ref={ref}
       type="checkbox"
+      aria-label={ariaLabel}
       checked={checked ?? false}
       onChange={(e) => onCheckedChange?.(e.target.checked)}
       className={cn('dg-checkbox', className)}

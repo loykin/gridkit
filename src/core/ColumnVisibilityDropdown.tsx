@@ -14,7 +14,7 @@ export function ColumnVisibilityDropdown<T extends object>({ table }: Props<T>) 
     <Popover>
       <PopoverTrigger
         render={(props) => (
-          <Button {...props} variant="outline" size="sm">
+          <Button {...props} aria-label="Choose visible columns" variant="outline" size="sm">
             {icons.columnVisibility}
             Columns
           </Button>
@@ -30,7 +30,11 @@ export function ColumnVisibilityDropdown<T extends object>({ table }: Props<T>) 
                 key={col.id}
                 style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}
               >
-                <Checkbox checked={col.getIsVisible()} onCheckedChange={col.toggleVisibility} />
+                <Checkbox
+                  aria-label={`Toggle ${typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id} column visibility`}
+                  checked={col.getIsVisible()}
+                  onCheckedChange={col.toggleVisibility}
+                />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id}
                 </span>

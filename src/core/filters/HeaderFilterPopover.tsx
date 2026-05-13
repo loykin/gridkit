@@ -40,6 +40,7 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
           render={(props) => (
             <Button
               {...props}
+              aria-label={`Filter ${col.id}`}
               variant="ghost"
               size="icon-xs"
               className={hasFilter ? 'dg-btn--filter-active' : 'dg-btn--filter-inactive'}
@@ -77,6 +78,7 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
               />
               {filterValue && (
                 <Button
+                  aria-label={`Clear ${col.id} filter`}
                   variant="ghost"
                   size="icon-xs"
                   onClick={() => col.setFilterValue(undefined)}

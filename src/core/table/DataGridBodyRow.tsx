@@ -91,6 +91,7 @@ export function DataGridBodyRow<T extends object>({
               })
             ) : meta?.actions != null ? (
               <Button
+                aria-label={`Open row actions for row ${row.id}`}
                 variant="ghost"
                 size="icon-xs"
                 onClick={(e) => {

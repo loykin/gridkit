@@ -21,6 +21,7 @@ export function DataGridPaginationCompact<T extends object>({
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
       <Button
+        aria-label="Go to previous page"
         variant="ghost"
         size="icon-xs"
         onClick={() => table.previousPage()}
@@ -32,6 +33,7 @@ export function DataGridPaginationCompact<T extends object>({
         {pageIndex + 1} / {Math.max(pageCount, 1)}
       </span>
       <Button
+        aria-label="Go to next page"
         variant="ghost"
         size="icon-xs"
         onClick={() => table.nextPage()}

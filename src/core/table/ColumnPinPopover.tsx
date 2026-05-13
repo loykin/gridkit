@@ -23,6 +23,7 @@ export function ColumnPinPopover<T extends object>({ col }: ColumnPinPopoverProp
           render={(props) => (
             <Button
               {...props}
+              aria-label={`Pin options for ${col.id}`}
               variant="ghost"
               size="icon-xs"
               className={pinned ? 'dg-btn--filter-active' : 'dg-btn--filter-inactive'}

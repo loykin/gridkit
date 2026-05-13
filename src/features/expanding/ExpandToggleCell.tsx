@@ -27,6 +27,8 @@ export function ExpandToggleCell({ row }: ExpandToggleCellProps) {
 
   return (
     <Button
+      aria-label={isExpanded ? 'Collapse detail row' : 'Expand detail row'}
+      aria-expanded={isExpanded}
       variant="ghost"
       size="icon-xs"
       onClick={(e) => {

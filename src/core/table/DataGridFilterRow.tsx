@@ -91,6 +91,7 @@ export function DataGridFilterRow<T extends object>({
                 />
                 {filterValue && (
                   <Button
+                    aria-label={`Clear ${col.id} filter`}
                     variant="ghost"
                     size="icon-xs"
                     onClick={() => col.setFilterValue(undefined)}

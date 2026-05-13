@@ -28,6 +28,7 @@ export function DateFilterContent<T extends object>({ col, mode }: Props<T>) {
         />
         {singleValue && (
           <Button
+            aria-label="Clear date filter"
             variant="ghost"
             size="icon-xs"
             onClick={() => col.setFilterValue(undefined)}
