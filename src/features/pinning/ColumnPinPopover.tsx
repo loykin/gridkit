@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import type { Column, Table } from '@tanstack/react-table'
+import type { Column } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useIcons } from '@/core/IconsContext'
 
 interface ColumnPinPopoverProps<T extends object> {
   col: Column<T>
-  table: Table<T>
 }
 
 export function ColumnPinPopover<T extends object>({ col }: ColumnPinPopoverProps<T>) {

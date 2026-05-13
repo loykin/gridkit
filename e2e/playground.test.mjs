@@ -146,7 +146,9 @@ test('datetime range popover shows seconds inputs without clipping', async () =>
   const popover = page.locator('.dg-popover-content').last()
   const inputs = popover.locator('input[type="datetime-local"]')
   await assert.doesNotReject(async () => {
+    await popover.waitFor({ state: 'visible', timeout: 1000 })
     assert.equal(await inputs.count(), 2)
+    await inputs.nth(1).waitFor({ state: 'visible', timeout: 1000 })
   })
 
   const popoverBox = await popover.boundingBox()
