@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -18,116 +18,16 @@ import {
 } from '@tanstack/react-table'
 import type {
   DataGridBaseProps,
-  DataGridColumnDef,
   DataGridPaginationConfig,
-  GridKitPersistedState,
-  GridKitPersistedStateKey,
 } from '@/types'
 import { useTableStore } from '@/core/hooks/useTableStore'
+import { useGridStatePersistence } from '@/core/hooks/useGridStatePersistence'
+import { useDataStoreSubscription } from '@/core/engine/useDataStoreSubscription'
 import { gridKitFeatures, getDataStoreCoreRowModel } from '@/core/engine/gridKitFeatures'
-
-// Stable no-op fallbacks for useSyncExternalStore when dataStore is absent
-const _noopSubscribe = (_listener: () => void) => () => {}
-const _noopGetVersion = () => 0
-
-const DEFAULT_PERSISTED_STATE_KEYS: GridKitPersistedStateKey[] = [
-  'columnSizing',
-  'columnOrder',
-  'columnPinning',
-  'columnVisibility',
-  'sorting',
-  'pageSize',
-]
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const defaultGlobalFilterFn: FilterFn<any> = (row, columnId, value: string) =>
-  String(row.getValue(columnId) ?? '')
-    .toLowerCase()
-    .includes(value.toLowerCase())
-
-/** Used for meta.filterType === 'multi-select' — checks row value is in selected array */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const multiSelectFilterFn: FilterFn<any> = (row, columnId, value: string[]) =>
-  value.includes(String(row.getValue(columnId) ?? ''))
-multiSelectFilterFn.autoRemove = (val: string[]) => !val || val.length === 0
-
-/** Used for meta.filterType === 'number' — range [min, max] */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const betweenFilterFn: FilterFn<any> = (row, columnId, value: [string, string]) => {
-  const raw = row.getValue<number>(columnId)
-  const [minStr, maxStr] = value
-  const min = minStr !== '' ? Number(minStr) : -Infinity
-  const max = maxStr !== '' ? Number(maxStr) : Infinity
-  return raw >= min && raw <= max
-}
-betweenFilterFn.autoRemove = (val: [string, string]) => !val || (val[0] === '' && val[1] === '')
-
-function toDateKey(value: unknown): string {
-  if (value instanceof Date) return value.toISOString().slice(0, 10)
-  const raw = String(value ?? '')
-  const isoDate = /^\d{4}-\d{2}-\d{2}/.exec(raw)
-  if (isoDate) return isoDate[0]
-  const time = Date.parse(raw)
-  return Number.isNaN(time) ? '' : new Date(time).toISOString().slice(0, 10)
-}
-
-function toDateTimeMs(value: unknown): number | undefined {
-  if (value instanceof Date) {
-    const time = value.getTime()
-    return Number.isNaN(time) ? undefined : time
-  }
-  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined
-
-  const raw = String(value ?? '').trim()
-  if (!raw) return undefined
-
-  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(raw)
-    ? raw.replace(' ', 'T')
-    : raw
-  const time = Date.parse(normalized)
-  return Number.isNaN(time) ? undefined : time
-}
-
-/** Used for meta.filterType === 'date' — exact date match */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const dateFilterFn: FilterFn<any> = (row, columnId, value: string) => {
-  if (!value) return true
-  return toDateKey(row.getValue(columnId)) === value
-}
-dateFilterFn.autoRemove = (val: string) => !val
-
-/** Used for meta.filterType === 'date-range' — inclusive [start, end] date range */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const dateRangeFilterFn: FilterFn<any> = (row, columnId, value: [string, string]) => {
-  const [start, end] = value
-  if (!start && !end) return true
-  const current = toDateKey(row.getValue(columnId))
-  if (!current) return false
-  return (!start || current >= start) && (!end || current <= end)
-}
-dateRangeFilterFn.autoRemove = (val: [string, string]) => !val || (val[0] === '' && val[1] === '')
-
-/** Used for meta.filterType === 'datetime' — exact date-time match */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const dateTimeFilterFn: FilterFn<any> = (row, columnId, value: string) => {
-  const target = toDateTimeMs(value)
-  const current = toDateTimeMs(row.getValue(columnId))
-  return target === undefined || current === target
-}
-dateTimeFilterFn.autoRemove = (val: string) => !val
-
-/** Used for meta.filterType === 'datetime-range' — inclusive [start, end] range */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const dateTimeRangeFilterFn: FilterFn<any> = (row, columnId, value: [string, string]) => {
-  const [startValue, endValue] = value
-  const start = toDateTimeMs(startValue)
-  const end = toDateTimeMs(endValue)
-  if (start === undefined && end === undefined) return true
-  const current = toDateTimeMs(row.getValue(columnId))
-  if (current === undefined) return false
-  return (start === undefined || current >= start) && (end === undefined || current <= end)
-}
-dateTimeRangeFilterFn.autoRemove = (val: [string, string]) => !val || (val[0] === '' && val[1] === '')
+import { defaultGlobalFilterFn } from '@/features/filters/filterFns'
+import { enrichFilterColumns } from '@/features/filters/enrichFilterColumns'
+import { useSearchableFilterFn } from '@/features/filters/useSearchableFilterFn'
+import { deriveInitialColumnPinning } from '@/features/pinning/deriveInitialColumnPinning'
 
 interface UseDataGridCoreOptions<T extends object> extends Pick<
   DataGridBaseProps<T>,
@@ -164,7 +64,7 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'enableColumnPinning'
   | 'onColumnPinningChange'
 > {
-  columns: DataGridColumnDef<T>[]
+  columns: DataGridBaseProps<T>['columns']
   getRowId?: (originalRow: T, index: number) => string
   pagination?: DataGridPaginationConfig
   sizing: ColumnSizingState
@@ -217,21 +117,9 @@ export function useDataGridCore<T extends object>({
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([])
   const [expanded, setExpanded] = useState<ExpandedState>({})
   const [sorting, setSorting] = useState<SortingState>(initialSorting ?? [])
-  // Derive pinning from column meta.pin, merged with explicit initialPinning prop
-  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(() => {
-    const fromMeta: ColumnPinningState = { left: [], right: [] }
-    for (const col of columns) {
-      const pin = col.meta?.pin
-      const id = (col as { accessorKey?: string }).accessorKey ?? (col as { id?: string }).id
-      if (!pin || !id) continue
-      if (pin === 'left') fromMeta.left!.push(id)
-      else fromMeta.right!.push(id)
-    }
-    return {
-      left: [...(fromMeta.left ?? []), ...(initialPinning?.left ?? [])],
-      right: [...(fromMeta.right ?? []), ...(initialPinning?.right ?? [])],
-    }
-  })
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(() =>
+    deriveInitialColumnPinning(columns, initialPinning),
+  )
   const [internalFilters, setInternalFilters] = useState<ColumnFiltersState>([])
   const [internalGlobal, setInternalGlobal] = useState(persisted?.searchTerm ?? '')
   const [internalColumnVisibility, setInternalColumnVisibility] = useState<VisibilityState>({})
@@ -241,13 +129,6 @@ export function useDataGridCore<T extends object>({
   })
 
   const tableReadyCalled = useRef(false)
-  const persistenceReadyRef = useRef(false)
-  const persistenceSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const persistenceKeys = statePersistence?.include ?? DEFAULT_PERSISTED_STATE_KEYS
-  const shouldPersist = useCallback(
-    (key: GridKitPersistedStateKey) => persistenceKeys.includes(key),
-    [persistenceKeys],
-  )
 
   // Register for state persistence
   useEffect(() => {
@@ -261,141 +142,56 @@ export function useDataGridCore<T extends object>({
     }
   }, [tableKey, syncState, register, pagination])
 
-  useEffect(() => {
-    if (!tableKey || !statePersistence) {
-      persistenceReadyRef.current = false
-      return
-    }
-
-    let cancelled = false
-    persistenceReadyRef.current = false
-
-    Promise.resolve(statePersistence.load?.(tableKey))
-      .then((loaded) => {
-        if (cancelled) return
-        if (!loaded) {
-          persistenceReadyRef.current = true
-          return
-        }
-
-        if (shouldPersist('columnSizing') && loaded.columnSizing) {
-          setSizing(loaded.columnSizing)
-        }
-        if (shouldPersist('columnOrder') && loaded.columnOrder) {
-          setColumnOrder(loaded.columnOrder)
-        }
-        if (shouldPersist('columnPinning') && loaded.columnPinning) {
-          setColumnPinning(loaded.columnPinning)
-        }
-        if (shouldPersist('columnVisibility') && loaded.columnVisibility && visibilityState === undefined) {
-          setInternalColumnVisibility(loaded.columnVisibility)
-          onColumnVisibilityChange?.(loaded.columnVisibility)
-        }
-        if (shouldPersist('sorting') && loaded.sorting) {
-          setSorting(loaded.sorting)
-          onSortingChange?.(loaded.sorting)
-        }
-        if (shouldPersist('columnFilters') && loaded.columnFilters && externalColumnFilters === undefined) {
-          setInternalFilters(loaded.columnFilters)
-          onColumnFiltersChange?.(loaded.columnFilters)
-        }
-        if (shouldPersist('globalFilter') && loaded.globalFilter !== undefined && externalGlobalFilter === undefined) {
-          setInternalGlobal(loaded.globalFilter)
-          onGlobalFilterChange?.(loaded.globalFilter)
-        }
-        const loadedPageSize = loaded.pageSize ?? loaded.pagination?.pageSize
-        if (shouldPersist('pageSize') && loadedPageSize && enablePagination) {
-          setPaginationState((prev) => ({ ...prev, pageIndex: 0, pageSize: loadedPageSize }))
-        }
-
-        persistenceReadyRef.current = true
-      })
-      .catch(() => {
-        if (!cancelled) persistenceReadyRef.current = true
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [
-    tableKey,
-    statePersistence,
-    shouldPersist,
-    setSizing,
-    onSortingChange,
-    onColumnFiltersChange,
-    onGlobalFilterChange,
-    externalColumnFilters,
-    externalGlobalFilter,
-    visibilityState,
-    onColumnVisibilityChange,
-    enablePagination,
-  ])
-
   const effectiveGlobalFilter = externalGlobalFilter ?? internalGlobal
   const effectiveColumnFilters = externalColumnFilters ?? internalFilters
   const effectiveColumnVisibility = visibilityState ?? internalColumnVisibility
 
-  // Build search filter for specified columns
-  const searchableFilterFn: FilterFn<T> | undefined = useMemo(
-    () =>
-      searchableColumns?.length
-        ? (row, _, value: string) => {
-            const search = String(value).toLowerCase()
-            return searchableColumns.some((colId) =>
-              String(row.getValue(colId) ?? '')
-                .toLowerCase()
-                .includes(search),
-            )
-          }
-        : undefined,
-    [searchableColumns],
-  )
+  const persistedState = useMemo(() => ({
+    sizing,
+    columnOrder,
+    columnPinning,
+    columnVisibility: effectiveColumnVisibility,
+    sorting,
+    columnFilters: effectiveColumnFilters,
+    globalFilter: effectiveGlobalFilter,
+    pageSize: paginationState.pageSize,
+  }), [
+    sizing,
+    columnOrder,
+    columnPinning,
+    effectiveColumnVisibility,
+    sorting,
+    effectiveColumnFilters,
+    effectiveGlobalFilter,
+    paginationState.pageSize,
+  ])
 
-  // Inject filterFn into columns that declare meta.filterType
-  const enrichedColumns = useMemo(
-    () => {
-      const enrichColumn = (col: DataGridColumnDef<T>): DataGridColumnDef<T> => {
-        const childColumns = (col as { columns?: DataGridColumnDef<T>[] }).columns
-        const withChildren = childColumns
-          ? { ...col, columns: childColumns.map(enrichColumn) }
-          : col
+  useGridStatePersistence({
+    tableKey,
+    statePersistence,
+    enablePagination,
+    externalColumnFilters,
+    externalGlobalFilter,
+    externalColumnVisibility: visibilityState,
+    setSizing,
+    setColumnOrder,
+    setColumnPinning,
+    setInternalColumnVisibility,
+    setSorting,
+    setInternalFilters,
+    setInternalGlobal,
+    setPaginationState,
+    onSortingChange,
+    onColumnFiltersChange,
+    onGlobalFilterChange,
+    onColumnVisibilityChange,
+    persistedState,
+  })
 
-        if (col.meta?.filterType === 'number' && !col.filterFn) {
-          return { ...withChildren, filterFn: betweenFilterFn as FilterFn<T> }
-        }
-        if (col.meta?.filterType === 'multi-select' && !col.filterFn) {
-          return { ...withChildren, filterFn: multiSelectFilterFn as FilterFn<T> }
-        }
-        if (col.meta?.filterType === 'date' && !col.filterFn) {
-          return { ...withChildren, filterFn: dateFilterFn as FilterFn<T> }
-        }
-        if (col.meta?.filterType === 'date-range' && !col.filterFn) {
-          return { ...withChildren, filterFn: dateRangeFilterFn as FilterFn<T> }
-        }
-        if (col.meta?.filterType === 'datetime' && !col.filterFn) {
-          return { ...withChildren, filterFn: dateTimeFilterFn as FilterFn<T> }
-        }
-        if (col.meta?.filterType === 'datetime-range' && !col.filterFn) {
-          return { ...withChildren, filterFn: dateTimeRangeFilterFn as FilterFn<T> }
-        }
-        return withChildren
-      }
+  const searchableFilterFn = useSearchableFilterFn<T>(searchableColumns)
+  const enrichedColumns = useMemo(() => enrichFilterColumns(columns), [columns])
 
-      return columns.map(enrichColumn)
-    },
-    [columns],
-  )
-
-  // Subscribe to DataStore changes — triggers re-render when a transaction fires.
-  // useSyncExternalStore must be called unconditionally, so noop stubs are used
-  // when dataStore is absent. The returned version is unused; we only need the
-  // subscription to cause the component to re-render so that the custom
-  // getCoreRowModel (which reads store.getVersion() internally) can re-evaluate.
-  useSyncExternalStore(
-    dataStore ? dataStore.subscribe : _noopSubscribe,
-    dataStore ? dataStore.getVersion : _noopGetVersion,
-  )
+  useDataStoreSubscription(dataStore)
 
   const table = useReactTable<T>({
     // Escape hatch — spread first so explicit props below always win
@@ -510,42 +306,6 @@ export function useDataGridCore<T extends object>({
     maxMultiSortColCount,
     enableColumnFilters,
   })
-
-  useEffect(() => {
-    if (!tableKey || !statePersistence || !persistenceReadyRef.current) return
-
-    const nextState: Partial<GridKitPersistedState> = {}
-    if (shouldPersist('columnSizing')) nextState.columnSizing = sizing
-    if (shouldPersist('columnOrder')) nextState.columnOrder = columnOrder
-    if (shouldPersist('columnPinning')) nextState.columnPinning = columnPinning
-    if (shouldPersist('columnVisibility')) nextState.columnVisibility = effectiveColumnVisibility
-    if (shouldPersist('sorting')) nextState.sorting = sorting
-    if (shouldPersist('columnFilters')) nextState.columnFilters = effectiveColumnFilters
-    if (shouldPersist('globalFilter')) nextState.globalFilter = effectiveGlobalFilter
-    if (shouldPersist('pageSize') && enablePagination) nextState.pageSize = paginationState.pageSize
-
-    if (persistenceSaveTimer.current) clearTimeout(persistenceSaveTimer.current)
-    persistenceSaveTimer.current = setTimeout(() => {
-      void statePersistence.save(tableKey, nextState)
-    }, statePersistence.debounce ?? 500)
-
-    return () => {
-      if (persistenceSaveTimer.current) clearTimeout(persistenceSaveTimer.current)
-    }
-  }, [
-    tableKey,
-    statePersistence,
-    shouldPersist,
-    sizing,
-    columnOrder,
-    columnPinning,
-    effectiveColumnVisibility,
-    sorting,
-    effectiveColumnFilters,
-    effectiveGlobalFilter,
-    enablePagination,
-    paginationState.pageSize,
-  ])
 
   const handleGlobalFilterChange = useCallback(
     (value: string) => {
