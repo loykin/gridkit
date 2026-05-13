@@ -28,7 +28,7 @@ async function waitForServer(url, timeout = 20_000) {
 test.before(async () => {
   server = spawn(
     'pnpm',
-    ['--dir', 'playground', 'dev', '--host', '127.0.0.1', '--port', String(PORT)],
+    ['--dir', 'playground', 'dev', '--host', '127.0.0.1', '--port', String(PORT), '--strictPort'],
     {
       cwd: process.cwd(),
       stdio: ['ignore', 'pipe', 'pipe'],

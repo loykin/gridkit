@@ -160,6 +160,7 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'tableOptions'
   | 'enableColumnReordering'
   | 'onColumnOrderChange'
+  | 'onColumnVisibilityChange'
   | 'enableColumnPinning'
   | 'onColumnPinningChange'
 > {
@@ -203,6 +204,7 @@ export function useDataGridCore<T extends object>({
   tableOptions,
   enableColumnReordering = false,
   onColumnOrderChange,
+  onColumnVisibilityChange,
   onColumnPinningChange,
   sizing,
   setSizing,
@@ -232,7 +234,7 @@ export function useDataGridCore<T extends object>({
   })
   const [internalFilters, setInternalFilters] = useState<ColumnFiltersState>([])
   const [internalGlobal, setInternalGlobal] = useState(persisted?.searchTerm ?? '')
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(visibilityState ?? {})
+  const [internalColumnVisibility, setInternalColumnVisibility] = useState<VisibilityState>({})
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: persisted?.pagination.pageIndex ?? pagination?.initialPageIndex ?? 0,
     pageSize: persisted?.pagination.pageSize ?? pagination?.pageSize ?? 20,
@@ -285,8 +287,9 @@ export function useDataGridCore<T extends object>({
         if (shouldPersist('columnPinning') && loaded.columnPinning) {
           setColumnPinning(loaded.columnPinning)
         }
-        if (shouldPersist('columnVisibility') && loaded.columnVisibility) {
-          setColumnVisibility(loaded.columnVisibility)
+        if (shouldPersist('columnVisibility') && loaded.columnVisibility && visibilityState === undefined) {
+          setInternalColumnVisibility(loaded.columnVisibility)
+          onColumnVisibilityChange?.(loaded.columnVisibility)
         }
         if (shouldPersist('sorting') && loaded.sorting) {
           setSorting(loaded.sorting)
@@ -324,11 +327,14 @@ export function useDataGridCore<T extends object>({
     onGlobalFilterChange,
     externalColumnFilters,
     externalGlobalFilter,
+    visibilityState,
+    onColumnVisibilityChange,
     enablePagination,
   ])
 
   const effectiveGlobalFilter = externalGlobalFilter ?? internalGlobal
   const effectiveColumnFilters = externalColumnFilters ?? internalFilters
+  const effectiveColumnVisibility = visibilityState ?? internalColumnVisibility
 
   // Build search filter for specified columns
   const searchableFilterFn: FilterFn<T> | undefined = useMemo(
@@ -405,7 +411,7 @@ export function useDataGridCore<T extends object>({
       sorting,
       columnFilters: effectiveColumnFilters,
       globalFilter: effectiveGlobalFilter,
-      columnVisibility,
+      columnVisibility: effectiveColumnVisibility,
       columnSizing: sizing,
       columnPinning,
       ...(enableColumnReordering ? { columnOrder } : {}),
@@ -430,15 +436,15 @@ export function useDataGridCore<T extends object>({
       if (externalColumnFilters === undefined) setInternalFilters(next)
       onColumnFiltersChange?.(next)
     },
-    onGlobalFilterChange: externalGlobalFilter !== undefined
-      ? undefined
-      : (updater) => {
-          const next = typeof updater === 'function' ? updater(internalGlobal) : updater
-          setInternalGlobal(next as string)
-          onGlobalFilterChange?.(next as string)
-        },
+    onGlobalFilterChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(effectiveGlobalFilter) : updater
+      if (externalGlobalFilter === undefined) setInternalGlobal(next as string)
+      onGlobalFilterChange?.(next as string)
+    },
     onColumnVisibilityChange: (updater) => {
-      setColumnVisibility((prev) => (typeof updater === 'function' ? updater(prev) : updater))
+      const next = typeof updater === 'function' ? updater(effectiveColumnVisibility) : updater
+      if (visibilityState === undefined) setInternalColumnVisibility(next)
+      onColumnVisibilityChange?.(next)
     },
     onColumnSizingChange: (updater) => {
       setSizing((prev) => {
@@ -512,7 +518,7 @@ export function useDataGridCore<T extends object>({
     if (shouldPersist('columnSizing')) nextState.columnSizing = sizing
     if (shouldPersist('columnOrder')) nextState.columnOrder = columnOrder
     if (shouldPersist('columnPinning')) nextState.columnPinning = columnPinning
-    if (shouldPersist('columnVisibility')) nextState.columnVisibility = columnVisibility
+    if (shouldPersist('columnVisibility')) nextState.columnVisibility = effectiveColumnVisibility
     if (shouldPersist('sorting')) nextState.sorting = sorting
     if (shouldPersist('columnFilters')) nextState.columnFilters = effectiveColumnFilters
     if (shouldPersist('globalFilter')) nextState.globalFilter = effectiveGlobalFilter
@@ -533,7 +539,7 @@ export function useDataGridCore<T extends object>({
     sizing,
     columnOrder,
     columnPinning,
-    columnVisibility,
+    effectiveColumnVisibility,
     sorting,
     effectiveColumnFilters,
     effectiveGlobalFilter,
@@ -546,8 +552,8 @@ export function useDataGridCore<T extends object>({
       table.setGlobalFilter(value)
       if (externalGlobalFilter === undefined) {
         setInternalGlobal(value)
-        onGlobalFilterChange?.(value)
       }
+      onGlobalFilterChange?.(value)
       if (tableKey && syncState) update(tableKey, { searchTerm: value })
     },
     [table, externalGlobalFilter, onGlobalFilterChange, tableKey, syncState, update],

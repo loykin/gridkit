@@ -711,6 +711,7 @@ function MyDateTimeRangeFilter<T extends object>({
 | `onColumnSizingChange` | `(s: ColumnSizingState) => void` | — | Called on column resize |
 | **Visibility & Pinning** ||||
 | `visibilityState` | `VisibilityState` | — | Controlled column visibility |
+| `onColumnVisibilityChange` | `(v: VisibilityState) => void` | — | Called when column visibility changes |
 | `initialPinning` | `ColumnPinningState` | — | Initial pinned columns `{ left: [...], right: [...] }` |
 | **Row Expansion** ||||
 | `enableExpanding` | `boolean` | `false` | Enable collapsible sub-rows |

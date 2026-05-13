@@ -50,6 +50,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     bordered,
     enableColumnReordering,
     onColumnOrderChange,
+    onColumnVisibilityChange,
     enableColumnPinning,
     onColumnPinningChange,
   } = options
@@ -102,6 +103,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     getRowId,
     enableColumnReordering,
     onColumnOrderChange,
+    onColumnVisibilityChange,
     enableColumnPinning,
     onColumnPinningChange,
     sizing,

@@ -362,6 +362,7 @@ export interface DataGridBaseProps<T extends object> extends GridKitCoreProps<T>
    * - 'onEnd': update only when drag ends
    */
   columnResizeMode?: 'onChange' | 'onEnd'
+  /** Controlled column visibility state. Pair with onColumnVisibilityChange. */
   visibilityState?: VisibilityState
   /** Initial column pinning — { left: ['id', ...], right: ['id', ...] } */
   initialPinning?: ColumnPinningState
@@ -381,6 +382,8 @@ export interface DataGridBaseProps<T extends object> extends GridKitCoreProps<T>
 
   // Callbacks
   onColumnSizingChange?: (sizing: ColumnSizingState) => void
+  /** Called when column visibility changes. Required for controlled visibilityState updates. */
+  onColumnVisibilityChange?: (visibility: VisibilityState) => void
   /** Called when the user drags a column header to a new position */
   onColumnOrderChange?: (order: string[]) => void
   /** Called when column pinning changes at runtime via the pin menu */
