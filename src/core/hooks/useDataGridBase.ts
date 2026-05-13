@@ -63,7 +63,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
   }, [columns, checkboxConfig])
 
   const { sizing, isSized, setSizing, measure } = useColumnSizing({
-    columns,
+    columns: columnsWithCheckbox,
     containerRef,
     mode: columnSizingMode,
     initialSizing: columnSizing,

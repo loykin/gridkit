@@ -430,7 +430,7 @@ export function useDataGridCore<T extends object>({
       if (externalColumnFilters === undefined) setInternalFilters(next)
       onColumnFiltersChange?.(next)
     },
-    onGlobalFilterChange: externalGlobalFilter
+    onGlobalFilterChange: externalGlobalFilter !== undefined
       ? undefined
       : (updater) => {
           const next = typeof updater === 'function' ? updater(internalGlobal) : updater
