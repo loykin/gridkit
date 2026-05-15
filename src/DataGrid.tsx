@@ -22,10 +22,12 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
     icons,
   } = props
 
-  const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase({
+  const { wrapperRef, containerRef, table, rows, isSized, measure, queryState } = useDataGridBase({
     ...props,
     pagination,
   })
+  const effectiveError = error ?? (props.queryMode === 'backend' ? queryState.error : null)
+  const effectiveIsLoading = props.isLoading ?? (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
 
   useEffect(() => {
     if (tableRef) {
@@ -46,7 +48,8 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
         rows={rows}
         isSized={isSized}
         measure={measure}
-        error={error}
+        error={effectiveError}
+        isLoading={effectiveIsLoading}
         headerLeft={headerLeft}
         headerRight={headerRight}
         footer={footer}

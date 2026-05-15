@@ -1,14 +1,36 @@
-import type { DataStoreBackend, QueryParams } from './DataStoreBackend'
+import type {
+  BackendTransactionResult,
+  DataStoreBackend,
+  FacetParams,
+  FacetResult,
+  QueryParams,
+} from './DataStoreBackend'
+
+export interface DataStoreQueryState {
+  isHydrating: boolean
+  isQuerying: boolean
+  error: Error | null
+  total: number
+  version: number
+  lastQueryMs: number | null
+  lastUpdatedAt: number | null
+}
 
 export interface Transaction<T> {
   add?: T[]
   update?: Array<{ id: string; data: Partial<T> }>
   remove?: string[]
   /**
-   * If true and a backend is configured, persists added rows via backend.append().
+   * If true and a backend is configured, persists the mutation via backend.applyTransaction().
    * No-op when no backend is set.
    */
   persist?: boolean
+}
+
+export interface TransactionResult {
+  ok: boolean
+  affected: number
+  error?: Error
 }
 
 export interface DataStoreOptions<T> {
@@ -22,7 +44,7 @@ export interface DataStoreOptions<T> {
   /**
    * Optional persistence backend (e.g. IndexedDB, REST API).
    * When set, hydrate() / query() delegate to the backend and
-   * applyTransaction({ persist: true }) calls backend.append().
+   * applyTransaction({ persist: true }) calls backend.applyTransaction().
    */
   backend?: DataStoreBackend<T>
 }
@@ -33,24 +55,31 @@ export interface DataStore<T> {
   getSnapshot(): T[]
   /** Monotonically increasing integer — increments on every transaction */
   getVersion(): number
+  getQueryState(): DataStoreQueryState
   applyTransaction(tx: Transaction<T>): void
+  applyTransactionAsync(tx: Transaction<T>): Promise<TransactionResult>
   /** useSyncExternalStore compatible subscribe */
   subscribe(listener: () => void): () => void
+  subscribeQueryState(listener: () => void): () => void
   /**
    * Load initial data from backend into the store.
    * No-op if no backend is configured.
    */
-  hydrate(params?: QueryParams<T>): Promise<void>
+  hydrate(params?: QueryParams): Promise<void>
   /**
    * Re-query backend and replace the current in-memory window.
    * No-op if no backend is configured.
    */
-  query(params: QueryParams<T>): Promise<void>
+  query(params: QueryParams): Promise<void>
+  getFacets(params: FacetParams): Promise<FacetResult | undefined>
   /**
    * Total row count: backend total when a backend is set,
    * otherwise the current in-memory map size.
    */
   getTotalCount(): number
+  reset(): void
+  clear(): Promise<void>
+  dispose(): void
 }
 
 export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
@@ -59,8 +88,19 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
   const map = new Map<string, T>()
   const orderedIds: string[] = []
   const listeners = new Set<() => void>()
+  const queryStateListeners = new Set<() => void>()
   let version = 0
   let backendTotal = 0
+  let querySequence = 0
+  let queryState: DataStoreQueryState = {
+    isHydrating: false,
+    isQuerying: false,
+    error: null,
+    total: 0,
+    version: 0,
+    lastQueryMs: null,
+    lastUpdatedAt: null,
+  }
 
   let cachedSnapshot: T[] = []
   let cachedSnapshotVersion = -1
@@ -68,6 +108,15 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
   function notify() {
     version++
     listeners.forEach((fn) => fn())
+  }
+
+  function notifyQueryState(patch: Partial<DataStoreQueryState>) {
+    queryState = {
+      ...queryState,
+      ...patch,
+      version: queryState.version + 1,
+    }
+    queryStateListeners.forEach((fn) => fn())
   }
 
   function trimToMaxSize() {
@@ -88,6 +137,96 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
     })
   }
 
+  function resetMemory() {
+    map.clear()
+    orderedIds.length = 0
+    backendTotal = 0
+    notify()
+    notifyQueryState({ total: 0, error: null, lastUpdatedAt: Date.now() })
+  }
+
+  function applyTransactionCore(tx: Transaction<T>) {
+    let affected = 0
+    let added = 0
+    let removed = 0
+
+    tx.add?.forEach((item, i) => {
+      const id = getRowId(item, map.size + i)
+      if (!map.has(id)) {
+        map.set(id, item)
+        orderedIds.push(id)
+        affected++
+        added++
+      }
+    })
+
+    if (maxSize !== undefined && affected > 0) trimToMaxSize()
+
+    tx.update?.forEach(({ id, data }) => {
+      if (map.has(id)) {
+        map.set(id, { ...map.get(id)!, ...data })
+        affected++
+      }
+    })
+
+    tx.remove?.forEach((id) => {
+      if (map.delete(id)) {
+        const idx = orderedIds.indexOf(id)
+        if (idx !== -1) orderedIds.splice(idx, 1)
+        affected++
+        removed++
+      }
+    })
+
+    if (affected > 0) {
+      backendTotal = backend ? Math.max(0, backendTotal + added - removed) : map.size
+      notify()
+      notifyQueryState({ total: backend ? backendTotal : map.size, error: null, lastUpdatedAt: Date.now() })
+    }
+
+    return { affected }
+  }
+
+  async function runQuery(kind: 'hydrate' | 'query', params: QueryParams) {
+    if (!backend) return
+    if (kind === 'hydrate' && !backend.hydrate) return
+
+    const sequence = ++querySequence
+    const startedAt = performance.now()
+    notifyQueryState({
+      isHydrating: kind === 'hydrate',
+      isQuerying: kind === 'query',
+      error: null,
+    })
+
+    try {
+      const result = kind === 'hydrate'
+        ? await backend.hydrate!(params)
+        : await backend.query(params)
+      if (sequence !== querySequence) return
+
+      replaceAll(result.rows)
+      backendTotal = result.total
+      notify()
+      notifyQueryState({
+        isHydrating: false,
+        isQuerying: false,
+        error: null,
+        total: result.total,
+        lastQueryMs: performance.now() - startedAt,
+        lastUpdatedAt: Date.now(),
+      })
+    } catch (error) {
+      if (sequence !== querySequence) return
+      notifyQueryState({
+        isHydrating: false,
+        isQuerying: false,
+        error: error instanceof Error ? error : new Error(String(error)),
+        lastQueryMs: performance.now() - startedAt,
+      })
+    }
+  }
+
   return {
     get: (id) => map.get(id),
 
@@ -101,65 +240,70 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
 
     getVersion: () => version,
 
+    getQueryState: () => queryState,
+
     subscribe: (listener) => {
       listeners.add(listener)
       return () => listeners.delete(listener)
     },
 
+    subscribeQueryState: (listener) => {
+      queryStateListeners.add(listener)
+      return () => queryStateListeners.delete(listener)
+    },
+
     applyTransaction: (tx) => {
-      let changed = false
-      const toAppend: T[] = []
+      applyTransactionCore(tx)
 
-      tx.add?.forEach((item, i) => {
-        const id = getRowId(item, map.size + i)
-        if (!map.has(id)) {
-          map.set(id, item)
-          orderedIds.push(id)
-          changed = true
-          if (tx.persist) toAppend.push(item)
-        }
-      })
-
-      if (maxSize !== undefined && changed) trimToMaxSize()
-
-      tx.update?.forEach(({ id, data }) => {
-        if (map.has(id)) {
-          map.set(id, { ...map.get(id)!, ...data })
-          changed = true
-        }
-      })
-
-      tx.remove?.forEach((id) => {
-        if (map.delete(id)) {
-          const idx = orderedIds.indexOf(id)
-          if (idx !== -1) orderedIds.splice(idx, 1)
-          changed = true
-        }
-      })
-
-      if (changed) notify()
-
-      if (toAppend.length > 0 && backend) {
-        backend.append(toAppend)
+      if (tx.persist && backend?.applyTransaction) {
+        void backend.applyTransaction(tx)
       }
     },
 
-    hydrate: async (params = {}) => {
-      if (!backend) return
-      const result = await backend.hydrate(params)
-      replaceAll(result.rows)
-      backendTotal = result.total
-      notify()
+    applyTransactionAsync: async (tx) => {
+      const { affected } = applyTransactionCore(tx)
+      try {
+        let backendResult: BackendTransactionResult | void = undefined
+        if (tx.persist && backend?.applyTransaction) {
+          backendResult = await backend.applyTransaction(tx)
+        }
+        if (backendResult && !backendResult.ok) {
+          return {
+            ok: false,
+            affected,
+            error: backendResult.error,
+          }
+        }
+        return { ok: true, affected }
+      } catch (error) {
+        return {
+          ok: false,
+          affected,
+          error: error instanceof Error ? error : new Error(String(error)),
+        }
+      }
     },
 
-    query: async (params) => {
-      if (!backend) return
-      const result = await backend.query(params)
-      replaceAll(result.rows)
-      backendTotal = result.total
-      notify()
-    },
+    hydrate: (params = {}) => runQuery('hydrate', params),
+
+    query: (params) => runQuery('query', params),
+
+    getFacets: (params) => backend?.getFacets?.(params) ?? Promise.resolve(undefined),
 
     getTotalCount: () => (backend ? backendTotal : map.size),
+
+    reset: resetMemory,
+
+    clear: async () => {
+      await backend?.clear?.()
+      resetMemory()
+    },
+
+    dispose: () => {
+      querySequence++
+      backend?.close?.()
+      queryStateListeners.clear()
+      listeners.clear()
+    },
   }
 }

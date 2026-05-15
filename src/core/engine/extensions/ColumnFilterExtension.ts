@@ -28,6 +28,9 @@ declare module '@tanstack/react-table' {
       | 'datetime-range'
       | 'custom'
       | false
+    backendField?: string
+    backendType?: 'string' | 'number' | 'date' | 'boolean' | 'json' | 'custom'
+    backendPath?: string
   }
 }
 

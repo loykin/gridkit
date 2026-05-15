@@ -102,6 +102,7 @@ export type PassthroughTableOptions<T extends object> = Omit<
 >
 
 export type ColumnSizingMode = 'auto' | 'flex' | 'fixed'
+export type DataGridQueryMode = 'client' | 'backend'
 
 /**
  * Table width handling strategy:
@@ -209,6 +210,11 @@ export interface GridKitCoreProps<T extends object> {
    * Mutually exclusive with the `data` prop — set one or the other.
    */
   dataStore?: DataStore<T>
+  /**
+   * Backend mode connects sorting, filtering, search, and pagination state to
+   * dataStore.query(). It requires dataStore and keeps GridKit backend-neutral.
+   */
+  queryMode?: DataGridQueryMode
   columns: DataGridColumnDef<T>[]
   error?: Error | null
   isLoading?: boolean

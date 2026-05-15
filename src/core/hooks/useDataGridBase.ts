@@ -16,6 +16,7 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
   const {
     data = [],
     dataStore,
+    queryMode,
     columns,
     enableSorting = true,
     enableMultiSort,
@@ -70,9 +71,10 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
     initialSizing: columnSizing,
   })
 
-  const { table } = useDataGridCore({
+  const { table, queryState } = useDataGridCore({
     data,
     dataStore,
+    queryMode,
     columns: columnsWithCheckbox,
     enableSorting,
     enableMultiSort,
@@ -112,5 +114,5 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
 
   const rows = table.getRowModel().rows
 
-  return { wrapperRef, containerRef, table, rows, isSized, bordered, measure }
+  return { wrapperRef, containerRef, table, rows, isSized, bordered, measure, queryState }
 }

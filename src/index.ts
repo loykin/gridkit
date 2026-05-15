@@ -17,9 +17,28 @@ export { useCSVExport } from './features/export/useCSVExport'
 
 // DataStore API
 export { useDataStore } from './core/engine/useDataStore'
+export { useDataStoreQueryState } from './core/engine/useDataStoreQueryState'
 export { createDataStore } from './core/engine/DataStore'
-export type { DataStore, Transaction, DataStoreOptions } from './core/engine/DataStore'
-export type { DataStoreBackend, QueryParams, QueryResult } from './core/engine/DataStoreBackend'
+export type {
+  DataStore,
+  DataStoreQueryState,
+  Transaction,
+  TransactionResult,
+  DataStoreOptions,
+} from './core/engine/DataStore'
+export type {
+  DataStoreBackend,
+  DataStoreBackendCapabilities,
+  BackendTransaction,
+  BackendTransactionResult,
+  FacetParams,
+  FacetResult,
+  FilterExpr,
+  FilterOperator,
+  QueryParams,
+  QueryResult,
+  SortExpr,
+} from './core/engine/DataStoreBackend'
 
 export type { EditCellProps } from './core/engine/extensions/ColumnFlexFeature'
 

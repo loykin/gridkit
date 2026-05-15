@@ -39,13 +39,15 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const { wrapperRef, containerRef, table, rows } = useDataGridBase({
+  const { wrapperRef, containerRef, table, rows, queryState } = useDataGridBase({
     ...props,
     pagination: undefined,
     enableSorting: props.enableSorting ?? false,
     enableColumnResizing: false,
     columnSizingMode: 'fixed',
   })
+  const effectiveError = error ?? (props.queryMode === 'backend' ? queryState.error : null)
+  const effectiveIsLoading = isLoading ?? (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
 
   const rowSignature = useMemo(() => rows.map((row) => row.id).join('\n'), [rows])
 
@@ -61,7 +63,7 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
     isFetchingPreviousPage,
     fetchPreviousPage,
     rootMargin,
-    enabled: !isLoading,
+    enabled: !effectiveIsLoading,
     dependency: rowSignature,
   })
 
@@ -73,8 +75,8 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
     onAtBottomChange,
   })
 
-  if (error) {
-    return <div className="dg-error">{error.message}</div>
+  if (effectiveError) {
+    return <div className="dg-error">{effectiveError.message}</div>
   }
 
   return (
@@ -89,7 +91,7 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
         footer={footer}
         loadPreviousRef={loadPreviousRef}
         isFetchingPreviousPage={isFetchingPreviousPage}
-        isLoading={isLoading}
+        isLoading={effectiveIsLoading}
         renderMessage={renderMessage}
         renderDaySeparator={renderDaySeparator}
         renderUnreadMarker={renderUnreadMarker}

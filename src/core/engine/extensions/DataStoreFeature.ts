@@ -8,7 +8,7 @@ import {
   type Table,
   type Row,
 } from '@tanstack/react-table'
-import type { Transaction, DataStore } from '../DataStore'
+import type { Transaction, TransactionResult, DataStore } from '../DataStore'
 
 // ── Declaration merging ───────────────────────────────────────────────────────
 declare module '@tanstack/react-table' {
@@ -19,6 +19,8 @@ declare module '@tanstack/react-table' {
   interface Table<TData extends RowData> {
     /** O(1) add/update/delete. Triggers React re-render automatically. */
     applyTransaction: (tx: Transaction<TData>) => void
+    /** Transaction path that awaits backend persistence when tx.persist is true. */
+    applyTransactionAsync: (tx: Transaction<TData>) => Promise<TransactionResult>
     /** O(1) row lookup by id */
     getRowNodeById: (id: string) => TData | undefined
     /** Escape hatch — direct access to the internal DataStore */
@@ -109,6 +111,11 @@ export const DataStoreFeature: TableFeature = {
     table.applyTransaction = (tx) => {
       if (!store) return
       store.applyTransaction(tx)
+    }
+
+    table.applyTransactionAsync = (tx) => {
+      if (!store) return Promise.resolve({ ok: true, affected: 0 })
+      return store.applyTransactionAsync(tx)
     }
 
     table.getRowNodeById = (id: string) => store?.get(id)

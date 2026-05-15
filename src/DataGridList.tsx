@@ -29,19 +29,21 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
     classNames,
   } = props
 
-  const { wrapperRef, containerRef, table, rows } = useDataGridBase({
+  const { wrapperRef, containerRef, table, rows, queryState } = useDataGridBase({
     ...props,
     pagination: undefined,
     enableColumnResizing: false,
     columnSizingMode: 'fixed',
   })
+  const effectiveError = error ?? (props.queryMode === 'backend' ? queryState.error : null)
+  const effectiveIsLoading = isLoading ?? (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
 
   const { loadMoreRef } = useInfiniteScroll({
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
     rootMargin,
-    enabled: !isLoading,
+    enabled: !effectiveIsLoading,
   })
 
   const { virtual, virtualizer } = useRowVirtualizer({
@@ -56,8 +58,8 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
   const virtualInitialHeight =
     typeof effectiveContainerHeight === 'number' ? effectiveContainerHeight : undefined
 
-  if (error) {
-    return <div className="dg-error">{error.message}</div>
+  if (effectiveError) {
+    return <div className="dg-error">{effectiveError.message}</div>
   }
 
   return (
@@ -72,7 +74,7 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
         footer={footer}
         loadMoreRef={loadMoreRef}
         isFetchingNextPage={isFetchingNextPage}
-        isLoading={isLoading}
+        isLoading={effectiveIsLoading}
         renderItem={renderItem}
         itemKey={itemKey}
         itemGap={itemGap}

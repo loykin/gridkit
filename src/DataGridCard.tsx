@@ -21,22 +21,24 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
     minColumns,
   } = props
 
-  const { wrapperRef, containerRef, table, rows } = useDataGridBase({
+  const { wrapperRef, containerRef, table, rows, queryState } = useDataGridBase({
     ...props,
     pagination: undefined,
     columnSizingMode: 'fixed',
   })
+  const effectiveError = error ?? (props.queryMode === 'backend' ? queryState.error : null)
+  const effectiveIsLoading = isLoading ?? (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
 
   const { loadMoreRef } = useInfiniteScroll({
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
     rootMargin,
-    enabled: !isLoading,
+    enabled: !effectiveIsLoading,
   })
 
-  if (error) {
-    return <div className="dg-error">{error.message}</div>
+  if (effectiveError) {
+    return <div className="dg-error">{effectiveError.message}</div>
   }
 
   return (
@@ -50,7 +52,7 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
         headerRight={headerRight}
         loadMoreRef={loadMoreRef}
         isFetchingNextPage={isFetchingNextPage}
-        isLoading={isLoading}
+        isLoading={effectiveIsLoading}
         renderCard={renderCard}
         cardColumns={cardColumns}
         minCardWidth={minCardWidth}

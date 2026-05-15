@@ -17,19 +17,21 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
     icons,
   } = props
 
-  const { wrapperRef, containerRef, table, rows, isSized, measure } = useDataGridBase({
+  const { wrapperRef, containerRef, table, rows, isSized, measure, queryState } = useDataGridBase({
     ...props,
     // Infinite scroll handles page loading via IntersectionObserver — no pagination needed.
     // Omitting pagination prop disables it entirely.
     pagination: undefined,
   })
+  const effectiveError = error ?? (props.queryMode === 'backend' ? queryState.error : null)
+  const effectiveIsLoading = isLoading ?? (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
 
   const { loadMoreRef } = useInfiniteScroll({
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
     rootMargin,
-    enabled: !isLoading,
+    enabled: !effectiveIsLoading,
   })
 
   return (
@@ -42,11 +44,12 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
       rows={rows}
       isSized={isSized}
       measure={measure}
-      error={error}
+      error={effectiveError}
       headerLeft={headerLeft}
       headerRight={headerRight}
       loadMoreRef={loadMoreRef}
       isFetchingNextPage={isFetchingNextPage}
+      isLoading={effectiveIsLoading}
     />
     </IconsProvider>
   )
