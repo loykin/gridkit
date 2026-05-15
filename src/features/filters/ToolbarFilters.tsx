@@ -3,7 +3,7 @@ import { Check, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { useColumnOptions } from '@/core/hooks/useColumnOptions'
+import { useColumnOptions } from '@/features/filters/useColumnOptions'
 import { MultiSelectContent } from './MultiSelectContent'
 
 // ─────────────────────────────────────────────────────────────────────────────

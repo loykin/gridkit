@@ -52,6 +52,7 @@ export type {
   DataGridChatProps,
   DataGridPaginationConfig,
   DataGridColumnDef,
+  DataGridQueryMode,
   ColumnSizingMode,
   TableWidthMode,
   CheckboxConfig,

@@ -152,17 +152,17 @@ export const auditColumns: DataGridColumnDef<AuditEvent>[] = [
   {
     accessorKey: 'timestamp',
     header: 'Timestamp',
-    meta: { width: 160, filterType: 'datetime-range', backendField: 'timestamp', backendType: 'date' },
+    meta: { width: 160, filterType: 'datetime-range', backendField: 'timestamp' },
   },
   {
     accessorKey: 'user',
     header: 'User',
-    meta: { flex: 1, filterType: 'text', backendField: 'user', backendType: 'string' },
+    meta: { flex: 1, filterType: 'text', backendField: 'user' },
   },
   {
     accessorKey: 'action',
     header: 'Action',
-    meta: { width: 100, filterType: 'multi-select', backendField: 'action', backendType: 'string' },
+    meta: { width: 100, filterType: 'multi-select', backendField: 'action' },
     cell: ({ row }) => (
       <span
         className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${ACTION_STYLE[row.original.action]}`}
@@ -174,17 +174,17 @@ export const auditColumns: DataGridColumnDef<AuditEvent>[] = [
   {
     accessorKey: 'resource',
     header: 'Resource',
-    meta: { flex: 1, filterType: 'select', backendField: 'resource', backendType: 'string' },
+    meta: { flex: 1, filterType: 'select', backendField: 'resource' },
   },
   {
     accessorKey: 'namespace',
     header: 'Namespace',
-    meta: { flex: 1, filterType: 'select', backendField: 'namespace', backendType: 'string' },
+    meta: { flex: 1, filterType: 'select', backendField: 'namespace' },
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    meta: { width: 90, filterType: 'select', backendField: 'status', backendType: 'string' },
+    meta: { width: 90, filterType: 'select', backendField: 'status' },
     cell: ({ row }) => (
       <span
         className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${

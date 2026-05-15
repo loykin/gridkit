@@ -29,8 +29,6 @@ declare module '@tanstack/react-table' {
       | 'custom'
       | false
     backendField?: string
-    backendType?: 'string' | 'number' | 'date' | 'boolean' | 'json' | 'custom'
-    backendPath?: string
   }
 }
 
