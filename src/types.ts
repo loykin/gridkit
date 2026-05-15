@@ -6,6 +6,7 @@ import type {
   ColumnPinningState,
   ColumnSizingState,
   Column,
+  GroupingState,
   Row,
   SortingState,
   Table,
@@ -218,6 +219,10 @@ export interface GridKitDisplayProps<T extends object> {
   onRowClick?: (row: T) => void
   rowCursor?: boolean
   tableHeight?: string | number | 'auto'
+  /** Cap the container height — content shorter than this grows naturally, taller gets a scrollbar. */
+  maxTableHeight?: string | number
+  /** Floor the container height — content taller than this grows naturally, shorter keeps this minimum. */
+  minTableHeight?: string | number
 }
 
 export interface GridKitCoreProps<T extends object> extends GridKitDisplayProps<T> {
@@ -346,6 +351,8 @@ export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T
   estimateRowHeight?: number
   /** Rows to render outside the visible area (virtualizer overscan, default: 10) */
   overscan?: number
+  /** Custom renderer for group header rows. Defaults to showing column value and sub-row count. */
+  renderGroupRow?: (row: Row<T>) => ReactNode
   /** Slot-based class injection for individual table elements */
   classNames?: DataGridClassNames
 }
@@ -379,6 +386,14 @@ export interface DataGridBaseProps<T extends object> extends GridKitCoreProps<T>
    * If omitted, TanStack Table looks for a 'subRows' key on each data item.
    */
   getSubRows?: (originalRow: T, index: number) => T[] | undefined
+
+  // Row Grouping
+  /** Enable grouping rows by column value. Set column IDs via `grouping` or column meta `enableGrouping`. */
+  enableGrouping?: boolean
+  /** Controlled grouping state — array of column IDs to group by. */
+  grouping?: GroupingState
+  /** Called when grouping changes. */
+  onGroupingChange?: (grouping: GroupingState) => void
 
   // Selection
   checkboxConfig?: CheckboxConfig<T>

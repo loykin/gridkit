@@ -29,6 +29,7 @@ import { ChatTab } from './tabs/ChatTab'
 import { AgentTraceTab } from './tabs/AgentTraceTab'
 import { EvalReviewTab } from './tabs/EvalReviewTab'
 import { HeaderGroupsTab } from './tabs/HeaderGroupsTab'
+import { GroupingTab } from './tabs/GroupingTab'
 import { StatePersistenceTab } from './tabs/StatePersistenceTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
@@ -44,6 +45,7 @@ const TABS = [
   { id: 'bordered', label: 'Bordered', content: <BorderedTab /> },
   { id: 'row-height', label: 'Row Height', content: <RowHeightTab /> },
   { id: 'tree', label: 'Tree / Groups', content: <TreeTab /> },
+  { id: 'grouping', label: 'Row Grouping', content: <GroupingTab /> },
   { id: 'drag', label: 'Row Drag', content: <DragTab /> },
   { id: 'filter-icon', label: 'Filter Icon', content: <FilterIconTab /> },
   { id: 'toolbar', label: 'Toolbar', content: <ToolbarTab /> },

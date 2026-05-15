@@ -585,6 +585,42 @@
   font-size: 13px;
 }
 
+/* ── Group rows ─────────────────────────────────────────────────────────────── */
+.dg-group-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border-bottom: 1px solid var(--dg-border);
+  background: color-mix(in oklab, var(--dg-muted) 40%, var(--dg-background));
+  font-weight: 500;
+  font-size: 13px;
+  cursor: default;
+}
+.dg-group-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  flex: 1;
+  min-height: 33px;
+}
+.dg-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--dg-muted-foreground);
+  flex-shrink: 0;
+}
+.dg-group-toggle:hover { color: var(--dg-foreground); }
+.dg-group-label { color: var(--dg-foreground); }
+.dg-group-count { color: var(--dg-muted-foreground); font-size: 12px; }
+
 /* ── Editing cell ───────────────────────────────────────────────────────────── */
 .dg-cell[data-editing="true"] {
   padding: 2px 4px;

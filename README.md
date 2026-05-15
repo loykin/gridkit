@@ -641,6 +641,8 @@ const columns: DataGridColumnDef<User>[] = [
 | `emptyContent` | `ReactNode` | — | Custom empty state UI (overrides `emptyMessage`) |
 | `showHeader` | `boolean` | `true` | Show/hide the header row |
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Fixed height — enables internal scroll and virtualization |
+| `maxTableHeight` | `string \| number` | — | Cap height — grows with content up to this limit, then scrolls |
+| `minTableHeight` | `string \| number` | — | Floor height — content shorter than this keeps minimum space |
 | `rowHeight` | `number` | `33` | Row height in px (also sets virtualizer estimate) |
 | `estimateRowHeight` | `number` | — | Override virtualizer estimate independently of `rowHeight` |
 | `overscan` | `number` | `10` | Rows to render outside the visible area |
@@ -720,6 +722,11 @@ function MyDateTimeRangeFilter<T extends object>({
 | `enableExpanding` | `boolean` | `false` | Enable collapsible sub-rows |
 | `getSubRows` | `(row: T, index: number) => T[] \| undefined` | — | Extract sub-rows from a row item |
 | `renderDetailRow` | `(row: Row<unknown>) => ReactNode` | — | Render a master-detail panel below each row. Use `ExpandToggleCell` in a column to toggle |
+| **Row Grouping** ||||
+| `enableGrouping` | `boolean` | `false` | Enable grouping rows by column value |
+| `grouping` | `GroupingState` | — | Controlled array of column IDs to group by |
+| `onGroupingChange` | `(grouping: GroupingState) => void` | — | Called when grouping changes |
+| `renderGroupRow` | `(row: Row<T>) => ReactNode` | — | Custom group header renderer |
 | **Selection** ||||
 | `checkboxConfig` | `CheckboxConfig<T>` | — | Row checkbox selection configuration |
 | **State Persistence** ||||
@@ -1057,6 +1064,58 @@ const columns = [
   getSubRows={(row) => row.children}
 />
 ```
+
+---
+
+## Row Grouping
+
+Group rows by one or more column values. Grouped rows are collapsible and show the group value and sub-row count by default.
+
+```tsx
+<DataGrid
+  data={data}
+  columns={columns}
+  enableGrouping
+  grouping={['status']}
+/>
+```
+
+Grouping state can be controlled externally:
+
+```tsx
+const [grouping, setGrouping] = useState<GroupingState>(['department'])
+
+<DataGrid
+  data={data}
+  columns={columns}
+  enableGrouping
+  grouping={grouping}
+  onGroupingChange={setGrouping}
+/>
+```
+
+Use `renderGroupRow` to customize the group header:
+
+```tsx
+<DataGrid
+  data={data}
+  columns={columns}
+  enableGrouping
+  grouping={['status']}
+  renderGroupRow={(row) => (
+    <span>{String(row.groupingValue)} — {row.subRows.length} items</span>
+  )}
+/>
+```
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `enableGrouping` | `boolean` | `false` | Enable row grouping |
+| `grouping` | `GroupingState` | — | Controlled array of column IDs to group by |
+| `onGroupingChange` | `(grouping: GroupingState) => void` | — | Called when grouping changes |
+| `renderGroupRow` | `(row: Row<T>) => ReactNode` | — | Custom group header renderer |
+
+> `GroupingState` is `string[]` from `@tanstack/react-table`.
 
 ---
 

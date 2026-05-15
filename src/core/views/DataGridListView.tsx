@@ -20,6 +20,8 @@ interface DataGridListViewProps<T extends object>
     | 'itemPadding'
     | 'containerHeight'
     | 'tableHeight'
+    | 'maxTableHeight'
+    | 'minTableHeight'
     | 'isFetchingNextPage'
     | 'headerLeft'
     | 'headerRight'
@@ -57,6 +59,8 @@ export function DataGridListView<T extends object>({
   itemPadding = 0,
   containerHeight,
   tableHeight,
+  maxTableHeight,
+  minTableHeight,
   onRowClick,
   rowCursor,
   classNames,
@@ -174,6 +178,8 @@ export function DataGridListView<T extends object>({
       headerRight={headerRight}
       containerHeight={containerHeight}
       tableHeight={tableHeight}
+      maxTableHeight={maxTableHeight}
+      minTableHeight={minTableHeight}
       containerClassName={cn('dg-list-container', classNames?.container)}
       footer={footer}
     >

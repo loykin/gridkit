@@ -4,6 +4,7 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
+  getGroupedRowModel,
   getPaginationRowModel,
   getExpandedRowModel,
   type ColumnFiltersState,
@@ -12,6 +13,7 @@ import {
   type ColumnSizingState,
   type ExpandedState,
   type FilterFn,
+  type GroupingState,
   type PaginationState,
   type SortingState,
   type VisibilityState,
@@ -61,6 +63,9 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   | 'onColumnSizingChange'
   | 'enableExpanding'
   | 'getSubRows'
+  | 'enableGrouping'
+  | 'grouping'
+  | 'onGroupingChange'
   | 'tableOptions'
   | 'enableColumnReordering'
   | 'onColumnOrderChange'
@@ -105,6 +110,9 @@ export function useDataGridCore<T extends object>({
   onColumnSizingChange,
   enableExpanding = false,
   getSubRows,
+  enableGrouping = false,
+  grouping: externalGrouping,
+  onGroupingChange,
   getRowId,
   tableOptions,
   enableColumnReordering = false,
@@ -122,6 +130,7 @@ export function useDataGridCore<T extends object>({
 
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([])
   const [expanded, setExpanded] = useState<ExpandedState>({})
+  const [internalGrouping, setInternalGrouping] = useState<GroupingState>([])
   const [sorting, setSorting] = useState<SortingState>(initialSorting ?? [])
   const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(() =>
     deriveInitialColumnPinning(columns, initialPinning),
@@ -148,6 +157,7 @@ export function useDataGridCore<T extends object>({
     }
   }, [tableKey, syncState, register, pagination])
 
+  const effectiveGrouping = externalGrouping ?? internalGrouping
   const effectiveGlobalFilter = externalGlobalFilter ?? internalGlobal
   const effectiveColumnFilters = externalColumnFilters ?? internalFilters
   const effectiveColumnVisibility = visibilityState ?? internalColumnVisibility
@@ -225,7 +235,8 @@ export function useDataGridCore<T extends object>({
       columnPinning,
       ...(enableColumnReordering ? { columnOrder } : {}),
       ...(enablePagination ? { pagination: paginationState } : {}),
-      ...(enableExpanding ? { expanded } : {}),
+      ...((enableExpanding || enableGrouping) ? { expanded } : {}),
+      ...(enableGrouping ? { grouping: effectiveGrouping } : {}),
     },
     manualSorting: effectiveManualSorting,
     manualFiltering: effectiveManualFiltering,
@@ -289,7 +300,14 @@ export function useDataGridCore<T extends object>({
           })
         }
       : undefined,
-    onExpandedChange: enableExpanding ? setExpanded : undefined,
+    onGroupingChange: enableGrouping ? (updater) => {
+      setInternalGrouping((prev) => {
+        const next = typeof updater === 'function' ? updater(prev) : updater
+        onGroupingChange?.(next)
+        return next
+      })
+    } : undefined,
+    onExpandedChange: (enableExpanding || enableGrouping) ? setExpanded : undefined,
     getSubRows,
     autoResetExpanded: false,
     // Explicitly derive canExpand from source data so depth-N rows show the
@@ -304,7 +322,8 @@ export function useDataGridCore<T extends object>({
 
     // Phase 3: row-caching model when DataStore is present; stock model otherwise
     getCoreRowModel: dataStore ? getDataStoreCoreRowModel<T>() : getCoreRowModel(),
-    getExpandedRowModel: enableExpanding ? getExpandedRowModel() : undefined,
+    getGroupedRowModel: enableGrouping ? getGroupedRowModel() : undefined,
+    getExpandedRowModel: (enableExpanding || enableGrouping) ? getExpandedRowModel() : undefined,
     getSortedRowModel: effectiveManualSorting ? undefined : getSortedRowModel(),
     getFilteredRowModel: effectiveManualFiltering ? undefined : getFilteredRowModel(),
     getPaginationRowModel: enablePagination && !enableBackendQuery ? getPaginationRowModel() : undefined,

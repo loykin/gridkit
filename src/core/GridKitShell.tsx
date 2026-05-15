@@ -6,12 +6,19 @@ import type { GridKitHeaderSlot } from '@/types'
 
 export function resolveContainerHeight(
   height: string | number | 'auto' | undefined,
+  maxHeight?: string | number,
+  minHeight?: string | number,
 ): React.CSSProperties {
-  if (height == null || height === 'auto') return {}
-  return {
-    height: typeof height === 'number' ? `${height}px` : height,
-    overflow: 'auto',
+  const toCSS = (v: string | number) => (typeof v === 'number' ? `${v}px` : v)
+  const min = minHeight != null ? { minHeight: toCSS(minHeight) } : {}
+
+  if (height != null && height !== 'auto') {
+    return { height: toCSS(height), overflow: 'auto', ...min }
   }
+  if (maxHeight != null) {
+    return { maxHeight: toCSS(maxHeight), overflow: 'auto', ...min }
+  }
+  return { ...min }
 }
 
 interface GridKitShellProps<T extends object> {
@@ -22,6 +29,8 @@ interface GridKitShellProps<T extends object> {
   headerRight?: GridKitHeaderSlot<T>
   containerHeight?: string | number | 'auto'
   tableHeight?: string | number | 'auto'
+  maxTableHeight?: string | number
+  minTableHeight?: string | number
   containerClassName?: string
   footer?: ReactNode
   children: ReactNode
@@ -35,11 +44,13 @@ export function GridKitShell<T extends object>({
   headerRight,
   containerHeight,
   tableHeight,
+  maxTableHeight,
+  minTableHeight,
   containerClassName,
   footer,
   children,
 }: GridKitShellProps<T>) {
-  const heightStyle = resolveContainerHeight(containerHeight ?? tableHeight)
+  const heightStyle = resolveContainerHeight(containerHeight ?? tableHeight, maxTableHeight, minTableHeight)
 
   return (
     <div ref={wrapperRef} className="dg-shell">

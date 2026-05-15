@@ -21,6 +21,8 @@ interface DataGridChatViewProps<T extends object>
     | 'footer'
     | 'containerHeight'
     | 'tableHeight'
+    | 'maxTableHeight'
+    | 'minTableHeight'
     | 'classNames'
   > {
   wrapperRef: React.RefObject<HTMLDivElement | null>
@@ -41,6 +43,8 @@ export function DataGridChatView<T extends object>({
   footer,
   containerHeight,
   tableHeight,
+  maxTableHeight,
+  minTableHeight,
   isFetchingPreviousPage,
   isLoading,
   emptyMessage = 'No messages',
@@ -116,6 +120,8 @@ export function DataGridChatView<T extends object>({
       headerRight={headerRight}
       containerHeight={containerHeight}
       tableHeight={tableHeight}
+      maxTableHeight={maxTableHeight}
+      minTableHeight={minTableHeight}
       containerClassName={cn('dg-chat-container', classNames?.container)}
       footer={footer}
     >

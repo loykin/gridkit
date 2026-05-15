@@ -117,6 +117,8 @@ export function DataGridTableView<T extends object>({
   customFilterComponents,
   filterDisplay = 'row',
   tableHeight,
+  maxTableHeight,
+  minTableHeight,
   tableWidthMode = 'spacer',
   rowHeight,
   estimateRowHeight,
@@ -127,6 +129,7 @@ export function DataGridTableView<T extends object>({
   enableColumnReordering = false,
   enableColumnPinning = false,
   renderDetailRow,
+  renderGroupRow,
   onCellValueChange,
   onMeasureColumns,
   classNames,
@@ -206,11 +209,17 @@ export function DataGridTableView<T extends object>({
   }, [bodyScrollRef, checkVScroll])
 
   // Body wrapper: fixed height when tableHeight is set so hscroll stays inside
+  const toCSS = (v: string | number) => (typeof v === 'number' ? `${v}px` : v)
   const bodyWrapperStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    ...(tableHeight && tableHeight !== 'auto' ? { height: tableHeight as string | number } : {}),
+    ...(tableHeight && tableHeight !== 'auto'
+      ? { height: toCSS(tableHeight as string | number) }
+      : maxTableHeight != null
+        ? { maxHeight: toCSS(maxTableHeight) }
+        : {}),
+    ...(minTableHeight != null ? { minHeight: toCSS(minTableHeight) } : {}),
   }
 
   // Body scroll element: fills remaining space after hscroll takes its height
@@ -304,6 +313,7 @@ export function DataGridTableView<T extends object>({
                     onActionTrigger={actionCol ? handleActionTrigger : undefined}
                     tableWidthMode={tableWidthMode}
                     renderDetailRow={renderDetailRow}
+                    renderGroupRow={renderGroupRow}
                     classNames={classNames}
                   />
                 </EditingCellContext>
