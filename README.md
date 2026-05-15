@@ -621,6 +621,7 @@ const columns: DataGridColumnDef<User>[] = [
 | `pin` | `'left' \| 'right'` | Pin column at definition level |
 | `wrap` | `boolean` | Allow multi-line content; row height adjusts automatically |
 | `filterType` | `'text' \| 'select' \| 'multi-select' \| 'number' \| 'date' \| 'date-range' \| 'datetime' \| 'datetime-range' \| 'custom' \| false` | Filter input type for this column |
+| `backendField` | `string` | Field name sent to `DataStoreBackend` query/facet params. Defaults to the column id |
 | `actions` | `(row: T) => Action[]` | Row action menu items |
 
 ---
@@ -633,6 +634,7 @@ const columns: DataGridColumnDef<User>[] = [
 |---|---|---|---|
 | `data` | `T[]` | `[]` | Row data |
 | `dataStore` | `DataStore<T>` | — | Map-based store for real-time updates. Mutually exclusive with `data` |
+| `queryMode` | `'client' \| 'backend'` | `'client'` | In backend mode, sorting, filtering, search, and pagination call `dataStore.query()` |
 | `columns` | `DataGridColumnDef<T>[]` | — | Column definitions |
 | `error` | `Error \| null` | — | Display error state |
 | `isLoading` | `boolean` | — | Show loading skeleton |
@@ -801,7 +803,174 @@ import {
 
 ---
 
+## Backend Query Mode
+
+Use `queryMode="backend"` when the grid should hold only the current backend result window while sorting, filtering, global search, and pagination are translated into backend-neutral query params.
+
+GridKit owns the grid lifecycle and query state. Your backend owns data semantics: REST params, SQL, IndexedDB queries, cache policy, polling, schema setup, and domain-specific filter behavior.
+
+```tsx
+import {
+  DataGrid,
+  DataGridPaginationBar,
+  GlobalSearch,
+  useDataStore,
+  useDataStoreQueryState,
+} from '@loykin/gridkit'
+import type { DataStoreBackend, QueryParams } from '@loykin/gridkit'
+
+interface AuditEvent {
+  id: string
+  user: string
+  action: string
+  status: string
+}
+
+const backend: DataStoreBackend<AuditEvent> = {
+  capabilities: {
+    filtering: true,
+    sorting: true,
+    pagination: true,
+    globalSearch: true,
+    facets: true,
+  },
+  async query(params: QueryParams) {
+    // Translate params.filters / params.globalFilter / params.sort
+    // / params.limit / params.offset into REST, SQL, IndexedDB, etc.
+    return fetchAuditEvents(params)
+  },
+  async getFacets(params) {
+    // Optional: values for select and multi-select filter UIs.
+    return fetchAuditFacetValues(params)
+  },
+}
+
+const columns = [
+  { accessorKey: 'user', meta: { filterType: 'text', backendField: 'user_name' } },
+  { accessorKey: 'action', meta: { filterType: 'multi-select' } },
+  { accessorKey: 'status', meta: { filterType: 'select' } },
+]
+
+export function AuditGrid() {
+  const store = useDataStore<AuditEvent>({
+    getRowId: (row) => row.id,
+    backend,
+  })
+  const queryState = useDataStoreQueryState(store)
+
+  return (
+    <DataGrid
+      dataStore={store}
+      queryMode="backend"
+      columns={columns}
+      enableColumnFilters
+      filterDisplay="icon"
+      enableMultiSort
+      isLoading={queryState.isHydrating || queryState.isQuerying}
+      error={queryState.error}
+      headerLeft={(table) => <GlobalSearch table={table} />}
+      pagination={{ pageSize: 100 }}
+      footer={(table) => (
+        <DataGridPaginationBar table={table} totalCount={queryState.total} />
+      )}
+    />
+  )
+}
+```
+
+### Query Contract
+
+```ts
+type FilterOperator =
+  | 'eq' | 'neq'
+  | 'in' | 'notIn'
+  | 'like' | 'startsWith' | 'endsWith'
+  | 'empty' | 'notEmpty'
+  | 'range'
+  | 'gt' | 'gte' | 'lt' | 'lte'
+
+interface FilterExpr {
+  field: string
+  op: FilterOperator
+  value?: unknown
+}
+
+interface SortExpr {
+  field: string
+  desc?: boolean
+}
+
+interface QueryParams {
+  filters?: FilterExpr[]
+  globalFilter?: string
+  sort?: SortExpr[]
+  limit?: number
+  offset?: number
+}
+```
+
+`field` is `column.meta.backendField` when provided, otherwise the column id. GridKit does not generate SQL, know schemas, escape database paths, poll APIs, or choose fallback/cache policy.
+
+When query criteria change, backend mode resets pagination to page 0 before querying. This avoids sending a stale offset from the previous result set.
+
+### Facets
+
+`getFacets` is optional. When present, `select` and `multi-select` filter options are loaded from the backend instead of scanning the current page.
+
+```ts
+interface FacetParams {
+  field: string
+  filters?: FilterExpr[]
+  globalFilter?: string
+  limit?: number
+}
+
+interface FacetResult {
+  values: string[]
+  truncated?: boolean
+  hasEmpty?: boolean
+}
+```
+
+Facet requests exclude the current column's own filter but include the other active filters and global search.
+
+### Transactions
+
+`applyTransaction()` is the synchronous local path for realtime updates. If `persist: true` is set, GridKit fires `backend.applyTransaction()` without awaiting it.
+
+`applyTransactionAsync()` is persistence-first. When `persist: true`, it awaits `backend.applyTransaction()` before updating the in-memory store; if the backend write fails, local rows are not changed.
+
+```ts
+const result = await store.applyTransactionAsync({
+  update: [{ id: row.id, data: { status: 'done' } }],
+  persist: true,
+})
+
+if (!result.ok) {
+  reportError(result.error)
+}
+```
+
+### Capabilities
+
+`backend.capabilities` is optional. In development, GridKit warns when `queryMode="backend"` uses a feature the backend declares unsupported.
+
+```ts
+const backend: DataStoreBackend<Row> = {
+  capabilities: {
+    filtering: true,
+    sorting: false,
+    pagination: true,
+  },
+  query,
+}
+```
+
+---
+
 ## Server-Side Sorting & Filtering
+
+This is the lower-level manual alternative to `queryMode="backend"`. Use it when the application wants to own all query orchestration and pass only the current page rows into `data`.
 
 ```tsx
 import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
