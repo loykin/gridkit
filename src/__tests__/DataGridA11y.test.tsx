@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { DataGrid } from '@/DataGrid'
-import { ColumnVisibilityDropdown } from '@/core/ColumnVisibilityDropdown'
-import { DataGridPaginationBar } from '@/core/DataGridPaginationBar'
+import { ColumnVisibilityDropdown } from '@/core/controls/ColumnVisibilityDropdown'
+import { DataGridPaginationBar } from '@/core/controls/DataGridPaginationBar'
 import type { DataGridColumnDef } from '@/types'
 
 interface Person {

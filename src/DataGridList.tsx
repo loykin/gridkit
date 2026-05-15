@@ -2,7 +2,7 @@ import type { DataGridListProps } from '@/types'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { useInfiniteScroll } from '@/core/hooks/useInfiniteScroll'
 import { useRowVirtualizer } from '@/core/hooks/useRowVirtualizer'
-import { DataGridListView } from '@/core/DataGridListView'
+import { DataGridListView } from '@/core/views/DataGridListView'
 import { IconsProvider } from '@/core/IconsContext'
 
 export function DataGridList<T extends object>(props: DataGridListProps<T>) {

@@ -33,4 +33,4 @@ declare module '@tanstack/react-table' {
 
 // ── Feature ───────────────────────────────────────────────────────────────────
 // Type declaration only — filter rendering is handled in DataGridTableView.
-export const ColumnFilterExtension: TableFeature = {}
+export const ColumnFilterFeature: TableFeature = {}

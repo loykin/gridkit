@@ -1,4 +1,4 @@
-import type { DataStoreBackend, QueryParams } from './backends/DataStoreBackend'
+import type { DataStoreBackend, QueryParams } from './DataStoreBackend'
 
 export interface Transaction<T> {
   add?: T[]

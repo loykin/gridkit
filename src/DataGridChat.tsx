@@ -3,7 +3,7 @@ import type { DataGridChatProps } from '@/types'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { useReverseInfiniteScroll } from '@/core/hooks/useReverseInfiniteScroll'
 import { useStickToBottom } from '@/core/hooks/useStickToBottom'
-import { DataGridChatView } from '@/core/DataGridChatView'
+import { DataGridChatView } from '@/core/views/DataGridChatView'
 import { IconsProvider } from '@/core/IconsContext'
 
 export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {

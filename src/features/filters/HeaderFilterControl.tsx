@@ -1,5 +1,5 @@
 import type { Table, Header } from '@tanstack/react-table'
-import { HeaderFilterPopover } from './controls/HeaderFilterPopover'
+import { HeaderFilterPopover } from './HeaderFilterPopover'
 import type { TableViewConfig } from '@/types'
 
 interface HeaderFilterControlProps<T extends object> {

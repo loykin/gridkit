@@ -1,7 +1,7 @@
 import type React from 'react'
 import type { ReactNode } from 'react'
 import type { Table } from '@tanstack/react-table'
-import { DataGridToolbar } from '@/core/DataGridToolbar'
+import { DataGridToolbar } from '@/core/controls/DataGridToolbar'
 import type { GridKitHeaderSlot } from '@/types'
 
 export function resolveContainerHeight(

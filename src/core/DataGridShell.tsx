@@ -2,7 +2,7 @@ import type React from 'react'
 import type { Table, Row } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { GridKitShell } from '@/core/GridKitShell'
-import { DataGridTableView } from '@/core/DataGridTableView'
+import { DataGridTableView } from '@/core/views/DataGridTableView'
 import type { GridKitHeaderSlot, TableViewConfig } from '@/types'
 
 interface DataGridShellProps<T extends object> extends TableViewConfig<T> {

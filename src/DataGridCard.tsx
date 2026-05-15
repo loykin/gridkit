@@ -1,7 +1,7 @@
 import type { DataGridCardProps } from '@/types'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { useInfiniteScroll } from '@/core/hooks/useInfiniteScroll'
-import { DataGridCardView } from '@/core/DataGridCardView'
+import { DataGridCardView } from '@/core/views/DataGridCardView'
 import { IconsProvider } from '@/core/IconsContext'
 
 export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {

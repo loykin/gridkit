@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { getColumnOptions } from '@/core/hooks/useColumnOptions'
-import { MultiSelectContent } from './controls/MultiSelectContent'
+import { MultiSelectContent } from './MultiSelectContent'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SelectFilter — single value dropdown for toolbar

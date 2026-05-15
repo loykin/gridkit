@@ -3,7 +3,7 @@ import { createRef } from 'react'
 import type { Table, VisibilityState } from '@tanstack/react-table'
 import { describe, expect, it, vi } from 'vitest'
 import { DataGrid } from '@/DataGrid'
-import { ColumnVisibilityDropdown } from '@/core/ColumnVisibilityDropdown'
+import { ColumnVisibilityDropdown } from '@/core/controls/ColumnVisibilityDropdown'
 import type { DataGridColumnDef } from '@/types'
 
 interface Person {
