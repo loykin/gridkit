@@ -29,6 +29,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "test": "vitest run",
+    "test:consumer": "node scripts/verify-package-consumer.mjs",
     "test:e2e": "node --test e2e/*.test.mjs",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
