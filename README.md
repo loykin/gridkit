@@ -1,6 +1,6 @@
 # @loykin/gridkit
 
-A feature-rich React DataGrid built on TanStack Table — Tailwind-independent, fully themeable via CSS variables, with virtualization, sorting, filtering, pagination, and real-time updates.
+A feature-rich React DataGrid built on TanStack Table — fully themeable via CSS variables, with virtualization, sorting, filtering, pagination, and real-time updates.
 
 **[Live Playground →](https://loykin.github.io/gridkit/playground/)** · **[GitHub →](https://github.com/loykin/gridkit)**
 
@@ -8,7 +8,6 @@ A feature-rich React DataGrid built on TanStack Table — Tailwind-independent, 
 
 ## Features
 
-- **No Tailwind required** — all styles ship as `dg-*` CSS classes. Works in any stack.
 - **Virtualization** — only visible rows are rendered via `@tanstack/react-virtual`
 - **Sorting** — client-side and server-side (manual)
 - **Column Filters** — filter row or icon-mode with `text`, `select`, `multi-select`, `number` types
