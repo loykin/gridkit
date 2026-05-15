@@ -1163,6 +1163,29 @@ interface DataGridClassNames {
 
 ---
 
+## Internal Architecture Notes
+
+GridKit treats `src/core/table` as the built-in table composition layer, not as a feature-free rendering primitive. It owns the standard DataGrid table structure and composes the built-in feature slices used by the default grid experience:
+
+- sorting indicators
+- header filter controls
+- pinning and resize controls
+- row action triggers
+- inline editing cell content
+- selection, expansion, and reordering integration
+
+The `src/features/*` folders contain reusable built-in feature slices. Importing those slices from `core/table` is intentional for the current architecture. A stricter slot/injection model can be introduced later if GridKit needs a plugin system or alternate table renderers, but it should start as an internal refactor rather than a public extension API.
+
+Good future candidates for partial injection, if the coupling starts to hurt:
+
+- `DataGridBodyCell`: editable cell content and row action trigger
+- `DataGridFilterRow`: built-in filter controls
+- `DataGridHeaderCell`: sort, filter, pinning, and resize controls
+
+Until then, keep `core/engine` backend-neutral, keep filter-specific option/facet loading in `features/filters`, and avoid moving product/domain behavior into GridKit.
+
+---
+
 ## License
 
 MIT
