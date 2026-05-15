@@ -61,6 +61,7 @@ export type {
   TableWidthMode,
   CheckboxConfig,
   GridKitCoreProps,
+  GridKitDisplayProps,
   GridKitRowsContext,
   GridKitTableContext,
   GridKitPersistedState,

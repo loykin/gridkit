@@ -203,7 +203,24 @@ export interface GridKitStatePersistence {
   include?: GridKitPersistedStateKey[]
 }
 
-export interface GridKitCoreProps<T extends object> {
+/**
+ * Display-layer props shared between GridKitCoreProps and TableViewConfig.
+ * Defined once here so both interfaces stay in sync automatically.
+ */
+export interface GridKitDisplayProps<T extends object> {
+  isLoading?: boolean
+  emptyMessage?: string
+  /**
+   * Custom UI rendered in the body area when there is no data.
+   * Takes precedence over emptyMessage when provided.
+   */
+  emptyContent?: ReactNode
+  onRowClick?: (row: T) => void
+  rowCursor?: boolean
+  tableHeight?: string | number | 'auto'
+}
+
+export interface GridKitCoreProps<T extends object> extends GridKitDisplayProps<T> {
   data?: T[]
   /**
    * Map-based external store for real-time / high-frequency updates.
@@ -217,15 +234,6 @@ export interface GridKitCoreProps<T extends object> {
   queryMode?: DataGridQueryMode
   columns: DataGridColumnDef<T>[]
   error?: Error | null
-  isLoading?: boolean
-  emptyMessage?: string
-  /**
-   * Custom UI rendered in the body area when there is no data.
-   * Takes precedence over emptyMessage when provided.
-   */
-  emptyContent?: ReactNode
-  onRowClick?: (row: T) => void
-  rowCursor?: boolean
 
   // Sorting
   enableSorting?: boolean
@@ -251,7 +259,6 @@ export interface GridKitCoreProps<T extends object> {
   /** Content rendered on the right side of the shared toolbar area. */
   headerRight?: GridKitHeaderSlot<T>
 
-  tableHeight?: string | number | 'auto'
   /** Preferred name for non-table view scroll container height. */
   containerHeight?: string | number | 'auto'
 
@@ -288,18 +295,9 @@ export interface GridKitCoreProps<T extends object> {
   tableOptions?: PassthroughTableOptions<T>
 }
 
-export interface TableViewConfig<T extends object> {
-  isLoading?: boolean
-  emptyMessage?: string
-  /**
-   * Custom UI rendered in the body area when there is no data.
-   * Takes precedence over emptyMessage when provided.
-   */
-  emptyContent?: ReactNode
+export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T> {
   /** Whether to show the header row. Defaults to true. */
   showHeader?: boolean
-  onRowClick?: (row: T) => void
-  rowCursor?: boolean
   enableColumnResizing?: boolean
   /** Show per-column filter row below the header (AG Grid style) */
   enableColumnFilters?: boolean
@@ -314,7 +312,6 @@ export interface TableViewConfig<T extends object> {
    * - 'icon': filter icon inside each header cell that opens a popover
    */
   filterDisplay?: 'row' | 'icon'
-  tableHeight?: string | number | 'auto'
   /** Show vertical dividers between columns */
   bordered?: boolean
   /** Enable drag-to-reorder columns by dragging the header */
