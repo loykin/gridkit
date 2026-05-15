@@ -57,21 +57,38 @@ function ActionMenuPopup({ anchor, onClose, children }: ActionMenuPopupProps) {
   }, [anchor])
 
   React.useEffect(() => {
-    const handle = (e: MouseEvent) => {
+    const firstItem = popupRef.current?.querySelector<HTMLElement>('[role="menuitem"]:not(:disabled)')
+    firstItem?.focus({ preventScroll: true })
+  }, [])
+
+  React.useEffect(() => {
+    const handlePointerDown = (e: MouseEvent) => {
       if (!popupRef.current?.contains(e.target as Node) && !anchor.contains(e.target as Node)) {
         onClose()
       }
     }
-    const timer = setTimeout(() => document.addEventListener('mousedown', handle), 0)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        onClose()
+        anchor.focus()
+      }
+    }
+    const timer = setTimeout(() => {
+      document.addEventListener('mousedown', handlePointerDown)
+      document.addEventListener('keydown', handleKeyDown)
+    }, 0)
     return () => {
       clearTimeout(timer)
-      document.removeEventListener('mousedown', handle)
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
     }
   }, [anchor, onClose])
 
   return createPortal(
     <div
       ref={popupRef}
+      role="menu"
       className="dg-action-menu"
       style={{ position: 'fixed', zIndex: 50, outline: 'none', ...pos }}
     >
@@ -320,6 +337,8 @@ export function DataGridTableView<T extends object>({
           {actionItems.map((item, i) => (
             <button
               key={i}
+              type="button"
+              role="menuitem"
               disabled={item.disabled}
               data-variant={item.variant ?? 'default'}
               onClick={() => {

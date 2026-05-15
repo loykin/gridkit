@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { DataGrid } from '@/DataGrid'
 import { ColumnVisibilityDropdown } from '@/core/ColumnVisibilityDropdown'
@@ -49,6 +49,44 @@ describe('DataGrid accessibility labels', () => {
     expect(screen.getByRole('button', { name: 'Choose visible columns' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Open row actions for row 1' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Go to next page' })).toBeInTheDocument()
+  })
+
+  it('exposes row action menus with menu semantics and Escape close behavior', async () => {
+    const columns: DataGridColumnDef<Person>[] = [
+      { accessorKey: 'name', header: 'Name' },
+      {
+        id: 'actions',
+        header: '',
+        meta: {
+          actions: () => [
+            { label: 'Inspect', onClick: vi.fn() },
+            { label: 'Delete', onClick: vi.fn(), variant: 'destructive' },
+          ],
+        },
+      },
+    ]
+
+    render(
+      <DataGrid
+        data={data}
+        columns={columns}
+        getRowId={(row) => row.id}
+      />,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Open row actions for row 1' })
+    expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
+
+    fireEvent.click(trigger)
+
+    const menu = await screen.findByRole('menu')
+    expect(screen.getByRole('menuitem', { name: 'Inspect' })).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Inspect' })).toHaveFocus())
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+
+    await waitFor(() => expect(menu).not.toBeInTheDocument())
+    expect(trigger).toHaveFocus()
   })
 
   it('names selection checkboxes', () => {

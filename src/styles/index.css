@@ -48,6 +48,19 @@
   --dg-ring:                 var(--ring,                oklch(0.556 0 0));
 }
 
+/* ── Spinner animation ──────────────────────────────────────────────────────── */
+
+@keyframes dg-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dg-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@layer gridkit {
+
 /* ── Scrollbar utility ──────────────────────────────────────────────────────── */
 
 .scrollbar-none {
@@ -55,12 +68,6 @@
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
-}
-
-/* ── Spinner animation ──────────────────────────────────────────────────────── */
-
-@keyframes dg-spin {
-  to { transform: rotate(360deg); }
 }
 
 .dg-spinner {
@@ -478,11 +485,6 @@
   animation: dg-pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes dg-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
-}
-
 .dg-scrollbar-track {
   background: var(--dg-muted);
 }
@@ -687,4 +689,6 @@
 .dg-chat-unread-marker,
 .dg-chat-typing-indicator {
   min-width: 0;
+}
+
 }

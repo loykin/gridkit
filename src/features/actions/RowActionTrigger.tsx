@@ -16,6 +16,7 @@ export function RowActionTrigger<T extends object>({
   return (
     <Button
       aria-label={`Open row actions for row ${row.id}`}
+      aria-haspopup="menu"
       variant="ghost"
       size="icon-xs"
       onClick={(e) => {
