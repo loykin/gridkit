@@ -14,7 +14,6 @@ import {
   type FilterFn,
   type PaginationState,
   type SortingState,
-  type Table,
   type VisibilityState,
 } from '@tanstack/react-table'
 import type {
@@ -26,7 +25,8 @@ import { useGridStatePersistence } from '@/core/hooks/useGridStatePersistence'
 import { useDataStoreSubscription } from '@/core/engine/useDataStoreSubscription'
 import { useDataStoreQueryState } from '@/core/engine/useDataStoreQueryState'
 import { gridKitFeatures, getDataStoreCoreRowModel } from '@/core/engine/gridKitFeatures'
-import type { FilterExpr, QueryParams } from '@/core/engine/DataStoreBackend'
+import { useBackendQuerySync } from '@/core/engine/useBackendQuerySync'
+import { useBackendCapabilitiesWarning } from '@/core/engine/useBackendCapabilitiesWarning'
 import { defaultGlobalFilterFn } from '@/features/filters/filterFns'
 import { enrichFilterColumns } from '@/features/filters/enrichFilterColumns'
 import { useSearchableFilterFn } from '@/features/filters/useSearchableFilterFn'
@@ -73,36 +73,6 @@ interface UseDataGridCoreOptions<T extends object> extends Pick<
   pagination?: DataGridPaginationConfig
   sizing: ColumnSizingState
   setSizing: React.Dispatch<React.SetStateAction<ColumnSizingState>>
-}
-
-function isEmptyFilterValue(value: unknown) {
-  if (value == null || value === '') return true
-  if (Array.isArray(value)) return value.length === 0 || value.every((item) => item === '')
-  return false
-}
-
-function filterValueToExpr<T extends object>(
-  table: Table<T>,
-  id: string,
-  value: unknown,
-): FilterExpr | undefined {
-  if (isEmptyFilterValue(value)) return undefined
-
-  const column = table.getColumn(id)
-  const meta = column?.columnDef.meta
-  const field = meta?.backendField ?? id
-  const filterType = meta?.filterType
-
-  if (Array.isArray(value)) {
-    if (filterType === 'multi-select') return { field, op: 'in', value }
-    return { field, op: 'range', value }
-  }
-
-  if (filterType === 'text' || filterType == null) {
-    return { field, op: 'like', value }
-  }
-
-  return { field, op: 'eq', value }
 }
 
 export function useDataGridCore<T extends object>({
@@ -165,9 +135,6 @@ export function useDataGridCore<T extends object>({
   })
 
   const tableReadyCalled = useRef(false)
-  const backendQueryKeyRef = useRef<string | null>(null)
-  const paginationOnPageChangeRef = useRef(pagination?.onPageChange)
-  paginationOnPageChangeRef.current = pagination?.onPageChange
 
   // Register for state persistence
   useEffect(() => {
@@ -372,64 +339,31 @@ export function useDataGridCore<T extends object>({
     }
   }, [table, onTableReady])
 
-  useEffect(() => {
-    if (!enableBackendQuery || !dataStore) return
-
-    const filters = effectiveColumnFilters
-      .map((filter) => filterValueToExpr(table, filter.id, filter.value))
-      .filter((filter): filter is FilterExpr => !!filter)
-
-    const params: QueryParams = {
-      filters,
-      globalFilter: effectiveGlobalFilter || undefined,
-      sort: sorting.map((sort) => ({
-        field: table.getColumn(sort.id)?.columnDef.meta?.backendField ?? sort.id,
-        desc: sort.desc,
-      })),
-      ...(enablePagination
-        ? {
-            limit: paginationState.pageSize,
-            offset: paginationState.pageIndex * paginationState.pageSize,
-          }
-        : {}),
-    }
-    const queryKey = JSON.stringify({
-      filters: params.filters,
-      globalFilter: params.globalFilter,
-      sort: params.sort,
-    })
-
-    if (
-      enablePagination &&
-      backendQueryKeyRef.current !== null &&
-      backendQueryKeyRef.current !== queryKey &&
-      paginationState.pageIndex !== 0
-    ) {
-      backendQueryKeyRef.current = queryKey
-      const next = { pageIndex: 0, pageSize: paginationState.pageSize }
-      setPaginationState(next)
-      if (tableKey && syncState) update(tableKey, { pagination: next })
-      paginationOnPageChangeRef.current?.(0, paginationState.pageSize)
-      return
-    }
-
-    backendQueryKeyRef.current = queryKey
-
-    void dataStore.query(params)
-  }, [
+  useBackendCapabilitiesWarning({
+    enabled: enableBackendQuery,
     dataStore,
-    effectiveColumnFilters,
-    effectiveGlobalFilter,
-    enableBackendQuery,
+    enableSorting,
+    enableMultiSort,
     enablePagination,
-    paginationState.pageIndex,
-    paginationState.pageSize,
-    sorting,
+    hasColumnFilters: effectiveColumnFilters.length > 0 || enableColumnFilters,
+    hasGlobalFilter: !!effectiveGlobalFilter,
+  })
+
+  useBackendQuerySync({
+    enabled: enableBackendQuery,
+    dataStore,
     table,
+    columnFilters: effectiveColumnFilters,
+    globalFilter: effectiveGlobalFilter,
+    sorting,
+    enablePagination,
+    paginationState,
+    setPaginationState,
     tableKey,
     syncState,
-    update,
-  ])
+    updatePersistedPagination: update,
+    pagination,
+  })
 
   return {
     table,

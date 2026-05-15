@@ -1,4 +1,4 @@
-import { act, render, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createRef } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { describe, expect, it, vi } from 'vitest'
@@ -14,7 +14,7 @@ interface Person {
 }
 
 const columns: DataGridColumnDef<Person>[] = [
-  { accessorKey: 'name', header: 'Name', meta: { backendField: 'person_name' } },
+  { accessorKey: 'name', header: 'Name', meta: { filterType: 'select', backendField: 'person_name' } },
   { accessorKey: 'age', header: 'Age' },
 ]
 
@@ -107,5 +107,63 @@ describe('DataGrid backend query mode', () => {
       limit: 10,
       offset: 0,
     }))
+  })
+
+  it('loads select filter options from backend facets in backend query mode', async () => {
+    const query = vi.fn(async (_params: QueryParams) => ({
+      rows: [{ id: '1', name: 'Ada', age: 36 }],
+      total: 1,
+    }))
+    const getFacets = vi.fn(async () => ({ values: ['Ada', 'Grace'] }))
+    const backend: DataStoreBackend<Person> = { query, getFacets }
+    const store = createDataStore<Person>({ getRowId: (row) => row.id, backend })
+
+    render(
+      <DataGrid
+        dataStore={store}
+        queryMode="backend"
+        columns={columns}
+        getRowId={(row) => row.id}
+        pagination={{ pageSize: 10 }}
+        enableColumnFilters
+        filterDisplay="icon"
+      />,
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Filter name' }))
+
+    await waitFor(() => expect(getFacets).toHaveBeenCalledWith({
+      field: 'person_name',
+      filters: [],
+      globalFilter: undefined,
+    }))
+    expect(await screen.findByRole('option', { name: 'Grace' })).toBeInTheDocument()
+  })
+
+  it('warns when backend capabilities do not match enabled backend mode features', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const backend: DataStoreBackend<Person> = {
+      capabilities: { sorting: false },
+      query: vi.fn(async () => ({
+        rows: [{ id: '1', name: 'Ada', age: 36 }],
+        total: 1,
+      })),
+    }
+    const store = createDataStore<Person>({ getRowId: (row) => row.id, backend })
+
+    render(
+      <DataGrid
+        dataStore={store}
+        queryMode="backend"
+        columns={columns}
+        getRowId={(row) => row.id}
+        pagination={{ pageSize: 10 }}
+      />,
+    )
+
+    await waitFor(() => expect(warn).toHaveBeenCalledWith(
+      '[GridKit] queryMode="backend" is using unsupported backend capabilities: sorting.',
+    ))
+    warn.mockRestore()
   })
 })

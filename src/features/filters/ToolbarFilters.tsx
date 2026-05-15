@@ -1,10 +1,9 @@
-import { useState } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { Check, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { getColumnOptions } from '@/core/hooks/useColumnOptions'
+import { useColumnOptions } from '@/core/hooks/useColumnOptions'
 import { MultiSelectContent } from './MultiSelectContent'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -19,20 +18,14 @@ interface SelectFilterProps<T extends object> {
 
 export function SelectFilter<T extends object>({ table, columnId, label }: SelectFilterProps<T>) {
   const icons = useIcons()
-  const [options, setOptions] = useState<string[] | null>(null)
   const col = table.getColumn(columnId)
   const value = (col?.getFilterValue() ?? '') as string
-
-  const handleOpenChange = (open: boolean) => {
-    if (open && options === null) {
-      setOptions(getColumnOptions(table, columnId))
-    }
-  }
+  const { options, isLoading } = useColumnOptions(table, columnId, !!col)
 
   if (!col) return null
 
   return (
-    <Popover onOpenChange={handleOpenChange}>
+    <Popover>
       <PopoverTrigger
         render={(props) => (
           <Button
@@ -57,7 +50,10 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
               {icons.clearFilter} Clear
             </button>
           )}
-          {(options ?? []).map((opt) => (
+          {isLoading && (
+            <div className="dg-popover-option">Loading...</div>
+          )}
+          {!isLoading && options.map((opt) => (
             <button
               key={opt}
               onClick={() => col.setFilterValue(opt === value ? undefined : opt)}

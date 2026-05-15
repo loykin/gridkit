@@ -1,5 +1,6 @@
 import type {
   BackendTransactionResult,
+  DataStoreBackendCapabilities,
   DataStoreBackend,
   FacetParams,
   FacetResult,
@@ -72,6 +73,8 @@ export interface DataStore<T> {
    */
   query(params: QueryParams): Promise<void>
   getFacets(params: FacetParams): Promise<FacetResult | undefined>
+  hasBackendFacets(): boolean
+  getBackendCapabilities(): DataStoreBackendCapabilities | undefined
   /**
    * Total row count: backend total when a backend is set,
    * otherwise the current in-memory map size.
@@ -261,7 +264,6 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
     },
 
     applyTransactionAsync: async (tx) => {
-      const { affected } = applyTransactionCore(tx)
       try {
         let backendResult: BackendTransactionResult | void = undefined
         if (tx.persist && backend?.applyTransaction) {
@@ -270,15 +272,16 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
         if (backendResult && !backendResult.ok) {
           return {
             ok: false,
-            affected,
+            affected: backendResult.affected,
             error: backendResult.error,
           }
         }
+        const { affected } = applyTransactionCore(tx)
         return { ok: true, affected }
       } catch (error) {
         return {
           ok: false,
-          affected,
+          affected: 0,
           error: error instanceof Error ? error : new Error(String(error)),
         }
       }
@@ -289,6 +292,10 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
     query: (params) => runQuery('query', params),
 
     getFacets: (params) => backend?.getFacets?.(params) ?? Promise.resolve(undefined),
+
+    hasBackendFacets: () => !!backend?.getFacets,
+
+    getBackendCapabilities: () => backend?.capabilities,
 
     getTotalCount: () => (backend ? backendTotal : map.size),
 

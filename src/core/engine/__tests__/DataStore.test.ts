@@ -77,7 +77,23 @@ describe('DataStore', () => {
       persist: true,
     })
 
-    expect(result).toEqual({ ok: false, affected: 1, error })
+    expect(result).toEqual({ ok: false, affected: 0, error })
+    expect(store.getSnapshot()).toEqual([])
+  })
+
+  it('applies async transactions after backend persistence succeeds', async () => {
+    const backend: DataStoreBackend<Row> = {
+      query: vi.fn(async () => ({ rows: [], total: 0 })),
+      applyTransaction: vi.fn(async () => ({ ok: true, affected: 1 })),
+    }
+    const store = createDataStore<Row>({ getRowId: (row) => row.id, backend })
+
+    const result = await store.applyTransactionAsync({
+      add: [{ id: '1', name: 'Ada' }],
+      persist: true,
+    })
+
+    expect(result).toEqual({ ok: true, affected: 1 })
     expect(store.getSnapshot()).toEqual([{ id: '1', name: 'Ada' }])
   })
 

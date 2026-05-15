@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
 import type { Column, Table } from '@tanstack/react-table'
-import { getColumnOptions } from '@/core/hooks/useColumnOptions'
+import { useColumnOptions } from '@/core/hooks/useColumnOptions'
 
 interface Props<T extends object> {
   col: Column<T>
@@ -9,13 +8,8 @@ interface Props<T extends object> {
 }
 
 export function SelectFilterCell<T extends object>({ col, table, onSelect }: Props<T>) {
-  const [options, setOptions] = useState<string[]>([])
+  const { options, isLoading } = useColumnOptions(table, col.id)
   const filterValue = (col.getFilterValue() ?? '') as string
-
-  useEffect(() => {
-    setOptions(getColumnOptions(table, col.id))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <select
@@ -26,8 +20,9 @@ export function SelectFilterCell<T extends object>({ col, table, onSelect }: Pro
       }}
       className="dg-select"
       style={{ width: '100%' }}
+      disabled={isLoading}
     >
-      <option value="">All</option>
+      <option value="">{isLoading ? 'Loading...' : 'All'}</option>
       {options.map((opt) => (
         <option key={opt} value={opt}>
           {opt}
