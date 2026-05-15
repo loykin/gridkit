@@ -715,9 +715,12 @@ function MyDateTimeRangeFilter<T extends object>({
 | `visibilityState` | `VisibilityState` | — | Controlled column visibility |
 | `onColumnVisibilityChange` | `(v: VisibilityState) => void` | — | Called when column visibility changes |
 | `initialPinning` | `ColumnPinningState` | — | Initial pinned columns `{ left: [...], right: [...] }` |
+| `enableColumnPinning` | `boolean` | `false` | Show pin/unpin menu inside each column header |
+| `enableColumnReordering` | `boolean` | `false` | Enable drag-to-reorder columns by dragging the header |
 | **Row Expansion** ||||
 | `enableExpanding` | `boolean` | `false` | Enable collapsible sub-rows |
 | `getSubRows` | `(row: T, index: number) => T[] \| undefined` | — | Extract sub-rows from a row item |
+| `renderDetailRow` | `(row: Row<unknown>) => ReactNode` | — | Render a master-detail panel below each row. Use `ExpandToggleCell` in a column to toggle |
 | **Selection** ||||
 | `checkboxConfig` | `CheckboxConfig<T>` | — | Row checkbox selection configuration |
 | **State Persistence** ||||
@@ -726,6 +729,7 @@ function MyDateTimeRangeFilter<T extends object>({
 | `statePersistence` | `GridKitStatePersistence` | — | Load/save grid preferences through localStorage, backend APIs, etc. Requires `tableKey` |
 | **Callbacks** ||||
 | `onTableReady` | `(table: Table<T>) => void` | — | Called when TanStack Table instance is ready |
+| `onCellValueChange` | `(rowId: string, columnId: string, value: unknown) => void` | — | Called when the user commits an inline cell edit |
 | `onColumnOrderChange` | `(order: string[]) => void` | — | Called when column order changes via drag |
 | `onColumnPinningChange` | `(pinning: ColumnPinningState) => void` | — | Called when column pinning changes |
 | **Advanced** ||||
