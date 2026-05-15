@@ -1,3 +1,7 @@
+import './core/engine/extensions/ColumnFilterExtension'
+import './core/engine/extensions/DataStoreFeature'
+import './core/engine/extensions/RowActionsFeature'
+
 export { DataGrid } from './DataGrid'
 export { DataGridInfinity } from './DataGridInfinity'
 export { DataGridDrag } from './DataGridDrag'
