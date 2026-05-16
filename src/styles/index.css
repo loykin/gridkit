@@ -253,6 +253,27 @@
 .dg-popover-option:hover {
   background: var(--dg-muted);
 }
+.dg-popover-option[data-active="true"] {
+  color: var(--dg-primary);
+}
+
+.dg-col-menu-section {
+  padding: 6px 8px 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dg-muted-foreground);
+  user-select: none;
+}
+.dg-col-menu-divider {
+  height: 1px;
+  background: var(--dg-border);
+  margin: 4px 0;
+}
+.dg-col-menu-filter {
+  padding: 4px 8px 8px;
+}
 
 /* ── DataGrid structural & visual rules ─────────────────────────────────────── */
 

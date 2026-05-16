@@ -7,6 +7,7 @@ import type { DataGridClassNames, TableViewConfig, TableWidthMode } from '@/type
 import { SortIndicator } from '@/features/sorting/SortIndicator'
 import { HeaderFilterControl } from '@/features/filters/HeaderFilterControl'
 import { ColumnPinControl } from '@/features/pinning/ColumnPinControl'
+import { ColumnMenuButton } from '@/features/menu/ColumnMenuButton'
 import { ColumnResizeHandle } from '@/features/resizing/ColumnResizeHandle'
 import { colStyle } from './tableUtils'
 
@@ -17,6 +18,8 @@ interface HeaderCellContentProps<T extends object> {
   enableColumnFilters?: boolean
   filterDisplay?: 'row' | 'icon'
   enableColumnPinning?: boolean
+  enableColumnMenu?: boolean
+  renderColumnMenu?: TableViewConfig<T>['renderColumnMenu']
   customFilterComponents?: TableViewConfig<T>['customFilterComponents']
   dragHandleProps?: React.HTMLAttributes<HTMLSpanElement>
 }
@@ -28,9 +31,12 @@ function HeaderCellContent<T extends object>({
   enableColumnFilters,
   filterDisplay = 'row',
   enableColumnPinning,
+  enableColumnMenu,
+  renderColumnMenu,
   customFilterComponents,
   dragHandleProps,
 }: HeaderCellContentProps<T>) {
+  const isLeafHeader = header.subHeaders.length === 0 && !header.isPlaceholder
   return (
     <>
       <span
@@ -46,14 +52,27 @@ function HeaderCellContent<T extends object>({
         <SortIndicator header={header} />
       </span>
 
-      <HeaderFilterControl
-        header={header}
-        table={table}
-        enabled={enableColumnFilters}
-        filterDisplay={filterDisplay}
-        customFilterComponents={customFilterComponents}
-      />
-      <ColumnPinControl header={header} enabled={enableColumnPinning} />
+      {enableColumnMenu && isLeafHeader ? (
+        <ColumnMenuButton
+          col={header.column}
+          table={table}
+          enableColumnFilters={enableColumnFilters}
+          enableColumnPinning={enableColumnPinning}
+          customFilterComponents={customFilterComponents}
+          renderColumnMenu={renderColumnMenu}
+        />
+      ) : (
+        <>
+          <HeaderFilterControl
+            header={header}
+            table={table}
+            enabled={enableColumnFilters}
+            filterDisplay={filterDisplay}
+            customFilterComponents={customFilterComponents}
+          />
+          <ColumnPinControl header={header} enabled={enableColumnPinning} />
+        </>
+      )}
       <ColumnResizeHandle header={header} enabled={enableColumnResizing} />
     </>
   )
@@ -123,6 +142,7 @@ interface HeaderCellFrameProps<T extends object> extends HeaderCellContentProps<
   isDragging?: boolean
 }
 
+
 function HeaderCellFrame<T extends object>({
   header,
   table,
@@ -140,6 +160,8 @@ function HeaderCellFrame<T extends object>({
   enableColumnFilters,
   filterDisplay,
   enableColumnPinning,
+  enableColumnMenu,
+  renderColumnMenu,
   customFilterComponents,
   dragHandleProps,
 }: HeaderCellFrameProps<T>) {
@@ -155,7 +177,7 @@ function HeaderCellFrame<T extends object>({
       aria-sort={canSort ? getAriaSort(header) : undefined}
       data-col-id={isLeafHeader ? header.column.id : undefined}
       data-header-id={header.id}
-      data-sortable={canSort ? 'true' : undefined}
+      data-sortable={canSort && !enableColumnMenu ? 'true' : undefined}
       data-header-group={isLeafHeader ? undefined : 'true'}
       data-placeholder={header.isPlaceholder ? 'true' : undefined}
       data-pinned={edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : undefined}
@@ -169,7 +191,7 @@ function HeaderCellFrame<T extends object>({
         transition,
         isDragging,
       })}
-      onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+      onClick={canSort && !enableColumnMenu ? header.column.getToggleSortingHandler() : undefined}
     >
       <HeaderCellContent
         header={header}
@@ -178,6 +200,8 @@ function HeaderCellFrame<T extends object>({
         enableColumnFilters={enableColumnFilters}
         filterDisplay={filterDisplay}
         enableColumnPinning={enableColumnPinning}
+        enableColumnMenu={enableColumnMenu}
+        renderColumnMenu={renderColumnMenu}
         customFilterComponents={customFilterComponents}
         dragHandleProps={dragHandleProps}
       />

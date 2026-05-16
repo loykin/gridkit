@@ -128,6 +128,8 @@ export function DataGridTableView<T extends object>({
   bordered = false,
   enableColumnReordering = false,
   enableColumnPinning = false,
+  enableColumnMenu = false,
+  renderColumnMenu,
   renderDetailRow,
   renderGroupRow,
   onCellValueChange,
@@ -270,10 +272,12 @@ export function DataGridTableView<T extends object>({
                   tableWidthMode={tableWidthMode}
                   enableColumnReordering={enableColumnReordering}
                   enableColumnPinning={enableColumnPinning}
+                  enableColumnMenu={enableColumnMenu}
+                  renderColumnMenu={renderColumnMenu}
                   classNames={classNames}
                 />
               ))}
-              {enableColumnFilters && filterDisplay !== 'icon' && (
+              {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && (
                 <DataGridFilterRow
                   visibleLeafColumns={visibleLeafColumns}
                   table={table}

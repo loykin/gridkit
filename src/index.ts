@@ -1,6 +1,7 @@
 import './core/engine/extensions/ColumnFilterExtension'
 import './core/engine/extensions/DataStoreFeature'
 import './core/engine/extensions/RowActionsFeature'
+import './core/engine/extensions/ColumnMenuExtension'
 
 export { DataGrid } from './DataGrid'
 export { DataGridInfinity } from './DataGridInfinity'
@@ -75,4 +76,5 @@ export type {
   DataGridListClassNames,
   DataGridChatClassNames,
   DataGridIcons,
+  ColumnMenuContext,
 } from './types'

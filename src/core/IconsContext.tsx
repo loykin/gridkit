@@ -13,6 +13,7 @@ import {
   GripVertical,
   Loader2,
   MoreHorizontal,
+  MoreVertical,
   PinOff,
   PinIcon,
   Search,
@@ -46,6 +47,7 @@ export const defaultIcons: Required<DataGridIcons> = {
   pinLeft:          <PinIcon size={13} />,
   pinRight:         <PinIcon size={13} style={{ transform: 'scaleX(-1)' }} />,
   pinOff:           <PinOff size={13} />,
+  columnMenu:       <MoreVertical size={13} />,
 }
 
 // ── Context ────────────────────────────────────────────────────────────────────

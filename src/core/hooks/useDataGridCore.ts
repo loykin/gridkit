@@ -301,11 +301,9 @@ export function useDataGridCore<T extends object>({
         }
       : undefined,
     onGroupingChange: enableGrouping ? (updater) => {
-      setInternalGrouping((prev) => {
-        const next = typeof updater === 'function' ? updater(prev) : updater
-        onGroupingChange?.(next)
-        return next
-      })
+      const next = typeof updater === 'function' ? updater(effectiveGrouping) : updater
+      onGroupingChange?.(next)
+      if (externalGrouping === undefined) setInternalGrouping(next)
     } : undefined,
     onExpandedChange: (enableExpanding || enableGrouping) ? setExpanded : undefined,
     getSubRows,

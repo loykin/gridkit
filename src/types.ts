@@ -77,6 +77,22 @@ export interface DataGridIcons {
   pinRight?: React.ReactNode
   /** Unpin column */
   pinOff?: React.ReactNode
+  /** Column header menu trigger button icon */
+  columnMenu?: React.ReactNode
+}
+
+/**
+ * Pre-resolved feature flags passed as the 4th argument to renderColumnMenu.
+ * Each flag combines the global grid prop with per-column meta/canXxx checks,
+ * so custom menu implementations don't need to re-derive what's enabled.
+ */
+export interface ColumnMenuContext {
+  /** Column can be sorted (enableSorting && col.getCanSort()) */
+  canSort: boolean
+  /** Column can be filtered (enableColumnFilters && filterType !== false) */
+  canFilter: boolean
+  /** Column can be pinned (enableColumnPinning && col.getCanPin()) */
+  canPin: boolean
 }
 
 /**
@@ -328,6 +344,19 @@ export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T
   renderDetailRow?: (row: Row<unknown>) => ReactNode
   /** Show a pin/unpin menu button inside each column header */
   enableColumnPinning?: boolean
+  /**
+   * Replace individual header icons (sort/filter/pin) with a single ⋮ menu button per column.
+   * Useful when columns are narrow. Works alongside enableSorting, enableColumnFilters, enableColumnPinning.
+   */
+  enableColumnMenu?: boolean
+  /**
+   * Custom content rendered inside the column menu popover.
+   * When provided, replaces the default sort/filter/pin items.
+   * Use this to plug in shadcn, MUI, or any other menu component.
+   * ctx contains pre-resolved flags (global props × per-column meta) so custom renders
+   * don't need to re-derive what's enabled.
+   */
+  renderColumnMenu?: (col: Column<T>, table: Table<T>, close: () => void, ctx: ColumnMenuContext) => ReactNode
   /** Called when the user commits an inline cell edit */
   onCellValueChange?: (rowId: string, columnId: string, value: unknown) => void
   /**

@@ -20,6 +20,7 @@ import { IconsTab } from './tabs/IconsTab'
 import { ColumnReorderTab } from './tabs/ColumnReorderTab'
 import { MasterDetailTab } from './tabs/MasterDetailTab'
 import { ColumnPinningTab } from './tabs/ColumnPinningTab'
+import { ColumnMenuTab } from './tabs/ColumnMenuTab'
 import { InlineEditTab } from './tabs/InlineEditTab'
 import { ExportTab } from './tabs/ExportTab'
 import { CardTab } from './tabs/CardTab'
@@ -59,6 +60,7 @@ const TABS = [
   { id: 'state-persistence', label: 'State Persistence', content: <StatePersistenceTab /> },
   { id: 'master-detail', label: 'Master-Detail', content: <MasterDetailTab /> },
   { id: 'column-pinning', label: 'Column Pinning UI', content: <ColumnPinningTab /> },
+  { id: 'column-menu', label: 'Column Menu', content: <ColumnMenuTab /> },
   { id: 'inline-edit', label: 'Inline Edit', content: <InlineEditTab /> },
   { id: 'export', label: 'Export CSV', content: <ExportTab /> },
   { id: 'card', label: 'Card Grid', content: <CardTab /> },

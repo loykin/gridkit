@@ -26,6 +26,8 @@ interface DataGridHeaderRowProps<T extends object>
     | 'filterDisplay'
     | 'enableColumnReordering'
     | 'enableColumnPinning'
+    | 'enableColumnMenu'
+    | 'renderColumnMenu'
     | 'customFilterComponents'
   > {
   headerGroup: HeaderGroup<T>
@@ -48,6 +50,8 @@ export function DataGridHeaderRow<T extends object>({
   filterDisplay = 'row',
   enableColumnReordering = false,
   enableColumnPinning = false,
+  enableColumnMenu = false,
+  renderColumnMenu,
   customFilterComponents,
   classNames,
 }: DataGridHeaderRowProps<T>) {
@@ -101,6 +105,8 @@ export function DataGridHeaderRow<T extends object>({
                   enableColumnFilters={enableColumnFilters}
                   filterDisplay={filterDisplay}
                   enableColumnPinning={enableColumnPinning}
+                  enableColumnMenu={enableColumnMenu}
+                  renderColumnMenu={renderColumnMenu}
                   customFilterComponents={customFilterComponents}
                 />
               )
@@ -142,6 +148,8 @@ export function DataGridHeaderRow<T extends object>({
             enableColumnFilters={enableColumnFilters}
             filterDisplay={filterDisplay}
             enableColumnPinning={enableColumnPinning}
+            enableColumnMenu={enableColumnMenu}
+            renderColumnMenu={renderColumnMenu}
             customFilterComponents={customFilterComponents}
           />
         )
