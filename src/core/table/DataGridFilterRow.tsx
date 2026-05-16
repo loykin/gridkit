@@ -6,10 +6,10 @@ import { useIcons } from '@/core/IconsContext'
 import { Input } from '@/components/ui/input'
 import type { TableViewConfig, TableWidthMode } from '@/types'
 import { colStyle } from './tableUtils'
-import { SelectFilterCell } from '@/features/filters/SelectFilterCell'
-import { MultiSelectFilterCell } from '@/features/filters/MultiSelectFilterCell'
-import { NumberFilterPopover } from '@/features/filters/NumberFilterPopover'
-import { DateFilterContent } from '@/features/filters/DateFilterContent'
+import { SelectFilterCell } from '@/features/filters/components/SelectFilterCell'
+import { MultiSelectFilterCell } from '@/features/filters/components/MultiSelectFilterCell'
+import { NumberFilterPopover } from '@/features/filters/components/NumberFilterPopover'
+import { DateFilterContent } from '@/features/filters/components/DateFilterContent'
 
 interface DataGridFilterRowProps<T extends object> extends Pick<TableViewConfig<T>, 'bordered' | 'customFilterComponents'> {
   visibleLeafColumns: Column<T>[]

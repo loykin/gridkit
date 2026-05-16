@@ -1,5 +1,5 @@
 import type { ColumnFiltersState, PaginationState, SortingState, Table } from '@tanstack/react-table'
-import type { FilterExpr, QueryParams } from './DataStoreBackend'
+import type { FilterExpr, QueryParams } from '../store/DataStoreBackend'
 
 function isEmptyFilterValue(value: unknown) {
   if (value == null || value === '') return true

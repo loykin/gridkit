@@ -1,5 +1,5 @@
 import type { Column, Table } from '@tanstack/react-table'
-import { useColumnOptions } from '@/features/filters/useColumnOptions'
+import { useColumnOptions } from '@/features/filters/hooks/useColumnOptions'
 
 interface Props<T extends object> {
   col: Column<T>

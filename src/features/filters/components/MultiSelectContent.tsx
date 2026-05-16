@@ -1,7 +1,7 @@
 import type { Column, Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useColumnOptions } from '@/features/filters/useColumnOptions'
+import { useColumnOptions } from '@/features/filters/hooks/useColumnOptions'
 
 interface Props<T extends object> {
   col: Column<T>

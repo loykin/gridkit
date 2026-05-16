@@ -1,6 +1,6 @@
 import type { Table } from '@tanstack/react-table'
 import { useEffect, useState } from 'react'
-import { buildBackendFilters, getBackendField } from '@/core/engine/buildBackendQueryParams'
+import { buildBackendFilters, getBackendField } from '@/core/engine/backend/buildBackendQueryParams'
 
 /**
  * Scans all core rows for a column and returns unique, sorted string values.

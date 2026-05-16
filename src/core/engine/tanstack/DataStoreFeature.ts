@@ -8,7 +8,7 @@ import {
   type Table,
   type Row,
 } from '@tanstack/react-table'
-import type { Transaction, TransactionResult, DataStore } from '../DataStore'
+import type { Transaction, TransactionResult, DataStore } from '../store/DataStore'
 
 // ── Declaration merging ───────────────────────────────────────────────────────
 declare module '@tanstack/react-table' {

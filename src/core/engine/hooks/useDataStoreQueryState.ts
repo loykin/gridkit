@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import type { DataStore, DataStoreQueryState } from './DataStore'
+import type { DataStore, DataStoreQueryState } from '../store/DataStore'
 
 const noopSubscribe = (_listener: () => void) => () => {}
 

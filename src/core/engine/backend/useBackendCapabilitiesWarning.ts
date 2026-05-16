@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import type { DataStore } from './DataStore'
+import type { DataStore } from '../store/DataStore'
 
 export function useBackendCapabilitiesWarning<T>({
   enabled,

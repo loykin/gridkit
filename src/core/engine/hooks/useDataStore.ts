@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { createDataStore, type DataStore, type DataStoreOptions } from './DataStore'
+import { createDataStore, type DataStore, type DataStoreOptions } from '../store/DataStore'
 
 export interface UseDataStoreOptions<T> extends DataStoreOptions<T> {
   closeOnUnmount?: boolean

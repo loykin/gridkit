@@ -3,8 +3,8 @@ import { createRef } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { describe, expect, it, vi } from 'vitest'
 import { DataGrid } from '@/DataGrid'
-import { createDataStore } from '@/core/engine/DataStore'
-import type { DataStoreBackend, QueryParams } from '@/core/engine/DataStoreBackend'
+import { createDataStore } from '@/core/engine/store/DataStore'
+import type { DataStoreBackend, QueryParams } from '@/core/engine/store/DataStoreBackend'
 import type { DataGridColumnDef } from '@/types'
 
 interface Person {

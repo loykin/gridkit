@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import type React from 'react'
 import type { ColumnFiltersState, PaginationState, SortingState, Table } from '@tanstack/react-table'
 import type { DataGridPaginationConfig } from '@/types'
-import type { DataStore } from './DataStore'
+import type { DataStore } from '../store/DataStore'
 import { buildBackendQueryParams } from './buildBackendQueryParams'
 
 export function useBackendQuerySync<T extends object>({

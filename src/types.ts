@@ -14,13 +14,13 @@ import type {
   VisibilityState,
   PaginationState,
 } from '@tanstack/react-table'
-import type { DataStore } from './core/engine/DataStore'
+import type { DataStore } from './core/engine/store/DataStore'
 
 // ColumnMeta and Table augmentations live in the extension files:
-//   src/core/engine/extensions/ColumnFlexFeature.ts    — flex, autoSize, align, wrap, etc.
-//   src/core/engine/extensions/ColumnFilterExtension.ts — filterType
-//   src/core/engine/extensions/RowActionsFeature.ts    — actions
-//   src/core/engine/extensions/DataStoreFeature.ts     — applyTransaction, getRowNodeById
+//   src/core/engine/tanstack/ColumnFlexFeature.ts   — flex, autoSize, align, wrap, etc.
+//   src/core/engine/tanstack/ColumnFilterFeature.ts — filterType
+//   src/core/engine/tanstack/RowActionsFeature.ts   — actions
+//   src/core/engine/tanstack/DataStoreFeature.ts    — applyTransaction, getRowNodeById
 
 export type DataGridColumnDef<T extends object> = ColumnDef<T, unknown>
 export type GridKitHeaderSlot<T extends object> =
