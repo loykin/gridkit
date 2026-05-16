@@ -245,8 +245,8 @@ test('row actions menu opens and exposes action items', async () => {
     await menu.waitFor({ state: 'visible', timeout: 1000 })
   })
   await assert.doesNotReject(async () => {
-    assert.ok(await page.getByRole('button', { name: 'Logs' }).isVisible())
-    assert.ok(await page.getByRole('button', { name: 'Delete' }).isVisible())
+    assert.ok(await page.getByRole('menuitem', { name: 'Logs' }).isVisible())
+    assert.ok(await page.getByRole('menuitem', { name: 'Delete' }).isVisible())
   })
   await closePage(page)
 })
