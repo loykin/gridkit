@@ -29,6 +29,18 @@ export default tseslint.config(
     },
   },
   {
+    files: ['e2e/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        fetch: 'readonly',
+        getComputedStyle: 'readonly',
+        localStorage: 'readonly',
+        process: 'readonly',
+        setTimeout: 'readonly',
+      },
+    },
+  },
+  {
     files: ['scripts/**/*.mjs'],
     languageOptions: {
       globals: {

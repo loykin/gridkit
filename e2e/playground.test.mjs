@@ -10,6 +10,7 @@ const BASE_URL = `http://127.0.0.1:${PORT}`
 let server
 let browser
 let serverOutput = ''
+const detachedServer = process.platform !== 'win32'
 
 async function waitForServer(url, timeout = 20_000) {
   const started = Date.now()
@@ -33,6 +34,7 @@ test.before(async () => {
       cwd: process.cwd(),
       stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, BROWSER: 'none' },
+      detached: detachedServer,
     },
   )
 
@@ -51,13 +53,26 @@ test.before(async () => {
 
 test.after(async () => {
   await browser?.close()
-  if (server && !server.killed) {
-    server.kill('SIGTERM')
-    await Promise.race([
-      once(server, 'exit'),
-      new Promise((resolve) => setTimeout(resolve, 1000)),
-    ])
+  if (!server || server.killed) return
+
+  const killServer = (signal) => {
+    if (detachedServer && server.pid) {
+      try {
+        process.kill(-server.pid, signal)
+        return
+      } catch {
+        // Fall back to killing the direct child below.
+      }
+    }
+    server.kill(signal)
   }
+
+  killServer('SIGTERM')
+  const exited = await Promise.race([
+    once(server, 'exit').then(() => true),
+    new Promise((resolve) => setTimeout(() => resolve(false), 1000)),
+  ])
+  if (!exited) killServer('SIGKILL')
 })
 
 async function newPage() {
