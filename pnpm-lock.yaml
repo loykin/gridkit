@@ -19,10 +19,10 @@ importers:
         version: 3.2.2(react@19.2.6)
       '@tanstack/react-table':
         specifier: ^8.21.3
-        version: 8.21.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 8.21.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tanstack/react-virtual':
         specifier: ^3.13.23
-        version: 3.13.23(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 3.13.24(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

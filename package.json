@@ -66,6 +66,12 @@
     "typescript-eslint": "^8.58.2",
     "vitest": "^4.1.5"
   },
+  "pnpm": {
+    "overrides": {
+      "react": "19.2.6",
+      "react-dom": "19.2.6"
+    }
+  },
   "keywords": [
     "react",
     "datagrid",
