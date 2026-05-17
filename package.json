@@ -79,5 +79,10 @@
     "virtualization",
     "tanstack"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/loykin/gridkit.git"
+  },
+  "homepage": "https://loykin.github.io/gridkit/playground/",
   "license": "MIT"
 }
