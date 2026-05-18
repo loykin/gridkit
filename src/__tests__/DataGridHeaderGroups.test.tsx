@@ -35,6 +35,18 @@ const columns: DataGridColumnDef<Employee>[] = [
   },
 ]
 
+const columnsWithUngrouped: DataGridColumnDef<Employee>[] = [
+  { accessorKey: 'id', header: 'ID' },
+  {
+    id: 'work',
+    header: 'Work',
+    columns: [
+      { accessorKey: 'role', header: 'Role' },
+      { accessorKey: 'salary', header: 'Salary' },
+    ],
+  },
+]
+
 describe('DataGrid header groups', () => {
   it('renders grouped headers and leaf headers', () => {
     render(
@@ -93,7 +105,7 @@ describe('DataGrid header groups', () => {
     expect(sortingStates[sortingStates.length - 1]).toEqual([{ id: 'salary', desc: true }])
   })
 
-  it('shows resize handles on group and leaf headers', () => {
+  it('shows resize handles on leaf headers only', () => {
     const { container } = render(
       <DataGrid
         data={data}
@@ -105,8 +117,98 @@ describe('DataGrid header groups', () => {
     const identityHeader = screen.getByRole('columnheader', { name: 'Identity' })
     const salaryHeader = screen.getByRole('columnheader', { name: /Salary/ })
 
-    expect(identityHeader.querySelector('.dg-resize-handle')).toBeInTheDocument()
+    expect(identityHeader.querySelector('.dg-resize-handle')).not.toBeInTheDocument()
     expect(salaryHeader.querySelector('.dg-resize-handle')).toBeInTheDocument()
-    expect(container.querySelectorAll('.dg-resize-handle').length).toBeGreaterThan(2)
+    expect(container.querySelectorAll('.dg-resize-handle').length).toBe(4)
+  })
+
+  it('renders padded placeholders by default', () => {
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columnsWithUngrouped}
+        getRowId={(row) => row.id}
+      />,
+    )
+
+    const idHeader = screen.getByRole('columnheader', { name: /ID/ })
+    const placeholder = container.querySelector('[data-placeholder="true"]')
+
+    expect(placeholder).toBeInTheDocument()
+    expect(idHeader).toHaveStyle({ top: '0px', height: '36px' })
+    expect(placeholder).toHaveStyle({ top: '36px' })
+  })
+
+  it('spans ungrouped leaf headers and hides placeholders in span layout', () => {
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columnsWithUngrouped}
+        getRowId={(row) => row.id}
+        headerGroupLayout="span"
+      />,
+    )
+
+    const idHeader = screen.getByRole('columnheader', { name: /ID/ })
+    const workHeader = screen.getByRole('columnheader', { name: 'Work' })
+
+    expect(container.querySelector('[data-placeholder="true"]')).not.toBeInTheDocument()
+    expect(idHeader).toHaveAttribute('aria-rowspan', '2')
+    expect(idHeader).toHaveStyle({ top: '0px' })
+    expect(idHeader).toHaveStyle({ height: '72px' })
+    expect(workHeader).toHaveAttribute('aria-colspan', '2')
+  })
+
+  it('keeps sorting active in span layout', () => {
+    const sortingStates: unknown[] = []
+
+    render(
+      <DataGrid
+        data={data}
+        columns={columnsWithUngrouped}
+        getRowId={(row) => row.id}
+        headerGroupLayout="span"
+        onSortingChange={(sorting) => sortingStates.push(sorting)}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('columnheader', { name: /Salary/ }))
+    expect(sortingStates[sortingStates.length - 1]).toEqual([{ id: 'salary', desc: true }])
+  })
+
+  it('keeps filter controls and column menus on leaf headers in span layout', () => {
+    render(
+      <DataGrid
+        data={data}
+        columns={columnsWithUngrouped}
+        getRowId={(row) => row.id}
+        headerGroupLayout="span"
+        enableColumnFilters
+        filterDisplay="icon"
+        enableColumnMenu
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: 'Column menu for work' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Column menu for salary' })).toBeInTheDocument()
+  })
+
+  it('keeps reorder handles on leaf headers in span layout', () => {
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columnsWithUngrouped}
+        getRowId={(row) => row.id}
+        headerGroupLayout="span"
+        enableColumnReordering
+      />,
+    )
+
+    const idHeader = screen.getByRole('columnheader', { name: /ID/ })
+    const workHeader = screen.getByRole('columnheader', { name: 'Work' })
+
+    expect(idHeader.querySelector('[data-reorder-handle="true"]')).toBeInTheDocument()
+    expect(workHeader.querySelector('[data-reorder-handle="true"]')).not.toBeInTheDocument()
+    expect(container.querySelectorAll('[data-reorder-handle="true"]').length).toBe(3)
   })
 })

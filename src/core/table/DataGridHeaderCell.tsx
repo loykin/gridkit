@@ -4,6 +4,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import type { DataGridClassNames, TableViewConfig, TableWidthMode } from '@/types'
+import type { HeaderLayoutCell } from './buildHeaderLayoutPlan'
 import { SortIndicator } from '@/features/sorting/SortIndicator'
 import { HeaderFilterControl } from '@/features/filters/components/HeaderFilterControl'
 import { ColumnPinControl } from '@/features/pinning/ColumnPinControl'
@@ -24,7 +25,7 @@ interface HeaderCellContentProps<T extends object> {
   dragHandleProps?: React.HTMLAttributes<HTMLSpanElement>
 }
 
-function HeaderCellContent<T extends object>({
+export function DataGridHeaderCellContent<T extends object>({
   header,
   table,
   enableColumnResizing,
@@ -87,6 +88,7 @@ function getAriaSort<T extends object>(header: Header<T, unknown>) {
 
 function getHeaderCellStyle<T extends object>({
   header,
+  layoutCell,
   virtual,
   isFillLast,
   transform,
@@ -94,6 +96,7 @@ function getHeaderCellStyle<T extends object>({
   isDragging,
 }: {
   header: Header<T, unknown>
+  layoutCell?: HeaderLayoutCell<T>
   virtual: boolean
   isFillLast: boolean
   transform?: string
@@ -105,6 +108,22 @@ function getHeaderCellStyle<T extends object>({
     ...(transition && { transition }),
     ...(isDragging !== undefined && { opacity: isDragging ? 0.5 : 1 }),
     ...(isDragging && { zIndex: 2 }),
+  }
+
+  if (layoutCell) {
+    return {
+      position: 'absolute',
+      top: layoutCell.top,
+      left: layoutCell.pin === 'right' ? undefined : layoutCell.left,
+      right: layoutCell.pin === 'right' ? layoutCell.right : undefined,
+      width: layoutCell.width,
+      height: layoutCell.height,
+      display: 'flex',
+      alignItems: 'center',
+      overflow: 'hidden',
+      zIndex: layoutCell.zIndex,
+      ...motionStyle,
+    }
   }
 
   if (virtual) {
@@ -129,8 +148,9 @@ function getHeaderCellStyle<T extends object>({
   }
 }
 
-interface HeaderCellFrameProps<T extends object> extends HeaderCellContentProps<T> {
+export interface HeaderCellFrameProps<T extends object> extends HeaderCellContentProps<T> {
   virtual: boolean
+  layoutCell?: HeaderLayoutCell<T>
   bordered?: boolean
   tableWidthMode?: TableWidthMode
   isLast: boolean
@@ -143,10 +163,11 @@ interface HeaderCellFrameProps<T extends object> extends HeaderCellContentProps<
 }
 
 
-function HeaderCellFrame<T extends object>({
+export function DataGridHeaderCellFrame<T extends object>({
   header,
   table,
   virtual,
+  layoutCell,
   bordered,
   tableWidthMode = 'spacer',
   isLast,
@@ -166,25 +187,32 @@ function HeaderCellFrame<T extends object>({
   dragHandleProps,
 }: HeaderCellFrameProps<T>) {
   const isFillLast = tableWidthMode === 'fill-last' && isLast
-  const isLeafHeader = header.subHeaders.length === 0 && !header.isPlaceholder
+  const isLeafHeader = layoutCell?.isLeafHeader ?? (header.subHeaders.length === 0 && !header.isPlaceholder)
   const canSort = isLeafHeader && header.column.getCanSort()
+  const colSpan = layoutCell?.colSpan ?? header.colSpan
+  const rowSpan = layoutCell?.rowSpan ?? 1
+  const isPlaceholder = layoutCell?.isPlaceholder ?? header.isPlaceholder
+  const pin = layoutCell?.pin ?? (edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : false)
 
   return (
     <div
       ref={setNodeRef}
       role="columnheader"
-      aria-colspan={header.colSpan > 1 ? header.colSpan : undefined}
+      aria-colspan={colSpan > 1 ? colSpan : undefined}
+      aria-rowspan={rowSpan > 1 ? rowSpan : undefined}
       aria-sort={canSort ? getAriaSort(header) : undefined}
+      aria-hidden={isPlaceholder ? 'true' : undefined}
       data-col-id={isLeafHeader ? header.column.id : undefined}
       data-header-id={header.id}
       data-sortable={canSort && !enableColumnMenu ? 'true' : undefined}
       data-header-group={isLeafHeader ? undefined : 'true'}
-      data-placeholder={header.isPlaceholder ? 'true' : undefined}
-      data-pinned={edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : undefined}
+      data-placeholder={isPlaceholder ? 'true' : undefined}
+      data-pinned={pin || undefined}
       data-bordered={bordered ? 'true' : undefined}
       className={cn('dg-header-cell', classNames?.headerCell)}
       style={getHeaderCellStyle({
         header,
+        layoutCell,
         virtual,
         isFillLast,
         transform,
@@ -193,7 +221,7 @@ function HeaderCellFrame<T extends object>({
       })}
       onClick={canSort && !enableColumnMenu ? header.column.getToggleSortingHandler() : undefined}
     >
-      <HeaderCellContent
+      <DataGridHeaderCellContent
         header={header}
         table={table}
         enableColumnResizing={enableColumnResizing}
@@ -219,7 +247,7 @@ interface DataGridHeaderCellProps<T extends object> extends HeaderCellContentPro
 }
 
 export function DataGridHeaderCell<T extends object>(props: DataGridHeaderCellProps<T>) {
-  return <HeaderCellFrame {...props} />
+  return <DataGridHeaderCellFrame {...props} />
 }
 
 interface SortableDataGridHeaderCellProps<T extends object> extends DataGridHeaderCellProps<T> {
@@ -237,7 +265,7 @@ export function SortableDataGridHeaderCell<T extends object>({
   })
 
   return (
-    <HeaderCellFrame
+    <DataGridHeaderCellFrame
       {...props}
       setNodeRef={setNodeRef}
       transform={CSS.Transform.toString(transform)}

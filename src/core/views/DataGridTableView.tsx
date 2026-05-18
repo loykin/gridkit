@@ -11,7 +11,7 @@ import type { TableViewConfig } from '@/types'
 import { useTableScrollSync } from '@/core/hooks/useTableScrollSync'
 import { useTableVirtualizer } from '@/core/hooks/useTableVirtualizer'
 import { useActionMenu } from '@/core/hooks/useActionMenu'
-import { DataGridHeaderRow } from '@/core/table/DataGridHeaderRow'
+import { DataGridHeaderLayout } from '@/core/table/DataGridHeaderLayout'
 import { DataGridFilterRow } from '@/core/table/DataGridFilterRow'
 import { DataGridBody } from '@/core/table/DataGridBody'
 import { DetailRowContext } from '@/features/expanding/DetailRowContext'
@@ -47,6 +47,7 @@ export function DataGridTableView<T extends object>({
   emptyMessage = 'No data',
   emptyContent,
   showHeader = true,
+  headerGroupLayout = 'padded',
   onRowClick,
   rowCursor,
   enableColumnResizing = true,
@@ -195,25 +196,23 @@ export function DataGridTableView<T extends object>({
         {showHeader && (
           <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className={cn('dg-header', classNames?.header)}>
             <div style={{ width: innerWidth, minWidth: '100%' }}>
-              {headerGroups.map((headerGroup) => (
-                <DataGridHeaderRow
-                  key={headerGroup.id}
-                  headerGroup={headerGroup}
-                  table={table}
-                  enableColumnResizing={enableColumnResizing}
-                  enableColumnFilters={enableColumnFilters}
-                  customFilterComponents={customFilterComponents}
-                  filterDisplay={filterDisplay}
-                  virtual={virtual}
-                  bordered={bordered}
-                  tableWidthMode={tableWidthMode}
-                  enableColumnReordering={enableColumnReordering}
-                  enableColumnPinning={enableColumnPinning}
-                  enableColumnMenu={enableColumnMenu}
-                  renderColumnMenu={renderColumnMenu}
-                  classNames={classNames}
-                />
-              ))}
+              <DataGridHeaderLayout
+                headerGroups={headerGroups}
+                table={table}
+                enableColumnResizing={enableColumnResizing}
+                enableColumnFilters={enableColumnFilters}
+                customFilterComponents={customFilterComponents}
+                filterDisplay={filterDisplay}
+                virtual={virtual}
+                bordered={bordered}
+                tableWidthMode={tableWidthMode}
+                headerGroupLayout={headerGroupLayout}
+                enableColumnReordering={enableColumnReordering}
+                enableColumnPinning={enableColumnPinning}
+                enableColumnMenu={enableColumnMenu}
+                renderColumnMenu={renderColumnMenu}
+                classNames={classNames}
+              />
               {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && (
                 <DataGridFilterRow
                   visibleLeafColumns={visibleLeafColumns}

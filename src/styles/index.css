@@ -354,6 +354,10 @@
   overflow: hidden;
 }
 
+.dg-header-layout .dg-header-cell {
+  border-bottom: 1px solid var(--dg-border);
+}
+
 .dg-header-cell[data-sortable="true"] {
   cursor: pointer;
 }

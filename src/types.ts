@@ -120,6 +120,7 @@ export type PassthroughTableOptions<T extends object> = Omit<
 
 export type ColumnSizingMode = 'auto' | 'flex' | 'fixed'
 export type DataGridQueryMode = 'client' | 'backend'
+export type HeaderGroupLayout = 'padded' | 'span'
 
 /**
  * Table width handling strategy:
@@ -319,6 +320,12 @@ export interface GridKitCoreProps<T extends object> extends GridKitDisplayProps<
 export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T> {
   /** Whether to show the header row. Defaults to true. */
   showHeader?: boolean
+  /**
+   * Header group layout mode.
+   * - 'padded': render TanStack placeholder header cells as empty cells (default)
+   * - 'span': ungrouped leaf headers span the remaining header height
+   */
+  headerGroupLayout?: HeaderGroupLayout
   enableColumnResizing?: boolean
   /** Show per-column filter row below the header (AG Grid style) */
   enableColumnFilters?: boolean

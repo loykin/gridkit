@@ -9,21 +9,20 @@ export function ColumnResizeHandle<T extends object>({
   header,
   enabled,
 }: ColumnResizeHandleProps<T>) {
-  const canResize = !header.isPlaceholder && enabled && header.column.getCanResize()
+  const isLeafHeader = header.subHeaders.length === 0 && !header.isPlaceholder
+  const canResize = isLeafHeader && enabled && header.column.getCanResize()
   if (!canResize) return null
 
   return (
     <div
       onPointerDown={(e) => {
+        if (e.pointerType === 'touch') return
         e.stopPropagation()
-      }}
-      onMouseDown={(e) => {
-        e.stopPropagation()
-        header.getResizeHandler()(e)
+        header.getResizeHandler(e.currentTarget.ownerDocument)(e)
       }}
       onTouchStart={(e) => {
         e.stopPropagation()
-        header.getResizeHandler()(e)
+        header.getResizeHandler(e.currentTarget.ownerDocument)(e)
       }}
       onClick={(e) => e.stopPropagation()}
       className="dg-resize-handle"

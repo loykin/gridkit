@@ -58,6 +58,7 @@ export type {
   DataGridPaginationConfig,
   DataGridColumnDef,
   DataGridQueryMode,
+  HeaderGroupLayout,
   ColumnSizingMode,
   TableWidthMode,
   CheckboxConfig,

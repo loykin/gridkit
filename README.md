@@ -661,6 +661,8 @@ const columns: DataGridColumnDef<User>[] = [
 | `rowCursor` | `boolean` | `false` | Show pointer cursor on rows |
 | `classNames` | `DataGridClassNames` | — | Slot-based class injection for table elements |
 | `icons` | `DataGridIcons` | — | Override any built-in icon slot |
+| **Headers** ||||
+| `headerGroupLayout` | `'padded' \| 'span'` | `'padded'` | Header group layout. `span` lets ungrouped leaf headers occupy the full grouped header height |
 | **Sorting** ||||
 | `enableSorting` | `boolean` | `true` | Enable column sorting |
 | `enableMultiSort` | `boolean` | `false` | Enable Shift+click multi-column sorting |

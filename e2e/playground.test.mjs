@@ -119,6 +119,14 @@ test('column resize does not trigger column reorder', async () => {
   await page.mouse.move(handleBox.x - 80, handleBox.y + handleBox.height / 2, { steps: 8 })
   await page.mouse.up()
 
+  await page.waitForFunction(
+    ({ selector, width }) => {
+      const node = globalThis.document.querySelector(selector)
+      return !!node && node.getBoundingClientRect().width < width - 20
+    },
+    { selector: '.dg-header [role="columnheader"][data-col-id="name"]', width: beforeBox.width },
+    { timeout: 1000 },
+  )
   const afterBox = await nameHeader.boundingBox()
   assert.ok(afterBox)
   const afterOrder = await leafHeaderIds(page)
@@ -132,9 +140,9 @@ test('header groups span their leaf header range', async () => {
   const page = await newPage()
   await openTab(page, 'Header Groups')
 
-  const organization = page.getByRole('columnheader', { name: 'Organization' })
-  const department = page.getByRole('columnheader', { name: /Department/ })
-  const status = page.getByRole('columnheader', { name: /Status/ })
+  const organization = page.getByRole('columnheader', { name: 'Organization' }).first()
+  const department = page.getByRole('columnheader', { name: /Department/ }).first()
+  const status = page.getByRole('columnheader', { name: /Status/ }).first()
 
   const orgBox = await organization.boundingBox()
   const deptBox = await department.boundingBox()
@@ -230,7 +238,7 @@ test('column visibility dropdown hides and restores a column', async () => {
   await closePage(page)
 })
 
-test('column pinning marks pinned headers as sticky', async () => {
+test('column pinning marks pinned headers as pinned', async () => {
   const page = await newPage()
   await openTab(page, 'Column Pinning UI')
 
@@ -243,7 +251,7 @@ test('column pinning marks pinned headers as sticky', async () => {
   })
   assert.equal(await nameHeader.getAttribute('data-pinned'), 'left')
   const position = await nameHeader.evaluate((node) => getComputedStyle(node).position)
-  assert.equal(position, 'sticky')
+  assert.equal(position, 'absolute')
   await closePage(page)
 })
 
