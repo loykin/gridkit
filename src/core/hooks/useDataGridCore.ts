@@ -166,6 +166,8 @@ export function useDataGridCore<T extends object>({
     pageIndex: pagination?.pageIndex ?? paginationState.pageIndex,
     pageSize: paginationState.pageSize,
   }), [pagination?.pageIndex, paginationState.pageIndex, paginationState.pageSize])
+  const paginationStateRef = useRef(paginationState)
+  paginationStateRef.current = paginationState
 
   const persistedState = useMemo(() => ({
     sizing,
@@ -280,10 +282,16 @@ export function useDataGridCore<T extends object>({
     },
     onPaginationChange: enablePagination
       ? (updater) => {
-          const next = typeof updater === 'function' ? updater(effectivePaginationState) : updater
+          const currentPaginationState = paginationStateRef.current
+          const prev = isPageIndexControlled
+            ? { pageIndex: pagination?.pageIndex ?? currentPaginationState.pageIndex, pageSize: currentPaginationState.pageSize }
+            : currentPaginationState
+          const next = typeof updater === 'function' ? updater(prev) : updater
           if (isPageIndexControlled) {
-            setPaginationState((prev) => ({ ...prev, pageSize: next.pageSize }))
+            paginationStateRef.current = { ...currentPaginationState, pageSize: next.pageSize }
+            setPaginationState((current) => ({ ...current, pageSize: next.pageSize }))
           } else {
+            paginationStateRef.current = next
             setPaginationState(next)
           }
           if (tableKey && syncState) update(tableKey, { pagination: next })

@@ -8,13 +8,13 @@ interface Row {
   c: string
 }
 
-function column(id: keyof Row, size: number, pin: false | 'left' | 'right' = false) {
+function column(id: keyof Row, size: number, pin: false | 'left' | 'right' = false, startOffset = 0) {
   return {
     id,
     getSize: () => size,
     getIsPinned: () => pin,
-    getStart: () => 0,
-    getAfter: () => 0,
+    getStart: () => startOffset,
+    getAfter: () => startOffset + size,
     getIsVisible: () => true,
   } as unknown as Column<Row, unknown>
 }
@@ -131,6 +131,63 @@ describe('buildHeaderLayoutPlan', () => {
 
     expect(plan.cells.find((cell) => cell.id === 'a')).toMatchObject({ top: 0, rowSpan: 2, height: 72 })
     expect(plan.cells.find((cell) => cell.id === 'a-placeholder')).toMatchObject({ render: false })
+  })
+
+  it('spans pinned ungrouped leaf to the top in span mode', () => {
+    const a = column('a', 80, 'left', 0)
+    const b = column('b', 120)
+    const c = column('c', 140)
+    const aPlaceholder = header({ id: 'a-placeholder', depth: 0, col: a, isPlaceholder: true })
+    const aLeaf = header({ id: 'a', depth: 1, col: a })
+    const bLeaf = header({ id: 'b', depth: 1, col: b })
+    const cLeaf = header({ id: 'c', depth: 1, col: c })
+    const group = header({ id: 'group', depth: 0, col: b, colSpan: 2, subHeaders: [bLeaf, cLeaf] })
+
+    const headerGroups = [
+      { id: '0', headers: [aPlaceholder, group] },
+      { id: '1', headers: [aLeaf, bLeaf, cLeaf] },
+    ] as unknown as HeaderGroup<Row>[]
+
+    const plan = buildHeaderLayoutPlan({
+      headerGroups,
+      visibleLeafColumns: [a, b, c],
+      layout: 'span',
+      rowHeight: 36,
+    })
+
+    expect(plan.cells.find((cell) => cell.id === 'a')).toMatchObject({
+      top: 0,
+      rowSpan: 2,
+      height: 72,
+      pin: 'left',
+    })
+    expect(plan.cells.find((cell) => cell.id === 'a-placeholder')).toMatchObject({ render: false })
+  })
+
+  it('places pinned ungrouped leaf at top with placeholder below in padded mode', () => {
+    const a = column('a', 80, 'left', 0)
+    const b = column('b', 120)
+    const c = column('c', 140)
+    const aPlaceholder = header({ id: 'a-placeholder', depth: 0, col: a, isPlaceholder: true })
+    const aLeaf = header({ id: 'a', depth: 1, col: a })
+    const bLeaf = header({ id: 'b', depth: 1, col: b })
+    const cLeaf = header({ id: 'c', depth: 1, col: c })
+    const group = header({ id: 'group', depth: 0, col: b, colSpan: 2, subHeaders: [bLeaf, cLeaf] })
+
+    const headerGroups = [
+      { id: '0', headers: [aPlaceholder, group] },
+      { id: '1', headers: [aLeaf, bLeaf, cLeaf] },
+    ] as unknown as HeaderGroup<Row>[]
+
+    const plan = buildHeaderLayoutPlan({
+      headerGroups,
+      visibleLeafColumns: [a, b, c],
+      layout: 'padded',
+      rowHeight: 36,
+    })
+
+    expect(plan.cells.find((cell) => cell.id === 'a')).toMatchObject({ top: 0, rowSpan: 1, pin: 'left' })
+    expect(plan.cells.find((cell) => cell.id === 'a-placeholder')).toMatchObject({ top: 36, render: true })
   })
 
   it('sizes group headers to the sum of their leaf columns', () => {

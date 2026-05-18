@@ -5,15 +5,6 @@ export interface HeaderLayoutPlan<T extends object> {
   width: number
   height: number
   rowHeight: number
-  rows: HeaderLayoutRow<T>[]
-  cells: HeaderLayoutCell<T>[]
-}
-
-export interface HeaderLayoutRow<T extends object> {
-  id: string
-  depth: number
-  top: number
-  height: number
   cells: HeaderLayoutCell<T>[]
 }
 
@@ -198,13 +189,6 @@ export function buildHeaderLayoutPlan<T extends object>({
     ? Math.max(...rawEntries.map((entry) => entry.header.depth))
     : headerGroups.length - 1
   const planHeight = (maxDepth - depthOffset + 1) * rowHeight
-  const rows: HeaderLayoutRow<T>[] = headerGroups.slice(depthOffset, maxDepth + 1).map((headerGroup, index) => ({
-    id: headerGroup.id,
-    depth: index,
-    top: index * rowHeight,
-    height: rowHeight,
-    cells: [],
-  }))
   const cells: HeaderLayoutCell<T>[] = []
 
   for (const entry of rawEntries) {
@@ -240,7 +224,6 @@ export function buildHeaderLayoutPlan<T extends object>({
         zIndex: pinned.zIndex,
       }
 
-      rows[header.depth - depthOffset]?.cells.push(cell)
       cells.push(cell)
     }
   }
@@ -249,7 +232,6 @@ export function buildHeaderLayoutPlan<T extends object>({
     width: totalWidth,
     height: planHeight,
     rowHeight,
-    rows,
     cells,
   }
 }

@@ -211,4 +211,23 @@ describe('DataGrid header groups', () => {
     expect(workHeader.querySelector('[data-reorder-handle="true"]')).not.toBeInTheDocument()
     expect(container.querySelectorAll('[data-reorder-handle="true"]').length).toBe(3)
   })
+
+  it('keeps pinned ungrouped leaf headers spanned in span layout', () => {
+    render(
+      <DataGrid
+        data={data}
+        columns={columnsWithUngrouped}
+        getRowId={(row) => row.id}
+        headerGroupLayout="span"
+        initialPinning={{ left: ['id'] }}
+        enableColumnPinning
+      />,
+    )
+
+    const idHeader = screen.getByRole('columnheader', { name: /ID/ })
+
+    expect(idHeader).toHaveAttribute('data-pinned', 'left')
+    expect(idHeader).toHaveAttribute('aria-rowspan', '2')
+    expect(idHeader).toHaveStyle({ top: '0px', height: '72px' })
+  })
 })
