@@ -616,6 +616,25 @@ const columns: DataGridColumnDef<User>[] = [
 ]
 ```
 
+### Header Group Layout
+
+`headerGroupLayout` controls how ungrouped leaf columns are rendered alongside group headers.
+
+| Value | Behaviour |
+|---|---|
+| `'padded'` (default) | Ungrouped leaf columns show a blank placeholder cell in the group row. Layout is uniform — all header rows are the same height |
+| `'span'` | Ungrouped leaf columns stretch to fill the full header height. No placeholder is rendered |
+
+```tsx
+// padded (default) — blank cell above "ID", full height group headers
+<DataGrid columns={columns} />
+
+// span — "ID" occupies both rows, no blank placeholder
+<DataGrid columns={columns} headerGroupLayout="span" />
+```
+
+Group header resize is intentionally disabled. Group header width is always the sum of its leaf columns. Only leaf column resize handles are shown.
+
 ### Column `meta` Reference
 
 | Field | Type | Description |
@@ -630,6 +649,7 @@ const columns: DataGridColumnDef<User>[] = [
 | `wrap` | `boolean` | Allow multi-line content; row height adjusts automatically |
 | `filterType` | `'text' \| 'select' \| 'multi-select' \| 'number' \| 'date' \| 'date-range' \| 'datetime' \| 'datetime-range' \| 'custom' \| false` | Filter input type for this column |
 | `backendField` | `string` | Field name sent to `DataStoreBackend` query/facet params. Defaults to the column id |
+| `editCell` | `(props: EditCellProps<T, V>) => ReactNode` | Inline cell editor triggered by double-click. Must call `props.onCommit(value)` or `props.onCancel()`. Requires `onCellValueChange` on the DataGrid |
 | `actions` | `(row: T) => Action[]` | Row action menu items |
 
 ---
@@ -637,6 +657,8 @@ const columns: DataGridColumnDef<User>[] = [
 ## Props
 
 ### Shared Props (`DataGrid`, `DataGridInfinity`, `DataGridDrag`, `DataGridCard`)
+
+#### Data & Display
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -661,16 +683,30 @@ const columns: DataGridColumnDef<User>[] = [
 | `rowCursor` | `boolean` | `false` | Show pointer cursor on rows |
 | `classNames` | `DataGridClassNames` | — | Slot-based class injection for table elements |
 | `icons` | `DataGridIcons` | — | Override any built-in icon slot |
-| **Headers** ||||
+
+#### Headers
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `headerGroupLayout` | `'padded' \| 'span'` | `'padded'` | Header group layout. `span` lets ungrouped leaf headers occupy the full grouped header height |
-| **Sorting** ||||
+| `enableColumnMenu` | `boolean` | `false` | Show a ⋯ menu button inside each column header |
+| `renderColumnMenu` | `(col: Column<T>, table: Table<T>, close: () => void, ctx: ColumnMenuContext) => ReactNode` | — | Custom column header menu. `ctx` provides pre-resolved `canSort`, `canFilter`, `canPin` flags |
+
+#### Sorting
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `enableSorting` | `boolean` | `true` | Enable column sorting |
 | `enableMultiSort` | `boolean` | `false` | Enable Shift+click multi-column sorting |
 | `maxMultiSortColCount` | `number` | `3` | Maximum sorted columns when multi-sort is enabled |
 | `initialSorting` | `SortingState` | — | Initial sort state |
 | `onSortingChange` | `(s: SortingState) => void` | — | Called on sort change |
 | `manualSorting` | `boolean` | `false` | Disable client-side sort — handle externally |
-| **Filtering** ||||
+
+#### Filtering
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `enableColumnFilters` | `boolean` | `false` | Show per-column filter UI |
 | `filterDisplay` | `'row' \| 'icon'` | `'row'` | Filter as dedicated row or icon inside header cell |
 | `customFilterComponents` | `Record<string, ComponentType<CustomFilterProps<T>>>` | — | Register custom filter UI by `filterType` |
@@ -717,39 +753,70 @@ function MyDateTimeRangeFilter<T extends object>({
 />
 ```
 
-| **Column Sizing** ||||
+#### Column Sizing
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `enableColumnResizing` | `boolean` | `true` | Enable drag-to-resize columns |
 | `columnResizeMode` | `'onChange' \| 'onEnd'` | `'onChange'` | When resize updates are applied |
 | `columnSizingMode` | `'auto' \| 'flex' \| 'fixed'` | `'flex'` | Column width strategy |
 | `columnSizing` | `ColumnSizingState` | — | Initial column widths |
 | `onColumnSizingChange` | `(s: ColumnSizingState) => void` | — | Called on column resize |
-| **Visibility & Pinning** ||||
+
+#### Visibility & Pinning
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `visibilityState` | `VisibilityState` | — | Controlled column visibility |
 | `onColumnVisibilityChange` | `(v: VisibilityState) => void` | — | Called when column visibility changes |
 | `initialPinning` | `ColumnPinningState` | — | Initial pinned columns `{ left: [...], right: [...] }` |
 | `enableColumnPinning` | `boolean` | `false` | Show pin/unpin menu inside each column header |
 | `enableColumnReordering` | `boolean` | `false` | Enable drag-to-reorder columns by dragging the header |
-| **Row Expansion** ||||
+
+#### Row Expansion
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `enableExpanding` | `boolean` | `false` | Enable collapsible sub-rows |
 | `getSubRows` | `(row: T, index: number) => T[] \| undefined` | — | Extract sub-rows from a row item |
 | `renderDetailRow` | `(row: Row<unknown>) => ReactNode` | — | Render a master-detail panel below each row. Use `ExpandToggleCell` in a column to toggle |
-| **Row Grouping** ||||
+
+#### Row Grouping
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `enableGrouping` | `boolean` | `false` | Enable grouping rows by column value |
 | `grouping` | `GroupingState` | — | Controlled array of column IDs to group by |
 | `onGroupingChange` | `(grouping: GroupingState) => void` | — | Called when grouping changes |
 | `renderGroupRow` | `(row: Row<T>) => ReactNode` | — | Custom group header renderer |
-| **Selection** ||||
+
+#### Selection
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `checkboxConfig` | `CheckboxConfig<T>` | — | Row checkbox selection configuration |
-| **State Persistence** ||||
+
+#### State Persistence
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `tableKey` | `string` | — | Key for in-memory Zustand state persistence |
 | `syncState` | `boolean` | `false` | Sync pagination and search state (requires `tableKey`) |
 | `statePersistence` | `GridKitStatePersistence` | — | Load/save grid preferences through localStorage, backend APIs, etc. Requires `tableKey` |
-| **Callbacks** ||||
+
+#### Callbacks
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `onTableReady` | `(table: Table<T>) => void` | — | Called when TanStack Table instance is ready |
 | `onCellValueChange` | `(rowId: string, columnId: string, value: unknown) => void` | — | Called when the user commits an inline cell edit |
 | `onColumnOrderChange` | `(order: string[]) => void` | — | Called when column order changes via drag |
 | `onColumnPinningChange` | `(pinning: ColumnPinningState) => void` | — | Called when column pinning changes |
-| **Advanced** ||||
+
+#### Advanced
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
 | `tableOptions` | `PassthroughTableOptions<T>` | — | Escape hatch for advanced TanStack Table options |
 
 ```tsx
