@@ -124,6 +124,7 @@ export function useDataGridCore<T extends object>({
 }: UseDataGridCoreOptions<T>) {
   const enablePagination = !!pagination
   const enableBackendQuery = queryMode === 'backend' && !!dataStore
+  const isPageIndexControlled = pagination?.pageIndex !== undefined
 
   const { register, update, tables } = useTableStore()
   const persisted = tableKey ? tables[tableKey] : undefined
@@ -139,7 +140,7 @@ export function useDataGridCore<T extends object>({
   const [internalGlobal, setInternalGlobal] = useState(persisted?.searchTerm ?? '')
   const [internalColumnVisibility, setInternalColumnVisibility] = useState<VisibilityState>({})
   const [paginationState, setPaginationState] = useState<PaginationState>({
-    pageIndex: persisted?.pagination.pageIndex ?? pagination?.initialPageIndex ?? 0,
+    pageIndex: pagination?.pageIndex ?? persisted?.pagination.pageIndex ?? pagination?.initialPageIndex ?? 0,
     pageSize: persisted?.pagination.pageSize ?? pagination?.pageSize ?? 20,
   })
 
@@ -161,6 +162,10 @@ export function useDataGridCore<T extends object>({
   const effectiveGlobalFilter = externalGlobalFilter ?? internalGlobal
   const effectiveColumnFilters = externalColumnFilters ?? internalFilters
   const effectiveColumnVisibility = visibilityState ?? internalColumnVisibility
+  const effectivePaginationState = useMemo<PaginationState>(() => ({
+    pageIndex: pagination?.pageIndex ?? paginationState.pageIndex,
+    pageSize: paginationState.pageSize,
+  }), [pagination?.pageIndex, paginationState.pageIndex, paginationState.pageSize])
 
   const persistedState = useMemo(() => ({
     sizing,
@@ -170,7 +175,7 @@ export function useDataGridCore<T extends object>({
     sorting,
     columnFilters: effectiveColumnFilters,
     globalFilter: effectiveGlobalFilter,
-    pageSize: paginationState.pageSize,
+    pageSize: effectivePaginationState.pageSize,
   }), [
     sizing,
     columnOrder,
@@ -179,7 +184,7 @@ export function useDataGridCore<T extends object>({
     sorting,
     effectiveColumnFilters,
     effectiveGlobalFilter,
-    paginationState.pageSize,
+    effectivePaginationState.pageSize,
   ])
 
   useGridStatePersistence({
@@ -213,7 +218,7 @@ export function useDataGridCore<T extends object>({
   const effectiveManualSorting = manualSorting || enableBackendQuery
   const effectiveManualFiltering = manualFiltering || enableBackendQuery
   const effectivePageCount = enableBackendQuery && enablePagination
-    ? pagination?.pageCount ?? Math.ceil(queryState.total / paginationState.pageSize)
+    ? pagination?.pageCount ?? Math.ceil(queryState.total / effectivePaginationState.pageSize)
     : pagination?.pageCount
 
   const table = useReactTable<T>({
@@ -234,7 +239,7 @@ export function useDataGridCore<T extends object>({
       columnSizing: sizing,
       columnPinning,
       ...(enableColumnReordering ? { columnOrder } : {}),
-      ...(enablePagination ? { pagination: paginationState } : {}),
+      ...(enablePagination ? { pagination: effectivePaginationState } : {}),
       ...((enableExpanding || enableGrouping) ? { expanded } : {}),
       ...(enableGrouping ? { grouping: effectiveGrouping } : {}),
     },
@@ -275,12 +280,14 @@ export function useDataGridCore<T extends object>({
     },
     onPaginationChange: enablePagination
       ? (updater) => {
-          setPaginationState((prev) => {
-            const next = typeof updater === 'function' ? updater(prev) : updater
-            if (tableKey && syncState) update(tableKey, { pagination: next })
-            pagination?.onPageChange?.(next.pageIndex, next.pageSize)
-            return next
-          })
+          const next = typeof updater === 'function' ? updater(effectivePaginationState) : updater
+          if (isPageIndexControlled) {
+            setPaginationState((prev) => ({ ...prev, pageSize: next.pageSize }))
+          } else {
+            setPaginationState(next)
+          }
+          if (tableKey && syncState) update(tableKey, { pagination: next })
+          pagination?.onPageChange?.(next.pageIndex, next.pageSize)
         }
       : undefined,
 
@@ -374,8 +381,9 @@ export function useDataGridCore<T extends object>({
     globalFilter: effectiveGlobalFilter,
     sorting,
     enablePagination,
-    paginationState,
+    paginationState: effectivePaginationState,
     setPaginationState,
+    isPageIndexControlled,
     tableKey,
     syncState,
     updatePersistedPagination: update,
@@ -384,7 +392,7 @@ export function useDataGridCore<T extends object>({
 
   return {
     table,
-    pagination: paginationState,
+    pagination: effectivePaginationState,
     globalFilter: effectiveGlobalFilter,
     handleGlobalFilterChange,
     queryState,

@@ -444,6 +444,12 @@ export interface DataGridBaseProps<T extends object> extends GridKitCoreProps<T>
 export interface DataGridPaginationConfig {
   /** Initial page size. Default: 20 */
   pageSize?: number
+  /**
+   * Controlled page index (0-based).
+   * When provided, the caller owns the current page and should update this
+   * value in response to onPageChange.
+   */
+  pageIndex?: number
   /** Initial page index (0-based). Default: 0 */
   initialPageIndex?: number
   /**

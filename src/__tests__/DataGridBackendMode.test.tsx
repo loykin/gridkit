@@ -11,11 +11,18 @@ interface Person {
   id: string
   name: string
   age: number
+  department?: string
+  status?: string
 }
 
 const columns: DataGridColumnDef<Person>[] = [
   { accessorKey: 'name', header: 'Name', meta: { filterType: 'select', backendField: 'person_name' } },
   { accessorKey: 'age', header: 'Age' },
+]
+
+const facetColumns: DataGridColumnDef<Person>[] = [
+  { accessorKey: 'department', header: 'Department', meta: { filterType: 'select', backendField: 'dept' } },
+  { accessorKey: 'status', header: 'Status', meta: { filterType: 'select', backendField: 'employee_status' } },
 ]
 
 describe('DataGrid backend query mode', () => {
@@ -72,6 +79,63 @@ describe('DataGrid backend query mode', () => {
       limit: 10,
       offset: 0,
     }))
+  })
+
+  it('uses controlled pagination.pageIndex for backend query params', async () => {
+    const query = vi.fn(async (_params: QueryParams) => ({
+      rows: [{ id: '1', name: 'Ada', age: 36 }],
+      total: 100,
+    }))
+    const backend: DataStoreBackend<Person> = { query }
+    const store = createDataStore<Person>({ getRowId: (row) => row.id, backend })
+
+    render(
+      <DataGrid
+        dataStore={store}
+        queryMode="backend"
+        columns={columns}
+        getRowId={(row) => row.id}
+        pagination={{ pageIndex: 2, pageSize: 10 }}
+      />,
+    )
+
+    await waitFor(() => expect(query).toHaveBeenCalledWith({
+      filters: [],
+      globalFilter: undefined,
+      sort: [],
+      limit: 10,
+      offset: 20,
+    }))
+  })
+
+  it('requests a controlled page reset when backend query criteria changes', async () => {
+    const query = vi.fn(async (_params: QueryParams) => ({
+      rows: [{ id: '1', name: 'Ada', age: 36 }],
+      total: 100,
+    }))
+    const onPageChange = vi.fn()
+    const backend: DataStoreBackend<Person> = { query }
+    const store = createDataStore<Person>({ getRowId: (row) => row.id, backend })
+    const tableRef = createRef<Table<Person> | null>()
+
+    render(
+      <DataGrid
+        dataStore={store}
+        queryMode="backend"
+        columns={columns}
+        getRowId={(row) => row.id}
+        tableRef={tableRef}
+        pagination={{ pageIndex: 2, pageSize: 10, onPageChange }}
+      />,
+    )
+
+    await waitFor(() => expect(tableRef.current).not.toBeNull())
+
+    act(() => {
+      tableRef.current!.setGlobalFilter('ada')
+    })
+
+    await waitFor(() => expect(onPageChange).toHaveBeenCalledWith(0, 10))
   })
 
   it('maps sorting to backendField in backend query params', async () => {
@@ -138,6 +202,83 @@ describe('DataGrid backend query mode', () => {
       globalFilter: undefined,
     }))
     expect(await screen.findByRole('option', { name: 'Grace' })).toBeInTheDocument()
+  })
+
+  it('reloads backend facets when column filters change and excludes the current column filter', async () => {
+    const query = vi.fn(async (_params: QueryParams) => ({
+      rows: [{ id: '1', name: 'Ada', age: 36, department: 'Engineering', status: 'Active' }],
+      total: 1,
+    }))
+    const getFacets = vi.fn(async () => ({ values: ['Active', 'Paused'] }))
+    const backend: DataStoreBackend<Person> = { query, getFacets }
+    const store = createDataStore<Person>({ getRowId: (row) => row.id, backend })
+    const tableRef = createRef<Table<Person> | null>()
+
+    render(
+      <DataGrid
+        dataStore={store}
+        queryMode="backend"
+        columns={facetColumns}
+        getRowId={(row) => row.id}
+        tableRef={tableRef}
+        pagination={{ pageSize: 10 }}
+        enableColumnFilters
+        filterDisplay="icon"
+      />,
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Filter status' }))
+    await waitFor(() => expect(getFacets).toHaveBeenCalledTimes(1))
+
+    act(() => {
+      tableRef.current!.setColumnFilters([
+        { id: 'department', value: 'Engineering' },
+        { id: 'status', value: 'Active' },
+      ])
+    })
+
+    await waitFor(() => expect(getFacets).toHaveBeenLastCalledWith({
+      field: 'employee_status',
+      filters: [{ field: 'dept', op: 'eq', value: 'Engineering' }],
+      globalFilter: undefined,
+    }))
+  })
+
+  it('reloads backend facets when global filter changes', async () => {
+    const query = vi.fn(async (_params: QueryParams) => ({
+      rows: [{ id: '1', name: 'Ada', age: 36, department: 'Engineering', status: 'Active' }],
+      total: 1,
+    }))
+    const getFacets = vi.fn(async () => ({ values: ['Active', 'Paused'] }))
+    const backend: DataStoreBackend<Person> = { query, getFacets }
+    const store = createDataStore<Person>({ getRowId: (row) => row.id, backend })
+    const tableRef = createRef<Table<Person> | null>()
+
+    render(
+      <DataGrid
+        dataStore={store}
+        queryMode="backend"
+        columns={facetColumns}
+        getRowId={(row) => row.id}
+        tableRef={tableRef}
+        pagination={{ pageSize: 10 }}
+        enableColumnFilters
+        filterDisplay="icon"
+      />,
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Filter status' }))
+    await waitFor(() => expect(getFacets).toHaveBeenCalledTimes(1))
+
+    act(() => {
+      tableRef.current!.setGlobalFilter('ada')
+    })
+
+    await waitFor(() => expect(getFacets).toHaveBeenLastCalledWith({
+      field: 'employee_status',
+      filters: [],
+      globalFilter: 'ada',
+    }))
   })
 
   it('warns when backend capabilities do not match enabled backend mode features', async () => {

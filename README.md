@@ -246,14 +246,22 @@ const [table, setTable] = useState(null)
 
 ### Server-Side Pagination
 
+Use `initialPageIndex` when GridKit owns the current page after mount. Use
+`pageIndex` when your app owns the current page, such as URL-synced pagination
+or resetting to page 0 after a parent resource changes.
+
 ```tsx
+const [pageIndex, setPageIndex] = useState(0)
+
 <DataGrid
   data={pageRows}           // current page data only
   columns={columns}
   pagination={{
+    pageIndex,
     pageSize: 20,
     pageCount: Math.ceil(totalCount / 20),   // tells TanStack total pages
     onPageChange: (pageIndex, pageSize) => {  // fetch on every page change
+      setPageIndex(pageIndex)
       fetchPage(pageIndex, pageSize)
     },
   }}
@@ -268,6 +276,7 @@ const [table, setTable] = useState(null)
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `pageSize` | `number` | `20` | Initial page size |
+| `pageIndex` | `number` | — | Controlled current page index (0-based) |
 | `initialPageIndex` | `number` | `0` | Initial page index (0-based) |
 | `pageCount` | `number` | — | Total page count for server-side (manual) pagination |
 | `onPageChange` | `(pageIndex, pageSize) => void` | — | Called on every page or size change |
@@ -921,7 +930,7 @@ interface QueryParams {
 
 `field` is `column.meta.backendField` when provided, otherwise the column id. GridKit does not generate SQL, know schemas, escape database paths, poll APIs, or choose fallback/cache policy.
 
-When query criteria change, backend mode resets pagination to page 0 before querying. This avoids sending a stale offset from the previous result set.
+When query criteria change, backend mode resets pagination to page 0 before querying. With controlled `pagination.pageIndex`, GridKit calls `onPageChange(0, pageSize)` and waits for the caller to pass the updated `pageIndex`.
 
 ### Facets
 

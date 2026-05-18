@@ -8,7 +8,11 @@ interface Props<T extends object> {
 }
 
 export function SelectFilterCell<T extends object>({ col, table, onSelect }: Props<T>) {
-  const { options, isLoading } = useColumnOptions(table, col.id)
+  const { columnFilters, globalFilter } = table.getState()
+  const { options, isLoading } = useColumnOptions(table, col.id, true, {
+    columnFilters,
+    globalFilter,
+  })
   const filterValue = (col.getFilterValue() ?? '') as string
 
   return (

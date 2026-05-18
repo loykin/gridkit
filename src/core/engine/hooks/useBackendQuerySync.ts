@@ -15,6 +15,7 @@ export function useBackendQuerySync<T extends object>({
   enablePagination,
   paginationState,
   setPaginationState,
+  isPageIndexControlled,
   tableKey,
   syncState,
   updatePersistedPagination,
@@ -29,6 +30,7 @@ export function useBackendQuerySync<T extends object>({
   enablePagination: boolean
   paginationState: PaginationState
   setPaginationState: React.Dispatch<React.SetStateAction<PaginationState>>
+  isPageIndexControlled: boolean
   tableKey?: string
   syncState: boolean
   updatePersistedPagination: (tableKey: string, value: { pagination: PaginationState }) => void
@@ -63,7 +65,9 @@ export function useBackendQuerySync<T extends object>({
     ) {
       queryKeyRef.current = queryKey
       const next = { pageIndex: 0, pageSize }
-      setPaginationState(next)
+      if (!isPageIndexControlled) {
+        setPaginationState(next)
+      }
       if (tableKey && syncState) updatePersistedPagination(tableKey, { pagination: next })
       paginationOnPageChangeRef.current?.(0, pageSize)
       return
@@ -77,6 +81,7 @@ export function useBackendQuerySync<T extends object>({
     enablePagination,
     enabled,
     globalFilter,
+    isPageIndexControlled,
     pageIndex,
     pageSize,
     setPaginationState,

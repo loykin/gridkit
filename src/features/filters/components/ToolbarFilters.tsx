@@ -20,7 +20,11 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
   const icons = useIcons()
   const col = table.getColumn(columnId)
   const value = (col?.getFilterValue() ?? '') as string
-  const { options, isLoading } = useColumnOptions(table, columnId, !!col)
+  const { columnFilters, globalFilter } = table.getState()
+  const { options, isLoading } = useColumnOptions(table, columnId, !!col, {
+    columnFilters,
+    globalFilter,
+  })
 
   if (!col) return null
 

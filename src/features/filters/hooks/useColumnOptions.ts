@@ -1,5 +1,5 @@
-import type { Table } from '@tanstack/react-table'
-import { useEffect, useState } from 'react'
+import type { ColumnFiltersState, Table } from '@tanstack/react-table'
+import { useEffect, useRef, useState } from 'react'
 import { buildBackendFilters, getBackendField } from '@/core/engine/backend/buildBackendQueryParams'
 
 /**
@@ -19,9 +19,25 @@ export function useColumnOptions<T extends object>(
   table: Table<T>,
   columnId: string,
   enabled = true,
+  state?: {
+    columnFilters?: ColumnFiltersState
+    globalFilter?: unknown
+  },
 ) {
   const [options, setOptions] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const columnFilters = state?.columnFilters ?? table.getState().columnFilters
+  const globalFilter = state?.globalFilter ?? table.getState().globalFilter
+  const columnFiltersKey = JSON.stringify(columnFilters)
+  const globalFilterKey = String(globalFilter ?? '')
+  const backendGlobalFilter = globalFilterKey || undefined
+  const columnFiltersRef = useRef(columnFilters)
+  const columnFiltersKeyRef = useRef(columnFiltersKey)
+
+  if (columnFiltersKeyRef.current !== columnFiltersKey) {
+    columnFiltersKeyRef.current = columnFiltersKey
+    columnFiltersRef.current = columnFilters
+  }
 
   useEffect(() => {
     if (!enabled) return
@@ -39,10 +55,10 @@ export function useColumnOptions<T extends object>(
 
     dataStore.getFacets({
       field: getBackendField(table, columnId),
-      filters: buildBackendFilters(table, table.getState().columnFilters, {
+      filters: buildBackendFilters(table, columnFiltersRef.current, {
         excludeColumnId: columnId,
       }),
-      globalFilter: table.getState().globalFilter || undefined,
+      globalFilter: backendGlobalFilter,
     }).then((result) => {
       if (!cancelled) setOptions(result?.values ?? getColumnOptions(table, columnId))
     }).finally(() => {
@@ -52,7 +68,7 @@ export function useColumnOptions<T extends object>(
     return () => {
       cancelled = true
     }
-  }, [columnId, enabled, table])
+  }, [backendGlobalFilter, columnFiltersKey, columnId, enabled, table])
 
   return { options, isLoading }
 }

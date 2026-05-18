@@ -9,7 +9,11 @@ interface Props<T extends object> {
 }
 
 export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
-  const { options, isLoading } = useColumnOptions(table, col.id)
+  const { columnFilters, globalFilter } = table.getState()
+  const { options, isLoading } = useColumnOptions(table, col.id, true, {
+    columnFilters,
+    globalFilter,
+  })
   const selected = (col.getFilterValue() as string[] | undefined) ?? []
 
   const toggle = (val: string) => {
