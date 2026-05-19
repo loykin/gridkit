@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback, useLayoutEffect, useMemo } from 'react'
 import {
   type Row,
   type Table,
@@ -57,6 +57,7 @@ export function DataGridTableView<T extends object>({
   tableHeight,
   maxTableHeight,
   minTableHeight,
+  fillContainer,
   tableWidthMode = 'spacer',
   rowHeight,
   estimateRowHeight,
@@ -113,6 +114,8 @@ export function DataGridTableView<T extends object>({
 
   // ── Scroll sync ────────────────────────────────────────────────────────────
   const { headerScrollRef, bodyScrollRef, syncScroll } = useTableScrollSync()
+  const bodyWrapperRef = React.useRef<HTMLDivElement | null>(null)
+  const [fillBodyMaxHeight, setFillBodyMaxHeight] = useState<number | undefined>()
 
   // ── Virtualizer ────────────────────────────────────────────────────────────
   const { virtual, virtualizer: rowVirtualizer } = useTableVirtualizer({
@@ -148,6 +151,54 @@ export function DataGridTableView<T extends object>({
     return () => ro.disconnect()
   }, [bodyScrollRef, checkVScroll])
 
+  useLayoutEffect(() => {
+    const hasFixedTableHeight = tableHeight != null && tableHeight !== 'auto'
+    if (!fillContainer || hasFixedTableHeight) {
+      setFillBodyMaxHeight(undefined)
+      return
+    }
+
+    const container = containerRef.current
+    const tableWrapper = container?.parentElement
+    const shell = tableWrapper?.parentElement
+    if (!container || !tableWrapper || typeof ResizeObserver === 'undefined') return
+
+    const measure = () => {
+      const tableMaxHeight = Number.parseFloat(
+        getComputedStyle(tableWrapper).getPropertyValue('--dg-fill-table-max-height'),
+      )
+      if (!(tableMaxHeight > 0)) return
+
+      const headerHeight = showHeader
+        ? (headerScrollRef.current?.getBoundingClientRect().height ?? 0)
+        : 0
+      const containerStyle = getComputedStyle(container)
+      const borderY =
+        (Number.parseFloat(containerStyle.borderTopWidth) || 0) +
+        (Number.parseFloat(containerStyle.borderBottomWidth) || 0)
+      const next = Math.floor(tableMaxHeight - headerHeight - borderY)
+
+      setFillBodyMaxHeight((current) => {
+        if (next <= 0) return current
+        return current === next ? current : next
+      })
+    }
+
+    const observer = new ResizeObserver(measure)
+    if (shell) observer.observe(shell)
+    observer.observe(tableWrapper)
+    observer.observe(container)
+    if (headerScrollRef.current) observer.observe(headerScrollRef.current)
+    if (bodyWrapperRef.current) observer.observe(bodyWrapperRef.current)
+    window.addEventListener('resize', measure)
+    measure()
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [containerRef, fillContainer, headerScrollRef, showHeader, tableHeight])
+
   // Body wrapper: fixed height when tableHeight is set so hscroll stays inside
   const toCSS = (v: string | number) => (typeof v === 'number' ? `${v}px` : v)
   const bodyWrapperStyle: React.CSSProperties = {
@@ -156,7 +207,11 @@ export function DataGridTableView<T extends object>({
     position: 'relative',
     ...(tableHeight && tableHeight !== 'auto'
       ? { height: toCSS(tableHeight as string | number) }
-      : maxTableHeight != null
+      : fillContainer
+        ? fillBodyMaxHeight != null
+          ? { maxHeight: toCSS(fillBodyMaxHeight) }
+          : {}
+        : maxTableHeight != null
         ? { maxHeight: toCSS(maxTableHeight) }
         : {}),
     ...(minTableHeight != null ? { minHeight: toCSS(minTableHeight) } : {}),
@@ -190,7 +245,7 @@ export function DataGridTableView<T extends object>({
           // which is required since the outer div's height is determined by its children.
           contain: 'layout paint',
         }}
-        className={cn('dg-container', classNames?.container)}
+        className={cn('dg-container', fillContainer && 'dg-container--fill', classNames?.container)}
       >
         {/* Header panel — conditionally rendered, overflow:hidden, scrollLeft mirrors body */}
         {showHeader && (
@@ -228,7 +283,11 @@ export function DataGridTableView<T extends object>({
         )}
 
         {/* Body scroll container + scrollbars */}
-        <div style={bodyWrapperStyle}>
+        <div
+          ref={bodyWrapperRef}
+          className={cn('dg-body-wrapper', fillContainer && 'dg-body-wrapper--fill')}
+          style={bodyWrapperStyle}
+        >
           <div
             ref={bodyScrollRef}
             style={bodyStyle}

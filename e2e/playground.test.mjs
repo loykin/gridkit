@@ -159,6 +159,50 @@ test('header groups span their leaf header range', async () => {
   await closePage(page)
 })
 
+test('fillContainer preserves natural height until body overflow', async () => {
+  const page = await newPage()
+  await openTab(page, 'Fill Container')
+
+  const readCase = async (testId) => page.locator(`[data-testid="${testId}"]`).evaluate((root) => {
+    const shell = root.querySelector('.dg-shell')
+    const tableWrapper = root.querySelector('.dg-table-wrapper')
+    const body = root.querySelector('.scrollbar-none')
+    const footer = root.querySelector('.dg-footer')
+    const rect = (node) => {
+      const box = node.getBoundingClientRect()
+      return { top: box.top, bottom: box.bottom, height: box.height }
+    }
+
+    return {
+      shell: rect(shell),
+      tableWrapper: rect(tableWrapper),
+      body: { clientHeight: body.clientHeight, scrollHeight: body.scrollHeight },
+      footer: footer ? rect(footer) : null,
+    }
+  })
+
+  await page.waitForTimeout(300)
+  const shortCase = await readCase('fill-short-case')
+  const longCase = await readCase('fill-long-case')
+
+  assert.ok(
+    shortCase.body.scrollHeight <= shortCase.body.clientHeight + 1,
+    `short data should not scroll: ${shortCase.body.scrollHeight} > ${shortCase.body.clientHeight}`,
+  )
+  assert.ok(shortCase.footer.top - shortCase.tableWrapper.bottom < 20)
+
+  assert.ok(
+    longCase.body.scrollHeight > longCase.body.clientHeight + 100,
+    `long data should scroll: ${longCase.body.scrollHeight} <= ${longCase.body.clientHeight}`,
+  )
+  assert.ok(
+    Math.abs(longCase.footer.bottom - longCase.shell.bottom) < 2,
+    `footer should stay at shell bottom: ${longCase.footer.bottom} != ${longCase.shell.bottom}`,
+  )
+
+  await closePage(page)
+})
+
 test('datetime range popover shows seconds inputs without clipping', async () => {
   const page = await newPage()
   await openTab(page, 'Log Stream')

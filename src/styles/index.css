@@ -285,9 +285,22 @@
   min-width: 0;
   overflow: hidden;
 }
+.dg-shell--fill {
+  height: 100%;
+  min-height: 0;
+}
+.dg-toolbar-frame,
+.dg-footer {
+  flex-shrink: 0;
+  min-width: 0;
+}
 
 .dg-table-wrapper {
   min-width: 0;
+}
+.dg-table-wrapper--fill {
+  min-height: 0;
+  overflow: hidden;
 }
 .dg-table-wrapper--hidden {
   visibility: hidden;
@@ -328,6 +341,13 @@
   border: 1px solid var(--dg-border);
   border-radius: var(--dg-radius);
   background: var(--dg-background);
+}
+.dg-container--fill {
+  min-height: 0;
+  max-height: var(--dg-fill-table-max-height);
+}
+.dg-body-wrapper {
+  position: relative;
 }
 
 .dg-header {

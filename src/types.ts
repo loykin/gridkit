@@ -187,10 +187,9 @@ export interface CustomFilterProps<T extends object, V = unknown> {
   close?: () => void
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type CustomFilterComponents<T extends object> = Record<
   string,
-  React.ComponentType<CustomFilterProps<T, any>>
+  React.ComponentType<CustomFilterProps<T, unknown>>
 >
 
 export type GridKitPersistedStateKey =
@@ -236,6 +235,12 @@ export interface GridKitDisplayProps<T extends object> {
   emptyContent?: ReactNode
   onRowClick?: (row: T) => void
   rowCursor?: boolean
+  /**
+   * Let the grid fit within an explicit parent height while preserving natural
+   * height for short content. When content exceeds the available space, only
+   * the table body scrolls and the footer remains visible below the table.
+   */
+  fillContainer?: boolean
   tableHeight?: string | number | 'auto'
   /** Cap the container height — content shorter than this grows naturally, taller gets a scrollbar. */
   maxTableHeight?: string | number

@@ -33,6 +33,7 @@ export function DataGridShell<T extends object>({
   loadMoreRef,
   isFetchingNextPage,
   footer,
+  fillContainer,
   ...viewConfig
 }: DataGridShellProps<T>) {
   if (error) {
@@ -45,6 +46,7 @@ export function DataGridShell<T extends object>({
       table={table}
       headerLeft={headerLeft}
       headerRight={headerRight}
+      fillContainer={fillContainer}
       containerClassName={cn('dg-table-wrapper', !isSized && 'dg-table-wrapper--hidden')}
       footer={footer?.(table)}
     >
@@ -55,6 +57,7 @@ export function DataGridShell<T extends object>({
         loadMoreRef={loadMoreRef}
         isFetchingNextPage={isFetchingNextPage}
         onMeasureColumns={measure}
+        fillContainer={fillContainer}
         {...viewConfig}
       />
     </GridKitShell>

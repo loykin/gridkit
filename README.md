@@ -148,6 +148,8 @@ const data = useMemo(() => rowsFromQuery ?? [], [rowsFromQuery])
 
 For large table views, set a fixed `tableHeight` so virtualization can keep DOM work bounded to the visible rows plus overscan. `DataGridList` also supports opt-in virtualization with `enableVirtualization` and a fixed `containerHeight`. `DataGridChat` is currently non-virtualized because prepend anchoring and bottom stickiness need stricter scroll handling.
 
+Use `fillContainer` when a table should fit inside an existing app panel without forcing short data to stretch. The parent must provide an explicit height, or a flex chain with `min-height: 0`.
+
 ### Current Limits
 
 - `DataGridCard` is not virtualized. Use it for small/medium card collections, or add app-level paging/infinite loading for large data sets.
@@ -165,7 +167,7 @@ Browser E2E coverage is intentionally focused on regressions that jsdom cannot c
 pnpm test:e2e
 ```
 
-The E2E suite starts the playground and verifies column resize vs reorder separation, header group alignment, datetime filter popover clipping, state persistence after reload, column visibility, runtime pinning, row actions, row selection, inline editing, tree expansion, and master-detail expansion.
+The E2E suite starts the playground and verifies column resize vs reorder separation, header group alignment, fill-container height behavior, datetime filter popover clipping, state persistence after reload, column visibility, runtime pinning, row actions, row selection, inline editing, tree expansion, and master-detail expansion.
 
 ---
 
@@ -278,6 +280,45 @@ const [pageIndex, setPageIndex] = useState(0)
 | `initialPageIndex` | `number` | `0` | Initial page index (0-based) |
 | `pageCount` | `number` | — | Total page count for server-side (manual) pagination |
 | `onPageChange` | `(pageIndex, pageSize) => void` | — | Called on every page or size change |
+
+---
+
+## Fill Container Layout
+
+Use `fillContainer` when the grid lives inside a fixed-height tab, drawer, split pane, or dashboard panel.
+
+```tsx
+import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
+
+export function UsersPanel() {
+  return (
+    <div style={{ height: 520, minHeight: 0 }}>
+      <DataGrid
+        fillContainer
+        data={rows}
+        columns={columns}
+        pagination={{ pageSize: 50 }}
+        footer={(table) => <DataGridPaginationBar table={table} />}
+      />
+    </div>
+  )
+}
+```
+
+Behavior:
+
+- Short data uses natural table height, so the footer sits directly below the table.
+- Overflowing data scrolls only inside the body area.
+- The footer remains visible at the bottom of the parent panel.
+- GridKit measures toolbar, header, footer, gaps, and parent resize internally; callers should not query `.dg-*` internals to calculate `maxTableHeight`.
+
+Parent requirements:
+
+- A fixed height, `height: 100%` chain, or flex layout that gives the parent a real height.
+- In flex layouts, make sure the parent chain can shrink with `min-height: 0`.
+- Do not add `overflow: auto` to `.dg-table-wrapper` or `.dg-container`; the scroll owner is the internal body element.
+
+If you want a hard fixed table body regardless of content length, use `tableHeight`. If you want content to grow until a known cap, use `maxTableHeight`. If the cap depends on the surrounding app panel, use `fillContainer`.
 
 ---
 
@@ -669,6 +710,7 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `emptyMessage` | `string` | — | Message when data is empty |
 | `emptyContent` | `ReactNode` | — | Custom empty state UI (overrides `emptyMessage`) |
 | `showHeader` | `boolean` | `true` | Show/hide the header row |
+| `fillContainer` | `boolean` | `false` | Fit inside an explicit parent height while keeping short content natural and scrolling only the body on overflow |
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Fixed height — enables internal scroll and virtualization |
 | `maxTableHeight` | `string \| number` | — | Cap height — grows with content up to this limit, then scrolls |
 | `minTableHeight` | `string \| number` | — | Floor height — content shorter than this keeps minimum space |

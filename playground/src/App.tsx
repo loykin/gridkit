@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PaginationTab } from './tabs/PaginationTab'
 import { InfinityTab } from './tabs/InfinityTab'
 import { FixedHeightTab } from './tabs/FixedHeightTab'
+import { FillContainerTab } from './tabs/FillContainerTab'
 import { LargeListTab } from './tabs/LargeListTab'
 import { LiveUpdateTab } from './tabs/LiveUpdateTab'
 import { PinningTab } from './tabs/PinningTab'
@@ -39,6 +40,7 @@ const TABS = [
   { id: 'pagination', label: 'Pagination', content: <PaginationTab /> },
   { id: 'infinity', label: 'Infinite Scroll', content: <InfinityTab /> },
   { id: 'fixed', label: 'Fixed Height', content: <FixedHeightTab /> },
+  { id: 'fill-container', label: 'Fill Container', content: <FillContainerTab /> },
   { id: 'large-list', label: 'Large List', content: <LargeListTab /> },
   { id: 'live-update', label: 'Live Update', content: <LiveUpdateTab /> },
   { id: 'pinning', label: 'Column Pinning', content: <PinningTab /> },
