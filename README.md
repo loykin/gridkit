@@ -707,7 +707,7 @@ Group header resize is intentionally disabled. Group header width is always the 
 |---|---|---|---|
 | `enableColumnFilters` | `boolean` | `false` | Show per-column filter UI |
 | `filterDisplay` | `'row' \| 'icon'` | `'row'` | Filter as dedicated row or icon inside header cell |
-| `customFilterComponents` | `Record<string, ComponentType<CustomFilterProps<T>>>` | — | Register custom filter UI by `filterType` |
+| `customFilterComponents` | `Record<string, ComponentType<CustomFilterProps<T, any>>>` | — | Register custom filter UI by `filterType` |
 | `manualFiltering` | `boolean` | `false` | Disable client-side filtering — handle externally |
 | `columnFilters` | `ColumnFiltersState` | — | Controlled column filter state |
 | `onColumnFiltersChange` | `(f: ColumnFiltersState) => void` | — | Called on filter change |
@@ -717,17 +717,19 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `headerLeft` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the left. Function form receives the table instance |
 | `headerRight` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the right. Function form receives the table instance |
 
-Custom filter UI can replace any built-in filter type, including date/time filters:
+Custom filter UI can replace any built-in filter type. The second type parameter `V` on `CustomFilterProps` types the filter value — each component can declare its own value shape with no casting required:
 
 ```tsx
 import type { CustomFilterProps } from '@loykin/gridkit'
+
+type DateTimeRange = [string, string] | undefined
 
 function MyDateTimeRangeFilter<T extends object>({
   value,
   onChange,
   close,
-}: CustomFilterProps<T>) {
-  const [start = '', end = ''] = Array.isArray(value) ? value as [string, string] : ['', '']
+}: CustomFilterProps<T, DateTimeRange>) {
+  const [start = '', end = ''] = value ?? ['', '']
 
   return (
     <DateTimeRangePicker

@@ -179,17 +179,18 @@ export interface GridKitTableContext<T extends object> extends GridKitRowsContex
   table: Table<T>
 }
 
-export interface CustomFilterProps<T extends object> {
+export interface CustomFilterProps<T extends object, V = unknown> {
   column: Column<T, unknown>
   table: Table<T>
-  value: unknown
-  onChange: (value: unknown) => void
+  value: V
+  onChange: (value: V | undefined) => void
   close?: () => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type CustomFilterComponents<T extends object> = Record<
   string,
-  React.ComponentType<CustomFilterProps<T>>
+  React.ComponentType<CustomFilterProps<T, any>>
 >
 
 export type GridKitPersistedStateKey =
