@@ -181,6 +181,7 @@ export function DataGridListView<T extends object>({
       maxTableHeight={maxTableHeight}
       minTableHeight={minTableHeight}
       containerClassName={cn('dg-list-container', classNames?.container)}
+      footerClassName={classNames?.footer}
       footer={footer}
     >
       {renderContent()}

@@ -51,6 +51,26 @@ describe('DataGrid accessibility labels', () => {
     expect(screen.getByRole('button', { name: 'Go to next page' })).toBeInTheDocument()
   })
 
+  it('applies classNames.footer to the footer wrapper', () => {
+    const columns: DataGridColumnDef<Person>[] = [
+      { accessorKey: 'name', header: 'Name' },
+      { accessorKey: 'age', header: 'Age' },
+    ]
+
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columns}
+        getRowId={(row) => row.id}
+        pagination={{ pageSize: 1 }}
+        footer={(table) => <DataGridPaginationBar table={table} />}
+        classNames={{ footer: 'custom-footer' }}
+      />,
+    )
+
+    expect(container.querySelector('.dg-footer')).toHaveClass('custom-footer')
+  })
+
   it('exposes row action menus with menu semantics and Escape close behavior', async () => {
     const columns: DataGridColumnDef<Person>[] = [
       { accessorKey: 'name', header: 'Name' },

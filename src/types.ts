@@ -145,9 +145,20 @@ export interface CheckboxConfig<T extends object> {
 export interface DataGridClassNames {
   container?: string
   header?: string
+  footer?: string
   headerCell?: string
   row?: string
   cell?: string
+  empty?: string
+  loadMore?: string
+}
+
+export interface DataGridCardClassNames {
+  container?: string
+  row?: string
+  empty?: string
+  loadMore?: string
+  footer?: string
 }
 
 export interface DataGridListClassNames {
@@ -155,6 +166,7 @@ export interface DataGridListClassNames {
   item?: string
   loadMore?: string
   empty?: string
+  footer?: string
 }
 
 export interface DataGridChatClassNames {
@@ -165,6 +177,7 @@ export interface DataGridChatClassNames {
   typingIndicator?: string
   loadPrevious?: string
   empty?: string
+  footer?: string
 }
 
 export interface GridKitRowsContext<T extends object> {
@@ -545,6 +558,10 @@ export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T
   fetchNextPage?: () => void
   /** IntersectionObserver rootMargin to trigger next page load */
   rootMargin?: string
+  /** Static footer content rendered below the card container. */
+  footer?: ReactNode
+  /** Slot-based class injection for card elements */
+  classNames?: DataGridCardClassNames
 }
 
 export interface DataGridListProps<T extends object> extends GridKitCoreProps<T> {

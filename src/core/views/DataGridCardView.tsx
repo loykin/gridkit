@@ -20,6 +20,7 @@ interface DataGridCardViewProps<T extends object>
     | 'isFetchingNextPage'
     | 'headerLeft'
     | 'headerRight'
+    | 'footer'
     | 'classNames'
   > {
   wrapperRef: React.RefObject<HTMLDivElement | null>
@@ -44,6 +45,7 @@ export function DataGridCardView<T extends object>({
   rows,
   headerLeft,
   headerRight,
+  footer,
   loadMoreRef,
   isFetchingNextPage,
   isLoading,
@@ -80,7 +82,7 @@ export function DataGridCardView<T extends object>({
     if (rows.length === 0) {
       return (
         <div className="dg-empty-row">
-          <div className="dg-empty">{emptyContent ?? emptyMessage}</div>
+          <div className={cn('dg-empty', classNames?.empty)}>{emptyContent ?? emptyMessage}</div>
         </div>
       )
     }
@@ -108,11 +110,13 @@ export function DataGridCardView<T extends object>({
       headerLeft={headerLeft}
       headerRight={headerRight}
       containerClassName={cn('dg-card-container', classNames?.container)}
+      footerClassName={classNames?.footer}
+      footer={footer}
     >
       {renderContent()}
 
       {loadMoreRef && (
-        <div ref={loadMoreRef} className="dg-card-load-more">
+        <div ref={loadMoreRef} className={cn('dg-card-load-more', classNames?.loadMore)}>
           {isFetchingNextPage && icons.loading}
         </div>
       )}

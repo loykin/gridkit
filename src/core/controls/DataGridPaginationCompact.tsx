@@ -1,9 +1,11 @@
 import type { Table } from '@tanstack/react-table'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
 
 interface DataGridPaginationCompactProps<T extends object> {
   table: Table<T>
+  className?: string
 }
 
 /**
@@ -13,13 +15,14 @@ interface DataGridPaginationCompactProps<T extends object> {
  */
 export function DataGridPaginationCompact<T extends object>({
   table,
+  className,
 }: DataGridPaginationCompactProps<T>) {
   const icons = useIcons()
   const { pageIndex } = table.getState().pagination
   const pageCount = table.getPageCount()
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <div className={cn('dg-pagination-compact', className)} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
       <Button
         aria-label="Go to previous page"
         variant="ghost"

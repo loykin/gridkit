@@ -88,7 +88,7 @@ export function DataGridBody<T extends object>({
       <div role="rowgroup" style={{ display: 'block' }}>
         <div role="row" className="dg-empty-row">
           <div role="gridcell" className="dg-empty-cell">
-            {emptyContent ?? <div className="dg-empty">{emptyMessage}</div>}
+            <div className={cn('dg-empty', classNames?.empty)}>{emptyContent ?? emptyMessage}</div>
           </div>
         </div>
       </div>

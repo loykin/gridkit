@@ -325,7 +325,7 @@ export function DataGridTableView<T extends object>({
             </ScrollTable>
 
             {loadMoreRef && (
-              <div ref={loadMoreRef} style={{ padding: '8px 0', display: 'flex', justifyContent: 'center' }}>
+              <div ref={loadMoreRef} className={cn('dg-table-load-more', classNames?.loadMore)}>
                 {isFetchingNextPage && icons.loading}
               </div>
             )}

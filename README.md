@@ -1,6 +1,33 @@
 # @loykin/gridkit
 
-A feature-rich React DataGrid built on TanStack Table — fully themeable via CSS variables, with virtualization, sorting, filtering, pagination, and real-time updates.
+A feature-rich React data grid built on TanStack Table. Ships with sensible default styles, themes entirely through CSS variables, and provides `classNames` slots so each element can be overridden without fighting specificity.
+
+It is not headless. It renders a real UI — table, list, card, and chat variants — and owns that structure so you don't have to. The tradeoff is that you style it rather than build it from scratch. CSS variables handle 90% of theming; `classNames` slots cover the rest.
+
+---
+
+## When to use
+
+- You want sorting, filtering, pagination, virtualization, and real-time updates **without assembling them yourself** from primitives.
+- You have an existing design system and need the grid to **adopt its colors and spacing** — not fight them.
+- You need **more than a table** — list, card grid, or chat timeline with the same filtering and data pipeline.
+
+If you want full rendering control with zero default markup, use TanStack Table directly. GridKit is the layer above it.
+
+---
+
+## View variants
+
+| Component | Output | Shared features |
+|---|---|---|
+| `DataGrid` | `<table>` with header, body, footer | All |
+| `DataGridInfinity` | Same as `DataGrid` with infinite scroll | All |
+| `DataGridDrag` | Same as `DataGrid` with row drag-reorder | All |
+| `DataGridCard` | Responsive card grid | Filtering, sorting, infinite scroll |
+| `DataGridList` | Custom item renderer in a list | Filtering, sorting, search, infinite scroll |
+| `DataGridChat` | Message timeline (top-load, stick-to-bottom) | Filtering, sorting, search |
+
+All variants share the same column definition, DataStore, and filter/sort/search pipeline.
 
 ---
 
@@ -12,9 +39,6 @@ A feature-rich React DataGrid built on TanStack Table — fully themeable via CS
 - **Global Search** — debounced toolbar search across configurable columns
 - **Pagination** — flexible placement: `footer`, toolbar, or fully external via `onTableReady`
 - **Infinite Scroll** — `DataGridInfinity` with IntersectionObserver-based next-page loading
-- **Card View** — `DataGridCard` renders rows as a responsive card grid — same filtering, sorting, and infinite scroll as the table view
-- **List View** — `DataGridList` renders each row with a custom item renderer while keeping sorting, filtering, search, DataStore, and infinite loading
-- **Chat View** — `DataGridChat` renders threaded/timeline-style messages with top loading, scroll offset preservation, and stick-to-bottom behavior
 - **Row Drag Reorder** — `DataGridDrag` for sortable rows via dnd-kit
 - **Column Resizing** — drag-to-resize with `onChange` or `onEnd` policy
 - **Column Pinning** — pin columns left or right
@@ -25,6 +49,7 @@ A feature-rich React DataGrid built on TanStack Table — fully themeable via CS
 - **DataStore** — map-based external store for high-frequency real-time updates
 - **Server-Side Support** — sorting, filtering, and pagination all controllable externally
 - **CSS Theming** — override `--dg-*` variables to match any design system
+- **`classNames` Slots** — apply custom classes to any structural element (container, header, footer, row, cell, empty state, load-more)
 - **Icon Overrides** — replace any built-in icon via the `icons` prop
 - **Escape Hatch** — `tableOptions` passes advanced TanStack Table options safely
 
@@ -52,7 +77,43 @@ Import the stylesheet once in your app entry point:
 import '@loykin/gridkit/styles'
 ```
 
-### Theming with CSS Variables
+### Theming
+
+GridKit has two customization surfaces:
+
+**1. CSS variables** — colors, spacing, fonts, backgrounds. If it's a design token, it goes here.
+
+```css
+:root {
+  --dg-header-background: #0f172a;
+  --dg-header-foreground: #f8fafc;
+  --dg-border: #e2e8f0;
+  --dg-radius: 0.75rem;
+}
+```
+
+**2. `classNames` prop** — structural class injection. Use this for layout utilities, shadows, and hover effects that CSS variables cannot express — not for colors or spacing that already have a `--dg-*` token.
+
+```tsx
+// Good — structure/layout that has no --dg-* equivalent
+<DataGrid
+  classNames={{
+    container: 'shadow-md',
+    row:       'hover:bg-blue-50',
+    footer:    'border-t',
+  }}
+  ...
+/>
+
+// Avoid — use CSS variables instead
+<DataGrid
+  classNames={{
+    header: 'bg-slate-900 text-white',  // → --dg-header-background / --dg-header-foreground
+    cell:   'px-4',                     // → --dg-cell-padding (if exposed)
+  }}
+  ...
+/>
+```
 
 **With shadcn/ui** — works out of the box. The `--dg-*` variables automatically fall back to your existing shadcn CSS variables.
 
@@ -149,9 +210,67 @@ import '@loykin/gridkit/styles'
 | `--dg-popover-section-foreground` | Generic popover section label color. Defaults to `--dg-muted-foreground` |
 | `--dg-footer-background` | Footer surface background. Defaults to `--dg-background` |
 | `--dg-footer-foreground` | Footer text color. Defaults to `--dg-muted-foreground` |
-| `--dg-footer-border` | Footer border color. Defaults to `--dg-border` |
+| `--dg-footer-border` | Footer border color token for custom footer styles. Defaults to `--dg-border`; the built-in footer wrapper does not draw a border by default |
 | `--dg-ring` | Focus ring color |
 | `--dg-radius` | Border radius base value |
+
+### `classNames` Reference
+
+Each view variant accepts a `classNames` prop with slots specific to its structure.
+
+**`DataGridClassNames`** — `DataGrid`, `DataGridInfinity`, `DataGridDrag`
+
+```ts
+interface DataGridClassNames {
+  container?: string  // scroll container
+  header?: string     // header panel
+  footer?: string     // footer wrapper
+  headerCell?: string // individual header cell
+  row?: string        // body row
+  cell?: string       // body cell
+  empty?: string      // empty state wrapper
+  loadMore?: string   // infinite scroll sentinel wrapper
+}
+```
+
+**`DataGridCardClassNames`** — `DataGridCard`
+
+```ts
+interface DataGridCardClassNames {
+  container?: string  // card container
+  row?: string        // individual card wrapper
+  empty?: string      // empty state wrapper
+  loadMore?: string   // infinite scroll sentinel wrapper
+  footer?: string     // footer wrapper
+}
+```
+
+**`DataGridListClassNames`** — `DataGridList`
+
+```ts
+interface DataGridListClassNames {
+  container?: string  // list container
+  item?: string       // individual list item wrapper
+  empty?: string      // empty state wrapper
+  loadMore?: string   // infinite scroll sentinel wrapper
+  footer?: string     // footer wrapper
+}
+```
+
+**`DataGridChatClassNames`** — `DataGridChat`
+
+```ts
+interface DataGridChatClassNames {
+  container?: string       // chat container
+  messageWrapper?: string  // individual message wrapper
+  daySeparator?: string    // day separator injected between messages
+  unreadMarker?: string    // unread marker injected before a message
+  typingIndicator?: string // typing indicator at the bottom
+  loadPrevious?: string    // load-previous sentinel wrapper
+  empty?: string           // empty state wrapper
+  footer?: string          // footer wrapper
+}
+```
 
 ---
 
@@ -575,6 +694,7 @@ Chat views use the shared row/data/filtering props, but omit table-only options 
 | `onAtBottomChange` | `(atBottom: boolean) => void` | — | Called when bottom state changes |
 | `containerHeight` | `string \| number \| 'auto'` | `'auto'` | Preferred chat container height |
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Compatibility alias for `containerHeight` |
+| `footer` | `ReactNode` | — | Static content below the chat container |
 | `classNames` | `DataGridChatClassNames` | — | Slot-based class injection for chat elements |
 
 ---
@@ -652,6 +772,8 @@ All [shared props](#shared-props-datagrid-datagridinfinity-datagriddag-datagridc
 | `isFetchingNextPage` | `boolean` | — | Show loading indicator at the bottom |
 | `fetchNextPage` | `() => void` | — | Called when the sentinel enters the viewport |
 | `rootMargin` | `string` | `'100px'` | IntersectionObserver `rootMargin` for early trigger |
+| `footer` | `ReactNode` | — | Static content below the card container |
+| `classNames` | `DataGridCardClassNames` | — | Slot-based class injection for card elements |
 
 ### Card CSS variables
 
@@ -1423,20 +1545,6 @@ interface CheckboxConfig<T> {
   selectedIds: Set<string>
   onSelectAll: (rows: Row<T>[], checked: boolean) => void
   onSelectOne: (rowId: string, checked: boolean) => void
-}
-```
-
----
-
-## `DataGridClassNames`
-
-```ts
-interface DataGridClassNames {
-  container?: string  // scroll container
-  header?: string     // header panel
-  headerCell?: string // individual header cell
-  row?: string        // body row
-  cell?: string       // body cell
 }
 ```
 

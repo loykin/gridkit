@@ -9,19 +9,21 @@ interface DataGridPaginationBarProps<T extends object> {
   pageSizes?: number[]
   /** Total row count for server-side display: "1–20 of 500" */
   totalCount?: number
+  className?: string
 }
 
 export function DataGridPaginationBar<T extends object>({
   table,
   pageSizes = [10, 20, 50, 100],
   totalCount,
+  className,
 }: DataGridPaginationBarProps<T>) {
   const icons = useIcons()
   const { pageIndex, pageSize } = table.getState().pagination
   const pageCount = table.getPageCount()
 
   return (
-    <div className={cn('dg-pagination')}>
+    <div className={cn('dg-pagination', className)}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span>Rows per page</span>
         <select

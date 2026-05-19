@@ -354,8 +354,6 @@
   border-bottom-left-radius: 0;
 }
 .dg-footer {
-  border: 1px solid var(--dg-footer-border);
-  border-top: 0;
   border-radius: 0 0 var(--dg-radius) var(--dg-radius);
   background: var(--dg-footer-background);
   color: var(--dg-footer-foreground);
@@ -428,6 +426,11 @@
 }
 .dg-body-wrapper {
   position: relative;
+}
+.dg-table-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
 }
 .dg-shell[data-fill-parent="true"] .dg-header {
   flex-shrink: 0;

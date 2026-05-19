@@ -1,4 +1,5 @@
 import type { Table } from '@tanstack/react-table'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
 
@@ -9,6 +10,7 @@ interface DataGridPaginationPagesProps<T extends object> {
    * Default: 2 → produces: 1 … 3 [4] 5 … 20
    */
   siblingCount?: number
+  className?: string
 }
 
 // ── Page number generation ─────────────────────────────────────────────────────
@@ -46,6 +48,7 @@ function getPageItems(
 export function DataGridPaginationPages<T extends object>({
   table,
   siblingCount = 2,
+  className,
 }: DataGridPaginationPagesProps<T>) {
   const icons = useIcons()
   const { pageIndex } = table.getState().pagination
@@ -53,7 +56,7 @@ export function DataGridPaginationPages<T extends object>({
   const items = getPageItems(pageIndex, pageCount, siblingCount)
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, width: '100%', padding: '0 12px' }}>
+    <div className={cn('dg-pagination-pages', className)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, width: '100%', padding: '0 12px' }}>
       <Button
         aria-label="Go to first page"
         variant="ghost"

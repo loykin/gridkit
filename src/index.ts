@@ -74,6 +74,7 @@ export type {
   TableViewConfig,
   DataGridBaseProps,
   DataGridClassNames,
+  DataGridCardClassNames,
   DataGridListClassNames,
   DataGridChatClassNames,
   DataGridIcons,

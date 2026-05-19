@@ -123,6 +123,7 @@ export function DataGridChatView<T extends object>({
       maxTableHeight={maxTableHeight}
       minTableHeight={minTableHeight}
       containerClassName={cn('dg-chat-container', classNames?.container)}
+      footerClassName={classNames?.footer}
       footer={footer}
     >
       {loadPreviousRef && (

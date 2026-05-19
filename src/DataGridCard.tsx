@@ -9,6 +9,7 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
     error,
     headerLeft,
     headerRight,
+    footer,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
@@ -50,6 +51,7 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
         rows={rows}
         headerLeft={headerLeft}
         headerRight={headerRight}
+        footer={footer}
         loadMoreRef={loadMoreRef}
         isFetchingNextPage={isFetchingNextPage}
         isLoading={effectiveIsLoading}

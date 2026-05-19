@@ -36,6 +36,7 @@ export function DataGridShell<T extends object>({
   footer,
   fillContainer,
   fillParent,
+  classNames,
   ...viewConfig
 }: DataGridShellProps<T>) {
   useEffect(() => {
@@ -57,6 +58,7 @@ export function DataGridShell<T extends object>({
       fillContainer={fillContainer}
       fillParent={fillParent}
       containerClassName={cn('dg-table-wrapper', !isSized && 'dg-table-wrapper--hidden')}
+      footerClassName={classNames?.footer}
       footer={footer?.(table)}
     >
       <DataGridTableView
@@ -68,6 +70,7 @@ export function DataGridShell<T extends object>({
         onMeasureColumns={measure}
         fillContainer={fillContainer}
         fillParent={fillParent}
+        classNames={classNames}
         {...viewConfig}
       />
     </GridKitShell>

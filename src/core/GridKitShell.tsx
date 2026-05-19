@@ -35,6 +35,7 @@ interface GridKitShellProps<T extends object> {
   fillContainer?: boolean
   fillParent?: boolean
   containerClassName?: string
+  footerClassName?: string
   footer?: ReactNode
   children: ReactNode
 }
@@ -52,6 +53,7 @@ export function GridKitShell<T extends object>({
   fillContainer,
   fillParent,
   containerClassName,
+  footerClassName,
   footer,
   children,
 }: GridKitShellProps<T>) {
@@ -137,7 +139,7 @@ export function GridKitShell<T extends object>({
         </div>
 
         {footer && (
-          <div ref={footerFrameRef} className="dg-footer">
+          <div ref={footerFrameRef} className={cn('dg-footer', footerClassName)}>
             {footer}
           </div>
         )}
