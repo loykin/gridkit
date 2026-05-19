@@ -23,7 +23,7 @@ export function DataGridPaginationBar<T extends object>({
   const pageCount = table.getPageCount()
 
   return (
-    <div className={cn('dg-pagination', className)}>
+    <div className={cn('dg-pagination-control dg-pagination-control--bar', className)}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span>Rows per page</span>
         <select

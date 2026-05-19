@@ -45,7 +45,7 @@ export function BorderedTab() {
           enableSorting
           enableColumnFilters
           pagination={{ pageSize: 20 }}
-          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20]} />}
+          footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20]} />}
           emptyMessage="No employees found"
           tableKey="bordered-default"
         />
@@ -61,7 +61,7 @@ export function BorderedTab() {
           enableColumnFilters
           bordered
           pagination={{ pageSize: 20 }}
-          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20]} />}
+          footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20]} />}
           emptyMessage="No employees found"
           tableKey="bordered-bordered"
         />

@@ -69,7 +69,7 @@ export function ExportTab() {
         columns={columns}
         enableSorting
         pagination={{ pageSize: 20 }}
-        footer={(table) => <DataGridPaginationBar table={table} pageSizes={[20, 50, 100]} />}
+        footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[20, 50, 100]} />}
         tableWidthMode="fill-last"
         emptyMessage="No employees found"
         headerRight={(table) => <ExportButton table={table as Table<Employee>} />}

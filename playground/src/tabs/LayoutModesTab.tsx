@@ -30,7 +30,7 @@ function ComparisonGrid({ long = false }: { long?: boolean }) {
             columns={columns}
             bordered
             pagination={{ pageSize }}
-            footer={(table) => <DataGridPaginationBar table={table} pageSizes={[20, 50, 100]} />}
+            footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[20, 50, 100]} />}
           />
         </div>
       </section>
@@ -47,7 +47,7 @@ function ComparisonGrid({ long = false }: { long?: boolean }) {
             columns={columns}
             bordered
             pagination={{ pageSize }}
-            footer={(table) => <DataGridPaginationBar table={table} pageSizes={[20, 50, 100]} />}
+            footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[20, 50, 100]} />}
           />
         </div>
       </section>

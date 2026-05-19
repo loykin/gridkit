@@ -76,7 +76,7 @@ export function FillContainerTab() {
               filterDisplay="icon"
               bordered
               pagination={{ pageSize: 20 }}
-              footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
+              footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20, 50]} />}
             />
           </div>
         </section>
@@ -95,7 +95,7 @@ export function FillContainerTab() {
               enableColumnPinning
               bordered
               pagination={{ pageSize: 100 }}
-              footer={(table) => <DataGridPaginationBar table={table} pageSizes={[50, 100, 200]} />}
+              footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[50, 100, 200]} />}
             />
           </div>
         </section>

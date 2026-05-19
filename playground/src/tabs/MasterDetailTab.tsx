@@ -53,7 +53,7 @@ export function MasterDetailTab() {
         columns={columns}
         enableSorting
         pagination={{ pageSize: 20 }}
-        footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
+        footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20, 50]} />}
         tableWidthMode="fill-last"
         emptyMessage="No employees found"
         renderDetailRow={(row) => {

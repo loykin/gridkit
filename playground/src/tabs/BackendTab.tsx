@@ -44,7 +44,7 @@ export function BackendTab() {
         columns={auditColumns}
         headerLeft={(table) => <GlobalSearch table={table} placeholder="Search audit events..." />}
         pagination={{ pageSize: BACKEND_PAGE_SIZE }}
-        footer={(table) => <DataGridPaginationBar table={table} totalCount={queryState.total} />}
+        footer={(table) => <DataGridPaginationBar table={table} className="pt-2" totalCount={queryState.total} />}
         enableColumnFilters
         filterDisplay="icon"
         enableMultiSort

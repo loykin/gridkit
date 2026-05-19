@@ -22,7 +22,7 @@ export function DataGridPaginationCompact<T extends object>({
   const pageCount = table.getPageCount()
 
   return (
-    <div className={cn('dg-pagination-compact', className)} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <div className={cn('dg-pagination-control dg-pagination-control--compact', className)}>
       <Button
         aria-label="Go to previous page"
         variant="ghost"

@@ -364,9 +364,19 @@ import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
   columns={columns}
   pagination={{ pageSize: 20 }}
   footer={(table) => (
-    <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />
+    <DataGridPaginationBar table={table} className="grid-footer-pagination" pageSizes={[10, 20, 50]} />
   )}
 />
+```
+
+Footer pagination controls do not add spacing by default. Add the vertical gap at
+the placement site with `className` so toolbar, footer, and external placements
+can each own their layout.
+
+```css
+.grid-footer-pagination {
+  padding-top: 8px;
+}
 ```
 
 **toolbar — inside the filter row**
@@ -391,7 +401,7 @@ import { DataGrid, DataGridPaginationPages } from '@loykin/gridkit'
   data={rows}
   columns={columns}
   pagination={{ pageSize: 10 }}
-  footer={(table) => <DataGridPaginationPages table={table} siblingCount={2} />}
+  footer={(table) => <DataGridPaginationPages table={table} className="grid-footer-pagination" siblingCount={2} />}
 />
 ```
 
@@ -435,7 +445,7 @@ const [pageIndex, setPageIndex] = useState(0)
     },
   }}
   footer={(table) => (
-    <DataGridPaginationBar table={table} totalCount={totalCount} />
+    <DataGridPaginationBar table={table} className="grid-footer-pagination" totalCount={totalCount} />
   )}
 />
 ```
@@ -467,7 +477,7 @@ export function UsersPanel() {
         data={rows}
         columns={columns}
         pagination={{ pageSize: 50 }}
-        footer={(table) => <DataGridPaginationBar table={table} />}
+        footer={(table) => <DataGridPaginationBar table={table} className="grid-footer-pagination" />}
       />
     </div>
   )
@@ -506,7 +516,7 @@ export function MetricsTab() {
         data={rows}
         columns={columns}
         pagination={{ pageSize: 100 }}
-        footer={(table) => <DataGridPaginationBar table={table} />}
+        footer={(table) => <DataGridPaginationBar table={table} className="grid-footer-pagination" />}
       />
     </div>
   )
@@ -1220,7 +1230,7 @@ export function AuditGrid() {
       headerLeft={(table) => <GlobalSearch table={table} />}
       pagination={{ pageSize: 100 }}
       footer={(table) => (
-        <DataGridPaginationBar table={table} totalCount={queryState.total} />
+        <DataGridPaginationBar table={table} className="grid-footer-pagination" totalCount={queryState.total} />
       )}
     />
   )
@@ -1356,7 +1366,7 @@ export function ServerGrid() {
         onPageChange: (pageIndex, pageSize) => load(pageIndex, pageSize),
       }}
       footer={(table) => (
-        <DataGridPaginationBar table={table} totalCount={totalCount} />
+        <DataGridPaginationBar table={table} className="grid-footer-pagination" totalCount={totalCount} />
       )}
       tableHeight={500}
     />

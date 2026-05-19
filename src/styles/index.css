@@ -349,7 +349,10 @@
   flex: 1 1 auto;
   min-height: 0;
 }
-.dg-table-stack .dg-table-wrapper:has(+ .dg-footer) .dg-container {
+/* Remove bottom radius from bordered containers when footer is adjacent */
+.dg-table-stack .dg-table-wrapper:has(+ .dg-footer) .dg-container,
+.dg-table-stack .dg-list-container:has(+ .dg-footer),
+.dg-table-stack .dg-chat-container:has(+ .dg-footer) {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
@@ -359,7 +362,6 @@
   color: var(--dg-footer-foreground);
   overflow: hidden;
 }
-
 .dg-table-wrapper {
   min-width: 0;
 }
@@ -723,14 +725,27 @@
   height: 16px;
 }
 
-.dg-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
+.dg-pagination-control {
   font-size: 12px;
   background: transparent;
   color: inherit;
+}
+.dg-pagination-control--bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.dg-pagination-control--pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+}
+.dg-pagination-control--compact {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 /* ── Multi-option hover state ───────────────────────────────────────────────── */

@@ -54,7 +54,7 @@ export function ToolbarTab() {
         columns={columns}
         enableSorting
         pagination={{ pageSize: 20 }}
-        footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
+        footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20, 50]} />}
         emptyMessage="No employees found"
         tableKey="toolbar"
         headerLeft={(table) => (

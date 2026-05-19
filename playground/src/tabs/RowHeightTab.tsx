@@ -81,7 +81,7 @@ export function RowHeightTab() {
         rowHeight={rowHeight}
         tableHeight={500}
         pagination={{ pageSize: 20 }}
-        footer={(table) => <DataGridPaginationBar table={table} pageSizes={[20, 50]} />}
+        footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[20, 50]} />}
         emptyMessage="No employees found"
         tableKey="row-height"
       />

@@ -81,7 +81,7 @@ export function PaginationTab() {
           enableSorting
           pagination={{ pageSize: 10 }}
           footer={(table) => (
-            <DataGridPaginationBar table={table} pageSizes={[5, 10, 25, 50]} />
+            <DataGridPaginationBar table={table} className="pt-2" pageSizes={[5, 10, 25, 50]} />
           )}
           emptyMessage="No employees"
           tableKey="pg-a"
@@ -158,7 +158,7 @@ export function PaginationTab() {
           columns={columns}
           enableSorting
           pagination={{ pageSize: 10 }}
-          footer={(table) => <DataGridPaginationPages table={table} siblingCount={2} />}
+          footer={(table) => <DataGridPaginationPages table={table} className="pt-2" siblingCount={2} />}
           emptyMessage="No employees"
           tableKey="pg-d"
         />
@@ -190,7 +190,7 @@ export function PaginationTab() {
             },
           }}
           footer={(table) => (
-            <DataGridPaginationBar table={table} totalCount={SERVER_TOTAL} />
+            <DataGridPaginationBar table={table} className="pt-2" totalCount={SERVER_TOTAL} />
           )}
           emptyMessage="No employees"
           tableKey="pg-d"

@@ -49,7 +49,7 @@ export function IconsTab() {
           filterDisplay="icon"
           enableSorting
           pagination={{ pageSize: 5 }}
-          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[5, 10, 20]} />}
+          footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[5, 10, 20]} />}
           tableKey="icons-default"
         />
       </section>
@@ -66,7 +66,7 @@ export function IconsTab() {
           filterDisplay="icon"
           enableSorting
           pagination={{ pageSize: 5 }}
-          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[5, 10, 20]} />}
+          footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[5, 10, 20]} />}
           icons={customIcons}
           tableKey="icons-custom"
         />

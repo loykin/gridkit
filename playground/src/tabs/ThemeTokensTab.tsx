@@ -366,7 +366,7 @@ export function ThemeTokensTab() {
             enableColumnFilters
             bordered
             pagination={{ pageSize: 10 }}
-            footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
+            footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20, 50]} />}
             tableKey="theme-tokens-custom"
           />
         </section>

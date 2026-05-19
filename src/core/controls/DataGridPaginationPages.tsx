@@ -56,7 +56,7 @@ export function DataGridPaginationPages<T extends object>({
   const items = getPageItems(pageIndex, pageCount, siblingCount)
 
   return (
-    <div className={cn('dg-pagination-pages', className)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, width: '100%', padding: '0 12px' }}>
+    <div className={cn('dg-pagination-control dg-pagination-control--pages', className)}>
       <Button
         aria-label="Go to first page"
         variant="ghost"

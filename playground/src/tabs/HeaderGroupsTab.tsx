@@ -103,7 +103,7 @@ export function HeaderGroupsTab() {
           filterDisplay="icon"
           bordered
           pagination={{ pageSize: 50 }}
-          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[20, 50, 100]} />}
+          footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[20, 50, 100]} />}
         />
       </div>
 
@@ -122,7 +122,7 @@ export function HeaderGroupsTab() {
           filterDisplay="icon"
           bordered
           pagination={{ pageSize: 50 }}
-          footer={(table) => <DataGridPaginationBar table={table} pageSizes={[20, 50, 100]} />}
+          footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[20, 50, 100]} />}
         />
       </div>
     </div>

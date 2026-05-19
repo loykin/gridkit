@@ -55,7 +55,7 @@ export function FillParentTab() {
               columns={columns}
               bordered
               pagination={{ pageSize: 20 }}
-              footer={(table) => <DataGridPaginationBar table={table} pageSizes={[10, 20, 50]} />}
+              footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20, 50]} />}
             />
           </div>
         </section>
@@ -72,7 +72,7 @@ export function FillParentTab() {
               filterDisplay="row"
               bordered
               pagination={{ pageSize: 500 }}
-              footer={(table) => <DataGridPaginationBar table={table} pageSizes={[100, 250, 500]} />}
+              footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[100, 250, 500]} />}
             />
           </div>
         </section>
