@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react'
@@ -101,6 +102,27 @@ interface PopoverContentProps {
   style?: React.CSSProperties
 }
 
+function readGridKitVars(node: HTMLElement): React.CSSProperties {
+  const computed = getComputedStyle(node)
+  const vars: React.CSSProperties = {}
+
+  for (let index = 0; index < computed.length; index += 1) {
+    const name = computed.item(index)
+    if (name.startsWith('--dg-')) {
+      ;(vars as Record<string, string>)[name] = computed.getPropertyValue(name).trim()
+    }
+  }
+
+  return vars
+}
+
+function sameStyleVars(a: React.CSSProperties, b: React.CSSProperties) {
+  const aKeys = Object.keys(a)
+  const bKeys = Object.keys(b)
+  if (aKeys.length !== bKeys.length) return false
+  return aKeys.every((key) => (a as Record<string, unknown>)[key] === (b as Record<string, unknown>)[key])
+}
+
 export function PopoverContent({
   children,
   side = 'bottom',
@@ -112,10 +134,14 @@ export function PopoverContent({
   const { open, setOpen, triggerRef } = useCtx()
   const popupRef = useRef<HTMLDivElement>(null)
   const [pos, setPos] = useState<React.CSSProperties>({ visibility: 'hidden' })
+  const [themeVars, setThemeVars] = useState<React.CSSProperties>({})
 
   // Position relative to trigger
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open || !triggerRef.current) return
+
+    const nextThemeVars = readGridKitVars(triggerRef.current)
+    setThemeVars((current) => sameStyleVars(current, nextThemeVars) ? current : nextThemeVars)
 
     const update = () => {
       const r = triggerRef.current!.getBoundingClientRect()
@@ -173,6 +199,7 @@ export function PopoverContent({
       style={{
         position: 'fixed',
         zIndex: 50,
+        ...themeVars,
         ...(isCenter && { transform: 'translateX(-50%)' }),
         ...pos,
         ...style,

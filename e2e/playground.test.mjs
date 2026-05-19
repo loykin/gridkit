@@ -168,9 +168,13 @@ test('header theme tokens style header cells and filter row', async () => {
       .dg-token-test {
         --dg-header-background: rgb(1 2 3);
         --dg-header-foreground: rgb(250 251 252);
+        --dg-header-border: rgb(70 80 90);
         --dg-header-control-background: rgb(10 20 30);
         --dg-header-control-foreground: rgb(230 240 250);
         --dg-header-control-border: rgb(40 50 60);
+        --dg-header-popover-background: rgb(4 5 6);
+        --dg-header-popover-foreground: rgb(240 241 242);
+        --dg-header-popover-border: rgb(90 91 92);
       }
     `,
   })
@@ -195,6 +199,7 @@ test('header theme tokens style header cells and filter row', async () => {
         background: style.backgroundColor,
         color: style.color,
         borderColor: style.borderColor,
+        borderBottomColor: style.borderBottomColor,
         controlBorder: style.getPropertyValue('--dg-control-border').trim(),
         headerControlBorder: style.getPropertyValue('--dg-header-control-border').trim(),
       }
@@ -214,6 +219,7 @@ test('header theme tokens style header cells and filter row', async () => {
   assert.equal(styles.leafCell.background, 'rgb(1, 2, 3)')
   assert.equal(styles.leafCell.color, 'rgb(250, 251, 252)')
   assert.equal(styles.filterRow.background, 'rgb(1, 2, 3)')
+  assert.equal(styles.filterRow.borderBottomColor, 'rgb(70, 80, 90)')
   assert.equal(styles.groupCell.background, 'rgb(1, 2, 3)')
   assert.equal(styles.groupCell.color, 'rgb(250, 251, 252)')
   assert.equal(styles.input.background, 'rgb(10, 20, 30)')
@@ -222,6 +228,22 @@ test('header theme tokens style header cells and filter row', async () => {
   assert.equal(styles.select.background, 'rgb(10, 20, 30)')
   assert.equal(styles.select.color, 'rgb(230, 240, 250)')
   assert.equal(styles.select.headerControlBorder, 'rgb(40 50 60)')
+
+  await page.getByRole('button', { name: 'Pin options for id' }).click()
+  const popover = page.locator('.dg-header-popover').last()
+  await popover.waitFor({ state: 'visible', timeout: 1000 })
+  const popoverStyles = await popover.evaluate((node) => {
+    const style = getComputedStyle(node)
+    return {
+      background: style.backgroundColor,
+      color: style.color,
+      borderColor: style.borderColor,
+    }
+  })
+
+  assert.equal(popoverStyles.background, 'rgb(4, 5, 6)')
+  assert.equal(popoverStyles.color, 'rgb(240, 241, 242)')
+  assert.equal(popoverStyles.borderColor, 'rgb(90, 91, 92)')
 
   await closePage(page)
 })

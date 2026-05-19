@@ -70,9 +70,19 @@ import '@loykin/gridkit/styles'
   --dg-muted-foreground: #6b7280;
   --dg-header-background: var(--dg-muted);
   --dg-header-foreground: var(--dg-muted-foreground);
+  --dg-header-border: var(--dg-border);
+  --dg-header-control-background: var(--dg-header-background);
+  --dg-header-control-foreground: var(--dg-header-foreground);
+  --dg-header-control-border: var(--dg-header-border);
+  --dg-header-popover-background: var(--dg-header-background);
+  --dg-header-popover-foreground: var(--dg-header-foreground);
+  --dg-header-popover-border: var(--dg-header-border);
   --dg-control-background: var(--dg-background);
   --dg-control-foreground: var(--dg-foreground);
   --dg-control-border: var(--dg-border);
+  --dg-footer-background: var(--dg-background);
+  --dg-footer-foreground: var(--dg-muted-foreground);
+  --dg-footer-border: var(--dg-border);
   --dg-radius: 0.5rem;
 }
 
@@ -85,9 +95,19 @@ import '@loykin/gridkit/styles'
   --dg-muted-foreground: #a1a1aa;
   --dg-header-background: var(--dg-muted);
   --dg-header-foreground: var(--dg-muted-foreground);
+  --dg-header-border: var(--dg-border);
+  --dg-header-control-background: var(--dg-header-background);
+  --dg-header-control-foreground: var(--dg-header-foreground);
+  --dg-header-control-border: var(--dg-header-border);
+  --dg-header-popover-background: var(--dg-header-background);
+  --dg-header-popover-foreground: var(--dg-header-foreground);
+  --dg-header-popover-border: var(--dg-header-border);
   --dg-control-background: var(--dg-background);
   --dg-control-foreground: var(--dg-foreground);
   --dg-control-border: var(--dg-border);
+  --dg-footer-background: var(--dg-background);
+  --dg-footer-foreground: var(--dg-muted-foreground);
+  --dg-footer-border: var(--dg-border);
 }
 ```
 
@@ -103,10 +123,18 @@ import '@loykin/gridkit/styles'
 | `--dg-primary-foreground` | Text on primary backgrounds |
 | `--dg-secondary` | Secondary background |
 | `--dg-secondary-foreground` | Secondary text |
-| `--dg-muted` | Header / muted background |
+| `--dg-muted` | Muted surface background |
 | `--dg-muted-foreground` | Muted text (placeholders, hints) |
 | `--dg-header-background` | Table header and filter row background. Defaults to `--dg-muted` |
 | `--dg-header-foreground` | Table header text color. Defaults to `--dg-muted-foreground` |
+| `--dg-header-border` | Header row, header cell, and filter row border color. Defaults to `--dg-border` |
+| `--dg-header-control-background` | Header filter input/select background. Defaults to `--dg-header-background` |
+| `--dg-header-control-foreground` | Header filter input/select text color. Defaults to `--dg-header-foreground` |
+| `--dg-header-control-border` | Header filter input/select/checkbox border color. Defaults to `--dg-header-border` |
+| `--dg-header-control-placeholder` | Header filter input placeholder color. Defaults to a translucent `--dg-header-control-foreground` |
+| `--dg-header-popover-background` | Header-origin popover background. Defaults to `--dg-header-background` |
+| `--dg-header-popover-foreground` | Header-origin popover text color. Defaults to `--dg-header-foreground` |
+| `--dg-header-popover-border` | Header-origin popover border color. Defaults to `--dg-header-border` |
 | `--dg-accent` | Hover / accent background |
 | `--dg-accent-foreground` | Accent text |
 | `--dg-destructive` | Destructive action color |
@@ -115,6 +143,13 @@ import '@loykin/gridkit/styles'
 | `--dg-control-background` | Input, select, and checkbox control background. Defaults to `--dg-background` |
 | `--dg-control-foreground` | Input and select text color. Defaults to `--dg-foreground` |
 | `--dg-control-border` | Input, select, and checkbox border color. Defaults to `--dg-input` |
+| `--dg-control-placeholder` | Input placeholder color. Defaults to `--dg-muted-foreground` |
+| `--dg-popover-border` | Generic popover and action menu border color. Defaults to a translucent `--dg-foreground` |
+| `--dg-popover-option-hover-background` | Generic popover option hover background. Defaults to `--dg-muted` |
+| `--dg-popover-section-foreground` | Generic popover section label color. Defaults to `--dg-muted-foreground` |
+| `--dg-footer-background` | Footer surface background. Defaults to `--dg-background` |
+| `--dg-footer-foreground` | Footer text color. Defaults to `--dg-muted-foreground` |
+| `--dg-footer-border` | Footer border color. Defaults to `--dg-border` |
 | `--dg-ring` | Focus ring color |
 | `--dg-radius` | Border radius base value |
 
