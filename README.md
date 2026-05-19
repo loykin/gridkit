@@ -68,6 +68,11 @@ import '@loykin/gridkit/styles'
   --dg-primary: #3b82f6;
   --dg-muted: #f5f5f5;
   --dg-muted-foreground: #6b7280;
+  --dg-header-background: var(--dg-muted);
+  --dg-header-foreground: var(--dg-muted-foreground);
+  --dg-control-background: var(--dg-background);
+  --dg-control-foreground: var(--dg-foreground);
+  --dg-control-border: var(--dg-border);
   --dg-radius: 0.5rem;
 }
 
@@ -78,6 +83,11 @@ import '@loykin/gridkit/styles'
   --dg-primary: #6366f1;
   --dg-muted: #1a1a1a;
   --dg-muted-foreground: #a1a1aa;
+  --dg-header-background: var(--dg-muted);
+  --dg-header-foreground: var(--dg-muted-foreground);
+  --dg-control-background: var(--dg-background);
+  --dg-control-foreground: var(--dg-foreground);
+  --dg-control-border: var(--dg-border);
 }
 ```
 
@@ -95,11 +105,16 @@ import '@loykin/gridkit/styles'
 | `--dg-secondary-foreground` | Secondary text |
 | `--dg-muted` | Header / muted background |
 | `--dg-muted-foreground` | Muted text (placeholders, hints) |
+| `--dg-header-background` | Table header and filter row background. Defaults to `--dg-muted` |
+| `--dg-header-foreground` | Table header text color. Defaults to `--dg-muted-foreground` |
 | `--dg-accent` | Hover / accent background |
 | `--dg-accent-foreground` | Accent text |
 | `--dg-destructive` | Destructive action color |
 | `--dg-border` | Border color |
-| `--dg-input` | Input border color |
+| `--dg-input` | Input border fallback. Defaults to framework `--input` when available |
+| `--dg-control-background` | Input, select, and checkbox control background. Defaults to `--dg-background` |
+| `--dg-control-foreground` | Input and select text color. Defaults to `--dg-foreground` |
+| `--dg-control-border` | Input, select, and checkbox border color. Defaults to `--dg-input` |
 | `--dg-ring` | Focus ring color |
 | `--dg-radius` | Border radius base value |
 

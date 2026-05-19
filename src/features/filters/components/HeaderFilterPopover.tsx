@@ -49,7 +49,7 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
             </Button>
           )}
         />
-        <PopoverContent side="bottom" align="start" style={{ width: popoverWidth }}>
+        <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: popoverWidth }}>
           {CustomFilter ? (
             <CustomFilter
               column={col}

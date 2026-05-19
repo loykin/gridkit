@@ -31,7 +31,7 @@ export function ColumnPinPopover<T extends object>({ col }: ColumnPinPopoverProp
             </Button>
           )}
         />
-        <PopoverContent side="bottom" align="start" style={{ width: 140, padding: '4px 0' }}>
+        <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: 140, padding: '4px 0' }}>
           <button
             className="dg-popover-option"
             onClick={() => { col.pin('left'); close() }}

@@ -20,6 +20,7 @@ import { LogStreamTab } from './tabs/LogStreamTab'
 import { BackendTab } from './tabs/BackendTab'
 import { EmptyStateTab } from './tabs/EmptyStateTab'
 import { IconsTab } from './tabs/IconsTab'
+import { ThemeTokensTab } from './tabs/ThemeTokensTab'
 import { ColumnReorderTab } from './tabs/ColumnReorderTab'
 import { MasterDetailTab } from './tabs/MasterDetailTab'
 import { ColumnPinningTab } from './tabs/ColumnPinningTab'
@@ -61,6 +62,7 @@ const TABS = [
   { id: 'backend', label: 'Backend', content: <BackendTab /> },
   { id: 'empty-state', label: 'Empty State', content: <EmptyStateTab /> },
   { id: 'icons', label: 'Custom Icons', content: <IconsTab /> },
+  { id: 'theme-tokens', label: 'Theme Tokens', content: <ThemeTokensTab /> },
   { id: 'column-reorder', label: 'Column Reorder', content: <ColumnReorderTab /> },
   { id: 'header-groups', label: 'Header Groups', content: <HeaderGroupsTab /> },
   { id: 'state-persistence', label: 'State Persistence', content: <StatePersistenceTab /> },

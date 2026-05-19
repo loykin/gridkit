@@ -181,7 +181,7 @@ export function ColumnMenuButton<T extends object>({
             </Button>
           )}
         />
-        <PopoverContent side="bottom" align="start" style={{ width: 200, padding: '4px 0' }}>
+        <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: 200, padding: '4px 0' }}>
           {renderColumnMenu ? renderColumnMenu(col, table, close, ctx) : renderDefaultContent()}
         </PopoverContent>
       </Popover>

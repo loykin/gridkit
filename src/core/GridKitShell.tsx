@@ -79,7 +79,7 @@ export function GridKitShell<T extends object>({
 
       const toolbarHeight = toolbarFrameRef.current?.getBoundingClientRect().height ?? 0
       const footerHeight = footerFrameRef.current?.getBoundingClientRect().height ?? 0
-      const childCount = 1 + (toolbarFrameRef.current ? 1 : 0) + (footerFrameRef.current ? 1 : 0)
+      const childCount = 1 + (toolbarFrameRef.current ? 1 : 0)
       const style = getComputedStyle(shell)
       const gap = Number.parseFloat(style.rowGap || style.gap || '0') || 0
       const totalGap = Math.max(0, childCount - 1) * gap
@@ -122,24 +122,26 @@ export function GridKitShell<T extends object>({
         </div>
       )}
 
-      <div
-        ref={(node) => {
-          tableWrapperRef.current = node
-          if (containerRef) {
-            ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
-          }
-        }}
-        className={cn(containerClassName, effectiveFillContainer && 'dg-table-wrapper--fill')}
-        style={containerStyle}
-      >
-        {children}
-      </div>
-
-      {footer && (
-        <div ref={footerFrameRef} className="dg-footer">
-          {footer}
+      <div className="dg-table-stack">
+        <div
+          ref={(node) => {
+            tableWrapperRef.current = node
+            if (containerRef) {
+              ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+            }
+          }}
+          className={cn(containerClassName, effectiveFillContainer && 'dg-table-wrapper--fill')}
+          style={containerStyle}
+        >
+          {children}
         </div>
-      )}
+
+        {footer && (
+          <div ref={footerFrameRef} className="dg-footer">
+            {footer}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

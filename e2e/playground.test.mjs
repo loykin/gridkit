@@ -159,6 +159,73 @@ test('header groups span their leaf header range', async () => {
   await closePage(page)
 })
 
+test('header theme tokens style header cells and filter row', async () => {
+  const page = await newPage()
+  await openTab(page, 'Fill Container')
+
+  await page.addStyleTag({
+    content: `
+      .dg-token-test {
+        --dg-header-background: rgb(1 2 3);
+        --dg-header-foreground: rgb(250 251 252);
+        --dg-header-control-background: rgb(10 20 30);
+        --dg-header-control-foreground: rgb(230 240 250);
+        --dg-header-control-border: rgb(40 50 60);
+      }
+    `,
+  })
+  await page.locator('[data-testid="fill-long-case"] .dg-shell').evaluate((node) => node.classList.add('dg-token-test'))
+  await page.evaluate(() => {
+    if (globalThis.document.activeElement instanceof globalThis.HTMLElement) {
+      globalThis.document.activeElement.blur()
+    }
+  })
+
+  const styles = await page.evaluate(() => {
+    const header = globalThis.document.querySelector('.dg-token-test .dg-header')
+    const leafCell = globalThis.document.querySelector('.dg-token-test .dg-header-cell[data-col-id="id"]')
+    const groupCell = globalThis.document.querySelector('.dg-token-test .dg-header-cell[data-header-group="true"]')
+    const filterRow = globalThis.document.querySelector('.dg-token-test .dg-filter-row')
+    const input = Array.from(globalThis.document.querySelectorAll('.dg-token-test .dg-filter-row .dg-input'))
+      .find((node) => node !== globalThis.document.activeElement)
+    const select = globalThis.document.querySelector('.dg-token-test .dg-filter-row .dg-select')
+    const read = (node) => {
+      const style = getComputedStyle(node)
+      return {
+        background: style.backgroundColor,
+        color: style.color,
+        borderColor: style.borderColor,
+        controlBorder: style.getPropertyValue('--dg-control-border').trim(),
+        headerControlBorder: style.getPropertyValue('--dg-header-control-border').trim(),
+      }
+    }
+
+    return {
+      header: read(header),
+      leafCell: read(leafCell),
+      groupCell: read(groupCell),
+      filterRow: read(filterRow),
+      input: read(input),
+      select: read(select),
+    }
+  })
+
+  assert.equal(styles.header.background, 'rgb(1, 2, 3)')
+  assert.equal(styles.leafCell.background, 'rgb(1, 2, 3)')
+  assert.equal(styles.leafCell.color, 'rgb(250, 251, 252)')
+  assert.equal(styles.filterRow.background, 'rgb(1, 2, 3)')
+  assert.equal(styles.groupCell.background, 'rgb(1, 2, 3)')
+  assert.equal(styles.groupCell.color, 'rgb(250, 251, 252)')
+  assert.equal(styles.input.background, 'rgb(10, 20, 30)')
+  assert.equal(styles.input.color, 'rgb(230, 240, 250)')
+  assert.equal(styles.input.headerControlBorder, 'rgb(40 50 60)')
+  assert.equal(styles.select.background, 'rgb(10, 20, 30)')
+  assert.equal(styles.select.color, 'rgb(230, 240, 250)')
+  assert.equal(styles.select.headerControlBorder, 'rgb(40 50 60)')
+
+  await closePage(page)
+})
+
 test('fillContainer preserves natural height until body overflow', async () => {
   const page = await newPage()
   await openTab(page, 'Fill Container')
