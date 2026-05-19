@@ -3,7 +3,7 @@ import { VIRTUAL_THRESHOLD } from '@/core/hooks/useColumnSizing'
 
 interface UseTableVirtualizerOptions<T> {
   rows: T[]
-  tableHeight: string | number | 'auto' | undefined
+  enabledByLayout: boolean
   bodyScrollRef: React.RefObject<HTMLDivElement | null>
   estimateSize: number
   overscan?: number
@@ -11,13 +11,12 @@ interface UseTableVirtualizerOptions<T> {
 
 export function useTableVirtualizer<T>({
   rows,
-  tableHeight,
+  enabledByLayout,
   bodyScrollRef,
   estimateSize,
   overscan = 10,
 }: UseTableVirtualizerOptions<T>) {
-  const hasFixedHeight = tableHeight != null && tableHeight !== 'auto'
-  const virtual = hasFixedHeight && rows.length >= VIRTUAL_THRESHOLD
+  const virtual = enabledByLayout && rows.length >= VIRTUAL_THRESHOLD
 
   const virtualizer = useVirtualizer({
     count: rows.length,

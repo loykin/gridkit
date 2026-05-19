@@ -289,6 +289,10 @@
   height: 100%;
   min-height: 0;
 }
+.dg-shell[data-fill-parent="true"] {
+  height: 100%;
+  min-height: 0;
+}
 .dg-toolbar-frame,
 .dg-footer {
   flex-shrink: 0;
@@ -299,6 +303,12 @@
   min-width: 0;
 }
 .dg-table-wrapper--fill {
+  min-height: 0;
+  overflow: hidden;
+}
+.dg-shell[data-fill-parent="true"] .dg-table-wrapper {
+  display: flex;
+  flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
 }
@@ -346,8 +356,22 @@
   min-height: 0;
   max-height: var(--dg-fill-table-max-height);
 }
+.dg-shell[data-fill-parent="true"] .dg-container {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
 .dg-body-wrapper {
   position: relative;
+}
+.dg-shell[data-fill-parent="true"] .dg-header {
+  flex-shrink: 0;
+}
+.dg-shell[data-fill-parent="true"] .dg-body-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .dg-header {

@@ -148,7 +148,7 @@ const data = useMemo(() => rowsFromQuery ?? [], [rowsFromQuery])
 
 For large table views, set a fixed `tableHeight` so virtualization can keep DOM work bounded to the visible rows plus overscan. `DataGridList` also supports opt-in virtualization with `enableVirtualization` and a fixed `containerHeight`. `DataGridChat` is currently non-virtualized because prepend anchoring and bottom stickiness need stricter scroll handling.
 
-Use `fillContainer` when a table should fit inside an existing app panel without forcing short data to stretch. The parent must provide an explicit height, or a flex chain with `min-height: 0`.
+Use `fillContainer` when a table should fit inside an existing app panel without forcing short data to stretch. Use `fillParent` when the table should always fill a parent-owned height.
 
 ### Current Limits
 
@@ -319,6 +319,52 @@ Parent requirements:
 - Do not add `overflow: auto` to `.dg-table-wrapper` or `.dg-container`; the scroll owner is the internal body element.
 
 If you want a hard fixed table body regardless of content length, use `tableHeight`. If you want content to grow until a known cap, use `maxTableHeight`. If the cap depends on the surrounding app panel, use `fillContainer`.
+
+---
+
+## Fill Parent Layout
+
+Use `fillParent` when the parent layout already owns height and the grid should occupy that whole region.
+
+```tsx
+import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
+
+export function MetricsTab() {
+  return (
+    <div className="h-full min-h-0 overflow-hidden">
+      <DataGrid
+        fillParent
+        data={rows}
+        columns={columns}
+        pagination={{ pageSize: 100 }}
+        footer={(table) => <DataGridPaginationBar table={table} />}
+      />
+    </div>
+  )
+}
+```
+
+Behavior:
+
+- The shell, table wrapper, container, and body wrapper participate in a full-height flex chain.
+- Short data still fills the parent region, so the footer remains at the parent bottom.
+- Overflowing data scrolls only inside the body area.
+- Large row sets still use table virtualization even without `tableHeight`.
+
+`fillContainer` and `fillParent` solve different layout problems:
+
+| Prop | Use when | Short data | Overflowing data |
+|---|---|---|---|
+| `fillContainer` | Parent height is a cap, but content should stay natural when short | Footer sits directly below the table | Body scrolls, footer remains visible |
+| `fillParent` | Parent height is the layout contract and the grid should fill it | Footer stays at parent bottom | Body scrolls, footer stays at parent bottom |
+
+Parent requirements:
+
+- The direct parent must have a real height, or be inside a valid `height: 100%` / flex chain.
+- In flex layouts, the parent chain should allow shrinking with `min-height: 0`.
+- Do not use `fillParent` as an alias for `tableHeight="100%"`; use the prop so GridKit can set the internal flex and virtualization behavior correctly.
+
+If `tableHeight` and `fillParent` are both provided, `tableHeight` remains the explicit body height. Prefer using only one layout mode.
 
 ---
 
@@ -711,6 +757,7 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `emptyContent` | `ReactNode` | — | Custom empty state UI (overrides `emptyMessage`) |
 | `showHeader` | `boolean` | `true` | Show/hide the header row |
 | `fillContainer` | `boolean` | `false` | Fit inside an explicit parent height while keeping short content natural and scrolling only the body on overflow |
+| `fillParent` | `boolean` | `false` | DataGrid table only. Fill a parent-owned height with an internal flex scroll chain |
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Fixed height — enables internal scroll and virtualization |
 | `maxTableHeight` | `string \| number` | — | Cap height — grows with content up to this limit, then scrolls |
 | `minTableHeight` | `string \| number` | — | Floor height — content shorter than this keeps minimum space |

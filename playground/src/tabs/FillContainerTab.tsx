@@ -1,6 +1,7 @@
 import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
 import type { DataGridColumnDef } from '@loykin/gridkit'
 import { ALL_DATA, type Employee } from '../data/employees'
+import { LayoutModeComparison } from './LayoutModeComparison'
 
 const groupedColumns: DataGridColumnDef<Employee>[] = [
   { accessorKey: 'id', header: 'ID', meta: { flex: 0.55, filterType: 'number' } },
@@ -59,6 +60,8 @@ export function FillContainerTab() {
           Short data keeps natural table height; long data scrolls inside the body while the footer stays in the parent box.
         </p>
       </div>
+
+      <LayoutModeComparison />
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <section className="space-y-2">

@@ -33,6 +33,7 @@ export interface DataGridTableViewProps<T extends object> extends TableViewConfi
    * based on newly rendered (possibly virtual) rows.
    */
   onMeasureColumns?: () => void
+  fillParent?: boolean
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -58,6 +59,7 @@ export function DataGridTableView<T extends object>({
   maxTableHeight,
   minTableHeight,
   fillContainer,
+  fillParent,
   tableWidthMode = 'spacer',
   rowHeight,
   estimateRowHeight,
@@ -116,11 +118,13 @@ export function DataGridTableView<T extends object>({
   const { headerScrollRef, bodyScrollRef, syncScroll } = useTableScrollSync()
   const bodyWrapperRef = React.useRef<HTMLDivElement | null>(null)
   const [fillBodyMaxHeight, setFillBodyMaxHeight] = useState<number | undefined>()
+  const hasFixedTableHeight = tableHeight != null && tableHeight !== 'auto'
+  const hasFixedScrollContainer = hasFixedTableHeight || fillParent === true
 
   // ── Virtualizer ────────────────────────────────────────────────────────────
   const { virtual, virtualizer: rowVirtualizer } = useTableVirtualizer({
     rows,
-    tableHeight,
+    enabledByLayout: hasFixedScrollContainer,
     bodyScrollRef,
     estimateSize: effectiveEstimate,
     overscan,
@@ -152,8 +156,7 @@ export function DataGridTableView<T extends object>({
   }, [bodyScrollRef, checkVScroll])
 
   useLayoutEffect(() => {
-    const hasFixedTableHeight = tableHeight != null && tableHeight !== 'auto'
-    if (!fillContainer || hasFixedTableHeight) {
+    if (!fillContainer || fillParent || hasFixedTableHeight) {
       setFillBodyMaxHeight(undefined)
       return
     }
@@ -197,7 +200,7 @@ export function DataGridTableView<T extends object>({
       observer.disconnect()
       window.removeEventListener('resize', measure)
     }
-  }, [containerRef, fillContainer, headerScrollRef, showHeader, tableHeight])
+  }, [containerRef, fillContainer, fillParent, hasFixedTableHeight, headerScrollRef, showHeader, tableHeight])
 
   // Body wrapper: fixed height when tableHeight is set so hscroll stays inside
   const toCSS = (v: string | number) => (typeof v === 'number' ? `${v}px` : v)
@@ -205,8 +208,10 @@ export function DataGridTableView<T extends object>({
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    ...(tableHeight && tableHeight !== 'auto'
+    ...(hasFixedTableHeight
       ? { height: toCSS(tableHeight as string | number) }
+      : fillParent
+        ? { flex: '1 1 auto', minHeight: 0 }
       : fillContainer
         ? fillBodyMaxHeight != null
           ? { maxHeight: toCSS(fillBodyMaxHeight) }
@@ -245,7 +250,7 @@ export function DataGridTableView<T extends object>({
           // which is required since the outer div's height is determined by its children.
           contain: 'layout paint',
         }}
-        className={cn('dg-container', fillContainer && 'dg-container--fill', classNames?.container)}
+        className={cn('dg-container', fillContainer && !fillParent && 'dg-container--fill', classNames?.container)}
       >
         {/* Header panel — conditionally rendered, overflow:hidden, scrollLeft mirrors body */}
         {showHeader && (
@@ -285,14 +290,14 @@ export function DataGridTableView<T extends object>({
         {/* Body scroll container + scrollbars */}
         <div
           ref={bodyWrapperRef}
-          className={cn('dg-body-wrapper', fillContainer && 'dg-body-wrapper--fill')}
+          className={cn('dg-body-wrapper', fillContainer && !fillParent && 'dg-body-wrapper--fill')}
           style={bodyWrapperStyle}
         >
           <div
             ref={bodyScrollRef}
             style={bodyStyle}
             onScroll={syncScroll}
-            className="scrollbar-none"
+            className="dg-body-scroll scrollbar-none"
           >
             <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
               <DetailRowContext value={detailRowCtx}>

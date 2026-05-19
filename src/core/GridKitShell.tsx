@@ -33,6 +33,7 @@ interface GridKitShellProps<T extends object> {
   maxTableHeight?: string | number
   minTableHeight?: string | number
   fillContainer?: boolean
+  fillParent?: boolean
   containerClassName?: string
   footer?: ReactNode
   children: ReactNode
@@ -49,6 +50,7 @@ export function GridKitShell<T extends object>({
   maxTableHeight,
   minTableHeight,
   fillContainer,
+  fillParent,
   containerClassName,
   footer,
   children,
@@ -59,9 +61,10 @@ export function GridKitShell<T extends object>({
   const [fillTableMaxHeight, setFillTableMaxHeight] = useState<number | undefined>()
   const heightStyle = resolveContainerHeight(containerHeight ?? tableHeight, maxTableHeight, minTableHeight)
   const hasToolbar = headerLeft != null || headerRight != null
+  const effectiveFillContainer = fillContainer && !fillParent
 
   useLayoutEffect(() => {
-    if (!fillContainer) {
+    if (!effectiveFillContainer) {
       setFillTableMaxHeight(undefined)
       return
     }
@@ -97,18 +100,22 @@ export function GridKitShell<T extends object>({
     measure()
 
     return () => observer.disconnect()
-  }, [fillContainer, footer, headerLeft, headerRight, wrapperRef])
+  }, [effectiveFillContainer, footer, headerLeft, headerRight, wrapperRef])
 
-  const fillStyle = fillContainer && fillTableMaxHeight != null
+  const fillStyle = effectiveFillContainer && fillTableMaxHeight != null
     ? ({
         '--dg-fill-table-max-height': `${fillTableMaxHeight}px`,
         maxHeight: `${fillTableMaxHeight}px`,
       } as React.CSSProperties)
     : undefined
-  const containerStyle = fillContainer ? { ...heightStyle, ...fillStyle } : heightStyle
+  const containerStyle = effectiveFillContainer ? { ...heightStyle, ...fillStyle } : heightStyle
 
   return (
-    <div ref={wrapperRef} className={cn('dg-shell', fillContainer && 'dg-shell--fill')}>
+    <div
+      ref={wrapperRef}
+      className={cn('dg-shell', effectiveFillContainer && 'dg-shell--fill')}
+      data-fill-parent={fillParent ? 'true' : undefined}
+    >
       {hasToolbar && (
         <div ref={toolbarFrameRef} className="dg-toolbar-frame">
           <DataGridToolbar table={table} headerLeft={headerLeft} headerRight={headerRight} />
@@ -122,7 +129,7 @@ export function GridKitShell<T extends object>({
             ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
           }
         }}
-        className={cn(containerClassName, fillContainer && 'dg-table-wrapper--fill')}
+        className={cn(containerClassName, effectiveFillContainer && 'dg-table-wrapper--fill')}
         style={containerStyle}
       >
         {children}

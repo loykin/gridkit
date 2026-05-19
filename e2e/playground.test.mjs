@@ -166,7 +166,7 @@ test('fillContainer preserves natural height until body overflow', async () => {
   const readCase = async (testId) => page.locator(`[data-testid="${testId}"]`).evaluate((root) => {
     const shell = root.querySelector('.dg-shell')
     const tableWrapper = root.querySelector('.dg-table-wrapper')
-    const body = root.querySelector('.scrollbar-none')
+    const body = root.querySelector('.dg-body-scroll')
     const footer = root.querySelector('.dg-footer')
     const rect = (node) => {
       const box = node.getBoundingClientRect()
@@ -199,6 +199,54 @@ test('fillContainer preserves natural height until body overflow', async () => {
     Math.abs(longCase.footer.bottom - longCase.shell.bottom) < 2,
     `footer should stay at shell bottom: ${longCase.footer.bottom} != ${longCase.shell.bottom}`,
   )
+
+  await closePage(page)
+})
+
+test('fillParent fills parent height and virtualizes overflowing rows', async () => {
+  const page = await newPage()
+  await openTab(page, 'Fill Parent')
+
+  const readCase = async (testId) => page.locator(`[data-testid="${testId}"]`).evaluate((root) => {
+    const shell = root.querySelector('.dg-shell')
+    const body = root.querySelector('.dg-body-scroll')
+    const footer = root.querySelector('.dg-footer')
+    const rows = root.querySelectorAll('.dg-row')
+    const rect = (node) => {
+      const box = node.getBoundingClientRect()
+      return { top: box.top, bottom: box.bottom, height: box.height }
+    }
+
+    return {
+      root: rect(root),
+      shell: rect(shell),
+      body: { clientHeight: body.clientHeight, scrollHeight: body.scrollHeight },
+      footer: footer ? rect(footer) : null,
+      marker: shell.getAttribute('data-fill-parent'),
+      rowCount: rows.length,
+    }
+  })
+
+  await page.waitForTimeout(300)
+  const shortCase = await readCase('fill-parent-short-case')
+  const longCase = await readCase('fill-parent-long-case')
+
+  assert.equal(shortCase.marker, 'true')
+  assert.ok(
+    Math.abs(shortCase.footer.bottom - shortCase.shell.bottom) < 2,
+    `short footer should stay at shell bottom: ${shortCase.footer.bottom} != ${shortCase.shell.bottom}`,
+  )
+
+  assert.equal(longCase.marker, 'true')
+  assert.ok(
+    longCase.body.scrollHeight > longCase.body.clientHeight + 100,
+    `long data should scroll: ${longCase.body.scrollHeight} <= ${longCase.body.clientHeight}`,
+  )
+  assert.ok(
+    Math.abs(longCase.footer.bottom - longCase.shell.bottom) < 2,
+    `long footer should stay at shell bottom: ${longCase.footer.bottom} != ${longCase.shell.bottom}`,
+  )
+  assert.ok(longCase.rowCount < 500, `expected virtualized rows, got ${longCase.rowCount}`)
 
   await closePage(page)
 })
