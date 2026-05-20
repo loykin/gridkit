@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { PaginationTab } from './tabs/PaginationTab'
 import { InfinityTab } from './tabs/InfinityTab'
 import { FixedHeightTab } from './tabs/FixedHeightTab'
@@ -39,66 +40,135 @@ import { StatePersistenceTab } from './tabs/StatePersistenceTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
+// ── Tab registry ──────────────────────────────────────────────────────────────
+
 const TABS = [
-  { id: 'pagination', label: 'Pagination', content: <PaginationTab /> },
-  { id: 'infinity', label: 'Infinite Scroll', content: <InfinityTab /> },
-  { id: 'fixed', label: 'Fixed Height', content: <FixedHeightTab /> },
-  { id: 'layout-modes', label: 'Layout Modes', content: <LayoutModesTab /> },
-  { id: 'fill-container', label: 'Fill Container', content: <FillContainerTab /> },
-  { id: 'fill-parent', label: 'Fill Parent', content: <FillParentTab /> },
-  { id: 'large-list', label: 'Large List', content: <LargeListTab /> },
-  { id: 'live-update', label: 'Live Update', content: <LiveUpdateTab /> },
-  { id: 'pinning', label: 'Column Pinning', content: <PinningTab /> },
-  { id: 'selection', label: 'Row Selection', content: <SelectionTab /> },
-  { id: 'bordered', label: 'Bordered', content: <BorderedTab /> },
-  { id: 'row-height', label: 'Row Height', content: <RowHeightTab /> },
-  { id: 'tree', label: 'Tree / Groups', content: <TreeTab /> },
-  { id: 'grouping', label: 'Row Grouping', content: <GroupingTab /> },
-  { id: 'drag', label: 'Row Drag', content: <DragTab /> },
-  { id: 'filter-icon', label: 'Filter Icon', content: <FilterIconTab /> },
-  { id: 'toolbar', label: 'Toolbar', content: <ToolbarTab /> },
-  { id: 'data-store', label: 'DataStore', content: <DataStoreTab /> },
-  { id: 'log-stream', label: 'Log Stream', content: <LogStreamTab /> },
-  { id: 'backend', label: 'Backend', content: <BackendTab /> },
-  { id: 'empty-state', label: 'Empty State', content: <EmptyStateTab /> },
-  { id: 'icons', label: 'Custom Icons', content: <IconsTab /> },
-  { id: 'theme-tokens', label: 'Theme Tokens', content: <ThemeTokensTab /> },
-  { id: 'column-reorder', label: 'Column Reorder', content: <ColumnReorderTab /> },
-  { id: 'header-groups', label: 'Header Groups', content: <HeaderGroupsTab /> },
+  { id: 'pagination',        label: 'Pagination',        content: <PaginationTab /> },
+  { id: 'infinity',          label: 'Infinite Scroll',   content: <InfinityTab /> },
+  { id: 'backend',           label: 'Backend',           content: <BackendTab /> },
+  { id: 'data-store',        label: 'DataStore',         content: <DataStoreTab /> },
+  { id: 'live-update',       label: 'Live Update',       content: <LiveUpdateTab /> },
   { id: 'state-persistence', label: 'State Persistence', content: <StatePersistenceTab /> },
-  { id: 'master-detail', label: 'Master-Detail', content: <MasterDetailTab /> },
-  { id: 'column-pinning', label: 'Column Pinning UI', content: <ColumnPinningTab /> },
-  { id: 'column-menu', label: 'Column Menu', content: <ColumnMenuTab /> },
-  { id: 'inline-edit', label: 'Inline Edit', content: <InlineEditTab /> },
-  { id: 'export', label: 'Export CSV', content: <ExportTab /> },
-  { id: 'card', label: 'Card Grid', content: <CardTab /> },
-  { id: 'card-list', label: 'Card List', content: <CardListTab /> },
-  { id: 'list', label: 'List', content: <ListTab /> },
-  { id: 'chat', label: 'Chat', content: <ChatTab /> },
-  { id: 'agent-trace', label: 'Agent Trace', content: <AgentTraceTab /> },
-  { id: 'eval-review', label: 'Eval Review', content: <EvalReviewTab /> },
+  { id: 'fixed',             label: 'Fixed Height',      content: <FixedHeightTab /> },
+  { id: 'layout-modes',      label: 'Layout Modes',      content: <LayoutModesTab /> },
+  { id: 'fill-container',    label: 'Fill Container',    content: <FillContainerTab /> },
+  { id: 'fill-parent',       label: 'Fill Parent',       content: <FillParentTab /> },
+  { id: 'large-list',        label: 'Large List',        content: <LargeListTab /> },
+  { id: 'pinning',           label: 'Column Pinning',    content: <PinningTab /> },
+  { id: 'column-pinning',    label: 'Pinning UI',        content: <ColumnPinningTab /> },
+  { id: 'column-reorder',    label: 'Reorder',           content: <ColumnReorderTab /> },
+  { id: 'column-menu',       label: 'Column Menu',       content: <ColumnMenuTab /> },
+  { id: 'header-groups',     label: 'Header Groups',     content: <HeaderGroupsTab /> },
+  { id: 'filter-icon',       label: 'Filter Icon',       content: <FilterIconTab /> },
+  { id: 'selection',         label: 'Row Selection',     content: <SelectionTab /> },
+  { id: 'row-height',        label: 'Row Height',        content: <RowHeightTab /> },
+  { id: 'drag',              label: 'Row Drag',          content: <DragTab /> },
+  { id: 'tree',              label: 'Tree / Groups',     content: <TreeTab /> },
+  { id: 'grouping',          label: 'Row Grouping',      content: <GroupingTab /> },
+  { id: 'master-detail',     label: 'Master-Detail',     content: <MasterDetailTab /> },
+  { id: 'inline-edit',       label: 'Inline Edit',       content: <InlineEditTab /> },
+  { id: 'export',            label: 'Export CSV',        content: <ExportTab /> },
+  { id: 'bordered',          label: 'Bordered',          content: <BorderedTab /> },
+  { id: 'empty-state',       label: 'Empty State',       content: <EmptyStateTab /> },
+  { id: 'icons',             label: 'Custom Icons',      content: <IconsTab /> },
+  { id: 'theme-tokens',      label: 'Theme Tokens',      content: <ThemeTokensTab /> },
+  { id: 'toolbar',           label: 'Toolbar',           content: <ToolbarTab /> },
+  { id: 'card',              label: 'Card Grid',         content: <CardTab /> },
+  { id: 'card-list',         label: 'Card List',         content: <CardListTab /> },
+  { id: 'list',              label: 'List',              content: <ListTab /> },
+  { id: 'chat',              label: 'Chat',              content: <ChatTab /> },
+  { id: 'log-stream',        label: 'Log Stream',        content: <LogStreamTab /> },
+  { id: 'agent-trace',       label: 'Agent Trace',       content: <AgentTraceTab /> },
+  { id: 'eval-review',       label: 'Eval Review',       content: <EvalReviewTab /> },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
 
-function ThemeSwatch({
-  theme,
-  active,
-  onClick,
-}: {
-  theme: Theme
-  active: boolean
-  onClick: () => void
-}) {
-  const primary =
-    theme.vars['--dg-primary'] ??
-    (theme.dark ? 'oklch(0.424 0.199 265.638)' : 'oklch(0.488 0.243 264.376)')
+// ── Sidebar nav groups ────────────────────────────────────────────────────────
+
+interface NavItem { id: TabId; label: string }
+interface NavGroup { label: string; items: NavItem[] }
+
+const NAV: NavGroup[] = [
+  {
+    label: 'Data',
+    items: [
+      { id: 'pagination',        label: 'Pagination' },
+      { id: 'infinity',          label: 'Infinite Scroll' },
+      { id: 'backend',           label: 'Backend' },
+      { id: 'data-store',        label: 'DataStore' },
+      { id: 'live-update',       label: 'Live Update' },
+      { id: 'state-persistence', label: 'State Persistence' },
+    ],
+  },
+  {
+    label: 'Layout',
+    items: [
+      { id: 'fixed',          label: 'Fixed Height' },
+      { id: 'layout-modes',   label: 'Layout Modes' },
+      { id: 'fill-container', label: 'Fill Container' },
+      { id: 'fill-parent',    label: 'Fill Parent' },
+      { id: 'large-list',     label: 'Large List' },
+    ],
+  },
+  {
+    label: 'Columns',
+    items: [
+      { id: 'pinning',        label: 'Column Pinning' },
+      { id: 'column-pinning', label: 'Pinning UI' },
+      { id: 'column-reorder', label: 'Reorder' },
+      { id: 'column-menu',    label: 'Column Menu' },
+      { id: 'header-groups',  label: 'Header Groups' },
+      { id: 'filter-icon',    label: 'Filter Icon' },
+    ],
+  },
+  {
+    label: 'Rows',
+    items: [
+      { id: 'selection',     label: 'Row Selection' },
+      { id: 'row-height',    label: 'Row Height' },
+      { id: 'drag',          label: 'Row Drag' },
+      { id: 'tree',          label: 'Tree / Groups' },
+      { id: 'grouping',      label: 'Row Grouping' },
+      { id: 'master-detail', label: 'Master-Detail' },
+      { id: 'inline-edit',   label: 'Inline Edit' },
+      { id: 'export',        label: 'Export CSV' },
+    ],
+  },
+  {
+    label: 'Appearance',
+    items: [
+      { id: 'bordered',     label: 'Bordered' },
+      { id: 'empty-state',  label: 'Empty State' },
+      { id: 'icons',        label: 'Custom Icons' },
+      { id: 'theme-tokens', label: 'Theme Tokens' },
+      { id: 'toolbar',      label: 'Toolbar' },
+    ],
+  },
+  {
+    label: 'Views',
+    items: [
+      { id: 'card',        label: 'Card Grid' },
+      { id: 'card-list',   label: 'Card List' },
+      { id: 'list',        label: 'List' },
+      { id: 'chat',        label: 'Chat' },
+      { id: 'log-stream',  label: 'Log Stream' },
+      { id: 'agent-trace', label: 'Agent Trace' },
+      { id: 'eval-review', label: 'Eval Review' },
+    ],
+  },
+]
+
+// ── Theme swatch ──────────────────────────────────────────────────────────────
+
+function ThemeSwatch({ theme, active, onClick }: { theme: Theme; active: boolean; onClick: () => void }) {
+  const primary = theme.vars['--dg-primary'] ?? (theme.dark ? 'oklch(0.424 0.199 265.638)' : 'oklch(0.488 0.243 264.376)')
   const bg = theme.vars['--dg-background'] ?? (theme.dark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)')
   return (
     <button
       onClick={onClick}
       title={theme.name}
-      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs transition-colors ${
+      className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors ${
         active ? 'ring-2 ring-primary ring-offset-1' : 'hover:bg-muted'
       }`}
     >
@@ -113,94 +183,135 @@ function ThemeSwatch({
 
 const RADIUS_PRESETS = [
   { label: 'None', value: '0rem' },
-  { label: 'SM', value: '0.25rem' },
-  { label: 'MD', value: '0.375rem' },
-  { label: 'LG', value: '0.5rem' },
-  { label: 'XL', value: '0.75rem' },
+  { label: 'SM',   value: '0.25rem' },
+  { label: 'MD',   value: '0.375rem' },
+  { label: 'LG',   value: '0.5rem' },
+  { label: 'XL',   value: '0.75rem' },
 ] as const
 
 type RadiusValue = (typeof RADIUS_PRESETS)[number]['value']
 
-export default function App() {
-  const [active, setActive] = useState<TabId>('pagination')
+// ── Inner app (needs router context) ─────────────────────────────────────────
+
+function PlaygroundApp() {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const pathId = location.pathname.replace(/^\//, '')
+  const active: TabId = TABS.some((t) => t.id === pathId) ? (pathId as TabId) : 'pagination'
+  const setActive = (id: TabId) => navigate(`/${id}`)
+
   const [theme, setTheme] = useState<Theme>(THEMES[0]!)
   const [radius, setRadius] = useState<RadiusValue>('0rem')
   const current = TABS.find((t) => t.id === active)!
 
-  const themeStyle = {
-    ...theme.vars,
-    '--dg-radius': radius,
-  } as React.CSSProperties
+  const themeStyle = { ...theme.vars, '--dg-radius': radius } as React.CSSProperties
 
   return (
     <PlaygroundContext value={{ rounded: radius !== '0rem' }}>
       <div className={theme.dark ? 'dark' : ''} style={themeStyle}>
-        <div className="min-h-screen bg-background text-foreground">
-          {/* Header */}
-          <div className="border-b border-border px-8 py-3 flex items-center justify-between gap-4 flex-wrap">
-            <div>
-              <h1 className="text-xl font-semibold">DataGrid Playground</h1>
+        <div className="flex h-screen bg-background text-foreground overflow-hidden">
+
+          {/* Sidebar */}
+          <aside className="w-52 shrink-0 border-r border-border flex flex-col overflow-hidden">
+            {/* Logo */}
+            <div className="px-4 py-4 border-b border-border shrink-0">
+              <p className="text-sm font-semibold">DataGrid Playground</p>
               <p className="text-xs text-muted-foreground mt-0.5">@loykin/gridkit</p>
             </div>
 
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Radius selector */}
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-muted-foreground mr-1">Radius</span>
-                {RADIUS_PRESETS.map((p) => (
-                  <button
-                    key={p.value}
-                    onClick={() => setRadius(p.value)}
-                    className={`px-2 py-1 text-xs font-medium transition-colors border rounded ${
-                      radius === p.value
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted'
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="w-px h-5 bg-border" />
-
-              {/* Theme swatches */}
-              <div className="flex items-center gap-1 flex-wrap">
-                {THEMES.map((t) => (
-                  <ThemeSwatch
-                    key={t.name}
-                    theme={t}
-                    active={t.name === theme.name}
-                    onClick={() => setTheme(t)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Tab bar */}
-          <div className="border-b border-border px-8">
-            <div className="flex gap-0 overflow-x-auto">
-              {TABS.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActive(tab.id)}
-                  className={`px-4 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${
-                    active === tab.id
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tab.label}
-                </button>
+            {/* Nav */}
+            <nav className="flex-1 overflow-y-auto py-3">
+              {NAV.map((group) => (
+                <div key={group.label} className="mb-4">
+                  <p className="px-4 mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {group.label}
+                  </p>
+                  {group.items.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setActive(item.id)}
+                      className={`w-full text-left px-4 py-1.5 text-xs transition-colors ${
+                        active === item.id
+                          ? 'bg-accent text-accent-foreground font-medium'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
               ))}
+            </nav>
+
+            {/* Theme controls */}
+            <div className="shrink-0 border-t border-border px-3 py-3 flex flex-col gap-2">
+              {/* Radius */}
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Radius
+                </p>
+                <div className="flex gap-1 flex-wrap">
+                  {RADIUS_PRESETS.map((p) => (
+                    <button
+                      key={p.value}
+                      onClick={() => setRadius(p.value)}
+                      className={`px-1.5 py-0.5 text-[10px] font-medium border rounded transition-colors ${
+                        radius === p.value
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Themes */}
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Theme
+                </p>
+                <div className="flex flex-col gap-0.5">
+                  {THEMES.map((t) => (
+                    <ThemeSwatch
+                      key={t.name}
+                      theme={t}
+                      active={t.name === theme.name}
+                      onClick={() => setTheme(t)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Main content */}
+          <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+            <div className="px-6 py-2 border-b border-border shrink-0">
+              <p className="text-sm font-medium">{current.label}</p>
+            </div>
+            <div className="flex-1 overflow-auto px-6 py-5">
+              {current.content}
             </div>
           </div>
 
-          {/* Content */}
-          <div className="px-8 py-6">{current.content}</div>
         </div>
       </div>
     </PlaygroundContext>
+  )
+}
+
+// ── App (router wrapper) ──────────────────────────────────────────────────────
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/pagination" replace />} />
+        <Route path="*" element={<PlaygroundApp />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
