@@ -16,6 +16,7 @@ interface DataGridFilterRowProps<T extends object> extends Pick<TableViewConfig<
   table: Table<T>
   virtual: boolean
   tableWidthMode?: TableWidthMode
+  pinning?: boolean
 }
 
 export function DataGridFilterRow<T extends object>({
@@ -24,22 +25,29 @@ export function DataGridFilterRow<T extends object>({
   virtual,
   bordered,
   tableWidthMode = 'spacer',
+  pinning = true,
   customFilterComponents,
 }: DataGridFilterRowProps<T>) {
   const icons = useIcons()
+  const fillLast = tableWidthMode === 'fill-last'
+
   return (
     <div
       role="row"
       className={cn('dg-filter-row')}
       style={{ width: '100%', height: '36px' }}
     >
-      {visibleLeafColumns.map((col) => {
+      {visibleLeafColumns.map((col, colIdx) => {
+        const isLast = colIdx === visibleLeafColumns.length - 1
+        const fillLastStyle: CSSProperties = fillLast && isLast && !col.getIsPinned()
+          ? { flex: 1, width: 'auto' }
+          : {}
         const ft = col.columnDef.meta?.filterType
         const CustomFilter = ft ? customFilterComponents?.[ft] : undefined
         const filterValue = (col.getFilterValue() ?? '') as string
         const cellStyle: CSSProperties = virtual
-          ? { display: 'flex', alignItems: 'center', width: col.getSize() }
-          : { ...colStyle(col), display: 'flex', alignItems: 'center' }
+          ? { display: 'flex', alignItems: 'center', width: col.getSize(), ...fillLastStyle }
+          : { ...colStyle(col, { pinning }), display: 'flex', alignItems: 'center', ...fillLastStyle }
 
         if (ft === false) {
           return (
@@ -48,7 +56,7 @@ export function DataGridFilterRow<T extends object>({
               key={col.id}
               className={cn(
                 'dg-filter-cell',
-                bordered && 'dg-filter-cell--bordered',
+                bordered && !isLast && 'dg-filter-cell--bordered',
               )}
               style={cellStyle}
             />
@@ -61,7 +69,7 @@ export function DataGridFilterRow<T extends object>({
             key={col.id}
             className={cn(
               'dg-filter-cell',
-              bordered && 'dg-filter-cell--bordered',
+              bordered && !isLast && 'dg-filter-cell--bordered',
             )}
             style={cellStyle}
           >

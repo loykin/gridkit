@@ -13,6 +13,8 @@ interface DataGridBodyRowProps<T extends object>
   measureRef?: (node: Element | null) => void
   showSpacer?: boolean
   fillLast?: boolean
+  visibleColumnIds?: Set<string>
+  pinning?: boolean
   rowHeight?: number
   onActionTrigger?: (row: T, el: HTMLElement) => void
   isLastRow?: boolean
@@ -30,13 +32,17 @@ export function DataGridBodyRow<T extends object>({
   measureRef,
   showSpacer = false,
   fillLast = false,
+  visibleColumnIds,
+  pinning = true,
   bordered = false,
   rowHeight,
   onActionTrigger,
   isLastRow = false,
   classNames,
 }: DataGridBodyRowProps<T>) {
-  const visibleCells = row.getVisibleCells()
+  const visibleCells = visibleColumnIds
+    ? row.getVisibleCells().filter((cell) => visibleColumnIds.has(cell.column.id))
+    : row.getVisibleCells()
   return (
     <div
       role="row"
@@ -53,6 +59,7 @@ export function DataGridBodyRow<T extends object>({
     >
       {visibleCells.map((cell, idx) => {
         const isLast = idx === visibleCells.length - 1
+        const isFillCell = fillLast && isLast && !cell.column.getIsPinned()
 
         return (
           <DataGridBodyCell
@@ -60,8 +67,9 @@ export function DataGridBodyRow<T extends object>({
             cell={cell}
             row={row}
             table={table}
-            bordered={bordered}
-            isFillCell={fillLast && isLast}
+            bordered={bordered && !isLast}
+            isFillCell={isFillCell}
+            pinning={pinning}
             onActionTrigger={onActionTrigger}
             classNames={classNames}
           />

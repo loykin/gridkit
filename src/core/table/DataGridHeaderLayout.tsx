@@ -1,4 +1,4 @@
-import type { HeaderGroup, Table } from '@tanstack/react-table'
+import type { Column, HeaderGroup, Table } from '@tanstack/react-table'
 import {
   DndContext,
   PointerSensor,
@@ -33,6 +33,7 @@ interface DataGridHeaderLayoutProps<T extends object>
   > {
   headerGroups: HeaderGroup<T>[]
   table: Table<T>
+  visibleLeafColumns?: Column<T>[]
   virtual: boolean
   tableWidthMode?: TableWidthMode
   headerGroupLayout?: HeaderGroupLayout
@@ -44,6 +45,7 @@ const HEADER_ROW_HEIGHT = 36
 export function DataGridHeaderLayout<T extends object>({
   headerGroups,
   table,
+  visibleLeafColumns: visibleLeafColumnsProp,
   enableColumnResizing,
   virtual,
   bordered,
@@ -58,7 +60,7 @@ export function DataGridHeaderLayout<T extends object>({
   customFilterComponents,
   classNames,
 }: DataGridHeaderLayoutProps<T>) {
-  const visibleLeafColumns = table.getVisibleLeafColumns()
+  const visibleLeafColumns = visibleLeafColumnsProp ?? table.getVisibleLeafColumns()
   const plan = buildHeaderLayoutPlan({
     headerGroups,
     visibleLeafColumns,

@@ -14,6 +14,7 @@ import { useActionMenu } from '@/core/hooks/useActionMenu'
 import { DataGridHeaderLayout } from '@/core/table/DataGridHeaderLayout'
 import { DataGridFilterRow } from '@/core/table/DataGridFilterRow'
 import { DataGridBody } from '@/core/table/DataGridBody'
+import { getColumnsWidth, splitVisibleColumnsByPin, type ColumnRegion } from '@/core/table/tableUtils'
 import { DetailRowContext } from '@/features/expanding/DetailRowContext'
 import { EditingCellContext } from '@/features/editing/EditingCellContext'
 import { ActionMenuPopup } from './table/ActionMenuPopup'
@@ -81,6 +82,16 @@ export function DataGridTableView<T extends object>({
 
   const headerGroups = table.getHeaderGroups()
   const visibleLeafColumns = table.getVisibleLeafColumns()
+  // Region widths are JS-owned: all header/body regions share the same values,
+  // so header-body column alignment is guaranteed without CSS involvement.
+  const columnRegions = splitVisibleColumnsByPin(visibleLeafColumns)
+  const regionWidths = {
+    left: getColumnsWidth(columnRegions.left),
+    center: getColumnsWidth(columnRegions.center),
+    right: getColumnsWidth(columnRegions.right),
+  }
+  const hasLeftRegion = regionWidths.left > 0
+  const hasRightRegion = regionWidths.right > 0
 
   // ── Master-Detail state ─────────────────────────────────────────────────
   const [expandedDetailRows, setExpandedDetailRows] = useState<Set<string>>(new Set())
@@ -115,7 +126,12 @@ export function DataGridTableView<T extends object>({
   const actionItems = actionCol && activeRow ? actionCol.columnDef.meta!.actions!(activeRow) : []
 
   // ── Scroll sync ────────────────────────────────────────────────────────────
-  const { headerScrollRef, bodyScrollRef, syncScroll } = useTableScrollSync()
+  const leftBodyScrollRef = React.useRef<HTMLDivElement | null>(null)
+  const rightBodyScrollRef = React.useRef<HTMLDivElement | null>(null)
+  const { headerScrollRef, bodyScrollRef, syncScroll } = useTableScrollSync([
+    leftBodyScrollRef,
+    rightBodyScrollRef,
+  ])
   const bodyWrapperRef = React.useRef<HTMLDivElement | null>(null)
   const [fillBodyMaxHeight, setFillBodyMaxHeight] = useState<number | undefined>()
   const hasFixedTableHeight = tableHeight != null && tableHeight !== 'auto'
@@ -229,7 +245,104 @@ export function DataGridTableView<T extends object>({
     overflow: 'auto',
   }
 
-  const innerWidth = table.getTotalSize()
+  const centerWidth = regionWidths.center
+  const gridTemplateColumns = `${regionWidths.left}px minmax(0, 1fr) ${regionWidths.right}px`
+  const renderHeaderRegion = (region: ColumnRegion) => {
+    const columns = columnRegions[region]
+    if (columns.length === 0) return null
+
+    return (
+      <DataGridHeaderLayout
+        headerGroups={headerGroups}
+        table={table}
+        visibleLeafColumns={columns}
+        enableColumnResizing={enableColumnResizing}
+        enableColumnFilters={enableColumnFilters}
+        customFilterComponents={customFilterComponents}
+        filterDisplay={filterDisplay}
+        virtual={virtual}
+        bordered={bordered}
+        tableWidthMode={region === 'center' ? tableWidthMode : 'independent'}
+        headerGroupLayout={headerGroupLayout}
+        enableColumnReordering={enableColumnReordering && region === 'center'}
+        enableColumnPinning={enableColumnPinning}
+        enableColumnMenu={enableColumnMenu}
+        renderColumnMenu={renderColumnMenu}
+        classNames={classNames}
+      />
+    )
+  }
+
+  const renderFilterRegion = (region: ColumnRegion) => {
+    const columns = columnRegions[region]
+    if (columns.length === 0) return null
+
+    return (
+      <DataGridFilterRow
+        visibleLeafColumns={columns}
+        table={table}
+        virtual={virtual}
+        bordered={bordered}
+        tableWidthMode={region === 'center' ? tableWidthMode : 'independent'}
+        pinning={false}
+        customFilterComponents={customFilterComponents}
+      />
+    )
+  }
+
+  const renderBodyRegion = ({
+    region,
+    scrollRef,
+    measureRows,
+  }: {
+    region: ColumnRegion
+    scrollRef?: React.RefObject<HTMLDivElement | null>
+    measureRows: boolean
+  }) => {
+    const columns = columnRegions[region]
+    if (columns.length === 0) return null
+
+    return (
+      <div
+        ref={scrollRef}
+        className={cn('dg-body-scroll', 'scrollbar-none', region !== 'center' && 'dg-body-scroll--pinned')}
+        style={region === 'center' ? bodyStyle : { overflow: 'hidden', minHeight: 0 }}
+        onScroll={region === 'center' ? syncScroll : undefined}
+      >
+        <ScrollTable style={{ width: regionWidths[region], minWidth: region === 'center' ? '100%' : undefined }}>
+          <DetailRowContext value={detailRowCtx}>
+            <EditingCellContext value={editingCtx}>
+              <DataGridBody
+                rows={rows}
+                table={table}
+                visibleLeafColumns={columns}
+                rowVirtualizer={virtual ? rowVirtualizer : undefined}
+                isLoading={isLoading}
+                emptyMessage={emptyMessage}
+                emptyContent={emptyContent}
+                onRowClick={onRowClick}
+                rowCursor={rowCursor}
+                bordered={bordered}
+                rowHeight={rowHeight}
+                onActionTrigger={actionCol ? handleActionTrigger : undefined}
+                tableWidthMode={region === 'center' ? tableWidthMode : 'independent'}
+                pinning={false}
+                measureRows={measureRows}
+                renderDetailRow={renderDetailRow}
+                renderGroupRow={renderGroupRow}
+                classNames={classNames}
+              />
+            </EditingCellContext>
+          </DetailRowContext>
+        </ScrollTable>
+        {region === 'center' && loadMoreRef && (
+          <div ref={loadMoreRef} className={cn('dg-table-load-more', classNames?.loadMore)}>
+            {isFetchingNextPage && icons.loading}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <>
@@ -252,36 +365,27 @@ export function DataGridTableView<T extends object>({
         }}
         className={cn('dg-container', fillContainer && !fillParent && 'dg-container--fill', classNames?.container)}
       >
-        {/* Header panel — conditionally rendered, overflow:hidden, scrollLeft mirrors body */}
+        {/* Header panel — split into pinned and horizontally scrollable regions. */}
         {showHeader && (
-          <div ref={headerScrollRef} style={{ overflow: 'hidden' }} className={cn('dg-header', classNames?.header)}>
-            <div style={{ width: innerWidth, minWidth: '100%' }}>
-              <DataGridHeaderLayout
-                headerGroups={headerGroups}
-                table={table}
-                enableColumnResizing={enableColumnResizing}
-                enableColumnFilters={enableColumnFilters}
-                customFilterComponents={customFilterComponents}
-                filterDisplay={filterDisplay}
-                virtual={virtual}
-                bordered={bordered}
-                tableWidthMode={tableWidthMode}
-                headerGroupLayout={headerGroupLayout}
-                enableColumnReordering={enableColumnReordering}
-                enableColumnPinning={enableColumnPinning}
-                enableColumnMenu={enableColumnMenu}
-                renderColumnMenu={renderColumnMenu}
-                classNames={classNames}
-              />
-              {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && (
-                <DataGridFilterRow
-                  visibleLeafColumns={visibleLeafColumns}
-                  table={table}
-                  virtual={virtual}
-                  bordered={bordered}
-                  tableWidthMode={tableWidthMode}
-                  customFilterComponents={customFilterComponents}
-                />
+          <div className={cn('dg-header', classNames?.header)}>
+            <div className="dg-region-grid" style={{ gridTemplateColumns }}>
+              {hasLeftRegion && (
+                <div className="dg-region dg-region--left" style={{ width: regionWidths.left }}>
+                  {renderHeaderRegion('left')}
+                  {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && renderFilterRegion('left')}
+                </div>
+              )}
+              <div ref={headerScrollRef} className="dg-region dg-region--center" style={{ overflow: 'hidden' }}>
+                <div style={{ width: centerWidth, minWidth: '100%' }}>
+                  {renderHeaderRegion('center')}
+                  {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && renderFilterRegion('center')}
+                </div>
+              </div>
+              {hasRightRegion && (
+                <div className="dg-region dg-region--right" style={{ width: regionWidths.right }}>
+                  {renderHeaderRegion('right')}
+                  {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && renderFilterRegion('right')}
+                </div>
               )}
             </div>
           </div>
@@ -293,40 +397,18 @@ export function DataGridTableView<T extends object>({
           className={cn('dg-body-wrapper', fillContainer && !fillParent && 'dg-body-wrapper--fill')}
           style={bodyWrapperStyle}
         >
-          <div
-            ref={bodyScrollRef}
-            style={bodyStyle}
-            onScroll={syncScroll}
-            className="dg-body-scroll scrollbar-none"
-          >
-            <ScrollTable style={{ width: innerWidth, minWidth: '100%' }}>
-              <DetailRowContext value={detailRowCtx}>
-                <EditingCellContext value={editingCtx}>
-                  <DataGridBody
-                    rows={rows}
-                    table={table}
-                    visibleLeafColumns={visibleLeafColumns}
-                    rowVirtualizer={virtual ? rowVirtualizer : undefined}
-                    isLoading={isLoading}
-                    emptyMessage={emptyMessage}
-                    emptyContent={emptyContent}
-                    onRowClick={onRowClick}
-                    rowCursor={rowCursor}
-                    bordered={bordered}
-                    rowHeight={rowHeight}
-                    onActionTrigger={actionCol ? handleActionTrigger : undefined}
-                    tableWidthMode={tableWidthMode}
-                    renderDetailRow={renderDetailRow}
-                    renderGroupRow={renderGroupRow}
-                    classNames={classNames}
-                  />
-                </EditingCellContext>
-              </DetailRowContext>
-            </ScrollTable>
-
-            {loadMoreRef && (
-              <div ref={loadMoreRef} className={cn('dg-table-load-more', classNames?.loadMore)}>
-                {isFetchingNextPage && icons.loading}
+          <div className="dg-region-grid dg-body-regions" style={{ gridTemplateColumns, flex: 1, minHeight: 0 }}>
+            {hasLeftRegion && (
+              <div className="dg-region dg-region--left" style={{ width: regionWidths.left, minHeight: 0 }}>
+                {renderBodyRegion({ region: 'left', scrollRef: leftBodyScrollRef, measureRows: false })}
+              </div>
+            )}
+            <div className="dg-region dg-region--center" style={{ minHeight: 0, minWidth: 0 }}>
+              {renderBodyRegion({ region: 'center', scrollRef: bodyScrollRef, measureRows: true })}
+            </div>
+            {hasRightRegion && (
+              <div className="dg-region dg-region--right" style={{ width: regionWidths.right, minHeight: 0 }}>
+                {renderBodyRegion({ region: 'right', scrollRef: rightBodyScrollRef, measureRows: false })}
               </div>
             )}
           </div>

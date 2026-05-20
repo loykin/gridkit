@@ -12,6 +12,7 @@ interface DataGridBodyCellProps<T extends object> {
   table: Table<T>
   bordered?: boolean
   isFillCell?: boolean
+  pinning?: boolean
   onActionTrigger?: (row: T, el: HTMLElement) => void
   classNames?: DataGridClassNames
 }
@@ -22,6 +23,7 @@ export function DataGridBodyCell<T extends object>({
   table,
   bordered = false,
   isFillCell = false,
+  pinning = true,
   onActionTrigger,
   classNames,
 }: DataGridBodyCellProps<T>) {
@@ -41,7 +43,7 @@ export function DataGridBodyCell<T extends object>({
       data-bordered={bordered ? 'true' : undefined}
       data-editing={isEditing ? 'true' : undefined}
       className={cn('dg-cell', classNames?.cell)}
-      style={{ ...colStyle(cell.column), ...(isFillCell && { flex: 1, width: 'auto' }) }}
+      style={{ ...colStyle(cell.column, { pinning }), ...(isFillCell && { flex: 1, width: 'auto' }) }}
       onDoubleClick={canEdit && !isEditing ? (e) => { e.stopPropagation(); editingCtx?.startEdit(cell.id) } : undefined}
     >
       {isEditing && meta?.editCell ? (

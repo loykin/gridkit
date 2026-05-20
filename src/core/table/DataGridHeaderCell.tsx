@@ -111,12 +111,15 @@ function getHeaderCellStyle<T extends object>({
   }
 
   if (layoutCell) {
+    const stretch = isFillLast && !layoutCell.pin
+
     return {
       position: 'absolute',
       top: layoutCell.top,
       left: layoutCell.pin === 'right' ? undefined : layoutCell.left,
-      right: layoutCell.pin === 'right' ? layoutCell.right : undefined,
-      width: layoutCell.width,
+      right: layoutCell.pin === 'right' ? layoutCell.right : (stretch ? 0 : undefined),
+      width: stretch ? undefined : layoutCell.width,
+      minWidth: stretch ? layoutCell.width : undefined,
       height: layoutCell.height,
       display: 'flex',
       alignItems: 'center',
@@ -193,6 +196,7 @@ export function DataGridHeaderCellFrame<T extends object>({
   const rowSpan = layoutCell?.rowSpan ?? 1
   const isPlaceholder = layoutCell?.isPlaceholder ?? header.isPlaceholder
   const pin = layoutCell?.pin ?? (edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : false)
+  const align = header.column.columnDef.meta?.align
 
   return (
     <div
@@ -208,7 +212,8 @@ export function DataGridHeaderCellFrame<T extends object>({
       data-header-group={isLeafHeader ? undefined : 'true'}
       data-placeholder={isPlaceholder ? 'true' : undefined}
       data-pinned={pin || undefined}
-      data-bordered={bordered ? 'true' : undefined}
+      data-align={isLeafHeader ? align : undefined}
+      data-bordered={bordered && !isLast ? 'true' : undefined}
       className={cn('dg-header-cell', classNames?.headerCell)}
       style={getHeaderCellStyle({
         header,

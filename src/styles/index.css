@@ -447,6 +447,68 @@
   background: var(--dg-header-background);
 }
 
+.dg-region-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+}
+
+.dg-region {
+  min-width: 0;
+  position: relative;
+}
+
+.dg-region--left {
+  grid-column: 1;
+  z-index: 2;
+}
+
+.dg-region--center {
+  grid-column: 2;
+  z-index: 1;
+}
+
+.dg-region--right {
+  grid-column: 3;
+  z-index: 2;
+}
+
+.dg-region--left {
+  box-shadow: 1px 0 0 0 var(--dg-border);
+}
+
+.dg-region--right {
+  box-shadow: -1px 0 0 0 var(--dg-border);
+}
+
+.dg-header .dg-region--left {
+  box-shadow: 1px 0 0 0 var(--dg-header-border);
+}
+
+.dg-header .dg-region--right {
+  box-shadow: -1px 0 0 0 var(--dg-header-border);
+}
+
+.dg-body-regions {
+  flex: 1;
+  min-height: 0;
+}
+
+.dg-body-regions .dg-region {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dg-body-scroll--pinned {
+  overflow: hidden !important;
+  scrollbar-width: none;
+}
+
+.dg-body-scroll--pinned::-webkit-scrollbar {
+  display: none;
+}
+
 .dg-header-row {
   display: flex;
   border-bottom: 1px solid var(--dg-header-border);
@@ -478,11 +540,17 @@
   color: var(--dg-header-foreground);
   font-weight: 600;
 }
+.dg-header-cell[data-align="right"] .dg-header-cell-content {
+  justify-content: flex-end;
+  text-align: right;
+}
+.dg-header-cell[data-align="center"] .dg-header-cell-content {
+  justify-content: center;
+  text-align: center;
+}
 .dg-header-cell[data-placeholder="true"] {
   pointer-events: none;
 }
-.dg-header-cell[data-pinned="left"]  { box-shadow: 1px 0 0 0 var(--dg-header-border); }
-.dg-header-cell[data-pinned="right"] { box-shadow: -1px 0 0 0 var(--dg-header-border); }
 .dg-header-cell[data-bordered="true"] { border-right: 1px solid var(--dg-header-border); }
 
 .dg-header-cell-content {
@@ -614,8 +682,6 @@
 .dg-cell[data-align="right"]  { justify-content: flex-end; }
 .dg-cell[data-align="center"] { justify-content: center; }
 .dg-cell[data-wrap="true"]    { align-items: flex-start; white-space: normal; }
-.dg-cell[data-pinned="left"]  { box-shadow: 1px 0 0 0 var(--dg-border); }
-.dg-cell[data-pinned="right"] { box-shadow: -1px 0 0 0 var(--dg-border); }
 .dg-cell[data-bordered="true"] { border-right: 1px solid var(--dg-border); }
 
 .dg-empty {
@@ -662,6 +728,8 @@
 
 .dg-scrollbar-track {
   background: var(--dg-muted);
+  /* Above .dg-region--left/right (z-index: 2) */
+  z-index: 3;
 }
 
 .dg-scrollbar-thumb {

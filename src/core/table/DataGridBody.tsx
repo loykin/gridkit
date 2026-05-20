@@ -20,6 +20,8 @@ interface DataGridBodyProps<T extends object>
   rowVirtualizer?: Virtualizer<HTMLDivElement, Element>
   onActionTrigger?: (row: T, el: HTMLElement) => void
   tableWidthMode?: TableWidthMode
+  pinning?: boolean
+  measureRows?: boolean
   classNames?: DataGridClassNames
 }
 
@@ -37,6 +39,8 @@ export function DataGridBody<T extends object>({
   rowHeight,
   onActionTrigger,
   tableWidthMode = 'spacer',
+  pinning = true,
+  measureRows = true,
   renderDetailRow,
   renderGroupRow,
   classNames,
@@ -47,6 +51,10 @@ export function DataGridBody<T extends object>({
   const virtual = !!rowVirtualizer
   const detailRowCtx = useDetailRow()
   const icons = useIcons()
+  const visibleColumnIds = React.useMemo(
+    () => new Set(visibleLeafColumns.map((column) => column.id)),
+    [visibleLeafColumns],
+  )
 
   if (isLoading) {
     return (
@@ -61,15 +69,16 @@ export function DataGridBody<T extends object>({
           >
             {visibleLeafColumns.map((col, colIdx) => {
               const isLast = colIdx === visibleLeafColumns.length - 1
+              const isFillCell = fillLast && isLast && !col.getIsPinned()
               return (
                 <div
                   role="gridcell"
                   key={col.id}
                   data-col-id={col.id}
-                  className={cn('dg-loading-cell', bordered && 'dg-loading-cell--bordered')}
+                  className={cn('dg-loading-cell', bordered && !isLast && 'dg-loading-cell--bordered')}
                   style={{
-                    ...colStyle(col),
-                    ...(fillLast && isLast && { flex: 1, width: 'auto' }),
+                    ...colStyle(col, { pinning }),
+                    ...(isFillCell && { flex: 1, width: 'auto' }),
                   }}
                 >
                   <div className="dg-loading-pulse" />
@@ -112,7 +121,7 @@ export function DataGridBody<T extends object>({
           transform: `translateY(${vRow.start}px)`,
         },
         dataIndex: vRow.index,
-        measureRef: rowVirtualizer!.measureElement,
+        measureRef: measureRows ? rowVirtualizer!.measureElement : undefined,
       }))
     : rows.map((row, index) => ({
         row,
@@ -188,6 +197,8 @@ export function DataGridBody<T extends object>({
                   rowHeight={rowHeight}
                   showSpacer={showSpacer}
                   fillLast={fillLast}
+                  visibleColumnIds={visibleColumnIds}
+                  pinning={pinning}
                   onActionTrigger={onActionTrigger}
                   isLastRow={index === rows.length - 1}
                   classNames={classNames}
@@ -208,6 +219,8 @@ export function DataGridBody<T extends object>({
                 rowHeight={rowHeight}
                 showSpacer={showSpacer}
                 fillLast={fillLast}
+                visibleColumnIds={visibleColumnIds}
+                pinning={pinning}
                 onActionTrigger={onActionTrigger}
                 isLastRow={index === rows.length - 1}
                 classNames={classNames}
@@ -238,13 +251,14 @@ export function DataGridBody<T extends object>({
         >
           {visibleLeafColumns.map((col, colIdx) => {
             const isLast = colIdx === visibleLeafColumns.length - 1
+            const isFillCell = fillLast && isLast && !col.getIsPinned()
             return (
               <div
                 key={col.id}
-                className={cn(bordered && 'dg-fill-cell--bordered')}
+                className={cn(bordered && !isLast && 'dg-fill-cell--bordered')}
                 style={{
-                  ...colStyle(col),
-                  ...(fillLast && isLast && { flex: 1, width: 'auto' }),
+                  ...colStyle(col, { pinning }),
+                  ...(isFillCell && { flex: 1, width: 'auto' }),
                 }}
               />
             )

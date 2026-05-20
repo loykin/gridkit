@@ -436,6 +436,129 @@ test('column pinning marks pinned headers as pinned', async () => {
   await closePage(page)
 })
 
+test('runtime right-pinned header aligns with body immediately after pinning', async () => {
+  const page = await newPage()
+  await page.setViewportSize({ width: 900, height: 900 })
+  await openTab(page, 'Column Pinning UI')
+
+  const statusHeader = page.locator('.dg-header [role="columnheader"][data-col-id="status"]').first()
+  await statusHeader.getByRole('button', { name: 'Pin options for status' }).click()
+  await page.getByRole('button', { name: 'Pin Right' }).click()
+  await page.waitForTimeout(100)
+
+  const positions = await page.evaluate(() => {
+    const header = globalThis.document.querySelector('.dg-header [role="columnheader"][data-col-id="status"]')
+    const cell = globalThis.document.querySelector('.dg-body-scroll [role="gridcell"][data-col-id="status"]')
+    const rect = (node) => {
+      const box = node?.getBoundingClientRect()
+      return box ? { left: box.left, right: box.right, width: box.width } : null
+    }
+
+    return {
+      header: rect(header),
+      cell: rect(cell),
+      headerPinned: header?.getAttribute('data-pinned') ?? null,
+      cellPinned: cell?.getAttribute('data-pinned') ?? null,
+    }
+  })
+
+  assert.ok(positions.header)
+  assert.ok(positions.cell)
+  assert.equal(positions.headerPinned, 'right')
+  assert.equal(positions.cellPinned, 'right')
+  assert.ok(
+    Math.abs(positions.header.right - positions.cell.right) <= 1,
+    `Runtime pinned Status header is not aligned with body: header ${positions.header.right}, cell ${positions.cell.right}`,
+  )
+
+  await closePage(page)
+})
+
+test('pinned body cells stay aligned while horizontally scrolling', async () => {
+  const page = await newPage()
+  await page.setViewportSize({ width: 900, height: 900 })
+  await page.getByRole('button', { name: 'Column Pinning', exact: true }).click()
+
+  const readPinned = async () => page.evaluate(() => {
+    const readColumn = (id) => {
+      const header = globalThis.document.querySelector(`.dg-header [role="columnheader"][data-col-id="${id}"]`)
+      const cell = globalThis.document.querySelector(`.dg-body-scroll [role="gridcell"][data-col-id="${id}"]`)
+      const rect = (node) => {
+        const box = node?.getBoundingClientRect()
+        return box ? { left: box.left, right: box.right, width: box.width } : null
+      }
+
+      return {
+        header: rect(header),
+        cell: rect(cell),
+        headerPosition: header ? getComputedStyle(header).position : null,
+        cellPosition: cell ? getComputedStyle(cell).position : null,
+        headerPinned: header?.getAttribute('data-pinned') ?? null,
+        cellPinned: cell?.getAttribute('data-pinned') ?? null,
+      }
+    }
+
+    const scroller = globalThis.document.querySelector('.dg-region.dg-region--center > .dg-body-scroll')
+
+    return {
+      scrollLeft: scroller?.scrollLeft ?? 0,
+      name: readColumn('name'),
+      status: readColumn('status'),
+    }
+  })
+
+  const before = await readPinned()
+  assert.ok(before.name.header)
+  assert.ok(before.name.cell)
+  assert.ok(before.status.header)
+  assert.ok(before.status.cell)
+  assert.equal(before.name.headerPinned, 'left')
+  assert.equal(before.name.cellPinned, 'left')
+  assert.equal(before.status.headerPinned, 'right')
+  assert.equal(before.status.cellPinned, 'right')
+  assert.equal(before.name.cellPosition, 'static')
+  assert.equal(before.status.cellPosition, 'static')
+  assert.ok(
+    Math.abs(before.name.cell.left - before.name.header.left) <= 1,
+    `Initial Name body cell is not aligned with header: cell ${before.name.cell.left}, header ${before.name.header.left}`,
+  )
+  assert.ok(
+    Math.abs(before.status.cell.right - before.status.header.right) <= 1,
+    `Initial Status body cell is not aligned with header: cell ${before.status.cell.right}, header ${before.status.header.right}`,
+  )
+
+  await page.locator('.dg-region.dg-region--center > .dg-body-scroll').evaluate((node) => {
+    node.scrollLeft = 100
+    node.dispatchEvent(new globalThis.Event('scroll', { bubbles: true }))
+  })
+  await page.waitForTimeout(100)
+
+  const after = await readPinned()
+  assert.ok(after.scrollLeft > before.scrollLeft)
+  assert.ok(after.name.header)
+  assert.ok(after.name.cell)
+  assert.ok(after.status.header)
+  assert.ok(after.status.cell)
+  assert.ok(
+    Math.abs(after.name.cell.left - before.name.cell.left) <= 1,
+    `Name body cell moved while pinned: before ${before.name.cell.left}, after ${after.name.cell.left}`,
+  )
+  assert.ok(
+    Math.abs(after.status.cell.right - before.status.cell.right) <= 1,
+    `Status body cell moved while pinned: before ${before.status.cell.right}, after ${after.status.cell.right}`,
+  )
+  assert.ok(
+    Math.abs(after.name.cell.left - after.name.header.left) <= 1,
+    `Name body cell is not aligned with header: cell ${after.name.cell.left}, header ${after.name.header.left}`,
+  )
+  assert.ok(
+    Math.abs(after.status.cell.right - after.status.header.right) <= 1,
+    `Status body cell is not aligned with header: cell ${after.status.cell.right}, header ${after.status.header.right}`,
+  )
+
+  await closePage(page)
+})
+
 test('row actions menu opens and exposes action items', async () => {
   const page = await newPage()
   page.on('dialog', (dialog) => dialog.dismiss())

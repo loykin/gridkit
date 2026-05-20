@@ -160,6 +160,7 @@ export function buildHeaderLayoutPlan<T extends object>({
   layout,
   rowHeight,
 }: BuildHeaderLayoutPlanInput<T>): HeaderLayoutPlan<T> {
+  const visibleLeafColumnIds = new Set(visibleLeafColumns.map((column) => column.id))
   const offsets = new Map<string, number>()
   let totalWidth = 0
 
@@ -172,7 +173,8 @@ export function buildHeaderLayoutPlan<T extends object>({
 
   for (const headerGroup of headerGroups) {
     for (const header of headerGroup.headers) {
-      const leafColumns = getHeaderLeafColumns(header).filter((column) => column.getIsVisible())
+      const leafColumns = getHeaderLeafColumns(header)
+        .filter((column) => column.getIsVisible() && visibleLeafColumnIds.has(column.id))
       if (leafColumns.length === 0) continue
       rawEntries.push({
         header,
