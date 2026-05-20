@@ -75,7 +75,8 @@ export function DataGridBody<T extends object>({
                   role="gridcell"
                   key={col.id}
                   data-col-id={col.id}
-                  className={cn('dg-loading-cell', bordered && !isLast && 'dg-loading-cell--bordered')}
+                  data-last-col={isLast ? 'true' : undefined}
+                  className={cn('dg-loading-cell', bordered && 'dg-loading-cell--bordered')}
                   style={{
                     ...colStyle(col, { pinning }),
                     ...(isFillCell && { flex: 1, width: 'auto' }),
@@ -255,7 +256,8 @@ export function DataGridBody<T extends object>({
             return (
               <div
                 key={col.id}
-                className={cn(bordered && !isLast && 'dg-fill-cell--bordered')}
+                data-last-col={isLast ? 'true' : undefined}
+                className={cn(bordered && 'dg-fill-cell--bordered')}
                 style={{
                   ...colStyle(col, { pinning }),
                   ...(isFillCell && { flex: 1, width: 'auto' }),

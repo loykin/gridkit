@@ -718,6 +718,15 @@
   border-right: 1px solid var(--dg-border);
 }
 
+/* Suppress border-right on the last visible column to prevent overlap with container border */
+.dg-header-cell[data-bordered="true"][data-last-col="true"],
+.dg-filter-cell--bordered[data-last-col="true"],
+.dg-cell[data-bordered="true"][data-last-col="true"],
+.dg-fill-cell--bordered[data-last-col="true"],
+.dg-loading-cell--bordered[data-last-col="true"] {
+  border-right: none;
+}
+
 .dg-loading-pulse {
   height: 16px;
   width: 100%;

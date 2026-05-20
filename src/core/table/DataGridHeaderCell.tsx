@@ -213,7 +213,8 @@ export function DataGridHeaderCellFrame<T extends object>({
       data-placeholder={isPlaceholder ? 'true' : undefined}
       data-pinned={pin || undefined}
       data-align={isLeafHeader ? align : undefined}
-      data-bordered={bordered && !isLast ? 'true' : undefined}
+      data-last-col={isLast ? 'true' : undefined}
+      data-bordered={bordered ? 'true' : undefined}
       className={cn('dg-header-cell', classNames?.headerCell)}
       style={getHeaderCellStyle({
         header,

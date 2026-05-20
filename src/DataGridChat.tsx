@@ -51,7 +51,7 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
 
   const rowSignature = useMemo(() => rows.map((row) => row.id).join('\n'), [rows])
 
-  // renderTypingIndicator 유무가 바뀌면 컨테이너 높이가 변하므로 stick dependency에 포함한다.
+  // Include renderTypingIndicator in the stick dependency since toggling it changes the container height.
   const stickDependency = useMemo(
     () => `${rowSignature}:${renderTypingIndicator != null ? 1 : 0}`,
     [rowSignature, renderTypingIndicator],

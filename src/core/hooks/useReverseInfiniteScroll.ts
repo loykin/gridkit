@@ -25,9 +25,9 @@ export function useReverseInfiniteScroll({
   const loadPreviousRef = useRef<HTMLDivElement>(null)
   const previousHeightRef = useRef<number | null>(null)
 
-  // ref로 최신 값을 유지해서 observer를 재생성하지 않고 최신 상태를 참조한다.
-  // isFetchingPreviousPage가 deps에 있으면, fetch 완료 후 observer 재생성 시점에
-  // sentinel이 viewport 안에 있으면 중복 fetch가 발생할 수 있다.
+  // Keep latest values in refs so the observer is never recreated on state changes.
+  // If isFetchingPreviousPage were in deps, the observer would be recreated after each fetch,
+  // and if the sentinel is still in the viewport at that moment a duplicate fetch would fire.
   const hasPreviousPageRef = useRef(hasPreviousPage)
   const isFetchingRef = useRef(isFetchingPreviousPage)
   const fetchPreviousPageRef = useRef(fetchPreviousPage)

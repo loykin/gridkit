@@ -54,9 +54,10 @@ export function DataGridFilterRow<T extends object>({
             <div
               role="columnheader"
               key={col.id}
+              data-last-col={isLast ? 'true' : undefined}
               className={cn(
                 'dg-filter-cell',
-                bordered && !isLast && 'dg-filter-cell--bordered',
+                bordered && 'dg-filter-cell--bordered',
               )}
               style={cellStyle}
             />
@@ -67,9 +68,10 @@ export function DataGridFilterRow<T extends object>({
           <div
             role="columnheader"
             key={col.id}
+            data-last-col={isLast ? 'true' : undefined}
             className={cn(
               'dg-filter-cell',
-              bordered && !isLast && 'dg-filter-cell--bordered',
+              bordered && 'dg-filter-cell--bordered',
             )}
             style={cellStyle}
           >

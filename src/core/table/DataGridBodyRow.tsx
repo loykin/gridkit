@@ -67,7 +67,8 @@ export function DataGridBodyRow<T extends object>({
             cell={cell}
             row={row}
             table={table}
-            bordered={bordered && !isLast}
+            bordered={bordered}
+            isLast={isLast}
             isFillCell={isFillCell}
             pinning={pinning}
             onActionTrigger={onActionTrigger}

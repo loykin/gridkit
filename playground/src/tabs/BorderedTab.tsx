@@ -66,6 +66,23 @@ export function BorderedTab() {
           tableKey="bordered-bordered"
         />
       </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-xs font-medium text-muted-foreground">
+          Bordered + fill-last — last column right border must not overlap the container border
+        </p>
+        <DataGrid
+          data={ALL_DATA}
+          columns={columns}
+          enableSorting
+          enableColumnFilters
+          bordered
+          tableWidthMode="fill-last"
+          pagination={{ pageSize: 20 }}
+          footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20]} />}
+          emptyMessage="No employees found"
+          tableKey="bordered-fill-last"
+        />
+      </div>
     </section>
   )
 }

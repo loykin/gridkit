@@ -39,9 +39,9 @@ export function useStickToBottom({
     const container = containerRef.current
     if (!container) return
 
-    // mount 시 즉시 updateAtBottom()을 호출하면 scrollTop=0 상태에서 atBottomRef=false로
-    // 설정되어, 뒤이어 실행되는 stick effect가 skip되는 레이스 컨디션이 생긴다.
-    // 초기 atBottomRef=true(useState 기본값)를 그대로 유지하고, 첫 scroll 이벤트에서 갱신한다.
+    // Calling updateAtBottom() immediately on mount would set atBottomRef=false while scrollTop=0,
+    // causing the subsequent stick effect to be skipped (race condition).
+    // Leave the initial atBottomRef=true (useState default) and update it on the first scroll event.
     container.addEventListener('scroll', updateAtBottom, { passive: true })
     return () => container.removeEventListener('scroll', updateAtBottom)
   }, [containerRef, updateAtBottom])

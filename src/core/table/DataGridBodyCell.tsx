@@ -11,6 +11,7 @@ interface DataGridBodyCellProps<T extends object> {
   row: Row<T>
   table: Table<T>
   bordered?: boolean
+  isLast?: boolean
   isFillCell?: boolean
   pinning?: boolean
   onActionTrigger?: (row: T, el: HTMLElement) => void
@@ -22,6 +23,7 @@ export function DataGridBodyCell<T extends object>({
   row,
   table,
   bordered = false,
+  isLast = false,
   isFillCell = false,
   pinning = true,
   onActionTrigger,
@@ -40,6 +42,7 @@ export function DataGridBodyCell<T extends object>({
       data-align={meta?.align ?? undefined}
       data-wrap={meta?.wrap ? 'true' : undefined}
       data-pinned={edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : undefined}
+      data-last-col={isLast ? 'true' : undefined}
       data-bordered={bordered ? 'true' : undefined}
       data-editing={isEditing ? 'true' : undefined}
       className={cn('dg-cell', classNames?.cell)}
