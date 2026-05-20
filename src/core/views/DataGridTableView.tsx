@@ -413,14 +413,19 @@ export function DataGridTableView<T extends object>({
             )}
           </div>
 
-          {/* Vertical custom scrollbar — overlays body right edge */}
+          {/* Horizontal scrollbar — margin-left/right avoids pinned regions and vertical scrollbar */}
           <CustomScrollbar
             scrollRef={bodyScrollRef}
-            direction="vertical"
+            direction="horizontal"
+            style={{
+              height: 8,
+              marginLeft: regionWidths.left,
+              marginRight: regionWidths.right + (hasVScroll ? 8 : 0),
+            }}
           />
 
-          {/* Horizontal scrollbar — flex item; margin-right avoids overlap with vertical scrollbar */}
-          <CustomScrollbar scrollRef={bodyScrollRef} direction="horizontal" style={{ height: 8, marginRight: hasVScroll ? 8 : 0 }} />
+          {/* Vertical scrollbar — absolutely positioned at far-right edge of body wrapper */}
+          <CustomScrollbar scrollRef={bodyScrollRef} direction="vertical" />
         </div>
       </div>
 

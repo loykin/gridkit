@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { PaginationTab } from './tabs/PaginationTab'
 import { InfinityTab } from './tabs/InfinityTab'
 import { FixedHeightTab } from './tabs/FixedHeightTab'
@@ -55,7 +54,7 @@ const TABS = [
   { id: 'fill-parent',       label: 'Fill Parent',       content: <FillParentTab /> },
   { id: 'large-list',        label: 'Large List',        content: <LargeListTab /> },
   { id: 'pinning',           label: 'Column Pinning',    content: <PinningTab /> },
-  { id: 'column-pinning',    label: 'Pinning UI',        content: <ColumnPinningTab /> },
+  { id: 'column-pinning',    label: 'Column Pinning UI', content: <ColumnPinningTab /> },
   { id: 'column-reorder',    label: 'Reorder',           content: <ColumnReorderTab /> },
   { id: 'column-menu',       label: 'Column Menu',       content: <ColumnMenuTab /> },
   { id: 'header-groups',     label: 'Header Groups',     content: <HeaderGroupsTab /> },
@@ -115,7 +114,7 @@ const NAV: NavGroup[] = [
     label: 'Columns',
     items: [
       { id: 'pinning',        label: 'Column Pinning' },
-      { id: 'column-pinning', label: 'Pinning UI' },
+      { id: 'column-pinning', label: 'Column Pinning UI' },
       { id: 'column-reorder', label: 'Reorder' },
       { id: 'column-menu',    label: 'Column Menu' },
       { id: 'header-groups',  label: 'Header Groups' },
@@ -191,15 +190,26 @@ const RADIUS_PRESETS = [
 
 type RadiusValue = (typeof RADIUS_PRESETS)[number]['value']
 
-// ── Inner app (needs router context) ─────────────────────────────────────────
+// ── App ────────────────────────────────────────────────────────────────────────
+
+function getTabIdFromPath(): TabId {
+  const pathId = window.location.pathname.replace(/^\//, '')
+  return TABS.some((t) => t.id === pathId) ? (pathId as TabId) : 'pagination'
+}
 
 function PlaygroundApp() {
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [active, setActiveState] = useState<TabId>(getTabIdFromPath)
 
-  const pathId = location.pathname.replace(/^\//, '')
-  const active: TabId = TABS.some((t) => t.id === pathId) ? (pathId as TabId) : 'pagination'
-  const setActive = (id: TabId) => navigate(`/${id}`)
+  const setActive = (id: TabId) => {
+    window.history.pushState({}, '', `/${id}`)
+    setActiveState(id)
+  }
+
+  useEffect(() => {
+    const onPop = () => setActiveState(getTabIdFromPath())
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   const [theme, setTheme] = useState<Theme>(THEMES[0]!)
   const [radius, setRadius] = useState<RadiusValue>('0rem')
@@ -303,15 +313,6 @@ function PlaygroundApp() {
   )
 }
 
-// ── App (router wrapper) ──────────────────────────────────────────────────────
-
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/pagination" replace />} />
-        <Route path="*" element={<PlaygroundApp />} />
-      </Routes>
-    </BrowserRouter>
-  )
+  return <PlaygroundApp />
 }

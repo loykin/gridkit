@@ -372,10 +372,13 @@ test('state persistence restores column sizing after reload', async () => {
   await openTab(page, 'State Persistence')
 
   const nameHeader = page.locator('.dg-header [role="columnheader"][data-col-id="name"]').first()
+  await nameHeader.waitFor({ state: 'visible', timeout: 1000 })
   const beforeBox = await nameHeader.boundingBox()
   assert.ok(beforeBox)
 
-  const handleBox = await nameHeader.locator('.dg-resize-handle').boundingBox()
+  const handle = nameHeader.locator('.dg-resize-handle')
+  await handle.waitFor({ state: 'visible', timeout: 1000 })
+  const handleBox = await handle.boundingBox()
   assert.ok(handleBox)
   await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2)
   await page.mouse.down()
@@ -421,7 +424,7 @@ test('column visibility dropdown hides and restores a column', async () => {
 
 test('column pinning marks pinned headers as pinned', async () => {
   const page = await newPage()
-  await openTab(page, 'Column Pinning UI')
+  await openTab(page, 'Pinning UI')
 
   const nameHeader = page.locator('.dg-header [role="columnheader"][data-col-id="name"]').first()
   await nameHeader.getByRole('button', { name: 'Pin options for name' }).click()
@@ -439,7 +442,7 @@ test('column pinning marks pinned headers as pinned', async () => {
 test('runtime right-pinned header aligns with body immediately after pinning', async () => {
   const page = await newPage()
   await page.setViewportSize({ width: 900, height: 900 })
-  await openTab(page, 'Column Pinning UI')
+  await openTab(page, 'Pinning UI')
 
   const statusHeader = page.locator('.dg-header [role="columnheader"][data-col-id="status"]').first()
   await statusHeader.getByRole('button', { name: 'Pin options for status' }).click()

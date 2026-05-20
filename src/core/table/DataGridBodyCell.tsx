@@ -31,6 +31,7 @@ export function DataGridBodyCell<T extends object>({
 }: DataGridBodyCellProps<T>) {
   const editingCtx = useEditingCell()
   const meta = cell.column.columnDef.meta
+  const pinned = cell.column.getIsPinned()
   const edge = isPinnedEdge(cell.column, table)
   const isEditing = editingCtx?.editingCellId === cell.id
   const canEdit = !!meta?.editCell
@@ -41,7 +42,8 @@ export function DataGridBodyCell<T extends object>({
       data-col-id={cell.column.id}
       data-align={meta?.align ?? undefined}
       data-wrap={meta?.wrap ? 'true' : undefined}
-      data-pinned={edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : undefined}
+      data-pinned={pinned || undefined}
+      data-pinned-edge={edge || undefined}
       data-last-col={isLast ? 'true' : undefined}
       data-bordered={bordered ? 'true' : undefined}
       data-editing={isEditing ? 'true' : undefined}

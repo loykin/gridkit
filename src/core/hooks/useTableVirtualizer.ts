@@ -1,5 +1,4 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { VIRTUAL_THRESHOLD } from '@/core/hooks/useColumnSizing'
 
 interface UseTableVirtualizerOptions<T> {
   rows: T[]
@@ -16,7 +15,7 @@ export function useTableVirtualizer<T>({
   estimateSize,
   overscan = 10,
 }: UseTableVirtualizerOptions<T>) {
-  const virtual = enabledByLayout && rows.length >= VIRTUAL_THRESHOLD
+  const virtual = enabledByLayout
 
   const virtualizer = useVirtualizer({
     count: rows.length,
