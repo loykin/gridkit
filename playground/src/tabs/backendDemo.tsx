@@ -32,7 +32,7 @@ export function generateAuditEvents(count: number): AuditEvent[] {
       user: USERS[Math.floor(Math.random() * USERS.length)]!,
       action: (roll < 0.5 ? 'READ' : roll < 0.7 ? 'UPDATE' : roll < 0.85 ? 'CREATE' : 'DELETE') as AuditEvent['action'],
       resource: RESOURCES[Math.floor(Math.random() * RESOURCES.length)]!,
-      namespace: NAMESPACES[Math.floor(Math.random() * NAMESPACES.length)]!,
+      namespace: i % 37 === 0 ? '' : NAMESPACES[Math.floor(Math.random() * NAMESPACES.length)]!,
       status: Math.random() < 0.9 ? 'success' : 'denied',
     }
   })
@@ -152,17 +152,17 @@ export const auditColumns: DataGridColumnDef<AuditEvent>[] = [
   {
     accessorKey: 'timestamp',
     header: 'Timestamp',
-    meta: { width: 160, filterType: 'datetime-range', backendField: 'timestamp' },
+    meta: { width: 160, filterType: 'datetime-range', backend: { field: 'timestamp', filterType: 'range' } },
   },
   {
     accessorKey: 'user',
     header: 'User',
-    meta: { flex: 1, filterType: 'text', backendField: 'user' },
+    meta: { flex: 1, filterType: 'text', backend: { field: 'user', filterType: 'text', sortable: true } },
   },
   {
     accessorKey: 'action',
     header: 'Action',
-    meta: { width: 100, filterType: 'multi-select', backendField: 'action' },
+    meta: { width: 100, filterType: 'multi-select', backend: { field: 'action', filterType: 'multi-select' } },
     cell: ({ row }) => (
       <span
         className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${ACTION_STYLE[row.original.action]}`}
@@ -174,17 +174,18 @@ export const auditColumns: DataGridColumnDef<AuditEvent>[] = [
   {
     accessorKey: 'resource',
     header: 'Resource',
-    meta: { flex: 1, filterType: 'select', backendField: 'resource' },
+    meta: { flex: 1, filterType: 'select', backend: { field: 'resource' } },
   },
   {
     accessorKey: 'namespace',
     header: 'Namespace',
-    meta: { flex: 1, filterType: 'select', backendField: 'namespace' },
+    meta: { flex: 1, filterType: 'multi-select', backend: { field: 'namespace', filterType: 'multi-select' } },
+    cell: ({ row }) => row.original.namespace || <span className="text-muted-foreground">(empty)</span>,
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    meta: { width: 90, filterType: 'select', backendField: 'status' },
+    meta: { width: 90, filterType: 'select', backend: { field: 'status' } },
     cell: ({ row }) => (
       <span
         className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${

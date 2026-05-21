@@ -48,6 +48,24 @@ export interface DataStoreOptions<T> {
    * applyTransaction({ persist: true }) calls backend.applyTransaction().
    */
   backend?: DataStoreBackend<T>
+  /**
+   * Optional post-processing hook for backend rows before they enter the store.
+   * Receives the previous row with the same id so callers can preserve object
+   * references for unchanged derived rows.
+   */
+  transformRow?: (row: T, previous: T | undefined) => T
+  /**
+   * Backend facet cache. Intended for "same other filters => same facets" UI
+   * lookups while a filter popover is open.
+   */
+  facetCache?: boolean | {
+    strategy?: 'by-other-filters'
+    maxEntries?: number
+  }
+  /**
+   * Gate backend hydrate/query calls until an external backend is ready.
+   */
+  ready?: boolean
 }
 
 export interface DataStore<T> {
@@ -72,6 +90,12 @@ export interface DataStore<T> {
    * No-op if no backend is configured.
    */
   query(params: QueryParams): Promise<void>
+  /**
+   * Re-run the latest backend query params. No-op before query() has been called.
+   */
+  refetch(): Promise<void>
+  setReady(ready: boolean): void
+  isReady(): boolean
   getFacets(params: FacetParams): Promise<FacetResult | undefined>
   hasBackendFacets(): boolean
   getBackendCapabilities(): DataStoreBackendCapabilities | undefined
@@ -86,7 +110,7 @@ export interface DataStore<T> {
 }
 
 export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
-  const { getRowId, maxSize, backend } = options
+  const { getRowId, maxSize, backend, transformRow } = options
 
   const map = new Map<string, T>()
   const orderedIds: string[] = []
@@ -95,6 +119,15 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
   let version = 0
   let backendTotal = 0
   let querySequence = 0
+  let ready = options.ready ?? true
+  let latestQueryParams: QueryParams | undefined
+  let pendingQuery: {
+    kind: 'hydrate' | 'query'
+    params: QueryParams
+    resolve: () => void
+  } | undefined
+  const facetCache = options.facetCache ? new Map<string, FacetResult | undefined>() : undefined
+  const facetCacheMaxEntries = typeof options.facetCache === 'object' ? options.facetCache.maxEntries ?? 100 : 100
   let queryState: DataStoreQueryState = {
     isHydrating: false,
     isQuerying: false,
@@ -107,6 +140,25 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
 
   let cachedSnapshot: T[] = []
   let cachedSnapshotVersion = -1
+
+  function stableStringify(value: unknown): string {
+    if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`
+    if (value && typeof value === 'object') {
+      return `{${Object.keys(value).sort().map((key) => {
+        const record = value as Record<string, unknown>
+        return `${JSON.stringify(key)}:${stableStringify(record[key])}`
+      }).join(',')}}`
+    }
+    return JSON.stringify(value)
+  }
+
+  function getFacetCacheKey(params: FacetParams) {
+    return stableStringify(params)
+  }
+
+  function clearFacetCache() {
+    facetCache?.clear()
+  }
 
   function notify() {
     version++
@@ -131,16 +183,18 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
   }
 
   function replaceAll(rows: T[]) {
+    const previous = new Map(map)
     map.clear()
     orderedIds.length = 0
     rows.forEach((item, i) => {
       const id = getRowId(item, i)
-      map.set(id, item)
+      map.set(id, transformRow ? transformRow(item, previous.get(id)) : item)
       orderedIds.push(id)
     })
   }
 
   function resetMemory() {
+    clearFacetCache()
     map.clear()
     orderedIds.length = 0
     backendTotal = 0
@@ -182,6 +236,7 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
     })
 
     if (affected > 0) {
+      clearFacetCache()
       backendTotal = backend ? Math.max(0, backendTotal + added - removed) : map.size
       notify()
       notifyQueryState({ total: backend ? backendTotal : map.size, error: null, lastUpdatedAt: Date.now() })
@@ -228,6 +283,20 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
         lastQueryMs: performance.now() - startedAt,
       })
     }
+  }
+
+  function enqueueQuery(kind: 'hydrate' | 'query', params: QueryParams) {
+    pendingQuery?.resolve()
+    return new Promise<void>((resolve) => {
+      pendingQuery = { kind, params, resolve }
+    })
+  }
+
+  function flushPendingQuery() {
+    if (!ready || !pendingQuery) return
+    const pending = pendingQuery
+    pendingQuery = undefined
+    void runQuery(pending.kind, pending.params).then(pending.resolve)
   }
 
   return {
@@ -287,11 +356,45 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
       }
     },
 
-    hydrate: (params = {}) => runQuery('hydrate', params),
+    hydrate: (params = {}) => {
+      if (!ready) return enqueueQuery('hydrate', params)
+      return runQuery('hydrate', params)
+    },
 
-    query: (params) => runQuery('query', params),
+    query: (params) => {
+      latestQueryParams = params
+      if (!ready) return enqueueQuery('query', params)
+      return runQuery('query', params)
+    },
 
-    getFacets: (params) => backend?.getFacets?.(params) ?? Promise.resolve(undefined),
+    refetch: () => {
+      if (!latestQueryParams) return Promise.resolve()
+      if (!ready) return enqueueQuery('query', latestQueryParams)
+      return runQuery('query', latestQueryParams)
+    },
+
+    setReady: (nextReady) => {
+      ready = nextReady
+      flushPendingQuery()
+    },
+
+    isReady: () => ready,
+
+    getFacets: async (params) => {
+      if (!backend?.getFacets) return undefined
+      if (!facetCache) return backend.getFacets(params)
+
+      const key = getFacetCacheKey(params)
+      if (facetCache.has(key)) return facetCache.get(key)
+
+      const result = await backend.getFacets(params)
+      facetCache.set(key, result)
+      if (facetCache.size > facetCacheMaxEntries) {
+        const oldestKey = facetCache.keys().next().value
+        if (oldestKey) facetCache.delete(oldestKey)
+      }
+      return result
+    },
 
     hasBackendFacets: () => !!backend?.getFacets,
 
@@ -303,6 +406,7 @@ export function createDataStore<T>(options: DataStoreOptions<T>): DataStore<T> {
 
     clear: async () => {
       await backend?.clear?.()
+      clearFacetCache()
       resetMemory()
     },
 

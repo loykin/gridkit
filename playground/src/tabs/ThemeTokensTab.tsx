@@ -193,6 +193,7 @@ function TokenSection({ title, children }: { title: string; children: React.Reac
 export function ThemeTokensTab() {
   const [theme, setTheme] = useState<ThemeValues>(presets[0].values)
   const [fontFamily, setFontFamily] = useState('inherit')
+  const [containerBorderVisible, setContainerBorderVisible] = useState(true)
 
   const setToken = (key: keyof ThemeValues, value: string) => {
     setTheme((current) => ({ ...current, [key]: value }))
@@ -226,7 +227,7 @@ export function ThemeTokensTab() {
     '--dg-accent-foreground': theme.accentForeground,
     '--dg-destructive': theme.destructive,
     '--dg-border': theme.border,
-    '--dg-container-border': theme.containerBorder,
+    '--dg-container-border': containerBorderVisible ? theme.containerBorder : 'transparent',
     '--dg-input': theme.input,
     '--dg-control-background': theme.controlBackground,
     '--dg-control-foreground': theme.controlForeground,
@@ -289,7 +290,21 @@ export function ThemeTokensTab() {
             <TokenInput label="Background" value={theme.background} onChange={(value) => setToken('background', value)} />
             <TokenInput label="Foreground" value={theme.foreground} onChange={(value) => setToken('foreground', value)} />
             <TokenInput label="Border" value={theme.border} onChange={(value) => setToken('border', value)} />
-            <TokenInput label="Container border" value={theme.containerBorder} onChange={(value) => setToken('containerBorder', value)} />
+            <div className="grid grid-cols-[1fr_44px] items-center gap-2 text-xs text-muted-foreground">
+              <span>Container border</span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={containerBorderVisible}
+                onClick={() => setContainerBorderVisible((v) => !v)}
+                className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors ${containerBorderVisible ? 'bg-primary' : 'bg-muted-foreground/40'}`}
+              >
+                <span className={`block h-4 w-4 rounded-full bg-white shadow-lg transition-transform ${containerBorderVisible ? 'translate-x-4' : 'translate-x-0'}`} />
+              </button>
+            </div>
+            {containerBorderVisible && (
+              <TokenInput label="Container border color" value={theme.containerBorder} onChange={(value) => setToken('containerBorder', value)} />
+            )}
             <TokenInput label="Input border fallback" value={theme.input} onChange={(value) => setToken('input', value)} />
             <TokenInput label="Ring" value={theme.ring} onChange={(value) => setToken('ring', value)} />
             <label className="grid gap-1 text-xs text-muted-foreground">

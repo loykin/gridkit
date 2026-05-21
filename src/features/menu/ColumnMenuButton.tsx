@@ -60,6 +60,7 @@ export function ColumnMenuButton<T extends object>({
           value={col.getFilterValue()}
           onChange={(value) => col.setFilterValue(value)}
           close={close}
+          backend={col.columnDef.meta?.backend}
         />
       )
     }

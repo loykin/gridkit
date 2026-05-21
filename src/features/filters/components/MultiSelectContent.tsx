@@ -10,10 +10,11 @@ interface Props<T extends object> {
 
 export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
   const { columnFilters, globalFilter } = table.getState()
-  const { options, isLoading } = useColumnOptions(table, col.id, true, {
+  const { options, hasEmpty, isLoading } = useColumnOptions(table, col.id, true, {
     columnFilters,
     globalFilter,
   })
+  const displayOptions = hasEmpty ? ['', ...options] : options
   const selected = (col.getFilterValue() as string[] | undefined) ?? []
 
   const toggle = (val: string) => {
@@ -29,14 +30,16 @@ export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
             Loading...
           </div>
         )}
-        {!isLoading && options.map((opt) => (
+        {!isLoading && displayOptions.map((opt) => (
           <label
-            key={opt}
+            key={opt || '__empty__'}
             className="dg-multi-option"
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 4px', cursor: 'pointer', fontSize: 12 }}
           >
             <Checkbox checked={selected.includes(opt)} onCheckedChange={() => toggle(opt)} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{opt}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {opt || '(빈값)'}
+            </span>
           </label>
         ))}
       </div>

@@ -198,6 +198,11 @@ export interface CustomFilterProps<T extends object, V = unknown> {
   value: V
   onChange: (value: V | undefined) => void
   close?: () => void
+  backend?: {
+    field?: string
+    filterType?: 'text' | 'multi-select' | 'range' | false
+    sortable?: boolean
+  }
 }
 
 export type CustomFilterComponents<T extends object> = Record<

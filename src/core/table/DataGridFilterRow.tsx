@@ -81,6 +81,7 @@ export function DataGridFilterRow<T extends object>({
                 table={table}
                 value={col.getFilterValue()}
                 onChange={(value) => col.setFilterValue(value)}
+                backend={col.columnDef.meta?.backend}
               />
             ) : ft === 'select' ? (
               <SelectFilterCell col={col} table={table} />

@@ -57,6 +57,7 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
               value={col.getFilterValue()}
               onChange={(value) => col.setFilterValue(value)}
               close={() => setOpen(false)}
+              backend={col.columnDef.meta?.backend}
             />
           ) : ft === 'select' ? (
             <SelectFilterCell col={col} table={table} onSelect={() => setOpen(false)} />

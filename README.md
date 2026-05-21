@@ -915,7 +915,9 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `pin` | `'left' \| 'right'` | Pin column at definition level |
 | `wrap` | `boolean` | Allow multi-line content; row height adjusts automatically |
 | `filterType` | `'text' \| 'select' \| 'multi-select' \| 'number' \| 'date' \| 'date-range' \| 'datetime' \| 'datetime-range' \| 'custom' \| false` | Filter input type for this column |
-| `backendField` | `string` | Field name sent to `DataStoreBackend` query/facet params. Defaults to the column id |
+| `backend.field` | `string` | Backend field name sent to `DataStoreBackend` params. Defaults to the column id |
+| `backend.filterType` | `'text' \| 'multi-select' \| 'range' \| false` | Override `filterType` for backend mode only |
+| `backend.sortable` | `boolean` | Whether this column is sortable in backend mode |
 | `editCell` | `(props: EditCellProps<T, V>) => ReactNode` | Inline cell editor triggered by double-click. Must call `props.onCommit(value)` or `props.onCancel()`. Requires `onCellValueChange` on the DataGrid |
 | `actions` | `(row: T) => Action[]` | Row action menu items |
 
@@ -1205,7 +1207,7 @@ const backend: DataStoreBackend<AuditEvent> = {
 }
 
 const columns = [
-  { accessorKey: 'user', meta: { filterType: 'text', backendField: 'user_name' } },
+  { accessorKey: 'user', meta: { filterType: 'text', backend: { field: 'user_name' } } },
   { accessorKey: 'action', meta: { filterType: 'multi-select' } },
   { accessorKey: 'status', meta: { filterType: 'select' } },
 ]
@@ -1268,9 +1270,11 @@ interface QueryParams {
 }
 ```
 
-`field` is `column.meta.backendField` when provided, otherwise the column id. GridKit does not generate SQL, know schemas, escape database paths, poll APIs, or choose fallback/cache policy.
+`field` is `column.meta.backend.field` when provided, otherwise the column id. GridKit does not generate SQL, know schemas, escape database paths, poll APIs, or choose fallback/cache policy.
 
 When query criteria change, backend mode resets pagination to page 0 before querying. With controlled `pagination.pageIndex`, GridKit calls `onPageChange(0, pageSize)` and waits for the caller to pass the updated `pageIndex`.
+
+`queryMode="backend"` automatically sets `manualSorting`, `manualFiltering`, and `manualPagination` to `true` — client-side row processing is disabled entirely. You do not need to set these manually.
 
 ### Facets
 
@@ -1292,6 +1296,25 @@ interface FacetResult {
 ```
 
 Facet requests exclude the current column's own filter but include the other active filters and global search.
+
+When `hasEmpty` is `true`, the multi-select filter UI automatically prepends an `(empty)` option so users can filter for null or blank values without custom UI.
+
+#### Facet Cache
+
+To avoid redundant `getFacets` calls when only one column's filter changes, enable the built-in cache:
+
+```ts
+const store = useDataStore<Row>({
+  getRowId: (r) => r.id,
+  backend,
+  facetCache: {
+    strategy: 'by-other-filters', // invalidate only when other column filters change
+    maxEntries: 100,              // LRU eviction limit (default: 100)
+  },
+})
+```
+
+Set `facetCache: true` for the same behaviour with default options.
 
 ### Transactions
 
@@ -1488,6 +1511,51 @@ export function LiveTable() {
 }
 ```
 
+### `refetch()`
+
+Re-runs the last query with the same parameters — useful for polling or triggering a refresh after an external data change:
+
+```ts
+// Refresh every 30 seconds
+useEffect(() => {
+  const id = setInterval(() => store.refetch(), 30_000)
+  return () => clearInterval(id)
+}, [store])
+```
+
+### Deferred first query (`ready`)
+
+When the underlying data source is not yet available on mount (e.g. a SQLite cache still loading), pass `ready: false` to delay the first query until the source is ready:
+
+```ts
+const store = useDataStore<Row>({
+  getRowId: (r) => r.id,
+  backend,
+  ready: false, // first query is queued, not fired
+})
+
+// Later, once the data source is ready:
+store.setReady(true) // flushes the pending query immediately
+```
+
+`store.isReady()` returns the current ready state synchronously.
+
+### `transformRow`
+
+Post-process each row after it enters the store. Receives the previous row with the same id so unchanged derived values can be returned by reference, avoiding unnecessary re-renders:
+
+```ts
+const store = useDataStore<Row>({
+  getRowId: (r) => r.id,
+  backend,
+  transformRow: (row, prev) => {
+    // Skip re-parsing when the row hasn't changed
+    if (prev && prev.rawJson === row.rawJson) return prev
+    return { ...row, parsed: JSON.parse(row.rawJson) }
+  },
+})
+```
+
 ---
 
 ## Icon Overrides
@@ -1543,7 +1611,7 @@ import { ChevronUp, ChevronDown, Filter } from 'lucide-react'
 />
 ```
 
-Excluded from `tableOptions` (managed internally): `data`, `columns`, `state`, `getRowId`, all `on*Change` handlers, all row model getters, `manualSorting`, `manualPagination`, `manualFiltering`.
+Excluded from `tableOptions` (managed internally): `data`, `columns`, `state`, `getRowId`, all `on*Change` handlers, all row model getters, `manualSorting`, `manualPagination`, `manualFiltering`. The manual-mode flags are set automatically when `queryMode="backend"`.
 
 ---
 

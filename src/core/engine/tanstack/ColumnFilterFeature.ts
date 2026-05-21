@@ -28,6 +28,15 @@ declare module '@tanstack/react-table' {
       | 'datetime-range'
       | 'custom'
       | false
+    /**
+     * Backend-only column metadata. Prefer this namespace for server query
+     * mapping; backendField is kept for backwards compatibility.
+     */
+    backend?: {
+      field?: string
+      filterType?: 'text' | 'multi-select' | 'range' | false
+      sortable?: boolean
+    }
     backendField?: string
   }
 }

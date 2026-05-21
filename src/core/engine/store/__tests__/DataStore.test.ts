@@ -114,4 +114,82 @@ describe('DataStore', () => {
     expect(backend.clear).toHaveBeenCalled()
     expect(backend.close).toHaveBeenCalled()
   })
+
+  it('refetches the latest backend query params', async () => {
+    const backend: DataStoreBackend<Row> = {
+      query: vi.fn()
+        .mockResolvedValueOnce({ rows: [{ id: '1', name: 'Ada' }], total: 1 })
+        .mockResolvedValueOnce({ rows: [{ id: '2', name: 'Grace' }], total: 1 }),
+    }
+    const params = { globalFilter: 'engineer' }
+    const store = createDataStore<Row>({ getRowId: (row) => row.id, backend })
+
+    await store.query(params)
+    await store.refetch()
+
+    expect(backend.query).toHaveBeenCalledTimes(2)
+    expect(backend.query).toHaveBeenLastCalledWith(params)
+    expect(store.getSnapshot()).toEqual([{ id: '2', name: 'Grace' }])
+  })
+
+  it('queues backend queries until the store is ready', async () => {
+    const backend: DataStoreBackend<Row> = {
+      query: vi.fn(async () => ({ rows: [{ id: '1', name: 'Ada' }], total: 1 })),
+    }
+    const store = createDataStore<Row>({ getRowId: (row) => row.id, backend, ready: false })
+
+    const query = store.query({ globalFilter: 'Ada' })
+
+    expect(store.isReady()).toBe(false)
+    expect(backend.query).not.toHaveBeenCalled()
+
+    store.setReady(true)
+    await query
+
+    expect(store.isReady()).toBe(true)
+    expect(backend.query).toHaveBeenCalledWith({ globalFilter: 'Ada' })
+    expect(store.getSnapshot()).toEqual([{ id: '1', name: 'Ada' }])
+  })
+
+  it('transforms backend rows with access to previous rows', async () => {
+    const previousRow = { id: '1', name: 'Ada' }
+    const backend: DataStoreBackend<Row> = {
+      query: vi.fn()
+        .mockResolvedValueOnce({ rows: [previousRow], total: 1 })
+        .mockResolvedValueOnce({ rows: [{ id: '1', name: 'Ada' }], total: 1 }),
+    }
+    const transformRow = vi.fn((row: Row, previous: Row | undefined) => (
+      previous && previous.name === row.name.toUpperCase() ? previous : { ...row, name: row.name.toUpperCase() }
+    ))
+    const store = createDataStore<Row>({ getRowId: (row) => row.id, backend, transformRow })
+
+    await store.query({})
+    expect(store.getSnapshot()).toEqual([{ id: '1', name: 'ADA' }])
+    const firstTransformedRow = store.getSnapshot()[0]
+
+    await store.query({})
+    expect(transformRow).toHaveBeenLastCalledWith({ id: '1', name: 'Ada' }, firstTransformedRow)
+    expect(store.getSnapshot()[0]).toBe(firstTransformedRow)
+  })
+
+  it('caches backend facets by params', async () => {
+    const backend: DataStoreBackend<Row> = {
+      query: vi.fn(async () => ({ rows: [], total: 0 })),
+      getFacets: vi.fn(async () => ({ values: ['Ada'], hasEmpty: true })),
+    }
+    const store = createDataStore<Row>({
+      getRowId: (row) => row.id,
+      backend,
+      facetCache: { strategy: 'by-other-filters' },
+    })
+    const params = { field: 'name', filters: [{ field: 'role', op: 'eq' as const, value: 'admin' }] }
+
+    await expect(store.getFacets(params)).resolves.toEqual({ values: ['Ada'], hasEmpty: true })
+    await expect(store.getFacets({ filters: params.filters, field: 'name' })).resolves.toEqual({
+      values: ['Ada'],
+      hasEmpty: true,
+    })
+
+    expect(backend.getFacets).toHaveBeenCalledTimes(1)
+  })
 })

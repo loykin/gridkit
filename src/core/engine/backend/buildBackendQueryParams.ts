@@ -3,12 +3,13 @@ import type { FilterExpr, QueryParams } from '../store/DataStoreBackend'
 
 function isEmptyFilterValue(value: unknown) {
   if (value == null || value === '') return true
-  if (Array.isArray(value)) return value.length === 0 || value.every((item) => item === '')
+  if (Array.isArray(value)) return value.length === 0
   return false
 }
 
 export function getBackendField<T extends object>(table: Table<T>, columnId: string) {
-  return table.getColumn(columnId)?.columnDef.meta?.backendField ?? columnId
+  const meta = table.getColumn(columnId)?.columnDef.meta
+  return meta?.backend?.field ?? meta?.backendField ?? columnId
 }
 
 export function filterValueToExpr<T extends object>(
@@ -20,11 +21,17 @@ export function filterValueToExpr<T extends object>(
 
   const column = table.getColumn(id)
   const meta = column?.columnDef.meta
-  const field = meta?.backendField ?? id
-  const filterType = meta?.filterType
+  const field = meta?.backend?.field ?? meta?.backendField ?? id
+  const filterType = meta?.backend?.filterType ?? meta?.filterType
+
+  if (filterType === false) return undefined
 
   if (Array.isArray(value)) {
-    if (filterType === 'multi-select') return { field, op: 'in', value }
+    if (filterType === 'multi-select') {
+      const nonEmptyValues = value.filter((item) => item !== '')
+      if (nonEmptyValues.length === 0 && value.includes('')) return { field, op: 'empty' }
+      return { field, op: 'in', value }
+    }
     return { field, op: 'range', value }
   }
 
