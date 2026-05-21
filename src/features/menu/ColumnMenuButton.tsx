@@ -74,7 +74,7 @@ export function ColumnMenuButton<T extends object>({
       <div style={{ position: 'relative' }}>
         <Input
           type="text"
-          placeholder="Filter…"
+          placeholder={col.columnDef.meta?.filterParams?.placeholder ?? 'Filter…'}
           value={filterValue}
           onChange={(e) => col.setFilterValue(e.target.value || undefined)}
           style={{ paddingRight: filterValue ? 28 : undefined }}

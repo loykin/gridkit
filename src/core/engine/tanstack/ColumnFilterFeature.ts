@@ -1,4 +1,5 @@
 import type { RowData, TableFeature } from '@tanstack/react-table'
+import type { FilterParams } from '@/types'
 
 // ── Declaration merging ───────────────────────────────────────────────────────
 declare module '@tanstack/react-table' {
@@ -38,6 +39,8 @@ declare module '@tanstack/react-table' {
       sortable?: boolean
     }
     backendField?: string
+    /** Per-column filter UI configuration — width, maxOptionsHeight, placeholder, etc. */
+    filterParams?: FilterParams
   }
 }
 

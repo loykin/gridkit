@@ -845,6 +845,10 @@ const columns: DataGridColumnDef<User>[] = [
       pin: 'left',          // 'left' | 'right'
       wrap: true,           // allow multi-line cell content
       filterType: 'text',   // 'text' | 'select' | 'multi-select' | 'number' | 'date' | 'date-range' | 'datetime' | 'datetime-range' | 'custom' | false
+      filterParams: {
+        width: 260,         // filter popover width for icon-mode filters
+        placeholder: 'Search name…',
+      },
     },
   },
   {
@@ -915,6 +919,9 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `pin` | `'left' \| 'right'` | Pin column at definition level |
 | `wrap` | `boolean` | Allow multi-line content; row height adjusts automatically |
 | `filterType` | `'text' \| 'select' \| 'multi-select' \| 'number' \| 'date' \| 'date-range' \| 'datetime' \| 'datetime-range' \| 'custom' \| false` | Filter input type for this column |
+| `filterParams.width` | `number` | Filter popover width in px for icon-mode filter popovers and row-mode multi-select popups. Does not resize the column menu popover |
+| `filterParams.maxOptionsHeight` | `number` | Multi-select option list max height in px. Defaults to `192` |
+| `filterParams.placeholder` | `string` | Text filter placeholder. Defaults to `Filter…` |
 | `backend.field` | `string` | Backend field name sent to `DataStoreBackend` params. Defaults to the column id |
 | `backend.filterType` | `'text' \| 'multi-select' \| 'range' \| false` | Override `filterType` for backend mode only |
 | `backend.sortable` | `boolean` | Whether this column is sortable in backend mode |
@@ -989,6 +996,35 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `searchableColumns` | `string[]` | — | Column keys included in global search |
 | `headerLeft` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the left. Function form receives the table instance |
 | `headerRight` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the right. Function form receives the table instance |
+
+Per-column filter UI can be tuned with `column.meta.filterParams`:
+
+```tsx
+const columns = [
+  {
+    accessorKey: 'country',
+    meta: {
+      filterType: 'multi-select',
+      filterParams: {
+        width: 280,
+        maxOptionsHeight: 320,
+      },
+    },
+  },
+  {
+    accessorKey: 'description',
+    meta: {
+      filterType: 'text',
+      filterParams: {
+        width: 320,
+        placeholder: 'Search description…',
+      },
+    },
+  },
+]
+```
+
+`width` applies to filter popovers opened from header filter icons and to row-mode multi-select popups. It intentionally does not resize the column menu popover, which also contains sort and pinning actions.
 
 Custom filter UI can replace any built-in filter type. The second type parameter `V` on `CustomFilterProps` types the filter value — each component can declare its own value shape with no casting required:
 

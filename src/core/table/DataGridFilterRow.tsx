@@ -95,7 +95,7 @@ export function DataGridFilterRow<T extends object>({
               <div style={{ position: 'relative', width: '100%' }}>
                 <Input
                   type="text"
-                  placeholder="Filter…"
+                  placeholder={col.columnDef.meta?.filterParams?.placeholder ?? 'Filter…'}
                   value={filterValue}
                   onChange={(e) => col.setFilterValue(e.target.value || undefined)}
                   style={{ paddingRight: 24 }}

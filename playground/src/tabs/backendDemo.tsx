@@ -152,12 +152,22 @@ export const auditColumns: DataGridColumnDef<AuditEvent>[] = [
   {
     accessorKey: 'timestamp',
     header: 'Timestamp',
-    meta: { width: 160, filterType: 'datetime-range', backend: { field: 'timestamp', filterType: 'range' } },
+    meta: {
+      width: 160,
+      filterType: 'datetime-range',
+      backend: { field: 'timestamp', filterType: 'range' },
+      filterParams: { width: 320 },
+    },
   },
   {
     accessorKey: 'user',
     header: 'User',
-    meta: { flex: 1, filterType: 'text', backend: { field: 'user', filterType: 'text', sortable: true } },
+    meta: {
+      flex: 1,
+      filterType: 'text',
+      backend: { field: 'user', filterType: 'text', sortable: true },
+      filterParams: { width: 260, placeholder: 'Search user…' },
+    },
   },
   {
     accessorKey: 'action',
@@ -179,7 +189,12 @@ export const auditColumns: DataGridColumnDef<AuditEvent>[] = [
   {
     accessorKey: 'namespace',
     header: 'Namespace',
-    meta: { flex: 1, filterType: 'multi-select', backend: { field: 'namespace', filterType: 'multi-select' } },
+    meta: {
+      flex: 1,
+      filterType: 'multi-select',
+      backend: { field: 'namespace', filterType: 'multi-select' },
+      filterParams: { width: 280, maxOptionsHeight: 240 },
+    },
     cell: ({ row }) => row.original.namespace || <span className="text-muted-foreground">(empty)</span>,
   },
   {

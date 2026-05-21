@@ -71,6 +71,7 @@ export type {
   GridKitStatePersistence,
   CustomFilterProps,
   CustomFilterComponents,
+  FilterParams,
   TableViewConfig,
   DataGridBaseProps,
   DataGridClassNames,

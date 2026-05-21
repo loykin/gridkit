@@ -35,7 +35,7 @@ export function NumberFilterPopover<T extends object>({ col }: Props<T>) {
           </Button>
         )}
       />
-      <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: 192 }}>
+      <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: col.columnDef.meta?.filterParams?.width ?? 192 }}>
         <NumberRangeFilterContent col={col} />
       </PopoverContent>
     </Popover>

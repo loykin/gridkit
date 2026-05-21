@@ -31,7 +31,9 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
   const hasFilter = col.getIsFiltered()
   const filterValue = (col.getFilterValue() ?? '') as string
   const CustomFilter = customFilterComponents?.[ft]
-  const popoverWidth = ft === 'datetime' || ft === 'datetime-range' ? 280 : 192
+  const filterParams = col.columnDef.meta?.filterParams
+  const defaultWidth = ft === 'datetime' || ft === 'datetime-range' ? 280 : 192
+  const popoverWidth = filterParams?.width ?? defaultWidth
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -71,7 +73,7 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
             <div style={{ position: 'relative' }}>
               <Input
                 type="text"
-                placeholder="Filter…"
+                placeholder={filterParams?.placeholder ?? 'Filter…'}
                 value={filterValue}
                 onChange={(e) => col.setFilterValue(e.target.value || undefined)}
                 style={{ paddingRight: 24 }}

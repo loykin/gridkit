@@ -24,7 +24,7 @@ export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <div style={{ maxHeight: 192, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div style={{ maxHeight: col.columnDef.meta?.filterParams?.maxOptionsHeight ?? 192, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
         {isLoading && (
           <div style={{ padding: '4px 4px', fontSize: 12, color: 'var(--dg-muted-foreground)' }}>
             Loading...

@@ -210,6 +210,26 @@ export type CustomFilterComponents<T extends object> = Record<
   React.ComponentType<CustomFilterProps<T, unknown>>
 >
 
+/**
+ * Per-column filter UI configuration. Set via `column.meta.filterParams`.
+ * Each filter type reads only the fields relevant to it.
+ */
+export interface FilterParams {
+  /**
+   * Filter popover width in px. Applies to icon-mode filter popovers and the
+   * row-mode multi-select popup. Does not affect the column menu popover width.
+   * Overrides per-type defaults (192px; datetime: 280px).
+   */
+  width?: number
+  /**
+   * Multi-select: max height of the scrollable options list in px.
+   * Default: 192. Increase for columns with many distinct values.
+   */
+  maxOptionsHeight?: number
+  /** Text filter: placeholder string. Default: 'Filter…' */
+  placeholder?: string
+}
+
 export type GridKitPersistedStateKey =
   | 'columnSizing'
   | 'columnOrder'
