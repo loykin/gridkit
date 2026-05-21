@@ -518,7 +518,7 @@ export interface DataGridProps<T extends object> extends DataGridBaseProps<T> {
 
 export type DataGridTableProps<T extends object> = DataGridProps<T>
 
-export interface DataGridDragProps<T extends object> extends DataGridBaseProps<T> {
+export interface DataGridDragProps<T extends object> extends Omit<DataGridBaseProps<T>, 'enableSorting' | 'enableMultiSort' | 'maxMultiSortColCount'> {
   /** Required: stable unique id per data item — used to track row identity across reorders */
   getRowId: (originalRow: T, index: number) => string
   /** Called with the full reordered data array after each drag */

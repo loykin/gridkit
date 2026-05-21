@@ -68,6 +68,7 @@ const presets = [
       accentForeground: '#0f172a',
       destructive: '#dc2626',
       border: '#e2e8f0',
+      containerBorder: '#e2e8f0',
       input: '#cbd5e1',
       controlBackground: '#ffffff',
       controlForeground: '#0f172a',
@@ -106,6 +107,7 @@ const presets = [
       accentForeground: '#0c4a6e',
       destructive: '#dc2626',
       border: '#bfdbfe',
+      containerBorder: '#bfdbfe',
       input: '#93c5fd',
       controlBackground: '#ffffff',
       controlForeground: '#0f172a',
@@ -144,6 +146,7 @@ const presets = [
       accentForeground: '#f9fafb',
       destructive: '#f87171',
       border: '#374151',
+      containerBorder: '#374151',
       input: '#4b5563',
       controlBackground: '#1f2937',
       controlForeground: '#f9fafb',
@@ -223,6 +226,7 @@ export function ThemeTokensTab() {
     '--dg-accent-foreground': theme.accentForeground,
     '--dg-destructive': theme.destructive,
     '--dg-border': theme.border,
+    '--dg-container-border': theme.containerBorder,
     '--dg-input': theme.input,
     '--dg-control-background': theme.controlBackground,
     '--dg-control-foreground': theme.controlForeground,
@@ -253,6 +257,7 @@ export function ThemeTokensTab() {
   --dg-control-border: ${theme.controlBorder};
   --dg-primary: ${theme.primary};
   --dg-border: ${theme.border};
+  --dg-container-border: ${theme.containerBorder};
   --dg-radius: ${theme.radius};
 }`
 
@@ -284,6 +289,7 @@ export function ThemeTokensTab() {
             <TokenInput label="Background" value={theme.background} onChange={(value) => setToken('background', value)} />
             <TokenInput label="Foreground" value={theme.foreground} onChange={(value) => setToken('foreground', value)} />
             <TokenInput label="Border" value={theme.border} onChange={(value) => setToken('border', value)} />
+            <TokenInput label="Container border" value={theme.containerBorder} onChange={(value) => setToken('containerBorder', value)} />
             <TokenInput label="Input border fallback" value={theme.input} onChange={(value) => setToken('input', value)} />
             <TokenInput label="Ring" value={theme.ring} onChange={(value) => setToken('ring', value)} />
             <label className="grid gap-1 text-xs text-muted-foreground">

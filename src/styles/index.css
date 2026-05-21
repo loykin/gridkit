@@ -33,6 +33,7 @@
   --dg-footer-background:     var(--dg-background);
   --dg-footer-foreground:     var(--dg-muted-foreground);
   --dg-footer-border:         var(--dg-border);
+  --dg-container-border:      var(--dg-border);
   --dg-accent:               var(--accent,              oklch(0.97 0 0));
   --dg-accent-foreground:    var(--accent-foreground,   oklch(0.205 0 0));
   --dg-destructive:          var(--destructive,         oklch(0.577 0.245 27.325));
@@ -73,6 +74,7 @@
   --dg-footer-background:     var(--dg-background);
   --dg-footer-foreground:     var(--dg-muted-foreground);
   --dg-footer-border:         var(--dg-border);
+  --dg-container-border:      var(--dg-border);
   --dg-accent:               var(--accent,              oklch(0.269 0 0));
   --dg-accent-foreground:    var(--accent-foreground,   oklch(0.985 0 0));
   --dg-destructive:          var(--destructive,         oklch(0.704 0.191 22.216));
@@ -411,7 +413,7 @@
   position: relative;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--dg-border);
+  border: 1px solid var(--dg-container-border);
   border-radius: var(--dg-radius);
   background: var(--dg-background);
 }
