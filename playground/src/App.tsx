@@ -28,6 +28,7 @@ import { ColumnMenuTab } from './tabs/ColumnMenuTab'
 import { InlineEditTab } from './tabs/InlineEditTab'
 import { ExportTab } from './tabs/ExportTab'
 import { CardTab } from './tabs/CardTab'
+import { CardVirtualizationTab } from './tabs/CardVirtualizationTab'
 import { CardListTab } from './tabs/CardListTab'
 import { ListTab } from './tabs/ListTab'
 import { ChatTab } from './tabs/ChatTab'
@@ -73,6 +74,7 @@ const TABS = [
   { id: 'theme-tokens',      label: 'Theme Tokens',      content: <ThemeTokensTab /> },
   { id: 'toolbar',           label: 'Toolbar',           content: <ToolbarTab /> },
   { id: 'card',              label: 'Card Grid',         content: <CardTab /> },
+  { id: 'card-virtual',      label: 'Card Virtualization', content: <CardVirtualizationTab /> },
   { id: 'card-list',         label: 'Card List',         content: <CardListTab /> },
   { id: 'list',              label: 'List',              content: <ListTab /> },
   { id: 'chat',              label: 'Chat',              content: <ChatTab /> },
@@ -148,6 +150,7 @@ const NAV: NavGroup[] = [
     label: 'Views',
     items: [
       { id: 'card',        label: 'Card Grid' },
+      { id: 'card-virtual', label: 'Card Virtualization' },
       { id: 'card-list',   label: 'Card List' },
       { id: 'list',        label: 'List' },
       { id: 'chat',        label: 'Chat' },

@@ -180,6 +180,23 @@ export interface DataGridChatClassNames {
   footer?: string
 }
 
+export type GridKitScrollbarMode = 'native' | 'custom' | 'hidden'
+
+export interface GridKitScrollbarConfig {
+  /** Scrollbar rendering mode. Defaults to native for non-table views. */
+  mode?: GridKitScrollbarMode
+  /** Track thickness when mode="custom". Defaults to var(--dg-scrollbar-size). */
+  size?: number | string
+  /** Extra class for the custom scrollbar track. */
+  trackClassName?: string
+  /** Extra class for the custom scrollbar thumb. */
+  thumbClassName?: string
+  /** Inline style for the custom scrollbar track. */
+  trackStyle?: React.CSSProperties
+  /** Inline style for the custom scrollbar thumb. */
+  thumbStyle?: React.CSSProperties
+}
+
 export interface GridKitRowsContext<T extends object> {
   rows: Row<T>[]
   containerRef: React.RefObject<HTMLElement | null>
@@ -587,6 +604,8 @@ export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T
   footer?: ReactNode
   /** Slot-based class injection for card elements */
   classNames?: DataGridCardClassNames
+  /** Scrollbar rendering for the card scroll container. Defaults to native. */
+  scrollbar?: GridKitScrollbarConfig
   /**
    * Enable row-group virtualization.
    * Requires containerHeight, tableHeight, or maxTableHeight.
@@ -628,6 +647,8 @@ export interface DataGridListProps<T extends object> extends GridKitCoreProps<T>
   rootMargin?: string
   /** Slot-based class injection for list elements */
   classNames?: DataGridListClassNames
+  /** Scrollbar rendering for the list scroll container. Defaults to native. */
+  scrollbar?: GridKitScrollbarConfig
 }
 
 export interface DataGridChatProps<T extends object> extends GridKitCoreProps<T> {
@@ -645,5 +666,7 @@ export interface DataGridChatProps<T extends object> extends GridKitCoreProps<T>
   onAtBottomChange?: (atBottom: boolean) => void
   /** Static footer content rendered below the chat container. */
   footer?: ReactNode
+  /** Scrollbar rendering for the chat scroll container. Defaults to native. */
+  scrollbar?: GridKitScrollbarConfig
   classNames?: DataGridChatClassNames
 }

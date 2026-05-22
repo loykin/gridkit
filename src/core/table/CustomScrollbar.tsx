@@ -6,10 +6,24 @@ interface CustomScrollbarProps {
   direction: 'vertical' | 'horizontal'
   className?: string
   style?: React.CSSProperties
+  size?: number | string
+  trackClassName?: string
+  thumbClassName?: string
+  thumbStyle?: React.CSSProperties
 }
 
-export function CustomScrollbar({ scrollRef, direction, className, style }: CustomScrollbarProps) {
+export function CustomScrollbar({
+  scrollRef,
+  direction,
+  className,
+  style,
+  size,
+  trackClassName,
+  thumbClassName,
+  thumbStyle,
+}: CustomScrollbarProps) {
   const isV = direction === 'vertical'
+  const resolvedSize = size ?? 'var(--dg-scrollbar-size)'
   const trackRef = useRef<HTMLDivElement>(null)
 
   // Refs for drag calculations (avoid stale closures)
@@ -122,17 +136,17 @@ export function CustomScrollbar({ scrollRef, direction, className, style }: Cust
     <div
       ref={trackRef}
       onClick={handleTrackClick}
-      className={cn('dg-scrollbar-track', !visible && 'hidden', className)}
-      style={isV ? { position: 'absolute', top: 0, right: 0, bottom: 0, width: 8, ...style } : { position: 'relative', flex: '0 0 auto', ...style }}
+      className={cn('dg-scrollbar-track', !visible && 'hidden', className, trackClassName)}
+      style={isV ? { position: 'absolute', top: 0, right: 0, bottom: 0, width: resolvedSize, ...style } : { position: 'relative', flex: '0 0 auto', height: resolvedSize, ...style }}
     >
       <div
-        className="dg-scrollbar-thumb"
+        className={cn('dg-scrollbar-thumb', thumbClassName)}
         onMouseDown={handleThumbMouseDown}
         onClick={(e) => e.stopPropagation()}
         style={
           isV
-            ? { top: `${thumbStart * 100}%`, bottom: `${(1 - thumbEnd) * 100}%`, left: 2, right: 2 }
-            : { left: `${thumbStart * 100}%`, right: `${(1 - thumbEnd) * 100}%`, top: 2, bottom: 2 }
+            ? { top: `${thumbStart * 100}%`, bottom: `${(1 - thumbEnd) * 100}%`, left: 2, right: 2, ...thumbStyle }
+            : { left: `${thumbStart * 100}%`, right: `${(1 - thumbEnd) * 100}%`, top: 2, bottom: 2, ...thumbStyle }
         }
       />
     </div>

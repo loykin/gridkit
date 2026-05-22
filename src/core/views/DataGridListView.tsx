@@ -27,6 +27,7 @@ interface DataGridListViewProps<T extends object>
     | 'headerRight'
     | 'footer'
     | 'classNames'
+    | 'scrollbar'
   > {
   wrapperRef: React.RefObject<HTMLDivElement | null>
   containerRef: React.RefObject<HTMLDivElement | null>
@@ -64,6 +65,7 @@ export function DataGridListView<T extends object>({
   onRowClick,
   rowCursor,
   classNames,
+  scrollbar,
   virtual,
   rowVirtualizer,
   virtualEstimateSize = 48,
@@ -182,6 +184,7 @@ export function DataGridListView<T extends object>({
       minTableHeight={minTableHeight}
       containerClassName={cn('dg-list-container', classNames?.container)}
       footerClassName={classNames?.footer}
+      scrollbar={scrollbar}
       footer={footer}
     >
       {renderContent()}

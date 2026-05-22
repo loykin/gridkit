@@ -3,7 +3,8 @@ import type { ReactNode } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { DataGridToolbar } from '@/core/controls/DataGridToolbar'
-import type { GridKitHeaderSlot } from '@/types'
+import { CustomScrollbar } from '@/core/table/CustomScrollbar'
+import type { GridKitHeaderSlot, GridKitScrollbarConfig } from '@/types'
 
 export function resolveContainerHeight(
   height: string | number | 'auto' | undefined,
@@ -36,6 +37,7 @@ interface GridKitShellProps<T extends object> {
   fillParent?: boolean
   containerClassName?: string
   footerClassName?: string
+  scrollbar?: GridKitScrollbarConfig
   footer?: ReactNode
   children: ReactNode
 }
@@ -54,6 +56,7 @@ export function GridKitShell<T extends object>({
   fillParent,
   containerClassName,
   footerClassName,
+  scrollbar,
   footer,
   children,
 }: GridKitShellProps<T>) {
@@ -111,6 +114,26 @@ export function GridKitShell<T extends object>({
       } as React.CSSProperties)
     : undefined
   const containerStyle = effectiveFillContainer ? { ...heightStyle, ...fillStyle } : heightStyle
+  const scrollbarMode = scrollbar?.mode ?? 'native'
+  const scrollContainer = (
+    <div
+      ref={(node) => {
+        tableWrapperRef.current = node
+        if (containerRef) {
+          ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+        }
+      }}
+      className={cn(
+        containerClassName,
+        'dg-scroll-container',
+        effectiveFillContainer && 'dg-table-wrapper--fill',
+      )}
+      data-scrollbar={scrollbarMode === 'native' ? undefined : scrollbarMode}
+      style={containerStyle}
+    >
+      {children}
+    </div>
+  )
 
   return (
     <div
@@ -125,18 +148,20 @@ export function GridKitShell<T extends object>({
       )}
 
       <div className="dg-table-stack">
-        <div
-          ref={(node) => {
-            tableWrapperRef.current = node
-            if (containerRef) {
-              ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
-            }
-          }}
-          className={cn(containerClassName, effectiveFillContainer && 'dg-table-wrapper--fill')}
-          style={containerStyle}
-        >
-          {children}
-        </div>
+        {scrollbarMode === 'custom' ? (
+          <div className={cn('dg-scroll-frame', effectiveFillContainer && 'dg-scroll-frame--fill')}>
+            {scrollContainer}
+            <CustomScrollbar
+              scrollRef={tableWrapperRef}
+              direction="vertical"
+              size={scrollbar?.size}
+              trackClassName={scrollbar?.trackClassName}
+              thumbClassName={scrollbar?.thumbClassName}
+              style={scrollbar?.trackStyle}
+              thumbStyle={scrollbar?.thumbStyle}
+            />
+          </div>
+        ) : scrollContainer}
 
         {footer && (
           <div ref={footerFrameRef} className={cn('dg-footer', footerClassName)}>

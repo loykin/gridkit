@@ -27,6 +27,7 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
     headerRight,
     footer,
     classNames,
+    scrollbar,
   } = props
 
   const { wrapperRef, containerRef, table, rows, queryState } = useDataGridBase({
@@ -86,6 +87,7 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
         virtualEstimateSize={estimateRowHeight}
         virtualInitialHeight={virtualInitialHeight}
         virtualOverscan={overscan}
+        scrollbar={scrollbar}
         onRowClick={props.onRowClick}
         rowCursor={props.rowCursor}
         emptyMessage={props.emptyMessage}

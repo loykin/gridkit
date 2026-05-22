@@ -53,7 +53,6 @@ export function buildTableLayoutModel<T extends object>({
     hasRightRegion: rightWidth > 0,
     centerWidth,
     horizontalScrollbarStyle: {
-      height: 8,
       marginLeft: leftWidth,
       marginRight: rightWidth + (hasVScroll ? 8 : 0),
     },

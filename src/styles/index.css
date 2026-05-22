@@ -48,6 +48,11 @@
   --dg-popover-section-foreground: var(--dg-muted-foreground);
   --dg-ring:                 var(--ring,                oklch(0.708 0 0));
   --dg-radius:               var(--radius,              0rem);
+  --dg-scrollbar-size:        8px;
+  --dg-scrollbar-track:       var(--dg-muted);
+  --dg-scrollbar-thumb:       var(--dg-muted-foreground);
+  --dg-scrollbar-thumb-opacity: 0.3;
+  --dg-scrollbar-thumb-hover-opacity: 0.6;
 }
 
 .dark {
@@ -354,7 +359,9 @@
 /* Remove bottom radius from bordered containers when footer is adjacent */
 .dg-table-stack .dg-table-wrapper:has(+ .dg-footer) .dg-container,
 .dg-table-stack .dg-list-container:has(+ .dg-footer),
-.dg-table-stack .dg-chat-container:has(+ .dg-footer) {
+.dg-table-stack .dg-chat-container:has(+ .dg-footer),
+.dg-table-stack .dg-scroll-frame:has(+ .dg-footer) .dg-list-container,
+.dg-table-stack .dg-scroll-frame:has(+ .dg-footer) .dg-chat-container {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
@@ -370,6 +377,22 @@
 .dg-table-wrapper--fill {
   min-height: 0;
   overflow: hidden;
+}
+.dg-scroll-frame {
+  position: relative;
+  min-width: 0;
+}
+.dg-scroll-frame--fill {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.dg-scroll-container[data-scrollbar="custom"],
+.dg-scroll-container[data-scrollbar="hidden"] {
+  scrollbar-width: none;
+}
+.dg-scroll-container[data-scrollbar="custom"]::-webkit-scrollbar,
+.dg-scroll-container[data-scrollbar="hidden"]::-webkit-scrollbar {
+  display: none;
 }
 .dg-shell[data-fill-parent="true"] .dg-table-wrapper {
   display: flex;
@@ -746,7 +769,7 @@
 }
 
 .dg-scrollbar-track {
-  background: var(--dg-muted);
+  background: var(--dg-scrollbar-track);
   /* Above .dg-region--left/right (z-index: 2) */
   z-index: 3;
 }
@@ -755,11 +778,11 @@
   position: absolute;
   border-radius: 9999px;
   cursor: pointer;
-  background: var(--dg-muted-foreground);
-  opacity: 0.3;
+  background: var(--dg-scrollbar-thumb);
+  opacity: var(--dg-scrollbar-thumb-opacity);
   transition: opacity 150ms;
 }
-.dg-scrollbar-thumb:hover { opacity: 0.6; }
+.dg-scrollbar-thumb:hover { opacity: var(--dg-scrollbar-thumb-hover-opacity); }
 
 .dg-action-menu {
   min-width: 128px;

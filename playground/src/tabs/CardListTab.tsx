@@ -52,7 +52,9 @@ export function CardListTab() {
         data={data}
         columns={columns}
         enableSorting
+        containerHeight={560}
         cardColumns={1}
+        scrollbar={{ mode: 'custom' }}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetching}
         fetchNextPage={fetchNextPage}

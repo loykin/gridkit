@@ -23,6 +23,7 @@ interface DataGridChatViewProps<T extends object>
     | 'tableHeight'
     | 'maxTableHeight'
     | 'minTableHeight'
+    | 'scrollbar'
     | 'classNames'
   > {
   wrapperRef: React.RefObject<HTMLDivElement | null>
@@ -45,6 +46,7 @@ export function DataGridChatView<T extends object>({
   tableHeight,
   maxTableHeight,
   minTableHeight,
+  scrollbar,
   isFetchingPreviousPage,
   isLoading,
   emptyMessage = 'No messages',
@@ -124,6 +126,7 @@ export function DataGridChatView<T extends object>({
       minTableHeight={minTableHeight}
       containerClassName={cn('dg-chat-container', classNames?.container)}
       footerClassName={classNames?.footer}
+      scrollbar={scrollbar}
       footer={footer}
     >
       {loadPreviousRef && (

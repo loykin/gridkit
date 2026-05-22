@@ -27,6 +27,7 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
     headerLeft,
     headerRight,
     footer,
+    scrollbar,
     classNames,
   } = props
 
@@ -98,6 +99,7 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
         renderTypingIndicator={renderTypingIndicator}
         containerHeight={containerHeight}
         tableHeight={tableHeight}
+        scrollbar={scrollbar}
         emptyMessage={props.emptyMessage}
         emptyContent={props.emptyContent}
         classNames={classNames}

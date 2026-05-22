@@ -23,6 +23,7 @@ interface DataGridCardViewProps<T extends object>
     | 'headerRight'
     | 'footer'
     | 'classNames'
+    | 'scrollbar'
     | 'containerHeight'
     | 'tableHeight'
     | 'maxTableHeight'
@@ -66,6 +67,7 @@ export function DataGridCardView<T extends object>({
   onRowClick,
   rowCursor,
   classNames,
+  scrollbar,
   containerHeight,
   tableHeight,
   maxTableHeight,
@@ -220,6 +222,7 @@ export function DataGridCardView<T extends object>({
       minTableHeight={minTableHeight}
       containerClassName={cn('dg-card-container', classNames?.container)}
       footerClassName={classNames?.footer}
+      scrollbar={scrollbar}
       footer={footer}
     >
       {renderCards()}

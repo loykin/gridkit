@@ -27,6 +27,7 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
     enableVirtualization,
     estimateCardHeight,
     overscan,
+    scrollbar,
   } = props
 
   const { wrapperRef, containerRef, table, rows, queryState } = useDataGridBase({
@@ -73,6 +74,7 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
         enableVirtualization={enableVirtualization}
         estimateCardHeight={estimateCardHeight}
         overscan={overscan}
+        scrollbar={scrollbar}
         onRowClick={props.onRowClick}
         rowCursor={props.rowCursor}
         emptyMessage={props.emptyMessage}

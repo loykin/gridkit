@@ -194,6 +194,11 @@ export function ThemeTokensTab() {
   const [theme, setTheme] = useState<ThemeValues>(presets[0].values)
   const [fontFamily, setFontFamily] = useState('inherit')
   const [containerBorderVisible, setContainerBorderVisible] = useState(true)
+  const [scrollbarTrack, setScrollbarTrack] = useState('#f8fafc')
+  const [scrollbarThumb, setScrollbarThumb] = useState('#64748b')
+  const [scrollbarThumbOpacity, setScrollbarThumbOpacity] = useState(0.3)
+  const [scrollbarThumbHoverOpacity, setScrollbarThumbHoverOpacity] = useState(0.6)
+  const [scrollbarSize, setScrollbarSize] = useState(8)
 
   const setToken = (key: keyof ThemeValues, value: string) => {
     setTheme((current) => ({ ...current, [key]: value }))
@@ -234,6 +239,11 @@ export function ThemeTokensTab() {
     '--dg-control-border': theme.controlBorder,
     '--dg-ring': theme.ring,
     '--dg-radius': theme.radius,
+    '--dg-scrollbar-size': `${scrollbarSize}px`,
+    '--dg-scrollbar-track': scrollbarTrack,
+    '--dg-scrollbar-thumb': scrollbarThumb,
+    '--dg-scrollbar-thumb-opacity': String(scrollbarThumbOpacity),
+    '--dg-scrollbar-thumb-hover-opacity': String(scrollbarThumbHoverOpacity),
     fontFamily,
   } as React.CSSProperties
 
@@ -259,6 +269,11 @@ export function ThemeTokensTab() {
   --dg-primary: ${theme.primary};
   --dg-border: ${theme.border};
   --dg-container-border: ${theme.containerBorder};
+  --dg-scrollbar-size: ${scrollbarSize}px;
+  --dg-scrollbar-track: ${scrollbarTrack};
+  --dg-scrollbar-thumb: ${scrollbarThumb};
+  --dg-scrollbar-thumb-opacity: ${scrollbarThumbOpacity};
+  --dg-scrollbar-thumb-hover-opacity: ${scrollbarThumbHoverOpacity};
   --dg-radius: ${theme.radius};
 }`
 
@@ -271,8 +286,8 @@ export function ThemeTokensTab() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[360px_minmax(0,1fr)] gap-5">
-        <section className="space-y-3 rounded border border-border p-4">
+      <div className="grid grid-cols-1 xl:grid-cols-[360px_minmax(0,1fr)] gap-5 xl:items-start">
+        <section className="space-y-3 rounded border border-border p-4 xl:max-h-[calc(100vh-160px)] xl:overflow-y-auto">
           <div className="flex flex-wrap gap-2">
             {presets.map((preset) => (
               <button
@@ -353,6 +368,44 @@ export function ThemeTokensTab() {
             <TokenInput label="Destructive" value={theme.destructive} onChange={(value) => setToken('destructive', value)} />
           </TokenSection>
 
+          <TokenSection title="Scrollbar">
+            <TokenInput label="Track" value={scrollbarTrack} onChange={setScrollbarTrack} />
+            <TokenInput label="Thumb" value={scrollbarThumb} onChange={setScrollbarThumb} />
+            <label className="grid gap-1 text-xs text-muted-foreground">
+              Size: {scrollbarSize}px
+              <input
+                type="range"
+                min={4}
+                max={16}
+                step={1}
+                value={scrollbarSize}
+                onChange={(event) => setScrollbarSize(Number(event.target.value))}
+              />
+            </label>
+            <label className="grid gap-1 text-xs text-muted-foreground">
+              Thumb opacity: {scrollbarThumbOpacity.toFixed(2)}
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={scrollbarThumbOpacity}
+                onChange={(event) => setScrollbarThumbOpacity(Number(event.target.value))}
+              />
+            </label>
+            <label className="grid gap-1 text-xs text-muted-foreground">
+              Thumb hover opacity: {scrollbarThumbHoverOpacity.toFixed(2)}
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={scrollbarThumbHoverOpacity}
+                onChange={(event) => setScrollbarThumbHoverOpacity(Number(event.target.value))}
+              />
+            </label>
+          </TokenSection>
+
           <TokenSection title="Popover">
             <TokenInput label="Popover" value={theme.popover} onChange={(value) => setToken('popover', value)} />
             <TokenInput label="Popover foreground" value={theme.popoverForeground} onChange={(value) => setToken('popoverForeground', value)} />
@@ -386,6 +439,7 @@ export function ThemeTokensTab() {
             headerGroupLayout="span"
             enableColumnFilters
             bordered
+            tableHeight={320}
             pagination={{ pageSize: 10 }}
             footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20, 50]} />}
             tableKey="theme-tokens-custom"
