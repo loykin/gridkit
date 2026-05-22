@@ -23,7 +23,7 @@ describe('DataGrid date filters', () => {
       { accessorKey: 'day', header: 'Day', meta: { filterType: 'date' } },
     ]
 
-    const { container } = render(
+    render(
       <DataGrid
         data={data}
         columns={columns}
@@ -32,7 +32,8 @@ describe('DataGrid date filters', () => {
       />,
     )
 
-    const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement
+    fireEvent.click(screen.getByRole('button', { name: 'Filter day by date' }))
+    const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement
     fireEvent.change(dateInput, { target: { value: '2024-02-15' } })
 
     expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
@@ -52,7 +53,7 @@ describe('DataGrid date filters', () => {
       },
     ]
 
-    const { container } = render(
+    render(
       <DataGrid
         data={data}
         columns={columns}
@@ -61,7 +62,8 @@ describe('DataGrid date filters', () => {
       />,
     )
 
-    const dateInputs = Array.from(container.querySelectorAll('input[type="date"]')) as HTMLInputElement[]
+    fireEvent.click(screen.getByRole('button', { name: 'Filter day by date' }))
+    const dateInputs = Array.from(document.querySelectorAll('input[type="date"]')) as HTMLInputElement[]
     fireEvent.change(dateInputs[0]!, { target: { value: '2024-02-01' } })
     fireEvent.change(dateInputs[1]!, { target: { value: '2024-02-28' } })
 
@@ -76,7 +78,7 @@ describe('DataGrid date filters', () => {
       { accessorKey: 'timestamp', header: 'Timestamp', meta: { filterType: 'datetime' } },
     ]
 
-    const { container } = render(
+    render(
       <DataGrid
         data={data}
         columns={columns}
@@ -85,7 +87,8 @@ describe('DataGrid date filters', () => {
       />,
     )
 
-    const dateTimeInput = container.querySelector('input[type="datetime-local"]') as HTMLInputElement
+    fireEvent.click(screen.getByRole('button', { name: 'Filter timestamp by date' }))
+    const dateTimeInput = document.querySelector('input[type="datetime-local"]') as HTMLInputElement
     fireEvent.change(dateTimeInput, { target: { value: '2024-01-01T12:30:00' } })
 
     expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
@@ -99,7 +102,7 @@ describe('DataGrid date filters', () => {
       { accessorKey: 'timestamp', header: 'Timestamp', meta: { filterType: 'datetime-range' } },
     ]
 
-    const { container } = render(
+    render(
       <DataGrid
         data={data}
         columns={columns}
@@ -108,7 +111,8 @@ describe('DataGrid date filters', () => {
       />,
     )
 
-    const dateTimeInputs = Array.from(container.querySelectorAll('input[type="datetime-local"]')) as HTMLInputElement[]
+    fireEvent.click(screen.getByRole('button', { name: 'Filter timestamp by date' }))
+    const dateTimeInputs = Array.from(document.querySelectorAll('input[type="datetime-local"]')) as HTMLInputElement[]
     fireEvent.change(dateTimeInputs[0]!, { target: { value: '2024-01-01T10:00:00' } })
     fireEvent.change(dateTimeInputs[1]!, { target: { value: '2024-01-01T13:00:00' } })
 

@@ -9,7 +9,7 @@ import { colStyle } from './tableUtils'
 import { SelectFilterCell } from '@/features/filters/components/SelectFilterCell'
 import { MultiSelectFilterCell } from '@/features/filters/components/MultiSelectFilterCell'
 import { NumberFilterPopover } from '@/features/filters/components/NumberFilterPopover'
-import { DateFilterContent } from '@/features/filters/components/DateFilterContent'
+import { DateFilterPopover } from '@/features/filters/components/DateFilterPopover'
 
 interface DataGridFilterRowProps<T extends object> extends Pick<TableViewConfig<T>, 'bordered' | 'customFilterComponents'> {
   visibleLeafColumns: Column<T>[]
@@ -90,7 +90,7 @@ export function DataGridFilterRow<T extends object>({
             ) : ft === 'number' ? (
               <NumberFilterPopover col={col} />
             ) : ft === 'date' || ft === 'date-range' || ft === 'datetime' || ft === 'datetime-range' ? (
-              <DateFilterContent col={col} mode={ft} />
+              <DateFilterPopover col={col} mode={ft} />
             ) : (
               <div style={{ position: 'relative', width: '100%' }}>
                 <Input

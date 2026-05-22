@@ -590,6 +590,10 @@
   touch-action: none;
   z-index: 1;
 }
+.dg-resize-handle[data-side="left"] {
+  left: 0;
+  right: auto;
+}
 
 .dg-resize-bar {
   position: absolute;
@@ -601,6 +605,10 @@
   opacity: 0;
   background: var(--dg-header-border);
   transition: opacity 150ms, background 150ms;
+}
+.dg-resize-handle[data-side="left"] .dg-resize-bar {
+  left: 6px;
+  right: auto;
 }
 .dg-header-cell:hover .dg-resize-bar,
 .dg-resize-bar[data-resizing="true"] {

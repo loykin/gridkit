@@ -6,18 +6,18 @@ import {
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { ScrollTable } from '@/core/table/ScrollTable'
-import { CustomScrollbar } from '@/core/table/CustomScrollbar'
 import type { TableViewConfig } from '@/types'
 import { useTableScrollSync } from '@/core/hooks/useTableScrollSync'
 import { useTableVirtualizer } from '@/core/hooks/useTableVirtualizer'
 import { useActionMenu } from '@/core/hooks/useActionMenu'
-import { DataGridHeaderLayout } from '@/core/table/DataGridHeaderLayout'
-import { DataGridFilterRow } from '@/core/table/DataGridFilterRow'
 import { DataGridBody } from '@/core/table/DataGridBody'
-import { getColumnsWidth, splitVisibleColumnsByPin, type ColumnRegion } from '@/core/table/tableUtils'
+import { buildTableLayoutModel } from '@/core/table/layout/buildTableLayoutModel'
+import type { ColumnRegionModel } from '@/core/table/layout/tableLayoutTypes'
 import { DetailRowContext } from '@/features/expanding/DetailRowContext'
 import { EditingCellContext } from '@/features/editing/EditingCellContext'
 import { ActionMenuPopup } from './table/ActionMenuPopup'
+import { TableHeaderRegions } from './table/TableHeaderRegions'
+import { TableScrollbars } from './table/TableScrollbars'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Props
@@ -82,16 +82,6 @@ export function DataGridTableView<T extends object>({
 
   const headerGroups = table.getHeaderGroups()
   const visibleLeafColumns = table.getVisibleLeafColumns()
-  // Region widths are JS-owned: all header/body regions share the same values,
-  // so header-body column alignment is guaranteed without CSS involvement.
-  const columnRegions = splitVisibleColumnsByPin(visibleLeafColumns)
-  const regionWidths = {
-    left: getColumnsWidth(columnRegions.left),
-    center: getColumnsWidth(columnRegions.center),
-    right: getColumnsWidth(columnRegions.right),
-  }
-  const hasLeftRegion = regionWidths.left > 0
-  const hasRightRegion = regionWidths.right > 0
 
   // ── Master-Detail state ─────────────────────────────────────────────────
   const [expandedDetailRows, setExpandedDetailRows] = useState<Set<string>>(new Set())
@@ -171,6 +161,13 @@ export function DataGridTableView<T extends object>({
     return () => ro.disconnect()
   }, [bodyScrollRef, checkVScroll])
 
+  const layout = buildTableLayoutModel({
+    visibleLeafColumns,
+    tableWidthMode,
+    enableColumnReordering,
+    hasVScroll,
+  })
+
   useLayoutEffect(() => {
     if (!fillContainer || fillParent || hasFixedTableHeight) {
       setFillBodyMaxHeight(undefined)
@@ -245,77 +242,42 @@ export function DataGridTableView<T extends object>({
     overflow: 'auto',
   }
 
-  const centerWidth = regionWidths.center
-  const gridTemplateColumns = `${regionWidths.left}px minmax(0, 1fr) ${regionWidths.right}px`
-  const renderHeaderRegion = (region: ColumnRegion) => {
-    const columns = columnRegions[region]
-    if (columns.length === 0) return null
+  const handleHeaderWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
+    const el = bodyScrollRef.current
+    if (!el) return
 
-    return (
-      <DataGridHeaderLayout
-        headerGroups={headerGroups}
-        table={table}
-        visibleLeafColumns={columns}
-        enableColumnResizing={enableColumnResizing}
-        enableColumnFilters={enableColumnFilters}
-        customFilterComponents={customFilterComponents}
-        filterDisplay={filterDisplay}
-        virtual={virtual}
-        bordered={bordered}
-        tableWidthMode={region === 'center' ? tableWidthMode : 'independent'}
-        headerGroupLayout={headerGroupLayout}
-        enableColumnReordering={enableColumnReordering && region === 'center'}
-        enableColumnPinning={enableColumnPinning}
-        enableColumnMenu={enableColumnMenu}
-        renderColumnMenu={renderColumnMenu}
-        classNames={classNames}
-      />
-    )
-  }
+    const horizontalDelta = Math.abs(event.deltaX) >= Math.abs(event.deltaY) || event.shiftKey
+      ? event.deltaX || event.deltaY
+      : 0
+    if (horizontalDelta === 0) return
 
-  const renderFilterRegion = (region: ColumnRegion) => {
-    const columns = columnRegions[region]
-    if (columns.length === 0) return null
-
-    return (
-      <DataGridFilterRow
-        visibleLeafColumns={columns}
-        table={table}
-        virtual={virtual}
-        bordered={bordered}
-        tableWidthMode={region === 'center' ? tableWidthMode : 'independent'}
-        pinning={false}
-        customFilterComponents={customFilterComponents}
-      />
-    )
-  }
+    event.preventDefault()
+    el.scrollLeft += horizontalDelta
+  }, [bodyScrollRef])
 
   const renderBodyRegion = ({
     region,
     scrollRef,
-    measureRows,
   }: {
-    region: ColumnRegion
+    region: ColumnRegionModel<T>
     scrollRef?: React.RefObject<HTMLDivElement | null>
-    measureRows: boolean
   }) => {
-    const columns = columnRegions[region]
-    if (columns.length === 0) return null
+    if (region.columns.length === 0) return null
 
     return (
       <div
         ref={scrollRef}
-        className={cn('dg-body-scroll', 'scrollbar-none', region !== 'center' && 'dg-body-scroll--pinned')}
-        style={region === 'center' ? bodyStyle : { overflow: 'hidden', minHeight: 0 }}
-        onScroll={region === 'center' ? syncScroll : undefined}
+        className={cn('dg-body-scroll', 'scrollbar-none', region.id !== 'center' && 'dg-body-scroll--pinned')}
+        style={region.id === 'center' ? bodyStyle : { overflow: 'hidden', minHeight: 0 }}
+        onScroll={region.id === 'center' ? syncScroll : undefined}
       >
-        <ScrollTable style={{ width: regionWidths[region], minWidth: region === 'center' ? '100%' : undefined }}>
+        <ScrollTable style={{ width: region.width, minWidth: region.id === 'center' ? '100%' : undefined }}>
           <DetailRowContext value={detailRowCtx}>
             <EditingCellContext value={editingCtx}>
               <DataGridBody
                 rows={rows}
                 table={table}
-                visibleLeafColumns={columns}
+                visibleLeafColumns={region.columns}
                 rowVirtualizer={virtual ? rowVirtualizer : undefined}
                 isLoading={isLoading}
                 emptyMessage={emptyMessage}
@@ -325,9 +287,9 @@ export function DataGridTableView<T extends object>({
                 bordered={bordered}
                 rowHeight={rowHeight}
                 onActionTrigger={actionCol ? handleActionTrigger : undefined}
-                tableWidthMode={region === 'center' ? tableWidthMode : 'independent'}
+                tableWidthMode={region.tableWidthMode}
                 pinning={false}
-                measureRows={measureRows}
+                measureRows={region.measureRows}
                 renderDetailRow={renderDetailRow}
                 renderGroupRow={renderGroupRow}
                 classNames={classNames}
@@ -335,7 +297,7 @@ export function DataGridTableView<T extends object>({
             </EditingCellContext>
           </DetailRowContext>
         </ScrollTable>
-        {region === 'center' && loadMoreRef && (
+        {region.id === 'center' && loadMoreRef && (
           <div ref={loadMoreRef} className={cn('dg-table-load-more', classNames?.loadMore)}>
             {isFetchingNextPage && icons.loading}
           </div>
@@ -366,30 +328,25 @@ export function DataGridTableView<T extends object>({
         className={cn('dg-container', fillContainer && !fillParent && 'dg-container--fill', classNames?.container)}
       >
         {/* Header panel — split into pinned and horizontally scrollable regions. */}
-        {showHeader && (
-          <div className={cn('dg-header', classNames?.header)}>
-            <div className="dg-region-grid" style={{ gridTemplateColumns }}>
-              {hasLeftRegion && (
-                <div className="dg-region dg-region--left" style={{ width: regionWidths.left }}>
-                  {renderHeaderRegion('left')}
-                  {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && renderFilterRegion('left')}
-                </div>
-              )}
-              <div ref={headerScrollRef} className="dg-region dg-region--center" style={{ overflow: 'hidden' }}>
-                <div style={{ width: centerWidth, minWidth: '100%' }}>
-                  {renderHeaderRegion('center')}
-                  {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && renderFilterRegion('center')}
-                </div>
-              </div>
-              {hasRightRegion && (
-                <div className="dg-region dg-region--right" style={{ width: regionWidths.right }}>
-                  {renderHeaderRegion('right')}
-                  {enableColumnFilters && filterDisplay !== 'icon' && !enableColumnMenu && renderFilterRegion('right')}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        <TableHeaderRegions
+          layout={layout}
+          headerGroups={headerGroups}
+          table={table}
+          showHeader={showHeader}
+          enableColumnResizing={enableColumnResizing}
+          enableColumnFilters={enableColumnFilters}
+          customFilterComponents={customFilterComponents}
+          filterDisplay={filterDisplay}
+          bordered={bordered}
+          virtual={virtual}
+          headerGroupLayout={headerGroupLayout}
+          enableColumnPinning={enableColumnPinning}
+          enableColumnMenu={enableColumnMenu}
+          renderColumnMenu={renderColumnMenu}
+          classNames={classNames}
+          headerScrollRef={headerScrollRef}
+          onCenterWheel={handleHeaderWheel}
+        />
 
         {/* Body scroll container + scrollbars */}
         <div
@@ -397,35 +354,26 @@ export function DataGridTableView<T extends object>({
           className={cn('dg-body-wrapper', fillContainer && !fillParent && 'dg-body-wrapper--fill')}
           style={bodyWrapperStyle}
         >
-          <div className="dg-region-grid dg-body-regions" style={{ gridTemplateColumns, flex: 1, minHeight: 0 }}>
-            {hasLeftRegion && (
-              <div className="dg-region dg-region--left" style={{ width: regionWidths.left, minHeight: 0 }}>
-                {renderBodyRegion({ region: 'left', scrollRef: leftBodyScrollRef, measureRows: false })}
+          <div className="dg-region-grid dg-body-regions" style={{ gridTemplateColumns: layout.gridTemplateColumns, flex: 1, minHeight: 0 }}>
+            {layout.hasLeftRegion && (
+              <div className="dg-region dg-region--left" style={{ width: layout.regions.left.width, minHeight: 0 }}>
+                {renderBodyRegion({ region: layout.regions.left, scrollRef: leftBodyScrollRef })}
               </div>
             )}
             <div className="dg-region dg-region--center" style={{ minHeight: 0, minWidth: 0 }}>
-              {renderBodyRegion({ region: 'center', scrollRef: bodyScrollRef, measureRows: true })}
+              {renderBodyRegion({ region: layout.regions.center, scrollRef: bodyScrollRef })}
             </div>
-            {hasRightRegion && (
-              <div className="dg-region dg-region--right" style={{ width: regionWidths.right, minHeight: 0 }}>
-                {renderBodyRegion({ region: 'right', scrollRef: rightBodyScrollRef, measureRows: false })}
+            {layout.hasRightRegion && (
+              <div className="dg-region dg-region--right" style={{ width: layout.regions.right.width, minHeight: 0 }}>
+                {renderBodyRegion({ region: layout.regions.right, scrollRef: rightBodyScrollRef })}
               </div>
             )}
           </div>
 
-          {/* Horizontal scrollbar — margin-left/right avoids pinned regions and vertical scrollbar */}
-          <CustomScrollbar
-            scrollRef={bodyScrollRef}
-            direction="horizontal"
-            style={{
-              height: 8,
-              marginLeft: regionWidths.left,
-              marginRight: regionWidths.right + (hasVScroll ? 8 : 0),
-            }}
+          <TableScrollbars
+            bodyScrollRef={bodyScrollRef}
+            horizontalStyle={layout.horizontalScrollbarStyle}
           />
-
-          {/* Vertical scrollbar — absolutely positioned at far-right edge of body wrapper */}
-          <CustomScrollbar scrollRef={bodyScrollRef} direction="vertical" />
         </div>
       </div>
 

@@ -587,6 +587,16 @@ export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T
   footer?: ReactNode
   /** Slot-based class injection for card elements */
   classNames?: DataGridCardClassNames
+  /** Enable row-group virtualization. Requires containerHeight or tableHeight to be set. */
+  enableVirtualization?: boolean
+  /**
+   * Estimated card row height in px for virtualization.
+   * A "row" is one horizontal band of cards (N cards wide).
+   * Default: 200
+   */
+  estimateCardHeight?: number
+  /** Virtualizer overscan row count. Default: 3 */
+  overscan?: number
 }
 
 export interface DataGridListProps<T extends object> extends GridKitCoreProps<T> {

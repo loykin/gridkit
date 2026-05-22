@@ -292,6 +292,55 @@ test('fillContainer preserves natural height until body overflow', async () => {
   await closePage(page)
 })
 
+test('fillContainer row date filters and horizontal scrollbar stay within layout', async () => {
+  const page = await newPage()
+  await openTab(page, 'Fill Container')
+
+  const layout = await page.evaluate(() => {
+    const root = globalThis.document.querySelector('[data-testid="fill-long-case"]')
+    const bodyCenter = root?.querySelector('.dg-region.dg-region--center > .dg-body-scroll')
+    const headerCenter = root?.querySelector('.dg-header .dg-region.dg-region--center')
+    const hTrack = root?.querySelector('.dg-scrollbar-track:not([style*="absolute"])')
+    const dateButton = root?.querySelector('.dg-filter-cell [aria-label="Filter startDate by date"]')
+    const dateCell = dateButton?.closest('.dg-filter-cell')
+    const rect = (node) => {
+      const box = node?.getBoundingClientRect()
+      return box ? { width: box.width, height: box.height, top: box.top, bottom: box.bottom } : null
+    }
+
+    if (bodyCenter) {
+      bodyCenter.scrollLeft = 20
+      bodyCenter.dispatchEvent(new globalThis.Event('scroll', { bubbles: true }))
+    }
+
+    return {
+      dateInputsInRow: root?.querySelectorAll('.dg-filter-cell input[type="date"]').length ?? 0,
+      dateCell: rect(dateCell),
+      dateCellScrollWidth: dateCell?.scrollWidth ?? null,
+      dateCellClientWidth: dateCell?.clientWidth ?? null,
+      bodyScrollWidth: bodyCenter?.scrollWidth ?? 0,
+      bodyClientWidth: bodyCenter?.clientWidth ?? 0,
+      bodyScrollLeft: bodyCenter?.scrollLeft ?? 0,
+      headerScrollLeft: headerCenter?.scrollLeft ?? 0,
+      hTrack: rect(hTrack),
+    }
+  })
+
+  assert.equal(layout.dateInputsInRow, 0)
+  assert.ok(layout.dateCell)
+  assert.equal(layout.dateCellScrollWidth, layout.dateCellClientWidth)
+  assert.ok(layout.bodyScrollWidth > layout.bodyClientWidth)
+  assert.ok(layout.hTrack)
+  assert.ok(layout.hTrack.height >= 7, `Horizontal scrollbar is collapsed: ${layout.hTrack.height}`)
+  assert.equal(layout.headerScrollLeft, layout.bodyScrollLeft)
+
+  await page.getByRole('button', { name: 'Filter startDate by date' }).click()
+  const popoverInputs = page.locator('.dg-header-popover input[type="date"]')
+  assert.equal(await popoverInputs.count(), 2)
+
+  await closePage(page)
+})
+
 test('fillParent fills parent height and virtualizes overflowing rows', async () => {
   const page = await newPage()
   await openTab(page, 'Fill Parent')
@@ -558,6 +607,40 @@ test('pinned body cells stay aligned while horizontally scrolling', async () => 
     Math.abs(after.status.cell.right - after.status.header.right) <= 1,
     `Status body cell is not aligned with header: cell ${after.status.cell.right}, header ${after.status.header.right}`,
   )
+
+  await closePage(page)
+})
+
+test('right-pinned column resizes from the inner edge', async () => {
+  const page = await newPage()
+  await page.setViewportSize({ width: 900, height: 900 })
+  await page.getByRole('button', { name: 'Column Pinning', exact: true }).click()
+
+  const statusHeader = page.locator('.dg-header [role="columnheader"][data-col-id="status"]').first()
+  const handle = statusHeader.locator('.dg-resize-handle')
+  assert.equal(await handle.getAttribute('data-side'), 'left')
+
+  const beforeBox = await statusHeader.boundingBox()
+  const handleBox = await handle.boundingBox()
+  assert.ok(beforeBox)
+  assert.ok(handleBox)
+  assert.ok(
+    Math.abs(handleBox.x - beforeBox.x) <= 1,
+    `Right-pinned resize handle should sit on the inner left edge: handle ${handleBox.x}, header ${beforeBox.x}`,
+  )
+
+  await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(handleBox.x - 40, handleBox.y + handleBox.height / 2, { steps: 5 })
+  await page.mouse.up()
+  await page.waitForTimeout(100)
+
+  const afterBox = await statusHeader.boundingBox()
+  assert.ok(afterBox)
+  const beforeRight = beforeBox.x + beforeBox.width
+  const afterRight = afterBox.x + afterBox.width
+  assert.ok(afterBox.width > beforeBox.width, `Expected Status to grow, before ${beforeBox.width}, after ${afterBox.width}`)
+  assert.ok(Math.abs(afterRight - beforeRight) <= 1, `Right edge should stay anchored: before ${beforeRight}, after ${afterRight}`)
 
   await closePage(page)
 })
