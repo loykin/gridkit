@@ -102,6 +102,14 @@ export function DataGridCardView<T extends object>({
     maxTableHeight != null
 
   const virtual = enableVirtualization && hasFixedHeight && rows.length > 0
+  const virtualInitialHeight =
+    typeof containerHeight === 'number'
+      ? containerHeight
+      : typeof tableHeight === 'number'
+        ? tableHeight
+        : typeof maxTableHeight === 'number'
+          ? maxTableHeight
+          : 480
 
   const virtualizer = useVirtualizer({
     count: rowGroupCount,
@@ -135,9 +143,24 @@ export function DataGridCardView<T extends object>({
 
     if (virtual) {
       const virtualItems = virtualizer.getVirtualItems()
+      const fallbackCount = Math.min(
+        rowGroupCount,
+        Math.ceil(virtualInitialHeight / estimateCardHeight) + overscan,
+      )
+      const itemEntries = virtualItems.length > 0
+        ? virtualItems
+        : Array.from({ length: fallbackCount }, (_, index) => ({
+            index,
+            start: index * estimateCardHeight,
+          }))
+
       return (
-        <div style={{ position: 'relative', height: virtualizer.getTotalSize() }}>
-          {virtualItems.map((vRow) => {
+        <div
+          className="dg-card-virtual-spacer"
+          data-virtualized="true"
+          style={{ height: virtualizer.getTotalSize() || rowGroupCount * estimateCardHeight }}
+        >
+          {itemEntries.map((vRow) => {
             const startIdx = vRow.index * effectiveCols
             const rowCards = rows.slice(startIdx, startIdx + effectiveCols)
             return (

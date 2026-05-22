@@ -917,6 +917,11 @@
   min-width: 0;
 }
 
+.dg-card-virtual-spacer {
+  position: relative;
+  width: 100%;
+}
+
 .dg-card--clickable {
   cursor: pointer;
 }

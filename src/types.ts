@@ -587,11 +587,16 @@ export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T
   footer?: ReactNode
   /** Slot-based class injection for card elements */
   classNames?: DataGridCardClassNames
-  /** Enable row-group virtualization. Requires containerHeight or tableHeight to be set. */
+  /**
+   * Enable row-group virtualization.
+   * Requires containerHeight, tableHeight, or maxTableHeight.
+   * This virtualizes horizontal card bands, not individual masonry cards.
+   */
   enableVirtualization?: boolean
   /**
-   * Estimated card row height in px for virtualization.
-   * A "row" is one horizontal band of cards (N cards wide).
+   * Estimated height in px for one virtualized card row.
+   * A card row is one horizontal band containing N cards.
+   * Use the tallest expected card height in that row.
    * Default: 200
    */
   estimateCardHeight?: number

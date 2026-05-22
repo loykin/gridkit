@@ -20,6 +20,13 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
     cardColumns,
     minCardWidth,
     minColumns,
+    containerHeight,
+    tableHeight,
+    maxTableHeight,
+    minTableHeight,
+    enableVirtualization,
+    estimateCardHeight,
+    overscan,
   } = props
 
   const { wrapperRef, containerRef, table, rows, queryState } = useDataGridBase({
@@ -59,6 +66,13 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
         cardColumns={cardColumns}
         minCardWidth={minCardWidth}
         minColumns={minColumns}
+        containerHeight={containerHeight}
+        tableHeight={tableHeight}
+        maxTableHeight={maxTableHeight}
+        minTableHeight={minTableHeight}
+        enableVirtualization={enableVirtualization}
+        estimateCardHeight={estimateCardHeight}
+        overscan={overscan}
         onRowClick={props.onRowClick}
         rowCursor={props.rowCursor}
         emptyMessage={props.emptyMessage}
