@@ -12,7 +12,9 @@ export function DateFilterContent<T extends object>({ col, mode }: Props<T>) {
   const icons = useIcons()
   const value = col.getFilterValue()
   const singleValue = typeof value === 'string' ? value : ''
-  const rangeValue = Array.isArray(value) ? value as [string, string] : ['', ''] as [string, string]
+  const rangeValue = Array.isArray(value) && value.length === 2
+    ? value as [string, string]
+    : ['', ''] as [string, string]
   const inputType = mode === 'datetime' || mode === 'datetime-range' ? 'datetime-local' : 'date'
   const isRange = mode === 'date-range' || mode === 'datetime-range'
 

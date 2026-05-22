@@ -65,6 +65,20 @@ describe('buildTableLayoutModel', () => {
     expect(model.horizontalScrollbarStyle).toEqual({ height: 8, marginLeft: 0, marginRight: 168 })
   })
 
+  it('adds vertical scrollbar width to the horizontal scrollbar right margin only when visible', () => {
+    const input = {
+      visibleLeafColumns: [column('name', 140), column('department', 160, 'right')],
+      tableWidthMode: 'spacer' as const,
+      enableColumnReordering: false,
+    }
+
+    const withoutVScroll = buildTableLayoutModel({ ...input, hasVScroll: false })
+    const withVScroll = buildTableLayoutModel({ ...input, hasVScroll: true })
+
+    expect(withoutVScroll.horizontalScrollbarStyle.marginRight).toBe(160)
+    expect(withVScroll.horizontalScrollbarStyle.marginRight).toBe(168)
+  })
+
   it('supports left, center, and right regions together', () => {
     const model = buildTableLayoutModel({
       visibleLeafColumns: [

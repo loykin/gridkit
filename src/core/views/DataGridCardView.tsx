@@ -93,7 +93,7 @@ export function DataGridCardView<T extends object>({
     return () => ro.disconnect()
   }, [cardColumns, containerRef, enableVirtualization, minCardWidth, minColumns])
 
-  const effectiveCols = cardColumns ?? measuredCols
+  const effectiveCols = Math.max(1, cardColumns ?? measuredCols)
   const rowGroupCount = Math.ceil(rows.length / effectiveCols)
 
   const hasFixedHeight =
