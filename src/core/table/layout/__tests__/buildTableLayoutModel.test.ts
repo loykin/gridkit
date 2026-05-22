@@ -48,7 +48,7 @@ describe('buildTableLayoutModel', () => {
     expect(model.regions.left.tableWidthMode).toBe('independent')
     expect(model.regions.left.reorderEnabled).toBe(false)
     expect(model.regions.left.measureRows).toBe(false)
-    expect(model.horizontalScrollbarStyle).toEqual({ height: 8, marginLeft: 90, marginRight: 0 })
+    expect(model.horizontalScrollbarStyle).toEqual({ marginLeft: 90, marginRight: 0 })
   })
 
   it('pins right columns and reserves vertical scrollbar space when needed', () => {
@@ -62,7 +62,7 @@ describe('buildTableLayoutModel', () => {
     expect(model.regions.right.columns.map((col) => col.id)).toEqual(['department'])
     expect(model.regions.right.width).toBe(160)
     expect(model.hasRightRegion).toBe(true)
-    expect(model.horizontalScrollbarStyle).toEqual({ height: 8, marginLeft: 0, marginRight: 168 })
+    expect(model.horizontalScrollbarStyle).toEqual({ marginLeft: 0, marginRight: 168 })
   })
 
   it('adds vertical scrollbar width to the horizontal scrollbar right margin only when visible', () => {
@@ -95,7 +95,7 @@ describe('buildTableLayoutModel', () => {
     expect(model.regions.center.width).toBe(80)
     expect(model.regions.right.width).toBe(140)
     expect(model.gridTemplateColumns).toBe('90px minmax(0, 1fr) 140px')
-    expect(model.horizontalScrollbarStyle).toEqual({ height: 8, marginLeft: 90, marginRight: 140 })
+    expect(model.horizontalScrollbarStyle).toEqual({ marginLeft: 90, marginRight: 140 })
   })
 
   it('keeps center region valid when every column is pinned', () => {
