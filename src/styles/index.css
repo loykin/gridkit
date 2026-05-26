@@ -356,6 +356,12 @@
   flex: 1 1 auto;
   min-height: 0;
 }
+.dg-shell[data-fill-parent="true"] .dg-scroll-frame {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 /* Remove bottom radius from bordered containers when footer is adjacent */
 .dg-table-stack .dg-table-wrapper:has(+ .dg-footer) .dg-container,
 .dg-table-stack .dg-list-container:has(+ .dg-footer),
@@ -928,6 +934,14 @@
 .dg-card-container {
   width: 100%;
 }
+.dg-card-container.dg-table-wrapper--fill {
+  overflow: auto;
+}
+.dg-shell[data-fill-parent="true"] .dg-card-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
 
 .dg-card-grid {
   display: grid;
@@ -962,6 +976,14 @@
   border: 1px solid var(--dg-border);
   border-radius: var(--dg-radius);
   background: var(--dg-background);
+}
+.dg-list-container.dg-table-wrapper--fill {
+  overflow: auto;
+}
+.dg-shell[data-fill-parent="true"] .dg-list-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
 }
 
 .dg-list-items {
@@ -1002,6 +1024,14 @@
   border: 1px solid var(--dg-border);
   border-radius: var(--dg-radius);
   background: var(--dg-background);
+}
+.dg-chat-container.dg-table-wrapper--fill {
+  overflow: auto;
+}
+.dg-shell[data-fill-parent="true"] .dg-chat-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
 }
 
 .dg-chat-load-previous {

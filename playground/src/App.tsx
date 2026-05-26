@@ -4,6 +4,7 @@ import { InfinityTab } from './tabs/InfinityTab'
 import { FixedHeightTab } from './tabs/FixedHeightTab'
 import { FillContainerTab } from './tabs/FillContainerTab'
 import { FillParentTab } from './tabs/FillParentTab'
+import { ViewsFillTab } from './tabs/ViewsFillTab'
 import { LayoutModesTab } from './tabs/LayoutModesTab'
 import { LargeListTab } from './tabs/LargeListTab'
 import { LiveUpdateTab } from './tabs/LiveUpdateTab'
@@ -53,6 +54,7 @@ const TABS = [
   { id: 'layout-modes',      label: 'Layout Modes',      content: <LayoutModesTab /> },
   { id: 'fill-container',    label: 'Fill Container',    content: <FillContainerTab /> },
   { id: 'fill-parent',       label: 'Fill Parent',       content: <FillParentTab /> },
+  { id: 'views-fill',        label: 'Views Fill',        content: <ViewsFillTab /> },
   { id: 'large-list',        label: 'Large List',        content: <LargeListTab /> },
   { id: 'pinning',           label: 'Column Pinning',    content: <PinningTab /> },
   { id: 'column-pinning',    label: 'Column Pinning UI', content: <ColumnPinningTab /> },
@@ -109,6 +111,7 @@ const NAV: NavGroup[] = [
       { id: 'layout-modes',   label: 'Layout Modes' },
       { id: 'fill-container', label: 'Fill Container' },
       { id: 'fill-parent',    label: 'Fill Parent' },
+      { id: 'views-fill',     label: 'Views Fill' },
       { id: 'large-list',     label: 'Large List' },
     ],
   },

@@ -28,6 +28,8 @@ interface DataGridCardViewProps<T extends object>
     | 'tableHeight'
     | 'maxTableHeight'
     | 'minTableHeight'
+    | 'fillContainer'
+    | 'fillParent'
     | 'enableVirtualization'
     | 'estimateCardHeight'
     | 'overscan'
@@ -72,6 +74,8 @@ export function DataGridCardView<T extends object>({
   tableHeight,
   maxTableHeight,
   minTableHeight,
+  fillContainer,
+  fillParent,
   enableVirtualization = false,
   estimateCardHeight = 200,
   overscan = 3,
@@ -99,6 +103,8 @@ export function DataGridCardView<T extends object>({
   const rowGroupCount = Math.ceil(rows.length / effectiveCols)
 
   const hasFixedHeight =
+    fillContainer ||
+    fillParent ||
     (containerHeight != null && containerHeight !== 'auto') ||
     (tableHeight != null && tableHeight !== 'auto') ||
     maxTableHeight != null
@@ -111,7 +117,7 @@ export function DataGridCardView<T extends object>({
         ? tableHeight
         : typeof maxTableHeight === 'number'
           ? maxTableHeight
-          : 480
+          : containerRef.current?.clientHeight ?? 480
 
   const virtualizer = useVirtualizer({
     count: rowGroupCount,
@@ -220,6 +226,8 @@ export function DataGridCardView<T extends object>({
       tableHeight={tableHeight}
       maxTableHeight={maxTableHeight}
       minTableHeight={minTableHeight}
+      fillContainer={fillContainer}
+      fillParent={fillParent}
       containerClassName={cn('dg-card-container', classNames?.container)}
       footerClassName={classNames?.footer}
       scrollbar={scrollbar}

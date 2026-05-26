@@ -24,6 +24,8 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
     tableHeight,
     maxTableHeight,
     minTableHeight,
+    fillContainer,
+    fillParent,
     enableVirtualization,
     estimateCardHeight,
     overscan,
@@ -71,6 +73,8 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
         tableHeight={tableHeight}
         maxTableHeight={maxTableHeight}
         minTableHeight={minTableHeight}
+        fillContainer={fillContainer}
+        fillParent={fillParent}
         enableVirtualization={enableVirtualization}
         estimateCardHeight={estimateCardHeight}
         overscan={overscan}

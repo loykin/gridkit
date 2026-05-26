@@ -72,6 +72,34 @@ function makeMessages(start: number, count: number) {
   })
 }
 
+describe('DataGridChat fill props', () => {
+  it('applies dg-table-wrapper--fill when fillContainer is set', () => {
+    const { container } = render(
+      <DataGridChat
+        data={makeMessages(0, 5)}
+        columns={columns}
+        getRowId={(m) => m.id}
+        fillContainer
+        renderMessage={(row) => <div>{row.original.body}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-chat-container')).toHaveClass('dg-table-wrapper--fill')
+  })
+
+  it('sets data-fill-parent when fillParent is set', () => {
+    const { container } = render(
+      <DataGridChat
+        data={makeMessages(0, 5)}
+        columns={columns}
+        getRowId={(m) => m.id}
+        fillParent
+        renderMessage={(row) => <div>{row.original.body}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-shell')).toHaveAttribute('data-fill-parent', 'true')
+  })
+})
+
 describe('DataGridChat scroll behavior', () => {
   afterEach(() => {
     vi.restoreAllMocks()

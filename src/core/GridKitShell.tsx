@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
@@ -60,6 +60,12 @@ export function GridKitShell<T extends object>({
   footer,
   children,
 }: GridKitShellProps<T>) {
+  useEffect(() => {
+    if (fillParent && fillContainer) {
+      console.warn('[GridKit] fillParent and fillContainer were both provided. fillParent takes precedence.')
+    }
+  }, [fillContainer, fillParent])
+
   const toolbarFrameRef = useRef<HTMLDivElement | null>(null)
   const tableWrapperRef = useRef<HTMLDivElement | null>(null)
   const footerFrameRef = useRef<HTMLDivElement | null>(null)

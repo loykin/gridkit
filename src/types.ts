@@ -296,6 +296,13 @@ export interface GridKitDisplayProps<T extends object> {
    * the table body scrolls and the footer remains visible below the table.
    */
   fillContainer?: boolean
+  /**
+   * Fill the height provided by the parent layout. Use this when the parent
+   * already owns sizing, such as a tab, drawer, split pane, or dashboard panel.
+   * The parent must provide a real height, usually with `height` or a flex
+   * chain that includes `min-height: 0`.
+   */
+  fillParent?: boolean
   tableHeight?: string | number | 'auto'
   /** Cap the container height — content shorter than this grows naturally, taller gets a scrollbar. */
   maxTableHeight?: string | number
@@ -532,13 +539,6 @@ export interface DataGridPaginationConfig {
 }
 
 export interface DataGridProps<T extends object> extends DataGridBaseProps<T> {
-  /**
-   * Fill the height provided by the parent layout. Use this when the parent
-   * already owns sizing, such as a tab, drawer, split pane, or dashboard panel.
-   * The parent must provide a real height, usually with `height` or a flex
-   * chain that includes `min-height: 0`.
-   */
-  fillParent?: boolean
   /**
    * Enables TanStack Table pagination. Presence of this prop activates the
    * pagination row model. Omit to disable pagination entirely.

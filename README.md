@@ -315,13 +315,13 @@ const columns = useMemo<DataGridColumnDef<User>[]>(
 const data = useMemo(() => rowsFromQuery ?? [], [rowsFromQuery])
 ```
 
-For large table views, set a fixed `tableHeight` so virtualization can keep DOM work bounded to the visible rows plus overscan. `DataGridList` also supports opt-in virtualization with `enableVirtualization` and a fixed `containerHeight`. `DataGridChat` is currently non-virtualized because prepend anchoring and bottom stickiness need stricter scroll handling.
+For large table views, set a fixed `tableHeight` so virtualization can keep DOM work bounded to the visible rows plus overscan. `DataGridList` and `DataGridCard` support opt-in virtualization with `enableVirtualization` — a fixed `containerHeight`, `tableHeight`, `fillContainer`, or `fillParent` is required to bound the scroll container. `DataGridChat` is currently non-virtualized because prepend anchoring and bottom stickiness need stricter scroll handling.
 
-Use `fillContainer` when a table should fit inside an existing app panel without forcing short data to stretch. Use `fillParent` when the table should always fill a parent-owned height.
+Use `fillContainer` when a grid should fit inside an existing app panel without forcing short data to stretch. Use `fillParent` when the grid should always fill a parent-owned height. Both props work across all view variants (`DataGrid`, `DataGridCard`, `DataGridList`, `DataGridChat`).
 
 ### Current Limits
 
-- `DataGridCard` is not virtualized. Use it for small/medium card collections, or add app-level paging/infinite loading for large data sets.
+- `DataGridCard` virtualization is opt-in (`enableVirtualization`). For large collections without a fixed height, add app-level paging or infinite loading instead.
 - Inline editing is basic cell editing: double-click enters `meta.editCell`, and the editor must call `onCommit` or `onCancel`. Validation, row edit mode, async save states, and undo/redo are not built in.
 - Accessibility is partial. Table roles, `aria-sort`, and popover semantics are present, but full keyboard grid navigation and screen-reader workflow testing are not complete.
 - Performance guidance is threshold-based rather than benchmark-based. Table virtualization turns on for fixed-height tables at 100+ rows; real app performance still depends on cell render cost, filter/sort cost, and data stability.
@@ -497,6 +497,8 @@ Parent requirements:
 - In flex layouts, make sure the parent chain can shrink with `min-height: 0`.
 - Do not add `overflow: auto` to `.dg-table-wrapper` or `.dg-container`; the scroll owner is the internal body element.
 
+`fillContainer` works across all view variants. For `DataGridCard` and `DataGridList`, it also enables `enableVirtualization` without requiring an explicit `containerHeight`.
+
 If you want a hard fixed table body regardless of content length, use `tableHeight`. If you want content to grow until a known cap, use `maxTableHeight`. If the cap depends on the surrounding app panel, use `fillContainer`.
 
 ---
@@ -525,10 +527,10 @@ export function MetricsTab() {
 
 Behavior:
 
-- The shell, table wrapper, container, and body wrapper participate in a full-height flex chain.
+- The shell and scroll container participate in a full-height flex chain.
 - Short data still fills the parent region, so the footer remains at the parent bottom.
-- Overflowing data scrolls only inside the body area.
-- Large row sets still use table virtualization even without `tableHeight`.
+- Overflowing data scrolls only inside the scroll area.
+- For `DataGrid`, large row sets use row virtualization automatically. For `DataGridCard` and `DataGridList`, set `enableVirtualization` to activate it.
 
 `fillContainer` and `fillParent` solve different layout problems:
 
@@ -542,6 +544,8 @@ Parent requirements:
 - The direct parent must have a real height, or be inside a valid `height: 100%` / flex chain.
 - In flex layouts, the parent chain should allow shrinking with `min-height: 0`.
 - Do not use `fillParent` as an alias for `tableHeight="100%"`; use the prop so GridKit can set the internal flex and virtualization behavior correctly.
+
+`fillParent` works across all view variants. For `DataGridCard` and `DataGridList`, it also enables `enableVirtualization` without requiring an explicit `containerHeight`.
 
 If `tableHeight` and `fillParent` are both provided, `tableHeight` remains the explicit body height. Prefer using only one layout mode.
 
@@ -634,7 +638,7 @@ List views use the shared row/data/filtering props, but omit table-only options 
 | `itemPadding` | `number` | `0` | Padding in px around the list body |
 | `containerHeight` | `string \| number \| 'auto'` | `'auto'` | Preferred list container height |
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Compatibility alias for `containerHeight` |
-| `enableVirtualization` | `boolean` | `false` | Render only the visible item window. Requires a fixed `containerHeight` or `tableHeight` |
+| `enableVirtualization` | `boolean` | `false` | Render only the visible item window. Requires a fixed `containerHeight`, `tableHeight`, `fillContainer`, or `fillParent` |
 | `estimateRowHeight` | `number` | `48` | Estimated item height in px for virtualization |
 | `overscan` | `number` | `10` | Items rendered outside the visible window when virtualized |
 | `headerLeft` | `ReactNode \| (table: Table<T>) => ReactNode` | — | Toolbar content on the left. Function form receives the table instance |
@@ -778,6 +782,9 @@ All [shared props](#shared-props-datagrid-datagridinfinity-datagriddag-datagridc
 | `minCardWidth` | `number` | `240` | Minimum card width in px — column count adjusts automatically |
 | `minColumns` | `number` | `1` | The grid never collapses below this number of columns |
 | `cardColumns` | `number` | — | Fixed column count — overrides `minCardWidth` and `minColumns` |
+| `enableVirtualization` | `boolean` | `false` | Render only the visible card row band. Requires a fixed `containerHeight`, `tableHeight`, `fillContainer`, or `fillParent` |
+| `estimateCardHeight` | `number` | `200` | Estimated height in px of one card row band for virtualization |
+| `overscan` | `number` | `3` | Card row bands to render outside the visible window when virtualized |
 | `hasNextPage` | `boolean` | — | Whether more pages exist |
 | `isFetchingNextPage` | `boolean` | — | Show loading indicator at the bottom |
 | `fetchNextPage` | `() => void` | — | Called when the sentinel enters the viewport |
@@ -947,8 +954,8 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `emptyMessage` | `string` | — | Message when data is empty |
 | `emptyContent` | `ReactNode` | — | Custom empty state UI (overrides `emptyMessage`) |
 | `showHeader` | `boolean` | `true` | Show/hide the header row |
-| `fillContainer` | `boolean` | `false` | Fit inside an explicit parent height while keeping short content natural and scrolling only the body on overflow |
-| `fillParent` | `boolean` | `false` | DataGrid table only. Fill a parent-owned height with an internal flex scroll chain |
+| `fillContainer` | `boolean` | `false` | Fit inside an explicit parent height while keeping short content natural and scrolling only the body on overflow. Works across all view variants |
+| `fillParent` | `boolean` | `false` | Fill a parent-owned height. The parent must supply a real height via a fixed size or a flex chain with `min-height: 0`. Works across all view variants |
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Fixed height — enables internal scroll and virtualization |
 | `maxTableHeight` | `string \| number` | — | Cap height — grows with content up to this limit, then scrolls |
 | `minTableHeight` | `string \| number` | — | Floor height — content shorter than this keeps minimum space |

@@ -7,6 +7,7 @@ interface UseRowVirtualizerOptions {
   estimateSize: number
   overscan?: number
   enabled?: boolean
+  fillMode?: boolean
 }
 
 export function useRowVirtualizer({
@@ -16,10 +17,13 @@ export function useRowVirtualizer({
   estimateSize,
   overscan = 10,
   enabled = false,
+  fillMode = false,
 }: UseRowVirtualizerOptions) {
-  const hasFixedHeight = containerHeight != null && containerHeight !== 'auto'
+  const hasFixedHeight = fillMode || (containerHeight != null && containerHeight !== 'auto')
   const virtual = enabled && hasFixedHeight && count > 0
-  const initialHeight = typeof containerHeight === 'number' ? containerHeight : 0
+  const initialHeight = typeof containerHeight === 'number'
+    ? containerHeight
+    : containerRef.current?.clientHeight ?? 0
 
   const virtualizer = useVirtualizer({
     count,

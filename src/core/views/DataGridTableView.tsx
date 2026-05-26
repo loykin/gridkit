@@ -125,7 +125,7 @@ export function DataGridTableView<T extends object>({
   const bodyWrapperRef = React.useRef<HTMLDivElement | null>(null)
   const [fillBodyMaxHeight, setFillBodyMaxHeight] = useState<number | undefined>()
   const hasFixedTableHeight = tableHeight != null && tableHeight !== 'auto'
-  const hasFixedScrollContainer = hasFixedTableHeight || fillParent === true
+  const hasFixedScrollContainer = hasFixedTableHeight || fillParent === true || fillContainer === true
 
   // ── Virtualizer ────────────────────────────────────────────────────────────
   const { virtual, virtualizer: rowVirtualizer } = useTableVirtualizer({

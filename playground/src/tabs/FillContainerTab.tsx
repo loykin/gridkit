@@ -116,6 +116,29 @@ export function FillContainerTab() {
           />
         </div>
       </section>
+
+      <section className="space-y-2">
+        <div>
+          <p className="text-sm font-semibold">fillContainer + Auto Virtualization</p>
+          <p className="text-sm text-muted-foreground">
+            No pagination — all {ALL_DATA.length} rows loaded. Row virtualization activates automatically once
+            fillContainer provides a bounded scroll container.
+          </p>
+        </div>
+        <div className="h-[480px] min-h-0 rounded border border-dashed border-border p-3">
+          <DataGrid
+            fillContainer
+            data={ALL_DATA}
+            columns={groupedColumns}
+            headerLeft={<ToolbarWrapProbe />}
+            headerGroupLayout="span"
+            enableColumnFilters
+            filterDisplay="row"
+            enableColumnPinning
+            bordered
+          />
+        </div>
+      </section>
     </div>
   )
 }

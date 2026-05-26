@@ -23,6 +23,8 @@ interface DataGridChatViewProps<T extends object>
     | 'tableHeight'
     | 'maxTableHeight'
     | 'minTableHeight'
+    | 'fillContainer'
+    | 'fillParent'
     | 'scrollbar'
     | 'classNames'
   > {
@@ -46,6 +48,8 @@ export function DataGridChatView<T extends object>({
   tableHeight,
   maxTableHeight,
   minTableHeight,
+  fillContainer,
+  fillParent,
   scrollbar,
   isFetchingPreviousPage,
   isLoading,
@@ -124,6 +128,8 @@ export function DataGridChatView<T extends object>({
       tableHeight={tableHeight}
       maxTableHeight={maxTableHeight}
       minTableHeight={minTableHeight}
+      fillContainer={fillContainer}
+      fillParent={fillParent}
       containerClassName={cn('dg-chat-container', classNames?.container)}
       footerClassName={classNames?.footer}
       scrollbar={scrollbar}

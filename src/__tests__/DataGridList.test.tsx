@@ -56,6 +56,64 @@ describe('DataGridList virtualization', () => {
     expect(screen.getByText('Item 19')).toBeInTheDocument()
   })
 
+  it('applies dg-table-wrapper--fill when fillContainer is set', () => {
+    const { container } = render(
+      <DataGridList
+        data={makeItems(5)}
+        columns={columns}
+        getRowId={(item) => item.id}
+        fillContainer
+        renderItem={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-list-container')).toHaveClass('dg-table-wrapper--fill')
+  })
+
+  it('sets data-fill-parent when fillParent is set', () => {
+    const { container } = render(
+      <DataGridList
+        data={makeItems(5)}
+        columns={columns}
+        getRowId={(item) => item.id}
+        fillParent
+        renderItem={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-shell')).toHaveAttribute('data-fill-parent', 'true')
+  })
+
+  it('activates virtual mode with fillContainer (no explicit height)', () => {
+    const { container } = render(
+      <DataGridList
+        data={makeItems(1000)}
+        columns={columns}
+        getRowId={(item) => item.id}
+        fillContainer
+        enableVirtualization
+        estimateRowHeight={40}
+        overscan={1}
+        renderItem={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-list-items')).toHaveAttribute('data-virtualized', 'true')
+  })
+
+  it('activates virtual mode with fillParent (no explicit height)', () => {
+    const { container } = render(
+      <DataGridList
+        data={makeItems(1000)}
+        columns={columns}
+        getRowId={(item) => item.id}
+        fillParent
+        enableVirtualization
+        estimateRowHeight={40}
+        overscan={1}
+        renderItem={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-list-items')).toHaveAttribute('data-virtualized', 'true')
+  })
+
   it('renders a bounded window when virtualization is enabled', async () => {
     const { container } = render(
       <DataGridList

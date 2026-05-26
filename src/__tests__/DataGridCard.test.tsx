@@ -73,6 +73,64 @@ describe('DataGridCard virtualization', () => {
     expect(container.querySelectorAll('.dg-card').length).toBeLessThan(1000)
   })
 
+  it('activates virtual mode with fillContainer (no explicit height)', () => {
+    const { container } = render(
+      <DataGridCard
+        data={makeItems(1000)}
+        columns={columns}
+        getRowId={(item) => item.id}
+        fillContainer
+        cardColumns={2}
+        enableVirtualization
+        estimateCardHeight={80}
+        renderCard={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-card-virtual-spacer')).toBeInTheDocument()
+  })
+
+  it('activates virtual mode with fillParent (no explicit height)', () => {
+    const { container } = render(
+      <DataGridCard
+        data={makeItems(1000)}
+        columns={columns}
+        getRowId={(item) => item.id}
+        fillParent
+        cardColumns={2}
+        enableVirtualization
+        estimateCardHeight={80}
+        renderCard={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-card-virtual-spacer')).toBeInTheDocument()
+  })
+
+  it('applies dg-table-wrapper--fill when fillContainer is set', () => {
+    const { container } = render(
+      <DataGridCard
+        data={makeItems(5)}
+        columns={columns}
+        getRowId={(item) => item.id}
+        fillContainer
+        renderCard={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-card-container')).toHaveClass('dg-table-wrapper--fill')
+  })
+
+  it('sets data-fill-parent when fillParent is set', () => {
+    const { container } = render(
+      <DataGridCard
+        data={makeItems(5)}
+        columns={columns}
+        getRowId={(item) => item.id}
+        fillParent
+        renderCard={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    expect(container.querySelector('.dg-shell')).toHaveAttribute('data-fill-parent', 'true')
+  })
+
   it('uses the shared custom scrollbar layer when requested', () => {
     const { container } = render(
       <DataGridCard

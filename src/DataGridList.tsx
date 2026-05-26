@@ -20,6 +20,8 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
     itemPadding,
     containerHeight,
     tableHeight,
+    fillContainer,
+    fillParent,
     enableVirtualization,
     estimateRowHeight = 48,
     overscan,
@@ -54,6 +56,7 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
     estimateSize: estimateRowHeight,
     overscan,
     enabled: enableVirtualization,
+    fillMode: fillContainer || fillParent,
   })
   const effectiveContainerHeight = containerHeight ?? tableHeight
   const virtualInitialHeight =
@@ -82,6 +85,8 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
         itemPadding={itemPadding}
         containerHeight={containerHeight}
         tableHeight={tableHeight}
+        fillContainer={fillContainer}
+        fillParent={fillParent}
         virtual={virtual}
         rowVirtualizer={virtual ? virtualizer : undefined}
         virtualEstimateSize={estimateRowHeight}

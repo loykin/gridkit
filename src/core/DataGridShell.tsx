@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import type { Table, Row } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { GridKitShell } from '@/core/GridKitShell'
@@ -18,7 +18,6 @@ interface DataGridShellProps<T extends object> extends TableViewConfig<T> {
   loadMoreRef?: React.RefObject<HTMLDivElement | null>
   isFetchingNextPage?: boolean
   footer?: (table: Table<T>) => React.ReactNode
-  fillParent?: boolean
 }
 
 export function DataGridShell<T extends object>({
@@ -39,12 +38,6 @@ export function DataGridShell<T extends object>({
   classNames,
   ...viewConfig
 }: DataGridShellProps<T>) {
-  useEffect(() => {
-    if (fillParent && fillContainer) {
-      console.warn('[GridKit] fillParent and fillContainer were both provided. fillParent takes precedence.')
-    }
-  }, [fillContainer, fillParent])
-
   if (error) {
     return <div className="dg-error">{error.message}</div>
   }
