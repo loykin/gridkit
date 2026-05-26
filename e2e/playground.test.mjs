@@ -229,7 +229,7 @@ test('header theme tokens style header cells and filter row', async () => {
   assert.equal(styles.select.color, 'rgb(230, 240, 250)')
   assert.equal(styles.select.headerControlBorder, 'rgb(40 50 60)')
 
-  await page.getByRole('button', { name: 'Pin options for id' }).click()
+  await page.locator('[data-testid="fill-long-case"]').getByRole('button', { name: 'Pin options for id' }).click()
   const popover = page.locator('.dg-header-popover').last()
   await popover.waitFor({ state: 'visible', timeout: 1000 })
   const popoverStyles = await popover.evaluate((node) => {
@@ -334,7 +334,7 @@ test('fillContainer row date filters and horizontal scrollbar stay within layout
   assert.ok(layout.hTrack.height >= 7, `Horizontal scrollbar is collapsed: ${layout.hTrack.height}`)
   assert.equal(layout.headerScrollLeft, layout.bodyScrollLeft)
 
-  await page.getByRole('button', { name: 'Filter startDate by date' }).click()
+  await page.locator('[data-testid="fill-long-case"]').getByRole('button', { name: 'Filter startDate by date' }).click()
   const popoverInputs = page.locator('.dg-header-popover input[type="date"]')
   assert.equal(await popoverInputs.count(), 2)
 
