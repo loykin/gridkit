@@ -240,34 +240,34 @@ export function DataGridBody<T extends object>({
           return bodyRow
         })}
       </div>
-      {/* Fill row: expands into remaining space when rows don't fill tableHeight.
-          gradient is invisible at height=0 (rows overflow), preventing double border. */}
-      {!virtual && (
-        <div
-          className="dg-fill-row"
-          style={{
-            background:
-              'linear-gradient(to bottom, var(--dg-border) 0px, var(--dg-border) 1px, transparent 1px)',
-          }}
-        >
-          {visibleLeafColumns.map((col, colIdx) => {
-            const isLast = colIdx === visibleLeafColumns.length - 1
-            const isFillCell = fillLast && isLast && !col.getIsPinned()
-            return (
-              <div
-                key={col.id}
-                data-last-col={isLast ? 'true' : undefined}
-                className={cn(bordered && 'dg-fill-cell--bordered')}
-                style={{
-                  ...colStyle(col, { pinning }),
-                  ...(isFillCell && { flex: 1, width: 'auto' }),
-                }}
-              />
-            )
-          })}
-          {showSpacer && <div style={{ flex: 1, minWidth: 0 }} />}
-        </div>
-      )}
+      {/* Fill row: expands into remaining space when rows don't fill the container.
+          gradient is invisible at height=0 (rows overflow), preventing double border.
+          Rendered in both virtual and non-virtual modes so the last-row separator
+          appears even when virtualization is active. */}
+      <div
+        className="dg-fill-row"
+        style={{
+          background:
+            'linear-gradient(to bottom, var(--dg-border) 0px, var(--dg-border) 1px, transparent 1px)',
+        }}
+      >
+        {visibleLeafColumns.map((col, colIdx) => {
+          const isLast = colIdx === visibleLeafColumns.length - 1
+          const isFillCell = fillLast && isLast && !col.getIsPinned()
+          return (
+            <div
+              key={col.id}
+              data-last-col={isLast ? 'true' : undefined}
+              className={cn(bordered && 'dg-fill-cell--bordered')}
+              style={{
+                ...colStyle(col, { pinning }),
+                ...(isFillCell && { flex: 1, width: 'auto' }),
+              }}
+            />
+          )
+        })}
+        {showSpacer && <div style={{ flex: 1, minWidth: 0 }} />}
+      </div>
     </>
   )
 }

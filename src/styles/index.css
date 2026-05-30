@@ -362,27 +362,19 @@
   display: flex;
   flex-direction: column;
 }
-/* Remove bottom radius from bordered containers when footer is adjacent */
-.dg-table-stack .dg-table-wrapper:has(+ .dg-footer) .dg-container,
-.dg-table-stack .dg-list-container:has(+ .dg-footer),
-.dg-table-stack .dg-chat-container:has(+ .dg-footer),
-.dg-table-stack .dg-scroll-frame:has(+ .dg-footer) .dg-list-container,
-.dg-table-stack .dg-scroll-frame:has(+ .dg-footer) .dg-chat-container {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
 .dg-footer {
-  border-radius: 0 0 var(--dg-radius) var(--dg-radius);
   background: var(--dg-footer-background);
   color: var(--dg-footer-foreground);
   overflow: hidden;
 }
 .dg-table-wrapper {
   min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--dg-container-border);
+  border-radius: var(--dg-radius);
 }
 .dg-table-wrapper--fill {
   min-height: 0;
-  overflow: hidden;
 }
 .dg-scroll-frame {
   position: relative;
@@ -402,9 +394,9 @@
 }
 .dg-shell[data-fill-parent="true"] .dg-table-wrapper {
   display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
-  overflow: hidden;
 }
 .dg-table-wrapper--hidden {
   visibility: hidden;
@@ -442,8 +434,6 @@
   position: relative;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--dg-container-border);
-  border-radius: var(--dg-radius);
   background: var(--dg-background);
 }
 .dg-container--fill {
@@ -935,11 +925,15 @@
   width: 100%;
 }
 .dg-card-container.dg-table-wrapper--fill {
+  display: flex;
+  flex-direction: column;
   overflow: auto;
 }
 .dg-shell[data-fill-parent="true"] .dg-card-container {
   flex: 1 1 auto;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: auto;
 }
 
@@ -973,16 +967,21 @@
 .dg-list-container {
   width: 100%;
   min-width: 0;
+  overflow: hidden;
   border: 1px solid var(--dg-border);
   border-radius: var(--dg-radius);
   background: var(--dg-background);
 }
 .dg-list-container.dg-table-wrapper--fill {
+  display: flex;
+  flex-direction: column;
   overflow: auto;
 }
 .dg-shell[data-fill-parent="true"] .dg-list-container {
   flex: 1 1 auto;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: auto;
 }
 
@@ -1021,16 +1020,21 @@
 .dg-chat-container {
   width: 100%;
   min-width: 0;
+  overflow: hidden;
   border: 1px solid var(--dg-border);
   border-radius: var(--dg-radius);
   background: var(--dg-background);
 }
 .dg-chat-container.dg-table-wrapper--fill {
+  display: flex;
+  flex-direction: column;
   overflow: auto;
 }
 .dg-shell[data-fill-parent="true"] .dg-chat-container {
   flex: 1 1 auto;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: auto;
 }
 
