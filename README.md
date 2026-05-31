@@ -26,9 +26,6 @@ If you want full rendering control with zero default markup, use TanStack Table 
 If you need spreadsheet-style editing, copy/paste, and keyboard-heavy data
 entry, a spreadsheet-focused grid such as `react-data-grid` may be a better fit.
 
-For architectural positioning against spreadsheet-focused grids such as
-`react-data-grid`, see [GridKit vs Comcast React Data Grid](docs/react-data-grid-comparison.md).
-
 ---
 
 ## View variants
