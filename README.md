@@ -1,18 +1,33 @@
 # @loykin/gridkit
 
-A feature-rich React data grid built on TanStack Table. Ships with sensible default styles, themes entirely through CSS variables, and provides `classNames` slots so each element can be overridden without fighting specificity.
+GridKit is a React data view library built on TanStack Table.
 
-It is not headless. It renders a real UI — table, list, card, and chat variants — and owns that structure so you don't have to. The tradeoff is that you style it rather than build it from scratch. CSS variables handle 90% of theming; `classNames` slots cover the rest.
+TanStack Table gives you the engine. GridKit gives you the rendered UI: tables,
+lists, cards, and chat-style timelines with shared sorting, filtering, search,
+pagination, virtualization, backend query state, and theming.
+
+It is not headless. It owns the structure for common product data views so you
+do not have to rebuild headers, filter controls, pagination, scroll layout,
+loading states, empty states, and design-system styling for every screen. The
+tradeoff is that you style the rendered structure rather than build it from
+scratch. CSS variables handle most theming; `classNames` slots cover the rest.
 
 ---
 
 ## When to use
 
-- You want sorting, filtering, pagination, virtualization, and real-time updates **without assembling them yourself** from primitives.
+- You want TanStack Table's state model **without assembling the rendered UI** from primitives.
 - You have an existing design system and need the grid to **adopt its colors and spacing** — not fight them.
 - You need **more than a table** — list, card grid, or chat timeline with the same filtering and data pipeline.
+- You are building admin tools, dashboards, resource browsers, datasource lists, product catalogs, or other data-heavy product screens.
 
 If you want full rendering control with zero default markup, use TanStack Table directly. GridKit is the layer above it.
+
+If you need spreadsheet-style editing, copy/paste, and keyboard-heavy data
+entry, a spreadsheet-focused grid such as `react-data-grid` may be a better fit.
+
+For architectural positioning against spreadsheet-focused grids such as
+`react-data-grid`, see [GridKit vs Comcast React Data Grid](docs/react-data-grid-comparison.md).
 
 ---
 
