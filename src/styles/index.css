@@ -704,6 +704,8 @@
   display: flex;
   align-items: center;
   overflow: hidden;
+  overflow: clip;
+  overflow-clip-margin: 1px;
   padding: 4px 12px;
   font-size: 13px;
   background: var(--_row-bg, var(--dg-background));
@@ -711,6 +713,8 @@
 .dg-cell[data-align="right"]  { justify-content: flex-end; }
 .dg-cell[data-align="center"] { justify-content: center; }
 .dg-cell[data-wrap="true"]    { align-items: flex-start; white-space: normal; }
+.dg-cell[data-overflow="visible"] { overflow: visible; }
+.dg-cell[data-overflow="hidden"]  { overflow: hidden; }
 .dg-cell[data-bordered="true"] { border-right: 1px solid var(--dg-border); }
 
 .dg-empty {

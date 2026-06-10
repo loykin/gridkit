@@ -937,6 +937,7 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `align` | `'left' \| 'center' \| 'right'` | Cell text alignment |
 | `pin` | `'left' \| 'right'` | Pin column at definition level |
 | `wrap` | `boolean` | Allow multi-line content; row height adjusts automatically |
+| `cellOverflow` | `'visible' \| 'hidden'` | Override cell overflow per column. Default is `clip`. Use `'visible'` for Badge, Avatar, or Chip components with border-radius or box-shadow. Content can escape the cell box but is still clipped by the table's scroll container — use a portal for dropdowns that must escape the table viewport |
 | `filterType` | `'text' \| 'select' \| 'multi-select' \| 'number' \| 'date' \| 'date-range' \| 'datetime' \| 'datetime-range' \| 'custom' \| false` | Filter input type for this column |
 | `filterParams.width` | `number` | Filter popover width in px for icon-mode filter popovers and row-mode multi-select popups. Does not resize the column menu popover |
 | `filterParams.maxOptionsHeight` | `number` | Multi-select option list max height in px. Defaults to `192` |

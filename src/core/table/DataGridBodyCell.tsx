@@ -47,6 +47,7 @@ export function DataGridBodyCell<T extends object>({
       data-last-col={isLast ? 'true' : undefined}
       data-bordered={bordered ? 'true' : undefined}
       data-editing={isEditing ? 'true' : undefined}
+      data-overflow={meta?.cellOverflow}
       className={cn('dg-cell', classNames?.cell)}
       style={{ ...colStyle(cell.column, { pinning }), ...(isFillCell && { flex: 1, width: 'auto' }) }}
       onDoubleClick={canEdit && !isEditing ? (e) => { e.stopPropagation(); editingCtx?.startEdit(cell.id) } : undefined}

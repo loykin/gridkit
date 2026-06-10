@@ -37,6 +37,13 @@ declare module '@tanstack/react-table' {
      * When false (default) content is truncated with an ellipsis.
      */
     wrap?: boolean
+    /**
+     * Override cell overflow per column. Default is clip.
+     * Note: content can only escape the cell box — ancestor scroll containers
+     * (overflow: auto/hidden) still clip at the table boundary. Use a portal
+     * for dropdowns or popovers that must escape the table viewport.
+     */
+    cellOverflow?: 'visible' | 'hidden'
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
