@@ -1707,6 +1707,15 @@ Until then, keep `core/engine` backend-neutral, keep filter-specific option/face
 
 ---
 
+## AI Coding Assistants
+
+This repository includes [`AGENTS.md`](./AGENTS.md) with project structure, commands, and conventions for AI coding assistants.
+
+- **OpenAI Codex** — reads `AGENTS.md` automatically
+- **Claude Code** — reads `CLAUDE.md`, which imports `AGENTS.md`
+
+---
+
 ## License
 
 MIT
