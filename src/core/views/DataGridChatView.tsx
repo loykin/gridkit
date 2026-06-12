@@ -26,6 +26,7 @@ interface DataGridChatViewProps<T extends object>
     | 'fillContainer'
     | 'fillParent'
     | 'scrollbar'
+    | 'containerStyle'
     | 'classNames'
   > {
   wrapperRef: React.RefObject<HTMLDivElement | null>
@@ -51,6 +52,7 @@ export function DataGridChatView<T extends object>({
   fillContainer,
   fillParent,
   scrollbar,
+  containerStyle,
   isFetchingPreviousPage,
   isLoading,
   emptyMessage = 'No messages',
@@ -131,6 +133,7 @@ export function DataGridChatView<T extends object>({
       fillContainer={fillContainer}
       fillParent={fillParent}
       containerClassName={cn('dg-chat-container', classNames?.container)}
+      containerStyle={containerStyle}
       footerClassName={classNames?.footer}
       scrollbar={scrollbar}
       footer={footer}

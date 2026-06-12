@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import { PaginationTab } from './tabs/PaginationTab'
 import { InfinityTab } from './tabs/InfinityTab'
 import { FixedHeightTab } from './tabs/FixedHeightTab'
@@ -33,6 +34,7 @@ import { CardVirtualizationTab } from './tabs/CardVirtualizationTab'
 import { CardListTab } from './tabs/CardListTab'
 import { ListTab } from './tabs/ListTab'
 import { ChatTab } from './tabs/ChatTab'
+import { AgentChatTab } from './tabs/AgentChatTab'
 import { AgentTraceTab } from './tabs/AgentTraceTab'
 import { EvalReviewTab } from './tabs/EvalReviewTab'
 import { HeaderGroupsTab } from './tabs/HeaderGroupsTab'
@@ -80,6 +82,7 @@ const TABS = [
   { id: 'card-list',         label: 'Card List',         content: <CardListTab /> },
   { id: 'list',              label: 'List',              content: <ListTab /> },
   { id: 'chat',              label: 'Chat',              content: <ChatTab /> },
+  { id: 'agent-chat',        label: 'Agent Chat',        content: <AgentChatTab /> },
   { id: 'log-stream',        label: 'Log Stream',        content: <LogStreamTab /> },
   { id: 'agent-trace',       label: 'Agent Trace',       content: <AgentTraceTab /> },
   { id: 'eval-review',       label: 'Eval Review',       content: <EvalReviewTab /> },
@@ -156,10 +159,16 @@ const NAV: NavGroup[] = [
       { id: 'card-virtual', label: 'Card Virtualization' },
       { id: 'card-list',   label: 'Card List' },
       { id: 'list',        label: 'List' },
-      { id: 'chat',        label: 'Chat' },
       { id: 'log-stream',  label: 'Log Stream' },
       { id: 'agent-trace', label: 'Agent Trace' },
       { id: 'eval-review', label: 'Eval Review' },
+    ],
+  },
+  {
+    label: 'Chat',
+    items: [
+      { id: 'chat',       label: 'Chat' },
+      { id: 'agent-chat', label: 'Agent Chat' },
     ],
   },
 ]
@@ -198,24 +207,24 @@ type RadiusValue = (typeof RADIUS_PRESETS)[number]['value']
 
 // ── App ────────────────────────────────────────────────────────────────────────
 
-function getTabIdFromPath(): TabId {
-  const pathId = window.location.pathname.replace(/^\//, '')
-  return TABS.some((t) => t.id === pathId) ? (pathId as TabId) : 'pagination'
+function isTabId(id: string | undefined): id is TabId {
+  return TABS.some((tab) => tab.id === id)
 }
 
 function PlaygroundApp() {
-  const [active, setActiveState] = useState<TabId>(getTabIdFromPath)
+  const { tabId = 'pagination' } = useParams()
+  const navigate = useNavigate()
+  const routeTab = isTabId(tabId) ? tabId : 'pagination'
+  const [active, setActiveState] = useState<TabId>(routeTab)
 
   const setActive = (id: TabId) => {
-    window.history.pushState({}, '', `/${id}`)
     setActiveState(id)
+    navigate(`/${id}`)
   }
 
   useEffect(() => {
-    const onPop = () => setActiveState(getTabIdFromPath())
-    window.addEventListener('popstate', onPop)
-    return () => window.removeEventListener('popstate', onPop)
-  }, [])
+    setActiveState(routeTab)
+  }, [routeTab])
 
   const [theme, setTheme] = useState<Theme>(THEMES[0]!)
   const [radius, setRadius] = useState<RadiusValue>('0rem')
@@ -320,5 +329,11 @@ function PlaygroundApp() {
 }
 
 export default function App() {
-  return <PlaygroundApp />
+  return (
+    <Routes>
+      <Route path="/:tabId" element={<PlaygroundApp />} />
+      <Route path="/" element={<Navigate to="/pagination" replace />} />
+      <Route path="*" element={<Navigate to="/pagination" replace />} />
+    </Routes>
+  )
 }

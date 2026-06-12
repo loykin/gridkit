@@ -180,6 +180,23 @@ export interface DataGridChatClassNames {
   footer?: string
 }
 
+export interface DataGridAgentChatClassNames extends DataGridChatClassNames {
+  event?: string
+  message?: string
+  toolCall?: string
+  toolResult?: string
+  artifact?: string
+  status?: string
+  user?: string
+  assistant?: string
+  system?: string
+  tool?: string
+  label?: string
+  content?: string
+  code?: string
+  actions?: string
+}
+
 export type GridKitScrollbarMode = 'native' | 'custom' | 'hidden'
 
 export interface GridKitScrollbarConfig {
@@ -668,5 +685,101 @@ export interface DataGridChatProps<T extends object> extends GridKitCoreProps<T>
   footer?: ReactNode
   /** Scrollbar rendering for the chat scroll container. Defaults to native. */
   scrollbar?: GridKitScrollbarConfig
+  /** Inline style for the chat scroll container. Useful for CSS token overrides. */
+  containerStyle?: React.CSSProperties
   classNames?: DataGridChatClassNames
+}
+
+export type AgentChatRole = 'user' | 'assistant' | 'system' | 'tool'
+export type AgentChatStatus = 'pending' | 'running' | 'streaming' | 'complete' | 'error'
+
+export interface AgentChatEventBase {
+  id: string
+  type: string
+  status?: AgentChatStatus
+  createdAt?: Date | string | number
+  metadata?: Record<string, unknown>
+}
+
+export interface AgentChatMessageEvent extends AgentChatEventBase {
+  type: 'message'
+  role: AgentChatRole
+  content: ReactNode
+}
+
+export interface AgentChatToolCallEvent extends AgentChatEventBase {
+  type: 'tool_call'
+  name: string
+  input?: unknown
+  status?: Extract<AgentChatStatus, 'pending' | 'running' | 'complete' | 'error'>
+}
+
+export interface AgentChatToolResultEvent extends AgentChatEventBase {
+  type: 'tool_result'
+  name: string
+  output: unknown
+}
+
+export interface AgentChatArtifactEvent extends AgentChatEventBase {
+  type: 'artifact'
+  kind: 'chart' | 'table' | 'image' | 'code' | string
+  data: unknown
+  title?: ReactNode
+}
+
+export interface AgentChatStatusEvent extends AgentChatEventBase {
+  type: 'status'
+  label?: ReactNode
+}
+
+export type AgentChatEvent =
+  | AgentChatMessageEvent
+  | AgentChatToolCallEvent
+  | AgentChatToolResultEvent
+  | AgentChatArtifactEvent
+  | AgentChatStatusEvent
+  | (AgentChatEventBase & Record<string, unknown>)
+
+export type AgentChatAdapter<TInput, TEvent extends AgentChatEvent = AgentChatEvent> =
+  | ((input: TInput) => readonly TEvent[])
+  | {
+      toEvents: (input: TInput) => readonly TEvent[]
+    }
+
+export interface AgentChatRenderContext<TEvent extends AgentChatEvent> {
+  row: Row<TEvent>
+  event: TEvent
+}
+
+export interface DataGridAgentChatProps<
+  TEvent extends AgentChatEvent = AgentChatEvent,
+  TInput = readonly TEvent[],
+> extends Omit<
+    DataGridChatProps<TEvent>,
+    'data' | 'dataStore' | 'queryMode' | 'columns' | 'renderMessage' | 'getRowId' | 'classNames'
+  > {
+  /** Normalized agent events. Use this directly when your runtime already emits Gridkit events. */
+  events?: readonly TEvent[]
+  /** Provider-specific input converted through adapter. */
+  input?: TInput
+  /** Converts OpenAI, Anthropic, LangChain, Vercel AI, or custom agent data into Gridkit agent events. */
+  adapter?: AgentChatAdapter<TInput, TEvent>
+  /** Optional columns for search/filter state. Defaults to event type, role, status, name, and content fields. */
+  columns?: DataGridColumnDef<TEvent>[]
+  /** Override row identity. Defaults to event.id. */
+  getEventId?: (event: TEvent, index: number) => string
+  /** Full event renderer override. Receives the normalized event and TanStack row. */
+  renderEvent?: (event: TEvent, context: AgentChatRenderContext<TEvent>) => ReactNode
+  renderMessageContent?: (event: Extract<TEvent, { type: 'message' }>, context: AgentChatRenderContext<TEvent>) => ReactNode
+  renderToolCall?: (event: Extract<TEvent, { type: 'tool_call' }>, context: AgentChatRenderContext<TEvent>) => ReactNode
+  renderToolResult?: (event: Extract<TEvent, { type: 'tool_result' }>, context: AgentChatRenderContext<TEvent>) => ReactNode
+  renderArtifact?: (event: Extract<TEvent, { type: 'artifact' }>, context: AgentChatRenderContext<TEvent>) => ReactNode
+  renderStatus?: (event: Extract<TEvent, { type: 'status' }>, context: AgentChatRenderContext<TEvent>) => ReactNode
+  renderEventActions?: (event: TEvent, context: AgentChatRenderContext<TEvent>) => ReactNode
+  /** Slot and event-type class injection for chat shells, bubbles, content, code blocks, and actions. */
+  classNames?: DataGridAgentChatClassNames
+  /** Per-event class hook. Useful for provider state, severity, pinned artifacts, or custom grouping. */
+  getEventClassName?: (event: TEvent, context: AgentChatRenderContext<TEvent>) => string | undefined
+  /** Per-event inline style hook for values that are naturally dynamic, such as accent colors or width. */
+  getEventStyle?: (event: TEvent, context: AgentChatRenderContext<TEvent>) => React.CSSProperties | undefined
 }

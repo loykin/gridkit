@@ -9,6 +9,7 @@ export { DataGridDrag } from './DataGridDrag'
 export { DataGridCard } from './DataGridCard'
 export { DataGridList } from './DataGridList'
 export { DataGridChat } from './DataGridChat'
+export { DataGridAgentChat } from './DataGridAgentChat'
 export { DataGridPaginationBar } from './core/controls/DataGridPaginationBar'
 export { DataGridPaginationCompact } from './core/controls/DataGridPaginationCompact'
 export { DataGridPaginationPages } from './core/controls/DataGridPaginationPages'
@@ -55,6 +56,7 @@ export type {
   DataGridCardProps,
   DataGridListProps,
   DataGridChatProps,
+  DataGridAgentChatProps,
   DataGridPaginationConfig,
   DataGridColumnDef,
   DataGridQueryMode,
@@ -78,6 +80,17 @@ export type {
   DataGridCardClassNames,
   DataGridListClassNames,
   DataGridChatClassNames,
+  AgentChatAdapter,
+  AgentChatArtifactEvent,
+  AgentChatEvent,
+  AgentChatEventBase,
+  AgentChatMessageEvent,
+  AgentChatRenderContext,
+  AgentChatRole,
+  AgentChatStatus,
+  AgentChatStatusEvent,
+  AgentChatToolCallEvent,
+  AgentChatToolResultEvent,
   DataGridIcons,
   ColumnMenuContext,
 } from './types'

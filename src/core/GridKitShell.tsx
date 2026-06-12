@@ -36,6 +36,7 @@ interface GridKitShellProps<T extends object> {
   fillContainer?: boolean
   fillParent?: boolean
   containerClassName?: string
+  containerStyle?: React.CSSProperties
   footerClassName?: string
   scrollbar?: GridKitScrollbarConfig
   footer?: ReactNode
@@ -55,6 +56,7 @@ export function GridKitShell<T extends object>({
   fillContainer,
   fillParent,
   containerClassName,
+  containerStyle: containerStyleProp,
   footerClassName,
   scrollbar,
   footer,
@@ -119,7 +121,9 @@ export function GridKitShell<T extends object>({
         maxHeight: `${fillTableMaxHeight}px`,
       } as React.CSSProperties)
     : undefined
-  const containerStyle = effectiveFillContainer ? { ...heightStyle, ...fillStyle } : heightStyle
+  const containerStyle = effectiveFillContainer
+    ? { ...containerStyleProp, ...heightStyle, ...fillStyle }
+    : { ...containerStyleProp, ...heightStyle }
   const scrollbarMode = scrollbar?.mode ?? 'native'
   const scrollContainer = (
     <div
