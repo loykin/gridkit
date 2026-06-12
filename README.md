@@ -3,8 +3,9 @@
 GridKit is a React data view library built on TanStack Table.
 
 TanStack Table gives you the engine. GridKit gives you the rendered UI: tables,
-lists, cards, and chat-style timelines with shared sorting, filtering, search,
-pagination, virtualization, backend query state, and theming.
+lists, cards, chat timelines, and agent event streams — all sharing the same
+sorting, filtering, search, pagination, virtualization, backend query state,
+and theming pipeline.
 
 It is not headless. It owns the structure for common product data views so you
 do not have to rebuild headers, filter controls, pagination, scroll layout,
@@ -38,6 +39,7 @@ entry, a spreadsheet-focused grid such as `react-data-grid` may be a better fit.
 | `DataGridCard` | Responsive card grid | Filtering, sorting, infinite scroll |
 | `DataGridList` | Custom item renderer in a list | Filtering, sorting, search, infinite scroll |
 | `DataGridChat` | Message timeline (top-load, stick-to-bottom) | Filtering, sorting, search |
+| `DataGridAgentChat` | Agent event stream (messages, tool calls, artifacts, status) | Filtering, sorting, search |
 
 All variants share the same column definition, DataStore, and filter/sort/search pipeline.
 
@@ -722,6 +724,109 @@ Chat views use the shared row/data/filtering props, but omit table-only options 
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Compatibility alias for `containerHeight` |
 | `footer` | `ReactNode` | — | Static content below the chat container |
 | `classNames` | `DataGridChatClassNames` | — | Slot-based class injection for chat elements |
+
+---
+
+## DataGridAgentChat (Agent Event Stream)
+
+Renders an LLM agent run as a scrollable event stream. Built on `DataGridChat`, it adds a typed event model covering messages, tool calls, tool results, artifacts, and status events — with per-event-type render slots and an adapter pattern for any provider format.
+
+### Basic usage
+
+```tsx
+import { DataGridAgentChat } from '@loykin/gridkit'
+import type { AgentChatEvent } from '@loykin/gridkit'
+
+const events: AgentChatEvent[] = [
+  { id: '1', type: 'message', role: 'user', content: 'Show me the deployment status.' },
+  { id: '2', type: 'tool_call', name: 'get_deployments', input: { env: 'prod' }, status: 'running' },
+  { id: '3', type: 'tool_result', name: 'get_deployments', output: { healthy: 12, degraded: 1 } },
+  { id: '4', type: 'message', role: 'assistant', content: '1 deployment is degraded.' },
+]
+
+export function AgentRunViewer() {
+  return (
+    <DataGridAgentChat
+      events={events}
+      containerHeight={560}
+    />
+  )
+}
+```
+
+### Adapter pattern
+
+Use `input` + `adapter` when your runtime emits provider-specific events instead of GridKit's normalized format:
+
+```tsx
+import { DataGridAgentChat } from '@loykin/gridkit'
+import type { AgentChatAdapter } from '@loykin/gridkit'
+
+type VercelMessage = { id: string; role: string; content: string; toolInvocations?: unknown[] }
+
+const vercelAdapter: AgentChatAdapter<VercelMessage[]> = (messages) =>
+  messages.map((m) => ({ id: m.id, type: 'message', role: m.role as AgentChatRole, content: m.content }))
+
+export function ChatUI() {
+  const { messages } = useChat()
+
+  return (
+    <DataGridAgentChat
+      input={messages}
+      adapter={vercelAdapter}
+      containerHeight={560}
+      stickToBottom
+    />
+  )
+}
+```
+
+### Per-type render slots
+
+Override rendering at any granularity without replacing the whole event renderer:
+
+```tsx
+<DataGridAgentChat
+  events={events}
+  renderMessageContent={(event) => <Markdown>{String(event.content)}</Markdown>}
+  renderToolCall={(event) => <ToolCallCard name={event.name} input={event.input} status={event.status} />}
+  renderArtifact={(event) => event.kind === 'chart' ? <Chart data={event.data} /> : null}
+/>
+```
+
+### `DataGridAgentChat`-only Props
+
+Inherits all `DataGridChat` props except `data`, `columns`, `renderMessage`, and `getRowId`.
+
+| Prop | Type | Description |
+|---|---|---|
+| `events` | `readonly TEvent[]` | Normalized agent events. Use when your runtime already emits GridKit events |
+| `input` | `TInput` | Provider-specific input, converted via `adapter` |
+| `adapter` | `AgentChatAdapter<TInput, TEvent>` | Converts provider events to GridKit's normalized event format. Accepts a function or `{ toEvents }` object |
+| `columns` | `DataGridColumnDef<TEvent>[]` | Override search/filter columns. Defaults to type, role, status, name, and content fields |
+| `getEventId` | `(event, index) => string` | Override row identity. Defaults to `event.id` |
+| `renderEvent` | `(event, ctx) => ReactNode` | Full event renderer override — takes precedence over all per-type slots |
+| `renderMessageContent` | `(event, ctx) => ReactNode` | Override message body rendering only |
+| `renderToolCall` | `(event, ctx) => ReactNode` | Override tool call rendering |
+| `renderToolResult` | `(event, ctx) => ReactNode` | Override tool result rendering |
+| `renderArtifact` | `(event, ctx) => ReactNode` | Override artifact rendering |
+| `renderStatus` | `(event, ctx) => ReactNode` | Override status event rendering |
+| `renderEventActions` | `(event, ctx) => ReactNode` | Inject action buttons into any event |
+| `classNames` | `DataGridAgentChatClassNames` | Slot-based class injection for event shells, bubbles, labels, code blocks, and actions |
+| `getEventClassName` | `(event, ctx) => string` | Per-event class hook |
+| `getEventStyle` | `(event, ctx) => CSSProperties` | Per-event inline style hook |
+
+### Agent chat CSS variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `--dg-agent-chat-font-size` | `14px` | Base font size for events |
+| `--dg-agent-chat-event-gap` | `6px` | Gap between event sections within a bubble |
+| `--dg-agent-chat-assistant-max-width` | `760px` | Max bubble width for assistant messages |
+| `--dg-agent-chat-user-max-width` | `640px` | Max bubble width for user messages |
+| `--dg-agent-chat-code-font-size` | `12px` | Font size for JSON/code preview blocks |
+| `--dg-agent-chat-user-background` | — | User message bubble background |
+| `--dg-agent-chat-user-border` | — | User message bubble border color |
 
 ---
 
