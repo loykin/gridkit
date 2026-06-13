@@ -60,7 +60,7 @@ describe('DataGridAgentChat', () => {
       />,
     )
 
-    const event = screen.getByText('Use custom spacing').closest('.dg-agent-chat-event')
+    const event = screen.getByText('Use custom spacing').closest('.gridkit-agent-chat-event')
     expect(event).toHaveClass('agent-event', 'agent-user', 'run-highlight')
     expect(event).toHaveStyle({ maxWidth: '320px' })
   })

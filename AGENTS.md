@@ -83,9 +83,9 @@ TanStack Table's `ColumnMeta` is augmented in:
 ## Styling
 
 - All styles in `src/styles/index.css`
-- Theme via CSS custom properties (`--dg-*`)
+- Theme via CSS custom properties (`--gridkit-*`)
 - State styling uses `data-*` attributes (e.g. `data-pinned`, `data-editing`, `data-dragging`)
-- Key classes: `.dg-detail-row`, `.dg-cell[data-editing="true"]`
+- Key classes: `.gridkit-detail-row`, `.gridkit-cell[data-editing="true"]`
 
 ## Conventions
 

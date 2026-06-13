@@ -1,9 +1,9 @@
 import React from 'react'
 import type { Table, Row } from '@tanstack/react-table'
-import { cn } from '@/lib/utils'
 import { GridKitShell } from '@/core/GridKitShell'
+import { GridKitError } from '@/core/GridKitError'
 import { DataGridTableView } from '@/core/views/DataGridTableView'
-import type { GridKitHeaderSlot, TableViewConfig } from '@/types'
+import type { DataGridStyles, GridKitHeaderSlot, TableViewConfig } from '@/types'
 
 interface DataGridShellProps<T extends object> extends TableViewConfig<T> {
   wrapperRef: React.RefObject<HTMLDivElement | null>
@@ -18,6 +18,7 @@ interface DataGridShellProps<T extends object> extends TableViewConfig<T> {
   loadMoreRef?: React.RefObject<HTMLDivElement | null>
   isFetchingNextPage?: boolean
   footer?: (table: Table<T>) => React.ReactNode
+  styles?: DataGridStyles
 }
 
 export function DataGridShell<T extends object>({
@@ -36,12 +37,9 @@ export function DataGridShell<T extends object>({
   fillContainer,
   fillParent,
   classNames,
+  styles,
   ...viewConfig
 }: DataGridShellProps<T>) {
-  if (error) {
-    return <div className="dg-error">{error.message}</div>
-  }
-
   return (
     <GridKitShell
       wrapperRef={wrapperRef}
@@ -50,22 +48,29 @@ export function DataGridShell<T extends object>({
       headerRight={headerRight}
       fillContainer={fillContainer}
       fillParent={fillParent}
-      containerClassName={cn('dg-table-wrapper', !isSized && 'dg-table-wrapper--hidden')}
-      footerClassName={classNames?.footer}
+      frameView="table"
+      frameHidden={!isSized}
+      classNames={classNames}
+      styles={styles}
       footer={footer?.(table)}
     >
-      <DataGridTableView
-        table={table}
-        rows={rows}
-        containerRef={containerRef}
-        loadMoreRef={loadMoreRef}
-        isFetchingNextPage={isFetchingNextPage}
-        onMeasureColumns={measure}
-        fillContainer={fillContainer}
-        fillParent={fillParent}
-        classNames={classNames}
-        {...viewConfig}
-      />
+      {error
+        ? <GridKitError error={error} classNames={classNames} styles={styles} />
+        : (
+            <DataGridTableView
+              table={table}
+              rows={rows}
+              containerRef={containerRef}
+              loadMoreRef={loadMoreRef}
+              isFetchingNextPage={isFetchingNextPage}
+              onMeasureColumns={measure}
+              fillContainer={fillContainer}
+              fillParent={fillParent}
+              classNames={classNames}
+              styles={styles}
+              {...viewConfig}
+            />
+          )}
     </GridKitShell>
   )
 }

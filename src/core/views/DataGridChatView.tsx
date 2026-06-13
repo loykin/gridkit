@@ -26,14 +26,15 @@ interface DataGridChatViewProps<T extends object>
     | 'fillContainer'
     | 'fillParent'
     | 'scrollbar'
-    | 'containerStyle'
     | 'classNames'
+    | 'styles'
   > {
   wrapperRef: React.RefObject<HTMLDivElement | null>
   containerRef: React.RefObject<HTMLDivElement | null>
   table: Table<T>
   rows: Row<T>[]
   loadPreviousRef?: React.RefObject<HTMLDivElement | null>
+  error?: Error | null
 }
 
 export function DataGridChatView<T extends object>({
@@ -52,9 +53,9 @@ export function DataGridChatView<T extends object>({
   fillContainer,
   fillParent,
   scrollbar,
-  containerStyle,
   isFetchingPreviousPage,
   isLoading,
+  error,
   emptyMessage = 'No messages',
   emptyContent,
   renderMessage,
@@ -62,16 +63,17 @@ export function DataGridChatView<T extends object>({
   renderUnreadMarker,
   renderTypingIndicator,
   classNames,
+  styles,
 }: DataGridChatViewProps<T>) {
   const icons = useIcons()
 
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="dg-chat-messages">
+        <div className={cn('gridkit-chat-messages', classNames?.loading)} style={styles?.loading}>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="dg-chat-message-wrapper">
-              <div className="dg-loading-pulse" />
+            <div key={i} className="gridkit-chat-message-wrapper">
+              <div className="gridkit-loading-pulse" />
             </div>
           ))}
         </div>
@@ -80,38 +82,38 @@ export function DataGridChatView<T extends object>({
 
     if (rows.length === 0) {
       return (
-        <div className={cn('dg-empty', classNames?.empty)}>
+        <div className={cn('gridkit-empty', classNames?.empty)} style={styles?.empty}>
           {emptyContent ?? emptyMessage}
         </div>
       )
     }
 
     return (
-      <div className="dg-chat-messages">
+      <div className={cn('gridkit-chat-messages', classNames?.content)} style={styles?.content}>
         {rows.map((row, index) => {
           const previousRow = index > 0 ? rows[index - 1] : undefined
           const daySeparator = renderDaySeparator?.(row, previousRow)
           const unreadMarker = renderUnreadMarker?.(row)
           return (
-            <div key={row.id} className="dg-chat-row">
+            <div key={row.id} className="gridkit-chat-row">
               {daySeparator && (
-                <div className={cn('dg-chat-day-separator', classNames?.daySeparator)}>
+                <div className={cn('gridkit-chat-day-separator', classNames?.daySeparator)} style={styles?.daySeparator}>
                   {daySeparator}
                 </div>
               )}
               {unreadMarker && (
-                <div className={cn('dg-chat-unread-marker', classNames?.unreadMarker)}>
+                <div className={cn('gridkit-chat-unread-marker', classNames?.unreadMarker)} style={styles?.unreadMarker}>
                   {unreadMarker}
                 </div>
               )}
-              <div className={cn('dg-chat-message-wrapper', classNames?.messageWrapper)}>
+              <div className={cn('gridkit-chat-message-wrapper', classNames?.messageWrapper)} style={styles?.messageWrapper}>
                 {renderMessage(row)}
               </div>
             </div>
           )
         })}
         {renderTypingIndicator && (
-          <div className={cn('dg-chat-typing-indicator', classNames?.typingIndicator)}>
+          <div className={cn('gridkit-chat-typing-indicator', classNames?.typingIndicator)} style={styles?.typingIndicator}>
             {renderTypingIndicator()}
           </div>
         )}
@@ -132,22 +134,25 @@ export function DataGridChatView<T extends object>({
       minTableHeight={minTableHeight}
       fillContainer={fillContainer}
       fillParent={fillParent}
-      containerClassName={cn('dg-chat-container', classNames?.container)}
-      containerStyle={containerStyle}
-      footerClassName={classNames?.footer}
+      frameView="chat"
+      classNames={classNames}
+      styles={styles}
       scrollbar={scrollbar}
       footer={footer}
     >
-      {loadPreviousRef && (
+      {error
+        ? <div className={cn('gridkit-error', classNames?.error)} style={styles?.error}>{error.message}</div>
+        : null}
+      {!error && loadPreviousRef && (
         <div
           ref={loadPreviousRef}
-          className={cn('dg-chat-load-previous', classNames?.loadPrevious)}
-          style={isFetchingPreviousPage ? undefined : { padding: 0 }}
+          className={cn('gridkit-chat-load-previous', classNames?.loadPrevious)}
+          style={{ ...(isFetchingPreviousPage ? undefined : { padding: 0 }), ...styles?.loadPrevious }}
         >
           {isFetchingPreviousPage && icons.loading}
         </div>
       )}
-      {renderContent()}
+      {!error && renderContent()}
     </GridKitShell>
   )
 }

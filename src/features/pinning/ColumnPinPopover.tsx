@@ -25,15 +25,15 @@ export function ColumnPinPopover<T extends object>({ col }: ColumnPinPopoverProp
               aria-label={`Pin options for ${col.id}`}
               variant="ghost"
               size="icon-xs"
-              className={pinned ? 'dg-btn--filter-active' : 'dg-btn--filter-inactive'}
+              className={pinned ? 'gridkit-btn--filter-active' : 'gridkit-btn--filter-inactive'}
             >
               {pinned === 'left' ? icons.pinLeft : pinned === 'right' ? icons.pinRight : icons.pinLeft}
             </Button>
           )}
         />
-        <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: 140, padding: '4px 0' }}>
+        <PopoverContent className="gridkit-header-popover" side="bottom" align="start" style={{ width: 140, padding: '4px 0' }}>
           <button
-            className="dg-popover-option"
+            className="gridkit-popover-option"
             onClick={() => { col.pin('left'); close() }}
             data-active={pinned === 'left' ? 'true' : undefined}
           >
@@ -41,7 +41,7 @@ export function ColumnPinPopover<T extends object>({ col }: ColumnPinPopoverProp
             <span>Pin Left</span>
           </button>
           <button
-            className="dg-popover-option"
+            className="gridkit-popover-option"
             onClick={() => { col.pin('right'); close() }}
             data-active={pinned === 'right' ? 'true' : undefined}
           >
@@ -50,7 +50,7 @@ export function ColumnPinPopover<T extends object>({ col }: ColumnPinPopoverProp
           </button>
           {pinned && (
             <button
-              className="dg-popover-option"
+              className="gridkit-popover-option"
               onClick={() => { col.pin(false); close() }}
             >
               {icons.pinOff}

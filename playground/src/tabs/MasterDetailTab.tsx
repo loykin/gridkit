@@ -61,15 +61,15 @@ export function MasterDetailTab() {
           return (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px 24px' }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--dg-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Start Date</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--gridkit-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Start Date</div>
                 <div style={{ fontSize: 13 }}>{emp.startDate}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--dg-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Score</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--gridkit-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Score</div>
                 <div style={{ fontSize: 13 }}>{emp.score}</div>
               </div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--dg-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Employee ID</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--gridkit-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Employee ID</div>
                 <div style={{ fontSize: 13 }}>EMP-{String(emp.id).padStart(4, '0')}</div>
               </div>
             </div>

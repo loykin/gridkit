@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useStickToBottom } from '../useStickToBottom'
 
-// jsdom에서 scrollHeight/clientHeight는 항상 0이므로 직접 override해서 시뮬레이션한다.
+// jsdom always returns 0 for scrollHeight/clientHeight, so we override them to simulate scroll behavior.
 function createScrollContainer(
   scrollHeight: number,
   clientHeight: number,
@@ -31,8 +31,8 @@ describe('useStickToBottom', () => {
     vi.restoreAllMocks()
   })
 
-  it('초기 atBottom 상태는 항상 true (mount 시 stick 가정)', () => {
-    // 스크롤 위치와 무관하게 초기 atBottom=true: mount 시 하단으로 스크롤하기 위한 전제
+  it('initial atBottom state is always true (assumed stuck to bottom on mount)', () => {
+    // atBottom=true regardless of scroll position: prerequisite for scrolling to bottom on mount
     const el = createScrollContainer(600, 300, 0)
     const { result } = renderHook(() =>
       useStickToBottom({ containerRef: makeRef(el), threshold: 48 }),
@@ -40,7 +40,7 @@ describe('useStickToBottom', () => {
     expect(result.current.atBottom).toBe(true)
   })
 
-  it('mount 시 enabled=true이면 scrollTop을 scrollHeight로 설정 (stick-to-bottom)', () => {
+  it('sets scrollTop to scrollHeight when enabled=true on mount (stick-to-bottom)', () => {
     const el = createScrollContainer(600, 300, 0)
     renderHook(({ dep }) =>
       useStickToBottom({ containerRef: makeRef(el), enabled: true, threshold: 48, dependency: dep }),
@@ -50,7 +50,7 @@ describe('useStickToBottom', () => {
     expect(el.scrollTop).toBe(600)
   })
 
-  it('scroll 이벤트 후 top 위치이면 atBottom=false로 전환', () => {
+  it('transitions atBottom to false when scrolled to top after scroll event', () => {
     let mockScrollTop = 0
     const el = document.createElement('div')
     Object.defineProperty(el, 'scrollHeight', { get: () => 600, configurable: true })
@@ -66,7 +66,7 @@ describe('useStickToBottom', () => {
     )
 
     // mount → stick → scrollTop=600 → atBottom=true
-    // 사용자가 위로 스크롤
+    // user scrolls up
     act(() => {
       mockScrollTop = 0
       el.dispatchEvent(new Event('scroll'))
@@ -74,7 +74,7 @@ describe('useStickToBottom', () => {
     expect(result.current.atBottom).toBe(false)
   })
 
-  it('스크롤을 하단으로 내리면 atBottom=true로 전환', () => {
+  it('transitions atBottom to true when scrolled back to bottom', () => {
     let mockScrollTop = 0
     const el = document.createElement('div')
     Object.defineProperty(el, 'scrollHeight', { get: () => 600, configurable: true })
@@ -89,14 +89,14 @@ describe('useStickToBottom', () => {
       useStickToBottom({ containerRef: makeRef(el), threshold: 48 }),
     )
 
-    // 상단 위치 → atBottom=false
+    // at top → atBottom=false
     act(() => {
       mockScrollTop = 0
       el.dispatchEvent(new Event('scroll'))
     })
     expect(result.current.atBottom).toBe(false)
 
-    // 하단 위치 (600-300=300, scrollTop=260 → bottom까지 40px ≤ 48)
+    // near bottom (600-300=300, scrollTop=260 → 40px from bottom ≤ 48)
     act(() => {
       mockScrollTop = 260
       el.dispatchEvent(new Event('scroll'))
@@ -104,7 +104,7 @@ describe('useStickToBottom', () => {
     expect(result.current.atBottom).toBe(true)
   })
 
-  it('dependency 변화 + atBottom=true이면 scrollTop을 scrollHeight로 설정', () => {
+  it('sets scrollTop to scrollHeight when dependency changes and atBottom=true', () => {
     let mockScrollTop = 300
     const el = document.createElement('div')
     Object.defineProperty(el, 'scrollHeight', { get: () => 600, configurable: true })
@@ -122,13 +122,13 @@ describe('useStickToBottom', () => {
     )
 
     // mount: atBottomRef=true → scrollTop = 600
-    // 사용자가 하단 근처에 있다고 가정 (scrollTop=300, isNearBottom=true)
+    // assume user is near bottom (scrollTop=300, isNearBottom=true)
     act(() => {
       mockScrollTop = 300
       el.dispatchEvent(new Event('scroll'))
     })
 
-    // dep 변화 → stick effect → scrollTop = scrollHeight
+    // dep change → stick effect → scrollTop = scrollHeight
     act(() => {
       rerender({ dep: 'v2' })
     })
@@ -136,7 +136,7 @@ describe('useStickToBottom', () => {
     expect(el.scrollTop).toBe(600)
   })
 
-  it('dependency 변화 + atBottom=false이면 scrollTop 변경 없음', () => {
+  it('does not change scrollTop when dependency changes and atBottom=false', () => {
     let mockScrollTop = 0
     const el = document.createElement('div')
     Object.defineProperty(el, 'scrollHeight', { get: () => 600, configurable: true })
@@ -153,14 +153,14 @@ describe('useStickToBottom', () => {
       { initialProps: { dep: 'v1' } },
     )
 
-    // mount: atBottomRef=true → scrollTop=600 (stick). 그 다음 사용자가 위로 스크롤
+    // mount: atBottomRef=true → scrollTop=600 (stuck). then user scrolls up
     act(() => {
-      mockScrollTop = 0  // 스크롤을 강제로 맨 위로
+      mockScrollTop = 0  // force scroll to top
       el.dispatchEvent(new Event('scroll'))
     })
-    // atBottom=false가 되었어야 함
+    // should have transitioned to atBottom=false
 
-    // dep 변화 → atBottom=false이므로 scrollTop 변경 없음
+    // dep change → atBottom=false so scrollTop is not modified
     act(() => {
       rerender({ dep: 'v2' })
     })
@@ -168,7 +168,7 @@ describe('useStickToBottom', () => {
     expect(el.scrollTop).toBe(0)
   })
 
-  it('enabled=false이면 dependency 변화 시 scrollTop 변경 없음', () => {
+  it('does not change scrollTop on dependency change when enabled=false', () => {
     let mockScrollTop = 300
     const el = document.createElement('div')
     Object.defineProperty(el, 'scrollHeight', { get: () => 600, configurable: true })
@@ -194,11 +194,11 @@ describe('useStickToBottom', () => {
       rerender({ dep: 'v2' })
     })
 
-    // enabled=false → stick effect가 실행되지 않으므로 scrollTop 변경 없음
+    // enabled=false → stick effect does not run, scrollTop unchanged
     expect(el.scrollTop).toBe(300)
   })
 
-  it('onAtBottomChange 콜백이 상태 전환 시 호출됨', () => {
+  it('calls onAtBottomChange callback on state transition', () => {
     const onAtBottomChange = vi.fn()
     let mockScrollTop = 300
     const el = document.createElement('div')
@@ -214,14 +214,14 @@ describe('useStickToBottom', () => {
       useStickToBottom({ containerRef: makeRef(el), threshold: 48, onAtBottomChange }),
     )
 
-    // true → false로 전환
+    // transition true → false
     act(() => {
       mockScrollTop = 0
       el.dispatchEvent(new Event('scroll'))
     })
     expect(onAtBottomChange).toHaveBeenCalledWith(false)
 
-    // false → true로 전환
+    // transition false → true
     act(() => {
       mockScrollTop = 260
       el.dispatchEvent(new Event('scroll'))
@@ -231,7 +231,7 @@ describe('useStickToBottom', () => {
     expect(onAtBottomChange).toHaveBeenCalledTimes(2)
   })
 
-  it('동일한 atBottom 상태에서는 onAtBottomChange가 중복 호출되지 않음', () => {
+  it('does not call onAtBottomChange redundantly when atBottom state does not change', () => {
     const onAtBottomChange = vi.fn()
     let mockScrollTop = 300
     const el = document.createElement('div')
@@ -247,7 +247,7 @@ describe('useStickToBottom', () => {
       useStickToBottom({ containerRef: makeRef(el), threshold: 48, onAtBottomChange }),
     )
 
-    // atBottom=true 상태에서 같은 위치로 scroll (상태 변화 없음)
+    // scroll to same position while atBottom=true (no state change)
     act(() => {
       mockScrollTop = 300
       el.dispatchEvent(new Event('scroll'))
@@ -257,11 +257,11 @@ describe('useStickToBottom', () => {
       el.dispatchEvent(new Event('scroll'))
     })
 
-    // atBottom 상태 변화가 없으면 콜백 호출 없음
+    // no callback when atBottom state does not change
     expect(onAtBottomChange).not.toHaveBeenCalled()
   })
 
-  it('threshold 경계값: scrollHeight-scrollTop-clientHeight === threshold이면 atBottom=true', () => {
+  it('atBottom=true when scrollHeight-scrollTop-clientHeight === threshold (boundary)', () => {
     // 600-252-300=48, threshold=48 → exactly at boundary → atBottom=true
     let mockScrollTop = 252
     const el = document.createElement('div')

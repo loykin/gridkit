@@ -47,7 +47,7 @@ describe('DataGridCard virtualization', () => {
       />,
     )
 
-    expect(container.querySelector('.dg-card-virtual-spacer')).not.toBeInTheDocument()
+    expect(container.querySelector('.gridkit-card-virtual-spacer')).not.toBeInTheDocument()
     expect(screen.getByText('Card 0')).toBeInTheDocument()
     expect(screen.getByText('Card 39')).toBeInTheDocument()
   })
@@ -67,10 +67,10 @@ describe('DataGridCard virtualization', () => {
       />,
     )
 
-    expect(container.querySelector('.dg-card-virtual-spacer')?.getAttribute('data-virtualized')).toBe('true')
+    expect(container.querySelector('.gridkit-card-virtual-spacer')?.getAttribute('data-virtualized')).toBe('true')
     await waitFor(() => expect(screen.getByText('Card 0')).toBeInTheDocument())
     expect(screen.queryByText('Card 999')).not.toBeInTheDocument()
-    expect(container.querySelectorAll('.dg-card').length).toBeLessThan(1000)
+    expect(container.querySelectorAll('.gridkit-card').length).toBeLessThan(1000)
   })
 
   it('activates virtual mode with fillContainer (no explicit height)', () => {
@@ -86,7 +86,7 @@ describe('DataGridCard virtualization', () => {
         renderCard={(row) => <div>{row.original.label}</div>}
       />,
     )
-    expect(container.querySelector('.dg-card-virtual-spacer')).toBeInTheDocument()
+    expect(container.querySelector('.gridkit-card-virtual-spacer')).toBeInTheDocument()
   })
 
   it('activates virtual mode with fillParent (no explicit height)', () => {
@@ -102,10 +102,10 @@ describe('DataGridCard virtualization', () => {
         renderCard={(row) => <div>{row.original.label}</div>}
       />,
     )
-    expect(container.querySelector('.dg-card-virtual-spacer')).toBeInTheDocument()
+    expect(container.querySelector('.gridkit-card-virtual-spacer')).toBeInTheDocument()
   })
 
-  it('applies dg-table-wrapper--fill when fillContainer is set', () => {
+  it('applies gridkit-frame--fill when fillContainer is set', () => {
     const { container } = render(
       <DataGridCard
         data={makeItems(5)}
@@ -115,7 +115,7 @@ describe('DataGridCard virtualization', () => {
         renderCard={(row) => <div>{row.original.label}</div>}
       />,
     )
-    expect(container.querySelector('.dg-card-container')).toHaveClass('dg-table-wrapper--fill')
+    expect(container.querySelector('.gridkit-frame')).toHaveClass('gridkit-frame--fill')
   })
 
   it('sets data-fill-parent when fillParent is set', () => {
@@ -128,7 +128,7 @@ describe('DataGridCard virtualization', () => {
         renderCard={(row) => <div>{row.original.label}</div>}
       />,
     )
-    expect(container.querySelector('.dg-shell')).toHaveAttribute('data-fill-parent', 'true')
+    expect(container.querySelector('.gridkit-shell')).toHaveAttribute('data-fill-parent', 'true')
   })
 
   it('uses the shared custom scrollbar layer when requested', () => {
@@ -144,9 +144,9 @@ describe('DataGridCard virtualization', () => {
       />,
     )
 
-    expect(container.querySelector('.dg-card-container')?.getAttribute('data-scrollbar')).toBe('custom')
-    expect(container.querySelector('.dg-scroll-frame')).toBeInTheDocument()
-    expect(container.querySelector('.dg-scrollbar-track')).toBeInTheDocument()
+    expect(container.querySelector('.gridkit-frame')?.getAttribute('data-scrollbar')).toBe('custom')
+    expect(container.querySelector('.gridkit-scroll-frame')).toBeInTheDocument()
+    expect(container.querySelector('.gridkit-scrollbar-track')).toBeInTheDocument()
   })
 
 })

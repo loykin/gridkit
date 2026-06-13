@@ -62,7 +62,7 @@ All variants share the same column definition, DataStore, and filter/sort/search
 - **Row Expansion** — tree rows with collapsible sub-rows
 - **DataStore** — map-based external store for high-frequency real-time updates
 - **Server-Side Support** — sorting, filtering, and pagination all controllable externally
-- **CSS Theming** — override `--dg-*` variables to match any design system
+- **CSS Theming** — override `--gridkit-*` variables to match any design system
 - **`classNames` Slots** — apply custom classes to any structural element (container, header, footer, row, cell, empty state, load-more)
 - **Icon Overrides** — replace any built-in icon via the `icons` prop
 - **Escape Hatch** — `tableOptions` passes advanced TanStack Table options safely
@@ -99,20 +99,20 @@ GridKit has two customization surfaces:
 
 ```css
 :root {
-  --dg-header-background: #0f172a;
-  --dg-header-foreground: #f8fafc;
-  --dg-border: #e2e8f0;
-  --dg-radius: 0.75rem;
+  --gridkit-header-background: #0f172a;
+  --gridkit-header-foreground: #f8fafc;
+  --gridkit-border: #e2e8f0;
+  --gridkit-radius: 0.75rem;
 }
 ```
 
-**2. `classNames` prop** — structural class injection. Use this for layout utilities, shadows, and hover effects that CSS variables cannot express — not for colors or spacing that already have a `--dg-*` token.
+**2. `classNames` prop** — structural class injection. Use this for layout utilities, shadows, and hover effects that CSS variables cannot express — not for colors or spacing that already have a `--gridkit-*` token.
 
 ```tsx
-// Good — structure/layout that has no --dg-* equivalent
+// Good — structure/layout that has no --gridkit-* equivalent
 <DataGrid
   classNames={{
-    container: 'shadow-md',
+    frame: 'shadow-md',
     row:       'hover:bg-blue-50',
     footer:    'border-t',
   }}
@@ -122,14 +122,14 @@ GridKit has two customization surfaces:
 // Avoid — use CSS variables instead
 <DataGrid
   classNames={{
-    header: 'bg-slate-900 text-white',  // → --dg-header-background / --dg-header-foreground
-    cell:   'px-4',                     // → --dg-cell-padding (if exposed)
+    header: 'bg-slate-900 text-white',  // → --gridkit-header-background / --gridkit-header-foreground
+    cell:   'px-4',                     // → --gridkit-cell-padding (if exposed)
   }}
   ...
 />
 ```
 
-**With shadcn/ui** — works out of the box. The `--dg-*` variables automatically fall back to your existing shadcn CSS variables.
+**With shadcn/ui** — works out of the box. The `--gridkit-*` variables automatically fall back to your existing shadcn CSS variables.
 
 **Standalone** — hardcoded defaults are applied automatically. No configuration needed.
 
@@ -137,96 +137,96 @@ GridKit has two customization surfaces:
 
 ```css
 :root {
-  --dg-background: #ffffff;
-  --dg-foreground: #0a0a0a;
-  --dg-border: #e5e7eb;
-  --dg-primary: #3b82f6;
-  --dg-muted: #f5f5f5;
-  --dg-muted-foreground: #6b7280;
-  --dg-header-background: var(--dg-muted);
-  --dg-header-foreground: var(--dg-muted-foreground);
-  --dg-header-border: var(--dg-border);
-  --dg-header-control-background: var(--dg-header-background);
-  --dg-header-control-foreground: var(--dg-header-foreground);
-  --dg-header-control-border: var(--dg-header-border);
-  --dg-header-popover-background: var(--dg-header-background);
-  --dg-header-popover-foreground: var(--dg-header-foreground);
-  --dg-header-popover-border: var(--dg-header-border);
-  --dg-control-background: var(--dg-background);
-  --dg-control-foreground: var(--dg-foreground);
-  --dg-control-border: var(--dg-border);
-  --dg-footer-background: var(--dg-background);
-  --dg-footer-foreground: var(--dg-muted-foreground);
-  --dg-footer-border: var(--dg-border);
-  --dg-radius: 0.5rem;
+  --gridkit-background: #ffffff;
+  --gridkit-foreground: #0a0a0a;
+  --gridkit-border: #e5e7eb;
+  --gridkit-primary: #3b82f6;
+  --gridkit-muted: #f5f5f5;
+  --gridkit-muted-foreground: #6b7280;
+  --gridkit-header-background: var(--gridkit-muted);
+  --gridkit-header-foreground: var(--gridkit-muted-foreground);
+  --gridkit-header-border: var(--gridkit-border);
+  --gridkit-header-control-background: var(--gridkit-header-background);
+  --gridkit-header-control-foreground: var(--gridkit-header-foreground);
+  --gridkit-header-control-border: var(--gridkit-header-border);
+  --gridkit-header-popover-background: var(--gridkit-header-background);
+  --gridkit-header-popover-foreground: var(--gridkit-header-foreground);
+  --gridkit-header-popover-border: var(--gridkit-header-border);
+  --gridkit-control-background: var(--gridkit-background);
+  --gridkit-control-foreground: var(--gridkit-foreground);
+  --gridkit-control-border: var(--gridkit-border);
+  --gridkit-footer-background: var(--gridkit-background);
+  --gridkit-footer-foreground: var(--gridkit-muted-foreground);
+  --gridkit-footer-border: var(--gridkit-border);
+  --gridkit-radius: 0.5rem;
 }
 
 .dark {
-  --dg-background: #0a0a0a;
-  --dg-foreground: #fafafa;
-  --dg-border: rgba(255, 255, 255, 0.1);
-  --dg-primary: #6366f1;
-  --dg-muted: #1a1a1a;
-  --dg-muted-foreground: #a1a1aa;
-  --dg-header-background: var(--dg-muted);
-  --dg-header-foreground: var(--dg-muted-foreground);
-  --dg-header-border: var(--dg-border);
-  --dg-header-control-background: var(--dg-header-background);
-  --dg-header-control-foreground: var(--dg-header-foreground);
-  --dg-header-control-border: var(--dg-header-border);
-  --dg-header-popover-background: var(--dg-header-background);
-  --dg-header-popover-foreground: var(--dg-header-foreground);
-  --dg-header-popover-border: var(--dg-header-border);
-  --dg-control-background: var(--dg-background);
-  --dg-control-foreground: var(--dg-foreground);
-  --dg-control-border: var(--dg-border);
-  --dg-footer-background: var(--dg-background);
-  --dg-footer-foreground: var(--dg-muted-foreground);
-  --dg-footer-border: var(--dg-border);
+  --gridkit-background: #0a0a0a;
+  --gridkit-foreground: #fafafa;
+  --gridkit-border: rgba(255, 255, 255, 0.1);
+  --gridkit-primary: #6366f1;
+  --gridkit-muted: #1a1a1a;
+  --gridkit-muted-foreground: #a1a1aa;
+  --gridkit-header-background: var(--gridkit-muted);
+  --gridkit-header-foreground: var(--gridkit-muted-foreground);
+  --gridkit-header-border: var(--gridkit-border);
+  --gridkit-header-control-background: var(--gridkit-header-background);
+  --gridkit-header-control-foreground: var(--gridkit-header-foreground);
+  --gridkit-header-control-border: var(--gridkit-header-border);
+  --gridkit-header-popover-background: var(--gridkit-header-background);
+  --gridkit-header-popover-foreground: var(--gridkit-header-foreground);
+  --gridkit-header-popover-border: var(--gridkit-header-border);
+  --gridkit-control-background: var(--gridkit-background);
+  --gridkit-control-foreground: var(--gridkit-foreground);
+  --gridkit-control-border: var(--gridkit-border);
+  --gridkit-footer-background: var(--gridkit-background);
+  --gridkit-footer-foreground: var(--gridkit-muted-foreground);
+  --gridkit-footer-border: var(--gridkit-border);
 }
 ```
 
-#### All `--dg-*` Variables
+#### All `--gridkit-*` Variables
 
 | Variable | Description |
 |---|---|
-| `--dg-background` | Table / cell background |
-| `--dg-foreground` | Default text color |
-| `--dg-popover` | Dropdown / popover background |
-| `--dg-popover-foreground` | Dropdown text color |
-| `--dg-primary` | Primary accent (active page button, checkboxes) |
-| `--dg-primary-foreground` | Text on primary backgrounds |
-| `--dg-secondary` | Secondary background |
-| `--dg-secondary-foreground` | Secondary text |
-| `--dg-muted` | Muted surface background |
-| `--dg-muted-foreground` | Muted text (placeholders, hints) |
-| `--dg-header-background` | Table header and filter row background. Defaults to `--dg-muted` |
-| `--dg-header-foreground` | Table header text color. Defaults to `--dg-muted-foreground` |
-| `--dg-header-border` | Header row, header cell, and filter row border color. Defaults to `--dg-border` |
-| `--dg-header-control-background` | Header filter input/select background. Defaults to `--dg-header-background` |
-| `--dg-header-control-foreground` | Header filter input/select text color. Defaults to `--dg-header-foreground` |
-| `--dg-header-control-border` | Header filter input/select/checkbox border color. Defaults to `--dg-header-border` |
-| `--dg-header-control-placeholder` | Header filter input placeholder color. Defaults to a translucent `--dg-header-control-foreground` |
-| `--dg-header-popover-background` | Header-origin popover background. Defaults to `--dg-header-background` |
-| `--dg-header-popover-foreground` | Header-origin popover text color. Defaults to `--dg-header-foreground` |
-| `--dg-header-popover-border` | Header-origin popover border color. Defaults to `--dg-header-border` |
-| `--dg-accent` | Hover / accent background |
-| `--dg-accent-foreground` | Accent text |
-| `--dg-destructive` | Destructive action color |
-| `--dg-border` | Border color |
-| `--dg-input` | Input border fallback. Defaults to framework `--input` when available |
-| `--dg-control-background` | Input, select, and checkbox control background. Defaults to `--dg-background` |
-| `--dg-control-foreground` | Input and select text color. Defaults to `--dg-foreground` |
-| `--dg-control-border` | Input, select, and checkbox border color. Defaults to `--dg-input` |
-| `--dg-control-placeholder` | Input placeholder color. Defaults to `--dg-muted-foreground` |
-| `--dg-popover-border` | Generic popover and action menu border color. Defaults to a translucent `--dg-foreground` |
-| `--dg-popover-option-hover-background` | Generic popover option hover background. Defaults to `--dg-muted` |
-| `--dg-popover-section-foreground` | Generic popover section label color. Defaults to `--dg-muted-foreground` |
-| `--dg-footer-background` | Footer surface background. Defaults to `--dg-background` |
-| `--dg-footer-foreground` | Footer text color. Defaults to `--dg-muted-foreground` |
-| `--dg-footer-border` | Footer border color token for custom footer styles. Defaults to `--dg-border`; the built-in footer wrapper does not draw a border by default |
-| `--dg-ring` | Focus ring color |
-| `--dg-radius` | Border radius base value |
+| `--gridkit-background` | Table / cell background |
+| `--gridkit-foreground` | Default text color |
+| `--gridkit-popover` | Dropdown / popover background |
+| `--gridkit-popover-foreground` | Dropdown text color |
+| `--gridkit-primary` | Primary accent (active page button, checkboxes) |
+| `--gridkit-primary-foreground` | Text on primary backgrounds |
+| `--gridkit-secondary` | Secondary background |
+| `--gridkit-secondary-foreground` | Secondary text |
+| `--gridkit-muted` | Muted surface background |
+| `--gridkit-muted-foreground` | Muted text (placeholders, hints) |
+| `--gridkit-header-background` | Table header and filter row background. Defaults to `--gridkit-muted` |
+| `--gridkit-header-foreground` | Table header text color. Defaults to `--gridkit-muted-foreground` |
+| `--gridkit-header-border` | Header row, header cell, and filter row border color. Defaults to `--gridkit-border` |
+| `--gridkit-header-control-background` | Header filter input/select background. Defaults to `--gridkit-header-background` |
+| `--gridkit-header-control-foreground` | Header filter input/select text color. Defaults to `--gridkit-header-foreground` |
+| `--gridkit-header-control-border` | Header filter input/select/checkbox border color. Defaults to `--gridkit-header-border` |
+| `--gridkit-header-control-placeholder` | Header filter input placeholder color. Defaults to a translucent `--gridkit-header-control-foreground` |
+| `--gridkit-header-popover-background` | Header-origin popover background. Defaults to `--gridkit-header-background` |
+| `--gridkit-header-popover-foreground` | Header-origin popover text color. Defaults to `--gridkit-header-foreground` |
+| `--gridkit-header-popover-border` | Header-origin popover border color. Defaults to `--gridkit-header-border` |
+| `--gridkit-accent` | Hover / accent background |
+| `--gridkit-accent-foreground` | Accent text |
+| `--gridkit-destructive` | Destructive action color |
+| `--gridkit-border` | Border color |
+| `--gridkit-input` | Input border fallback. Defaults to framework `--input` when available |
+| `--gridkit-control-background` | Input, select, and checkbox control background. Defaults to `--gridkit-background` |
+| `--gridkit-control-foreground` | Input and select text color. Defaults to `--gridkit-foreground` |
+| `--gridkit-control-border` | Input, select, and checkbox border color. Defaults to `--gridkit-input` |
+| `--gridkit-control-placeholder` | Input placeholder color. Defaults to `--gridkit-muted-foreground` |
+| `--gridkit-popover-border` | Generic popover and action menu border color. Defaults to a translucent `--gridkit-foreground` |
+| `--gridkit-popover-option-hover-background` | Generic popover option hover background. Defaults to `--gridkit-muted` |
+| `--gridkit-popover-section-foreground` | Generic popover section label color. Defaults to `--gridkit-muted-foreground` |
+| `--gridkit-footer-background` | Footer surface background. Defaults to `--gridkit-background` |
+| `--gridkit-footer-foreground` | Footer text color. Defaults to `--gridkit-muted-foreground` |
+| `--gridkit-footer-border` | Footer border color token for custom footer styles. Defaults to `--gridkit-border`; the built-in footer wrapper does not draw a border by default |
+| `--gridkit-ring` | Focus ring color |
+| `--gridkit-radius` | Border radius base value |
 
 ### `classNames` Reference
 
@@ -503,13 +503,13 @@ Behavior:
 - Short data uses natural table height, so the footer sits directly below the table.
 - Overflowing data scrolls only inside the body area.
 - The footer remains visible at the bottom of the parent panel.
-- GridKit measures toolbar, header, footer, gaps, and parent resize internally; callers should not query `.dg-*` internals to calculate `maxTableHeight`.
+- GridKit measures toolbar, header, footer, gaps, and parent resize internally; callers should not query internal GridKit class names to calculate `maxTableHeight`.
 
 Parent requirements:
 
 - A fixed height, `height: 100%` chain, or flex layout that gives the parent a real height.
 - In flex layouts, make sure the parent chain can shrink with `min-height: 0`.
-- Do not add `overflow: auto` to `.dg-table-wrapper` or `.dg-container`; the scroll owner is the internal body element.
+- Do not add `overflow: auto` to the GridKit frame or container elements; the scroll owner is the internal body element.
 
 `fillContainer` works across all view variants. For `DataGridCard` and `DataGridList`, it also enables `enableVirtualization` without requiring an explicit `containerHeight`.
 
@@ -668,8 +668,8 @@ List views use the shared row/data/filtering props, but omit table-only options 
 
 | Variable | Default | Description |
 |---|---|---|
-| `--dg-list-gap` | `0px` | Gap between list items |
-| `--dg-list-padding` | `0px` | Padding around the list body |
+| `--gridkit-list-gap` | `0px` | Gap between list items |
+| `--gridkit-list-padding` | `0px` | Padding around the list body |
 
 ---
 
@@ -820,13 +820,13 @@ Inherits all `DataGridChat` props except `data`, `columns`, `renderMessage`, and
 
 | Variable | Default | Description |
 |---|---|---|
-| `--dg-agent-chat-font-size` | `14px` | Base font size for events |
-| `--dg-agent-chat-event-gap` | `6px` | Gap between event sections within a bubble |
-| `--dg-agent-chat-assistant-max-width` | `760px` | Max bubble width for assistant messages |
-| `--dg-agent-chat-user-max-width` | `640px` | Max bubble width for user messages |
-| `--dg-agent-chat-code-font-size` | `12px` | Font size for JSON/code preview blocks |
-| `--dg-agent-chat-user-background` | — | User message bubble background |
-| `--dg-agent-chat-user-border` | — | User message bubble border color |
+| `--gridkit-agent-chat-font-size` | `14px` | Base font size for events |
+| `--gridkit-agent-chat-event-gap` | `6px` | Gap between event sections within a bubble |
+| `--gridkit-agent-chat-assistant-max-width` | `760px` | Max bubble width for assistant messages |
+| `--gridkit-agent-chat-user-max-width` | `640px` | Max bubble width for user messages |
+| `--gridkit-agent-chat-code-font-size` | `12px` | Font size for JSON/code preview blocks |
+| `--gridkit-agent-chat-user-background` | — | User message bubble background |
+| `--gridkit-agent-chat-user-border` | — | User message bubble border color |
 
 ---
 
@@ -913,8 +913,8 @@ All [shared props](#shared-props-datagrid-datagridinfinity-datagriddag-datagridc
 
 | Variable | Default | Description |
 |---|---|---|
-| `--dg-card-gap` | `16px` | Gap between cards |
-| `--dg-card-padding` | `16px` | Padding around the grid |
+| `--gridkit-card-gap` | `16px` | Gap between cards |
+| `--gridkit-card-padding` | `16px` | Padding around the grid |
 
 ---
 

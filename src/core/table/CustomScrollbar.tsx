@@ -23,7 +23,7 @@ export function CustomScrollbar({
   thumbStyle,
 }: CustomScrollbarProps) {
   const isV = direction === 'vertical'
-  const resolvedSize = size ?? 'var(--dg-scrollbar-size)'
+  const resolvedSize = size ?? 'var(--gridkit-scrollbar-size)'
   const trackRef = useRef<HTMLDivElement>(null)
 
   // Refs for drag calculations (avoid stale closures)
@@ -136,11 +136,11 @@ export function CustomScrollbar({
     <div
       ref={trackRef}
       onClick={handleTrackClick}
-      className={cn('dg-scrollbar-track', !visible && 'hidden', className, trackClassName)}
+      className={cn('gridkit-scrollbar-track', !visible && 'hidden', className, trackClassName)}
       style={isV ? { position: 'absolute', top: 0, right: 0, bottom: 0, width: resolvedSize, ...style } : { position: 'relative', flex: '0 0 auto', height: resolvedSize, ...style }}
     >
       <div
-        className={cn('dg-scrollbar-thumb', thumbClassName)}
+        className={cn('gridkit-scrollbar-thumb', thumbClassName)}
         onMouseDown={handleThumbMouseDown}
         onClick={(e) => e.stopPropagation()}
         style={

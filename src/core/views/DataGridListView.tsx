@@ -4,6 +4,7 @@ import type { Virtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { GridKitShell } from '@/core/GridKitShell'
+import { GridKitError } from '@/core/GridKitError'
 import type { DataGridListProps } from '@/types'
 
 interface DataGridListViewProps<T extends object>
@@ -24,11 +25,13 @@ interface DataGridListViewProps<T extends object>
     | 'minTableHeight'
     | 'fillContainer'
     | 'fillParent'
+    | 'error'
     | 'isFetchingNextPage'
     | 'headerLeft'
     | 'headerRight'
     | 'footer'
     | 'classNames'
+    | 'styles'
     | 'scrollbar'
   > {
   wrapperRef: React.RefObject<HTMLDivElement | null>
@@ -54,6 +57,7 @@ export function DataGridListView<T extends object>({
   loadMoreRef,
   isFetchingNextPage,
   isLoading,
+  error,
   emptyMessage = 'No data',
   emptyContent,
   renderItem,
@@ -69,6 +73,7 @@ export function DataGridListView<T extends object>({
   onRowClick,
   rowCursor,
   classNames,
+  styles,
   scrollbar,
   virtual,
   rowVirtualizer,
@@ -78,8 +83,8 @@ export function DataGridListView<T extends object>({
 }: DataGridListViewProps<T>) {
   const icons = useIcons()
   const listStyle = {
-    '--dg-list-gap': `${itemGap}px`,
-    '--dg-list-padding': `${itemPadding}px`,
+    '--gridkit-list-gap': `${itemGap}px`,
+    '--gridkit-list-padding': `${itemPadding}px`,
   } as React.CSSProperties
 
   const renderItemWrapper = (
@@ -93,11 +98,11 @@ export function DataGridListView<T extends object>({
       ref={measureRef}
       data-index={dataIndex}
       className={cn(
-        'dg-list-item',
-        rowCursor && onRowClick && 'dg-list-item--clickable',
+        'gridkit-list-item',
+        rowCursor && onRowClick && 'gridkit-list-item--clickable',
         classNames?.item,
       )}
-      style={style}
+      style={{ ...style, ...styles?.item }}
       onClick={onRowClick ? () => onRowClick(row.original) : undefined}
     >
       {renderItem(row)}
@@ -105,12 +110,16 @@ export function DataGridListView<T extends object>({
   )
 
   const renderContent = () => {
+    if (error) {
+      return <GridKitError error={error} classNames={classNames} styles={styles} />
+    }
+
     if (isLoading) {
       return (
-        <div className="dg-list-items" style={listStyle}>
+        <div className={cn('gridkit-list-items', classNames?.loading)} style={{ ...listStyle, ...styles?.loading }}>
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="dg-list-item">
-              <div className="dg-loading-pulse" />
+            <div key={i} className="gridkit-list-item">
+              <div className="gridkit-loading-pulse" />
             </div>
           ))}
         </div>
@@ -119,7 +128,7 @@ export function DataGridListView<T extends object>({
 
     if (rows.length === 0) {
       return (
-        <div className={cn('dg-empty', classNames?.empty)}>
+        <div className={cn('gridkit-empty', classNames?.empty)} style={styles?.empty}>
           {emptyContent ?? emptyMessage}
         </div>
       )
@@ -144,9 +153,9 @@ export function DataGridListView<T extends object>({
           }))
 
       return (
-        <div className="dg-list-items" style={listStyle} data-virtualized="true">
+        <div className={cn('gridkit-list-items', classNames?.content)} style={{ ...listStyle, ...styles?.content }} data-virtualized="true">
           <div
-            className="dg-list-virtual-spacer"
+            className="gridkit-list-virtual-spacer"
             style={{ height: rowVirtualizer.getTotalSize() || rows.length * virtualEstimateSize }}
           >
             {itemEntries.map((virtualRow) => {
@@ -169,7 +178,7 @@ export function DataGridListView<T extends object>({
     }
 
     return (
-      <div className="dg-list-items" style={listStyle}>
+      <div className={cn('gridkit-list-items', classNames?.content)} style={{ ...listStyle, ...styles?.content }}>
         {rows.map((row) => renderItemWrapper(row))}
       </div>
     )
@@ -188,14 +197,15 @@ export function DataGridListView<T extends object>({
       minTableHeight={minTableHeight}
       fillContainer={fillContainer}
       fillParent={fillParent}
-      containerClassName={cn('dg-list-container', classNames?.container)}
-      footerClassName={classNames?.footer}
+      frameView="list"
+      classNames={classNames}
+      styles={styles}
       scrollbar={scrollbar}
       footer={footer}
     >
       {renderContent()}
-      {loadMoreRef && (
-        <div ref={loadMoreRef} className={cn('dg-list-load-more', classNames?.loadMore)}>
+      {!error && loadMoreRef && (
+        <div ref={loadMoreRef} className={cn('gridkit-list-load-more', classNames?.loadMore)} style={styles?.loadMore}>
           {isFetchingNextPage && icons.loading}
         </div>
       )}

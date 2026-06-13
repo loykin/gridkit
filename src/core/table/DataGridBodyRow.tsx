@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { Row, Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
-import type { DataGridClassNames, TableViewConfig, TableWidthMode } from '@/types'
+import type { DataGridClassNames, DataGridStyles, TableViewConfig } from '@/types'
 import { DataGridBodyCell } from './DataGridBodyCell'
 
 interface DataGridBodyRowProps<T extends object>
@@ -18,8 +18,8 @@ interface DataGridBodyRowProps<T extends object>
   rowHeight?: number
   onActionTrigger?: (row: T, el: HTMLElement) => void
   isLastRow?: boolean
-  tableWidthMode?: TableWidthMode
   classNames?: DataGridClassNames
+  styles?: DataGridStyles
 }
 
 export function DataGridBodyRow<T extends object>({
@@ -39,6 +39,7 @@ export function DataGridBodyRow<T extends object>({
   onActionTrigger,
   isLastRow = false,
   classNames,
+  styles,
 }: DataGridBodyRowProps<T>) {
   const visibleCells = visibleColumnIds
     ? row.getVisibleCells().filter((cell) => visibleColumnIds.has(cell.column.id))
@@ -52,10 +53,10 @@ export function DataGridBodyRow<T extends object>({
       ref={measureRef}
       onClick={onRowClick ? () => onRowClick(row.original) : undefined}
       className={cn(
-        'dg-row',
+        'gridkit-row',
         classNames?.row,
       )}
-      style={{ minHeight: rowHeight, ...style }}
+      style={{ ...styles?.row, minHeight: rowHeight, ...style }}
     >
       {visibleCells.map((cell, idx) => {
         const isLast = idx === visibleCells.length - 1
@@ -73,6 +74,7 @@ export function DataGridBodyRow<T extends object>({
             pinning={pinning}
             onActionTrigger={onActionTrigger}
             classNames={classNames}
+            styles={styles}
           />
         )
       })}

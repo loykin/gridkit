@@ -4,7 +4,7 @@ import type { Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { DataGridToolbar } from '@/core/controls/DataGridToolbar'
 import { CustomScrollbar } from '@/core/table/CustomScrollbar'
-import type { GridKitHeaderSlot, GridKitScrollbarConfig } from '@/types'
+import type { GridKitClassNames, GridKitHeaderSlot, GridKitScrollbarConfig, GridKitStyles } from '@/types'
 
 export function resolveContainerHeight(
   height: string | number | 'auto' | undefined,
@@ -35,11 +35,16 @@ interface GridKitShellProps<T extends object> {
   minTableHeight?: string | number
   fillContainer?: boolean
   fillParent?: boolean
-  containerClassName?: string
-  containerStyle?: React.CSSProperties
-  footerClassName?: string
+  /** data-view attribute on the frame element — used for view-specific fill CSS */
+  frameView?: 'table' | 'card' | 'list' | 'chat'
+  /** Hides the frame before column measurement completes (table view only) */
+  frameHidden?: boolean
+  /** Additional class applied to the frame (e.g. gridkit-agent-chat-frame) */
+  frameExtra?: string
   scrollbar?: GridKitScrollbarConfig
   footer?: ReactNode
+  classNames?: GridKitClassNames
+  styles?: GridKitStyles
   children: ReactNode
 }
 
@@ -55,11 +60,13 @@ export function GridKitShell<T extends object>({
   minTableHeight,
   fillContainer,
   fillParent,
-  containerClassName,
-  containerStyle: containerStyleProp,
-  footerClassName,
+  frameView = 'table',
+  frameHidden,
+  frameExtra,
   scrollbar,
   footer,
+  classNames,
+  styles,
   children,
 }: GridKitShellProps<T>) {
   useEffect(() => {
@@ -117,13 +124,16 @@ export function GridKitShell<T extends object>({
 
   const fillStyle = effectiveFillContainer && fillTableMaxHeight != null
     ? ({
-        '--dg-fill-table-max-height': `${fillTableMaxHeight}px`,
+        '--gridkit-fill-table-max-height': `${fillTableMaxHeight}px`,
         maxHeight: `${fillTableMaxHeight}px`,
       } as React.CSSProperties)
     : undefined
-  const containerStyle = effectiveFillContainer
-    ? { ...containerStyleProp, ...heightStyle, ...fillStyle }
-    : { ...containerStyleProp, ...heightStyle }
+
+  // Internal styles first, user styles override (escape hatch — see docs/api-v0.2-styling.md)
+  const frameStyle = effectiveFillContainer
+    ? { ...heightStyle, ...fillStyle, ...styles?.frame }
+    : { ...heightStyle, ...styles?.frame }
+
   const scrollbarMode = scrollbar?.mode ?? 'native'
   const scrollContainer = (
     <div
@@ -134,12 +144,16 @@ export function GridKitShell<T extends object>({
         }
       }}
       className={cn(
-        containerClassName,
-        'dg-scroll-container',
-        effectiveFillContainer && 'dg-table-wrapper--fill',
+        'gridkit-frame',
+        'gridkit-scroll-container',
+        frameExtra,
+        classNames?.frame,
+        effectiveFillContainer && 'gridkit-frame--fill',
+        frameHidden && 'gridkit-frame--hidden',
       )}
+      data-view={frameView}
       data-scrollbar={scrollbarMode === 'native' ? undefined : scrollbarMode}
-      style={containerStyle}
+      style={frameStyle}
     >
       {children}
     </div>
@@ -148,18 +162,19 @@ export function GridKitShell<T extends object>({
   return (
     <div
       ref={wrapperRef}
-      className={cn('dg-shell', effectiveFillContainer && 'dg-shell--fill')}
+      className={cn('gridkit-shell', effectiveFillContainer && 'gridkit-shell--fill', classNames?.root)}
       data-fill-parent={fillParent ? 'true' : undefined}
+      style={styles?.root}
     >
       {hasToolbar && (
-        <div ref={toolbarFrameRef} className="dg-toolbar-frame">
+        <div ref={toolbarFrameRef} className={cn('gridkit-toolbar-frame', classNames?.toolbar)} style={styles?.toolbar}>
           <DataGridToolbar table={table} headerLeft={headerLeft} headerRight={headerRight} />
         </div>
       )}
 
-      <div className="dg-table-stack">
+      <div className="gridkit-table-stack">
         {scrollbarMode === 'custom' ? (
-          <div className={cn('dg-scroll-frame', effectiveFillContainer && 'dg-scroll-frame--fill')}>
+          <div className={cn('gridkit-scroll-frame', effectiveFillContainer && 'gridkit-scroll-frame--fill')}>
             {scrollContainer}
             <CustomScrollbar
               scrollRef={tableWrapperRef}
@@ -174,7 +189,7 @@ export function GridKitShell<T extends object>({
         ) : scrollContainer}
 
         {footer && (
-          <div ref={footerFrameRef} className={cn('dg-footer', footerClassName)}>
+          <div ref={footerFrameRef} className={cn('gridkit-footer', classNames?.footer)} style={styles?.footer}>
             {footer}
           </div>
         )}

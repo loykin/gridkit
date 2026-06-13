@@ -89,7 +89,7 @@ export function DataGridHeaderLayout<T extends object>({
   const content = (
     <div
       role="row"
-      className={cn('dg-header-row', 'dg-header-layout')}
+      className={cn('gridkit-header-row', 'gridkit-header-layout')}
       data-header-group-layout={headerGroupLayout}
       style={{
         position: 'relative',

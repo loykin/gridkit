@@ -16,7 +16,7 @@ const ScrollTable = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={ref}
       role="table"
-      className={['dg-table', className].filter(Boolean).join(' ')}
+      className={['gridkit-table', className].filter(Boolean).join(' ')}
       style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', ...style }}
       {...props}
     />

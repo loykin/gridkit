@@ -117,9 +117,9 @@ describe('DataGrid header groups', () => {
     const identityHeader = screen.getByRole('columnheader', { name: 'Identity' })
     const salaryHeader = screen.getByRole('columnheader', { name: /Salary/ })
 
-    expect(identityHeader.querySelector('.dg-resize-handle')).not.toBeInTheDocument()
-    expect(salaryHeader.querySelector('.dg-resize-handle')).toBeInTheDocument()
-    expect(container.querySelectorAll('.dg-resize-handle').length).toBe(4)
+    expect(identityHeader.querySelector('.gridkit-resize-handle')).not.toBeInTheDocument()
+    expect(salaryHeader.querySelector('.gridkit-resize-handle')).toBeInTheDocument()
+    expect(container.querySelectorAll('.gridkit-resize-handle').length).toBe(4)
   })
 
   it('renders padded placeholders by default', () => {

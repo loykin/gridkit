@@ -21,14 +21,14 @@ export function DragHandleCell() {
       aria-label="Drag row"
       {...ctx?.listeners}
       {...ctx?.attributes}
-      className="dg-btn dg-btn--drag-handle"
+      className="gridkit-btn gridkit-btn--drag-handle"
       data-variant="ghost"
       style={{
         width: '100%',
         height: '100%',
         cursor: 'grab',
         touchAction: 'none',
-        color: 'color-mix(in oklab, var(--dg-muted-foreground) 40%, transparent)',
+        color: 'color-mix(in oklab, var(--gridkit-muted-foreground) 40%, transparent)',
       }}
     >
       {icons.dragHandle}

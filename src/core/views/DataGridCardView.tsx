@@ -4,12 +4,14 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { GridKitShell } from '@/core/GridKitShell'
+import { GridKitError } from '@/core/GridKitError'
 import type { DataGridCardProps } from '@/types'
 
 interface DataGridCardViewProps<T extends object>
   extends Pick<
     DataGridCardProps<T>,
     | 'isLoading'
+    | 'error'
     | 'emptyMessage'
     | 'emptyContent'
     | 'onRowClick'
@@ -23,6 +25,7 @@ interface DataGridCardViewProps<T extends object>
     | 'headerRight'
     | 'footer'
     | 'classNames'
+    | 'styles'
     | 'scrollbar'
     | 'containerHeight'
     | 'tableHeight'
@@ -60,6 +63,7 @@ export function DataGridCardView<T extends object>({
   loadMoreRef,
   isFetchingNextPage,
   isLoading,
+  error,
   emptyMessage = 'No data',
   emptyContent,
   renderCard,
@@ -69,6 +73,7 @@ export function DataGridCardView<T extends object>({
   onRowClick,
   rowCursor,
   classNames,
+  styles,
   scrollbar,
   containerHeight,
   tableHeight,
@@ -128,13 +133,17 @@ export function DataGridCardView<T extends object>({
   })
 
   const renderCards = () => {
+    if (error) {
+      return <GridKitError error={error} classNames={classNames} styles={styles} />
+    }
+
     if (isLoading) {
       const skeletonCount = effectiveCols * 2
       return (
-        <div className="dg-card-grid" style={{ gridTemplateColumns: resolveGridColumns(cardColumns, minCardWidth, minColumns) }}>
+        <div className={cn('gridkit-card-grid', classNames?.loading)} style={{ gridTemplateColumns: resolveGridColumns(cardColumns, minCardWidth, minColumns), ...styles?.loading }}>
           {Array.from({ length: skeletonCount }).map((_, i) => (
-            <div key={i} className="dg-card">
-              <div className="dg-loading-pulse" style={{ height: 200 }} />
+            <div key={i} className="gridkit-card">
+              <div className="gridkit-loading-pulse" style={{ height: 200 }} />
             </div>
           ))}
         </div>
@@ -143,8 +152,8 @@ export function DataGridCardView<T extends object>({
 
     if (rows.length === 0) {
       return (
-        <div className="dg-empty-row">
-          <div className={cn('dg-empty', classNames?.empty)}>{emptyContent ?? emptyMessage}</div>
+        <div className="gridkit-empty-row">
+          <div className={cn('gridkit-empty', classNames?.empty)} style={styles?.empty}>{emptyContent ?? emptyMessage}</div>
         </div>
       )
     }
@@ -164,9 +173,9 @@ export function DataGridCardView<T extends object>({
 
       return (
         <div
-          className="dg-card-virtual-spacer"
+          className={cn('gridkit-card-virtual-spacer', classNames?.content)}
           data-virtualized="true"
-          style={{ height: virtualizer.getTotalSize() || rowGroupCount * estimateCardHeight }}
+          style={{ ...styles?.content, height: virtualizer.getTotalSize() || rowGroupCount * estimateCardHeight }}
         >
           {itemEntries.map((vRow) => {
             const startIdx = vRow.index * effectiveCols
@@ -187,7 +196,8 @@ export function DataGridCardView<T extends object>({
                 {rowCards.map((row) => (
                   <div
                     key={row.id}
-                    className={cn('dg-card', rowCursor && onRowClick && 'dg-card--clickable', classNames?.row)}
+                    className={cn('gridkit-card', rowCursor && onRowClick && 'gridkit-card--clickable', classNames?.card)}
+                    style={styles?.card}
                     onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                   >
                     {renderCard(row)}
@@ -201,11 +211,15 @@ export function DataGridCardView<T extends object>({
     }
 
     return (
-      <div className="dg-card-grid" style={{ gridTemplateColumns: resolveGridColumns(cardColumns, minCardWidth, minColumns) }}>
+      <div
+        className={cn('gridkit-card-grid', classNames?.content)}
+        style={{ gridTemplateColumns: resolveGridColumns(cardColumns, minCardWidth, minColumns), ...styles?.content }}
+      >
         {rows.map((row) => (
           <div
             key={row.id}
-            className={cn('dg-card', rowCursor && onRowClick && 'dg-card--clickable', classNames?.row)}
+            className={cn('gridkit-card', rowCursor && onRowClick && 'gridkit-card--clickable', classNames?.card)}
+            style={styles?.card}
             onClick={onRowClick ? () => onRowClick(row.original) : undefined}
           >
             {renderCard(row)}
@@ -228,15 +242,16 @@ export function DataGridCardView<T extends object>({
       minTableHeight={minTableHeight}
       fillContainer={fillContainer}
       fillParent={fillParent}
-      containerClassName={cn('dg-card-container', classNames?.container)}
-      footerClassName={classNames?.footer}
+      frameView="card"
+      classNames={classNames}
+      styles={styles}
       scrollbar={scrollbar}
       footer={footer}
     >
       {renderCards()}
 
-      {loadMoreRef && (
-        <div ref={loadMoreRef} className={cn('dg-card-load-more', classNames?.loadMore)}>
+      {!error && loadMoreRef && (
+        <div ref={loadMoreRef} className={cn('gridkit-card-load-more', classNames?.loadMore)} style={styles?.loadMore}>
           {isFetchingNextPage && icons.loading}
         </div>
       )}

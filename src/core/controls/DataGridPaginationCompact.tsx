@@ -22,7 +22,7 @@ export function DataGridPaginationCompact<T extends object>({
   const pageCount = table.getPageCount()
 
   return (
-    <div className={cn('dg-pagination-control dg-pagination-control--compact', className)}>
+    <div className={cn('gridkit-pagination-control gridkit-pagination-control--compact', className)}>
       <Button
         aria-label="Go to previous page"
         variant="ghost"

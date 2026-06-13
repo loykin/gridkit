@@ -33,7 +33,7 @@ export const defaultIcons: Required<DataGridIcons> = {
   clearFilter:      <X size={13} />,
   rowActions:       <MoreHorizontal size={14} />,
   columnVisibility: <Columns3 size={14} />,
-  loading:          <Loader2 size={16} className="dg-spinner" />,
+  loading:          <Loader2 size={16} className="gridkit-spinner" />,
   pageFirst:        <ChevronsLeft size={14} />,
   pagePrev:         <ChevronLeft size={14} />,
   pageNext:         <ChevronRight size={14} />,

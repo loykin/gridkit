@@ -46,10 +46,10 @@ function ExportButton({ table }: { table: Table<Employee> }) {
         padding: '4px 12px',
         fontSize: 12,
         fontWeight: 500,
-        borderRadius: 'var(--dg-radius)',
-        border: '1px solid var(--dg-border)',
-        background: 'var(--dg-background)',
-        color: 'var(--dg-foreground)',
+        borderRadius: 'var(--gridkit-radius)',
+        border: '1px solid var(--gridkit-border)',
+        background: 'var(--gridkit-background)',
+        color: 'var(--gridkit-foreground)',
         cursor: 'pointer',
       }}
     >

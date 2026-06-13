@@ -29,7 +29,7 @@ export function Checkbox({
       aria-label={ariaLabel}
       checked={checked ?? false}
       onChange={(e) => onCheckedChange?.(e.target.checked)}
-      className={cn('dg-checkbox', className)}
+      className={cn('gridkit-checkbox', className)}
     />
   )
 }

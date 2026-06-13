@@ -13,7 +13,7 @@ export function SortIndicator<T extends object>({ header }: SortIndicatorProps<T
   const sorted = header.column.getIsSorted()
 
   return (
-    <span className="dg-sort-icon">
+    <span className="gridkit-sort-icon">
       {sorted === 'asc'
         ? icons.sortAsc
         : sorted === 'desc'

@@ -68,7 +68,7 @@ describe('DataGrid accessibility labels', () => {
       />,
     )
 
-    expect(container.querySelector('.dg-footer')).toHaveClass('custom-footer')
+    expect(container.querySelector('.gridkit-footer')).toHaveClass('custom-footer')
   })
 
   it('exposes row action menus with menu semantics and Escape close behavior', async () => {

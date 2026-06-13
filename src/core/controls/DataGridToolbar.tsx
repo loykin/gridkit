@@ -27,9 +27,9 @@ export function DataGridToolbar<T extends object>({
   }
 
   return (
-    <div className={cn('dg-toolbar', className)}>
-      <div className="dg-toolbar-left">{renderHeaderSlot(headerLeft, table)}</div>
-      <div className="dg-toolbar-right">{renderHeaderSlot(headerRight, table)}</div>
+    <div className={cn('gridkit-toolbar', className)}>
+      <div className="gridkit-toolbar-left">{renderHeaderSlot(headerLeft, table)}</div>
+      <div className="gridkit-toolbar-right">{renderHeaderSlot(headerRight, table)}</div>
     </div>
   )
 }

@@ -176,8 +176,8 @@ const NAV: NavGroup[] = [
 // ── Theme swatch ──────────────────────────────────────────────────────────────
 
 function ThemeSwatch({ theme, active, onClick }: { theme: Theme; active: boolean; onClick: () => void }) {
-  const primary = theme.vars['--dg-primary'] ?? (theme.dark ? 'oklch(0.424 0.199 265.638)' : 'oklch(0.488 0.243 264.376)')
-  const bg = theme.vars['--dg-background'] ?? (theme.dark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)')
+  const primary = theme.vars['--gridkit-primary'] ?? (theme.dark ? 'oklch(0.424 0.199 265.638)' : 'oklch(0.488 0.243 264.376)')
+  const bg = theme.vars['--gridkit-background'] ?? (theme.dark ? 'oklch(0.145 0 0)' : 'oklch(1 0 0)')
   return (
     <button
       onClick={onClick}
@@ -230,7 +230,7 @@ function PlaygroundApp() {
   const [radius, setRadius] = useState<RadiusValue>('0rem')
   const current = TABS.find((t) => t.id === active)!
 
-  const themeStyle = { ...theme.vars, '--dg-radius': radius } as React.CSSProperties
+  const themeStyle = { ...theme.vars, '--gridkit-radius': radius } as React.CSSProperties
 
   return (
     <PlaygroundContext value={{ rounded: radius !== '0rem' }}>

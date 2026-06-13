@@ -5,7 +5,7 @@ export function Input({ className, ...props }: ComponentProps<'input'>) {
   return (
     <input
       data-slot="input"
-      className={cn('dg-input', className)}
+      className={cn('gridkit-input', className)}
       {...props}
     />
   )

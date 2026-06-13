@@ -12,10 +12,10 @@ function TextEditor({ value, onCommit, onCancel }: EditCellProps<Employee, strin
         width: '100%',
         padding: '2px 6px',
         fontSize: 13,
-        border: '1px solid var(--dg-ring)',
-        borderRadius: 'calc(var(--dg-radius) * 0.5)',
-        background: 'var(--dg-background)',
-        color: 'var(--dg-foreground)',
+        border: '1px solid var(--gridkit-ring)',
+        borderRadius: 'calc(var(--gridkit-radius) * 0.5)',
+        background: 'var(--gridkit-background)',
+        color: 'var(--gridkit-foreground)',
         outline: 'none',
       }}
       onBlur={(e) => onCommit(e.target.value)}

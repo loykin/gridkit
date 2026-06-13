@@ -48,15 +48,12 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
     enabled: !effectiveIsLoading,
   })
 
-  if (effectiveError) {
-    return <div className="dg-error">{effectiveError.message}</div>
-  }
-
   return (
     <IconsProvider icons={icons}>
       <DataGridCardView
         wrapperRef={wrapperRef}
         containerRef={containerRef}
+        error={effectiveError}
         table={table}
         rows={rows}
         headerLeft={headerLeft}
@@ -84,6 +81,7 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
         emptyMessage={props.emptyMessage}
         emptyContent={props.emptyContent}
         classNames={props.classNames}
+        styles={props.styles}
       />
     </IconsProvider>
   )

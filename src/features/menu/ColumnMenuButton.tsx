@@ -99,9 +99,9 @@ export function ColumnMenuButton<T extends object>({
     <>
       {canSort && (
         <>
-          <div className="dg-col-menu-section">Sort</div>
+          <div className="gridkit-col-menu-section">Sort</div>
           <button
-            className="dg-popover-option"
+            className="gridkit-popover-option"
             data-active={sorted === 'asc' ? 'true' : undefined}
             onClick={() => { col.toggleSorting(false); close() }}
           >
@@ -109,7 +109,7 @@ export function ColumnMenuButton<T extends object>({
             <span>Sort Ascending</span>
           </button>
           <button
-            className="dg-popover-option"
+            className="gridkit-popover-option"
             data-active={sorted === 'desc' ? 'true' : undefined}
             onClick={() => { col.toggleSorting(true); close() }}
           >
@@ -117,7 +117,7 @@ export function ColumnMenuButton<T extends object>({
             <span>Sort Descending</span>
           </button>
           {sorted && (
-            <button className="dg-popover-option" onClick={() => { col.clearSorting(); close() }}>
+            <button className="gridkit-popover-option" onClick={() => { col.clearSorting(); close() }}>
               {icons.clearFilter}
               <span>Clear Sort</span>
             </button>
@@ -127,9 +127,9 @@ export function ColumnMenuButton<T extends object>({
 
       {canFilter && (
         <>
-          {canSort && <div className="dg-col-menu-divider" />}
-          <div className="dg-col-menu-section">Filter</div>
-          <div className="dg-col-menu-filter">
+          {canSort && <div className="gridkit-col-menu-divider" />}
+          <div className="gridkit-col-menu-section">Filter</div>
+          <div className="gridkit-col-menu-filter">
             {renderFilterContent()}
           </div>
         </>
@@ -137,10 +137,10 @@ export function ColumnMenuButton<T extends object>({
 
       {canPin && (
         <>
-          {(canSort || canFilter) && <div className="dg-col-menu-divider" />}
-          <div className="dg-col-menu-section">Pin</div>
+          {(canSort || canFilter) && <div className="gridkit-col-menu-divider" />}
+          <div className="gridkit-col-menu-section">Pin</div>
           <button
-            className="dg-popover-option"
+            className="gridkit-popover-option"
             data-active={pinned === 'left' ? 'true' : undefined}
             onClick={() => { col.pin('left'); close() }}
           >
@@ -148,7 +148,7 @@ export function ColumnMenuButton<T extends object>({
             <span>Pin Left</span>
           </button>
           <button
-            className="dg-popover-option"
+            className="gridkit-popover-option"
             data-active={pinned === 'right' ? 'true' : undefined}
             onClick={() => { col.pin('right'); close() }}
           >
@@ -156,7 +156,7 @@ export function ColumnMenuButton<T extends object>({
             <span>Pin Right</span>
           </button>
           {pinned && (
-            <button className="dg-popover-option" onClick={() => { col.pin(false); close() }}>
+            <button className="gridkit-popover-option" onClick={() => { col.pin(false); close() }}>
               {icons.pinOff}
               <span>Unpin</span>
             </button>
@@ -176,13 +176,13 @@ export function ColumnMenuButton<T extends object>({
               aria-label={`Column menu for ${col.id}`}
               variant="ghost"
               size="icon-xs"
-              className={isActive ? 'dg-btn--filter-active' : 'dg-btn--filter-inactive'}
+              className={isActive ? 'gridkit-btn--filter-active' : 'gridkit-btn--filter-inactive'}
             >
               {icons.columnMenu}
             </Button>
           )}
         />
-        <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: 200, padding: '4px 0' }}>
+        <PopoverContent className="gridkit-header-popover" side="bottom" align="start" style={{ width: 200, padding: '4px 0' }}>
           {renderColumnMenu ? renderColumnMenu(col, table, close, ctx) : renderDefaultContent()}
         </PopoverContent>
       </Popover>

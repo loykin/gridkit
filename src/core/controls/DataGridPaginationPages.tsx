@@ -56,7 +56,7 @@ export function DataGridPaginationPages<T extends object>({
   const items = getPageItems(pageIndex, pageCount, siblingCount)
 
   return (
-    <div className={cn('dg-pagination-control dg-pagination-control--pages', className)}>
+    <div className={cn('gridkit-pagination-control gridkit-pagination-control--pages', className)}>
       <Button
         aria-label="Go to first page"
         variant="ghost"
@@ -80,7 +80,7 @@ export function DataGridPaginationPages<T extends object>({
         item === 'ellipsis' ? (
           <span
             key={`ellipsis-${idx}`}
-            style={{ padding: '0 2px', fontSize: 12, color: 'var(--dg-muted-foreground)' }}
+            style={{ padding: '0 2px', fontSize: 12, color: 'var(--gridkit-muted-foreground)' }}
           >
             …
           </span>

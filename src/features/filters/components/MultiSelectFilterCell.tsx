@@ -26,7 +26,7 @@ export function MultiSelectFilterCell<T extends object>({ col, table }: Props<T>
           </Button>
         )}
       />
-      <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: col.columnDef.meta?.filterParams?.width ?? 192 }}>
+      <PopoverContent className="gridkit-header-popover" side="bottom" align="start" style={{ width: col.columnDef.meta?.filterParams?.width ?? 192 }}>
         <MultiSelectContent col={col} table={table} />
       </PopoverContent>
     </Popover>

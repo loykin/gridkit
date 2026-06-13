@@ -34,7 +34,7 @@ export function DataGridFilterRow<T extends object>({
   return (
     <div
       role="row"
-      className={cn('dg-filter-row')}
+      className={cn('gridkit-filter-row')}
       style={{ width: '100%', height: '36px' }}
     >
       {visibleLeafColumns.map((col, colIdx) => {
@@ -56,8 +56,8 @@ export function DataGridFilterRow<T extends object>({
               key={col.id}
               data-last-col={isLast ? 'true' : undefined}
               className={cn(
-                'dg-filter-cell',
-                bordered && 'dg-filter-cell--bordered',
+                'gridkit-filter-cell',
+                bordered && 'gridkit-filter-cell--bordered',
               )}
               style={cellStyle}
             />
@@ -70,8 +70,8 @@ export function DataGridFilterRow<T extends object>({
             key={col.id}
             data-last-col={isLast ? 'true' : undefined}
             className={cn(
-              'dg-filter-cell',
-              bordered && 'dg-filter-cell--bordered',
+              'gridkit-filter-cell',
+              bordered && 'gridkit-filter-cell--bordered',
             )}
             style={cellStyle}
           >

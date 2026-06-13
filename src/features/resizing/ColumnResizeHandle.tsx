@@ -61,11 +61,11 @@ export function ColumnResizeHandle<T extends object>({
       }}
       onClick={(e) => e.stopPropagation()}
       data-side={resizeFromLeft ? 'left' : 'right'}
-      className="dg-resize-handle"
+      className="gridkit-resize-handle"
     >
       <div
         data-resizing={header.column.getIsResizing() ? 'true' : undefined}
-        className="dg-resize-bar"
+        className="gridkit-resize-bar"
       />
     </div>
   )

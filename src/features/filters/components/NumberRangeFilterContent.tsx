@@ -15,7 +15,7 @@ export function NumberRangeFilterContent<T extends object>({ col }: Props<T>) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <span style={{ fontSize: 12, color: 'var(--dg-muted-foreground)' }}>Min</span>
+        <span style={{ fontSize: 12, color: 'var(--gridkit-muted-foreground)' }}>Min</span>
         <Input
           type="number"
           placeholder="Min"
@@ -26,7 +26,7 @@ export function NumberRangeFilterContent<T extends object>({ col }: Props<T>) {
         />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <span style={{ fontSize: 12, color: 'var(--dg-muted-foreground)' }}>Max</span>
+        <span style={{ fontSize: 12, color: 'var(--gridkit-muted-foreground)' }}>Max</span>
         <Input
           type="number"
           placeholder="Max"

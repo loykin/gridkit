@@ -8,21 +8,21 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background:           var(--dg-background);
-  --color-foreground:           var(--dg-foreground);
-  --color-popover:              var(--dg-popover);
-  --color-popover-foreground:   var(--dg-popover-foreground);
-  --color-primary:              var(--dg-primary);
-  --color-primary-foreground:   var(--dg-primary-foreground);
-  --color-secondary:            var(--dg-secondary);
-  --color-secondary-foreground: var(--dg-secondary-foreground);
-  --color-muted:                var(--dg-muted);
-  --color-muted-foreground:     var(--dg-muted-foreground);
-  --color-accent:               var(--dg-accent);
-  --color-accent-foreground:    var(--dg-accent-foreground);
-  --color-destructive:          var(--dg-destructive);
-  --color-border:               var(--dg-border);
-  --color-input:                var(--dg-input);
-  --color-ring:                 var(--dg-ring);
-  --radius:                     var(--dg-radius);
+  --color-background:           var(--gridkit-background);
+  --color-foreground:           var(--gridkit-foreground);
+  --color-popover:              var(--gridkit-popover);
+  --color-popover-foreground:   var(--gridkit-popover-foreground);
+  --color-primary:              var(--gridkit-primary);
+  --color-primary-foreground:   var(--gridkit-primary-foreground);
+  --color-secondary:            var(--gridkit-secondary);
+  --color-secondary-foreground: var(--gridkit-secondary-foreground);
+  --color-muted:                var(--gridkit-muted);
+  --color-muted-foreground:     var(--gridkit-muted-foreground);
+  --color-accent:               var(--gridkit-accent);
+  --color-accent-foreground:    var(--gridkit-accent-foreground);
+  --color-destructive:          var(--gridkit-destructive);
+  --color-border:               var(--gridkit-border);
+  --color-input:                var(--gridkit-input);
+  --color-ring:                 var(--gridkit-ring);
+  --radius:                     var(--gridkit-radius);
 }

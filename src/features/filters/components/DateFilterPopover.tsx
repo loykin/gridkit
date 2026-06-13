@@ -48,7 +48,7 @@ export function DateFilterPopover<T extends object>({ col, mode }: Props<T>) {
           </Button>
         )}
       />
-      <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width }}>
+      <PopoverContent className="gridkit-header-popover" side="bottom" align="start" style={{ width }}>
         <DateFilterContent col={col} mode={mode} />
       </PopoverContent>
     </Popover>

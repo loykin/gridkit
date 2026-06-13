@@ -23,13 +23,13 @@ export function DataGridPaginationBar<T extends object>({
   const pageCount = table.getPageCount()
 
   return (
-    <div className={cn('dg-pagination-control dg-pagination-control--bar', className)}>
+    <div className={cn('gridkit-pagination-control gridkit-pagination-control--bar', className)}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span>Rows per page</span>
         <select
           value={pageSize}
           onChange={(e) => table.setPageSize(Number(e.target.value))}
-          className="dg-select"
+          className="gridkit-select"
         >
           {pageSizes.map((size) => (
             <option key={size} value={size}>

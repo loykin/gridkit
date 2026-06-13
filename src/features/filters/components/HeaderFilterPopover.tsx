@@ -45,13 +45,13 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
               aria-label={`Filter ${col.id}`}
               variant="ghost"
               size="icon-xs"
-              className={hasFilter ? 'dg-btn--filter-active' : 'dg-btn--filter-inactive'}
+              className={hasFilter ? 'gridkit-btn--filter-active' : 'gridkit-btn--filter-inactive'}
             >
               {icons.filter}
             </Button>
           )}
         />
-        <PopoverContent className="dg-header-popover" side="bottom" align="start" style={{ width: popoverWidth }}>
+        <PopoverContent className="gridkit-header-popover" side="bottom" align="start" style={{ width: popoverWidth }}>
           {CustomFilter ? (
             <CustomFilter
               column={col}

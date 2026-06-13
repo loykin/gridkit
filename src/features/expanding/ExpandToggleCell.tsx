@@ -35,7 +35,7 @@ export function ExpandToggleCell({ row }: ExpandToggleCellProps) {
         e.stopPropagation()
         ctx.toggleRow(row.id)
       }}
-      style={{ color: 'color-mix(in oklab, var(--dg-foreground) 60%, transparent)' }}
+      style={{ color: 'color-mix(in oklab, var(--gridkit-foreground) 60%, transparent)' }}
     >
       {isExpanded ? icons.detailCollapse : icons.detailExpand}
     </Button>

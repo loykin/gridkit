@@ -53,7 +53,7 @@ export function ActionMenuPopup({ anchor, onClose, children }: ActionMenuPopupPr
     <div
       ref={popupRef}
       role="menu"
-      className="dg-action-menu"
+      className="gridkit-action-menu"
       style={{ position: 'fixed', zIndex: 50, outline: 'none', ...pos }}
     >
       {children}

@@ -26,19 +26,19 @@ export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <div style={{ maxHeight: col.columnDef.meta?.filterParams?.maxOptionsHeight ?? 192, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
         {isLoading && (
-          <div style={{ padding: '4px 4px', fontSize: 12, color: 'var(--dg-muted-foreground)' }}>
+          <div style={{ padding: '4px 4px', fontSize: 12, color: 'var(--gridkit-muted-foreground)' }}>
             Loading...
           </div>
         )}
         {!isLoading && displayOptions.map((opt) => (
           <label
             key={opt || '__empty__'}
-            className="dg-multi-option"
+            className="gridkit-multi-option"
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 4px', cursor: 'pointer', fontSize: 12 }}
           >
             <Checkbox checked={selected.includes(opt)} onCheckedChange={() => toggle(opt)} />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {opt || '(빈값)'}
+              {opt || '(empty)'}
             </span>
           </label>
         ))}

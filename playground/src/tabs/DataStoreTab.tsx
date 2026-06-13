@@ -319,7 +319,7 @@ export function DataStoreTab() {
         </div>
 
         {/* Transaction log */}
-        <div className="w-72 shrink-0 flex flex-col border border-border rounded-[--dg-radius] overflow-hidden">
+        <div className="w-72 shrink-0 flex flex-col border border-border rounded-[--gridkit-radius] overflow-hidden">
           <div className="px-3 py-2 border-b border-border bg-muted/40 flex items-center justify-between">
             <span className="text-xs font-medium">Transaction Log</span>
             <button

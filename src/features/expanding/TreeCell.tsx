@@ -45,10 +45,10 @@ export function TreeCell({ row, indentSize = 16, children }: TreeCellProps) {
             e.stopPropagation()
             row.toggleExpanded()
           }}
-          className="dg-btn dg-btn--tree-toggle"
+          className="gridkit-btn gridkit-btn--tree-toggle"
           data-variant="ghost"
           data-size="icon-xs"
-          style={{ color: 'color-mix(in oklab, var(--dg-foreground) 60%, transparent)' }}
+          style={{ color: 'color-mix(in oklab, var(--gridkit-foreground) 60%, transparent)' }}
         >
           {row.getIsExpanded() ? icons.treeCollapse : icons.treeExpand}
         </button>

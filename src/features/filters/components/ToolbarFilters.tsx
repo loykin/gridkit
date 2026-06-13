@@ -38,7 +38,7 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
             size="sm"
           >
             {value ? (
-              <><span className="dg-filter-label">{label}:</span> {value}</>
+              <><span className="gridkit-filter-label">{label}:</span> {value}</>
             ) : label}
             <ChevronDown />
           </Button>
@@ -49,19 +49,19 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
           {value && (
             <button
               onClick={() => col.setFilterValue(undefined)}
-              className="dg-popover-option"
+              className="gridkit-popover-option"
             >
               {icons.clearFilter} Clear
             </button>
           )}
           {isLoading && (
-            <div className="dg-popover-option">Loading...</div>
+            <div className="gridkit-popover-option">Loading...</div>
           )}
           {!isLoading && options.map((opt) => (
             <button
               key={opt}
               onClick={() => col.setFilterValue(opt === value ? undefined : opt)}
-              className="dg-popover-option"
+              className="gridkit-popover-option"
             >
               <Check style={{ opacity: opt === value ? 1 : 0, width: 12, height: 12 }} />
               {opt}
@@ -103,7 +103,7 @@ export function MultiSelectFilter<T extends object>({
             size="sm"
           >
             {selected.length > 0 ? (
-              <><span className="dg-filter-label">{label}:</span>{' '}{selected.length} selected</>
+              <><span className="gridkit-filter-label">{label}:</span>{' '}{selected.length} selected</>
             ) : (
               label
             )}

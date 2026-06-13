@@ -41,7 +41,7 @@ export function DataGridHeaderCellContent<T extends object>({
   return (
     <>
       <span
-        className="dg-header-cell-content"
+        className="gridkit-header-cell-content"
         data-reorder-handle={dragHandleProps ? 'true' : undefined}
         {...dragHandleProps}
       >
@@ -159,6 +159,7 @@ export interface HeaderCellFrameProps<T extends object> extends HeaderCellConten
   isLast: boolean
   edge: 'left-edge' | 'right-edge' | false
   classNames?: DataGridClassNames
+  styles?: import('@/types').DataGridStyles
   setNodeRef?: (node: HTMLElement | null) => void
   transform?: string
   transition?: string
@@ -176,6 +177,7 @@ export function DataGridHeaderCellFrame<T extends object>({
   isLast,
   edge,
   classNames,
+  styles,
   setNodeRef,
   transform,
   transition,
@@ -215,8 +217,8 @@ export function DataGridHeaderCellFrame<T extends object>({
       data-align={isLeafHeader ? align : undefined}
       data-last-col={isLast ? 'true' : undefined}
       data-bordered={bordered ? 'true' : undefined}
-      className={cn('dg-header-cell', classNames?.headerCell)}
-      style={getHeaderCellStyle({
+      className={cn('gridkit-header-cell', classNames?.headerCell)}
+      style={{ ...getHeaderCellStyle({
         header,
         layoutCell,
         virtual,
@@ -224,7 +226,7 @@ export function DataGridHeaderCellFrame<T extends object>({
         transform,
         transition,
         isDragging,
-      })}
+      }), ...styles?.headerCell }}
       onClick={canSort && !enableColumnMenu ? header.column.getToggleSortingHandler() : undefined}
     >
       <DataGridHeaderCellContent

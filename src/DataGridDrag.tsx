@@ -87,7 +87,7 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
         <DragOverlay>
           {activeRow && (
             <div
-              className="rounded border border-[var(--dg-primary)]/40 bg-[var(--dg-primary)]/5 shadow-xl ring-1 ring-primary/20"
+              className="rounded border border-[var(--gridkit-primary)]/40 bg-[var(--gridkit-primary)]/5 shadow-xl ring-1 ring-primary/20"
               style={{ height: props.rowHeight ?? 36 }}
             />
           )}

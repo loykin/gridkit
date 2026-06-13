@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { AgentChatAdapter, AgentChatEvent, AgentChatRenderContext, DataGridAgentChatProps, DataGridColumnDef } from '@/types'
+import type { AgentChatAdapter, AgentChatEvent, AgentChatRenderContext, DataGridAgentChatProps, DataGridAgentChatStyles, DataGridColumnDef } from '@/types'
 import { DataGridChat } from '@/DataGridChat'
 import { cn } from '@/lib/utils'
 
@@ -70,6 +70,7 @@ export function DataGridAgentChat<
     renderStatus,
     renderEventActions,
     classNames,
+    styles,
     getEventClassName,
     getEventStyle,
     ...chatProps
@@ -88,10 +89,11 @@ export function DataGridAgentChat<
   return (
     <DataGridChat
       {...chatProps}
+      styles={styles}
       classNames={{
         ...classNames,
-        container: cn('dg-agent-chat-container', classNames?.container),
-        messageWrapper: cn('dg-agent-chat-event-wrapper', classNames?.messageWrapper),
+        frame: cn('gridkit-agent-chat-frame', classNames?.frame),
+        messageWrapper: cn('gridkit-agent-chat-event-wrapper', classNames?.messageWrapper),
       }}
       data={data}
       columns={resolvedColumns}
@@ -112,13 +114,13 @@ export function DataGridAgentChat<
         return (
           <div
             className={cn(
-              'dg-agent-chat-event',
-              `dg-agent-chat-event--${event.type}`,
+              'gridkit-agent-chat-event',
+              `gridkit-agent-chat-event--${event.type}`,
               classNames?.event,
               resolveEventClassName(event, classNames),
               eventClassName,
             )}
-            style={eventStyle}
+            style={{ ...styles?.event, ...resolveEventStyle(event, styles), ...eventStyle }}
             data-event-type={event.type}
             data-status={event.status}
             data-role={event.type === 'message' ? event.role : undefined}
@@ -130,8 +132,9 @@ export function DataGridAgentChat<
               renderArtifact,
               renderStatus,
               classNames,
+              styles,
             })}
-            {actions && <div className={cn('dg-agent-chat-actions', classNames?.actions)}>{actions}</div>}
+            {actions && <div className={cn('gridkit-agent-chat-actions', classNames?.actions)} style={styles?.actions}>{actions}</div>}
           </div>
         )
       }}
@@ -157,13 +160,32 @@ function resolveEventClassName<TEvent extends AgentChatEvent>(
   return undefined
 }
 
+function resolveEventStyle<TEvent extends AgentChatEvent>(
+  event: TEvent,
+  styles: DataGridAgentChatStyles | undefined,
+): React.CSSProperties | undefined {
+  if (!styles) return undefined
+
+  if (event.type === 'message') {
+    const role = (event as Extract<TEvent, { type: 'message' }>).role
+    const roleStyle = styles[role as keyof DataGridAgentChatStyles] as React.CSSProperties | undefined
+    return { ...styles.message, ...roleStyle }
+  }
+
+  if (event.type === 'tool_call') return styles.toolCall
+  if (event.type === 'tool_result') return styles.toolResult
+  if (event.type === 'artifact') return styles.artifact
+  if (event.type === 'status') return styles.status
+  return undefined
+}
+
 function renderDefaultEvent<TEvent extends AgentChatEvent>(
   event: TEvent,
   context: AgentChatRenderContext<TEvent>,
   renderers: Pick<
     DataGridAgentChatProps<TEvent>,
     'renderMessageContent' | 'renderToolCall' | 'renderToolResult' | 'renderArtifact' | 'renderStatus'
-  > & Pick<DataGridAgentChatProps<TEvent>, 'classNames'>,
+  > & Pick<DataGridAgentChatProps<TEvent>, 'classNames'> & { styles?: DataGridAgentChatStyles },
 ) {
   if (event.type === 'message') {
     const message = event as Extract<TEvent, { type: 'message' }>
@@ -172,8 +194,8 @@ function renderDefaultEvent<TEvent extends AgentChatEvent>(
 
     return (
       <>
-        <div className={cn('dg-agent-chat-label', renderers.classNames?.label)}>{defaultMessage.role}</div>
-        <div className={cn('dg-agent-chat-content', renderers.classNames?.content)}>{content}</div>
+        <div className={cn('gridkit-agent-chat-label', renderers.classNames?.label)} style={renderers.styles?.label}>{defaultMessage.role}</div>
+        <div className={cn('gridkit-agent-chat-content', renderers.classNames?.eventBody)} style={renderers.styles?.eventBody}>{content}</div>
       </>
     )
   }
@@ -184,9 +206,9 @@ function renderDefaultEvent<TEvent extends AgentChatEvent>(
     const custom = renderers.renderToolCall?.(toolCall, context)
 
     return custom ?? (
-      <div className="dg-agent-chat-tool">
-        <div className={cn('dg-agent-chat-label', renderers.classNames?.label)}>{defaultToolCall.name}</div>
-        <pre className={cn('dg-agent-chat-code', renderers.classNames?.code)}>{renderJsonPreview(defaultToolCall.input)}</pre>
+      <div className="gridkit-agent-chat-tool">
+        <div className={cn('gridkit-agent-chat-label', renderers.classNames?.label)} style={renderers.styles?.label}>{defaultToolCall.name}</div>
+        <pre className={cn('gridkit-agent-chat-code', renderers.classNames?.code)} style={renderers.styles?.code}>{renderJsonPreview(defaultToolCall.input)}</pre>
       </div>
     )
   }
@@ -197,9 +219,9 @@ function renderDefaultEvent<TEvent extends AgentChatEvent>(
     const custom = renderers.renderToolResult?.(toolResult, context)
 
     return custom ?? (
-      <div className="dg-agent-chat-tool">
-        <div className={cn('dg-agent-chat-label', renderers.classNames?.label)}>{defaultToolResult.name}</div>
-        <pre className={cn('dg-agent-chat-code', renderers.classNames?.code)}>{renderJsonPreview(defaultToolResult.output)}</pre>
+      <div className="gridkit-agent-chat-tool">
+        <div className={cn('gridkit-agent-chat-label', renderers.classNames?.label)} style={renderers.styles?.label}>{defaultToolResult.name}</div>
+        <pre className={cn('gridkit-agent-chat-code', renderers.classNames?.code)} style={renderers.styles?.code}>{renderJsonPreview(defaultToolResult.output)}</pre>
       </div>
     )
   }
@@ -210,9 +232,9 @@ function renderDefaultEvent<TEvent extends AgentChatEvent>(
     const custom = renderers.renderArtifact?.(artifact, context)
 
     return custom ?? (
-      <div className="dg-agent-chat-artifact">
-        <div className={cn('dg-agent-chat-label', renderers.classNames?.label)}>{defaultArtifact.title ?? defaultArtifact.kind}</div>
-        <pre className={cn('dg-agent-chat-code', renderers.classNames?.code)}>{renderJsonPreview(defaultArtifact.data)}</pre>
+      <div className="gridkit-agent-chat-artifact">
+        <div className={cn('gridkit-agent-chat-label', renderers.classNames?.label)} style={renderers.styles?.label}>{defaultArtifact.title ?? defaultArtifact.kind}</div>
+        <pre className={cn('gridkit-agent-chat-code', renderers.classNames?.code)} style={renderers.styles?.code}>{renderJsonPreview(defaultArtifact.data)}</pre>
       </div>
     )
   }
@@ -223,14 +245,14 @@ function renderDefaultEvent<TEvent extends AgentChatEvent>(
     const custom = renderers.renderStatus?.(status, context)
 
     return custom ?? (
-      <div className="dg-agent-chat-status">
+      <div className="gridkit-agent-chat-status">
         {defaultStatus.label ?? defaultStatus.status ?? 'status'}
       </div>
     )
   }
 
   return (
-    <pre className={cn('dg-agent-chat-code', renderers.classNames?.code)}>
+    <pre className={cn('gridkit-agent-chat-code', renderers.classNames?.code)} style={renderers.styles?.code}>
       {renderJsonPreview(event)}
     </pre>
   )

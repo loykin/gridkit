@@ -30,8 +30,8 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
     headerRight,
     footer,
     scrollbar,
-    containerStyle,
     classNames,
+    styles,
   } = props
 
   useEffect(() => {
@@ -79,10 +79,6 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
     onAtBottomChange,
   })
 
-  if (effectiveError) {
-    return <div className="dg-error">{effectiveError.message}</div>
-  }
-
   return (
     <IconsProvider icons={icons}>
       <DataGridChatView
@@ -96,6 +92,7 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
         loadPreviousRef={loadPreviousRef}
         isFetchingPreviousPage={isFetchingPreviousPage}
         isLoading={effectiveIsLoading}
+        error={effectiveError}
         renderMessage={renderMessage}
         renderDaySeparator={renderDaySeparator}
         renderUnreadMarker={renderUnreadMarker}
@@ -105,10 +102,10 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
         fillContainer={fillContainer}
         fillParent={fillParent}
         scrollbar={scrollbar}
-        containerStyle={containerStyle}
         emptyMessage={props.emptyMessage}
         emptyContent={props.emptyContent}
         classNames={classNames}
+        styles={styles}
       />
     </IconsProvider>
   )

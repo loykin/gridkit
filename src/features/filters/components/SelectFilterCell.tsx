@@ -22,7 +22,7 @@ export function SelectFilterCell<T extends object>({ col, table, onSelect }: Pro
         col.setFilterValue(e.target.value || undefined)
         onSelect?.()
       }}
-      className="dg-select"
+      className="gridkit-select"
       style={{ width: '100%' }}
       disabled={isLoading}
     >

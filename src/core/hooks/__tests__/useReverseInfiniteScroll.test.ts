@@ -4,7 +4,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useReverseInfiniteScroll } from '../useReverseInfiniteScroll'
 
 // ── IntersectionObserver mock ────────────────────────────────────────────────
-// vi.fn()은 화살표 함수로 구현하면 constructor로 사용할 수 없으므로 class를 사용한다.
+// vi.fn() arrow functions cannot be used as constructors, so a class is used instead.
 
 type IOCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void
 
@@ -37,7 +37,7 @@ function setupIntersectionObserver() {
   }
 }
 
-// ── 스크롤 컨테이너 헬퍼 ─────────────────────────────────────────────────────
+// ── Scroll container helper ───────────────────────────────────────────────────
 
 function createScrollContainer(scrollHeight = 1000, scrollTop = 200) {
   const state = { scrollHeight, scrollTop }
@@ -56,9 +56,9 @@ function createScrollContainer(scrollHeight = 1000, scrollTop = 200) {
   return { el, state }
 }
 
-// ── 테스트 컴포넌트 ──────────────────────────────────────────────────────────
-// renderHook은 ref를 실제 DOM에 연결하지 않으므로 loadPreviousRef.current가 null이다.
-// hook을 직접 렌더링하는 컴포넌트를 통해 sentinel div에 ref를 연결한다.
+// ── Test component ───────────────────────────────────────────────────────────
+// renderHook does not attach refs to real DOM, so loadPreviousRef.current would be null.
+// Use a wrapper component that renders the hook so the sentinel div gets a real ref.
 
 interface HarnessProps {
   containerEl: HTMLElement
@@ -96,14 +96,14 @@ function ReverseScrollHarness(props: HarnessProps) {
   return React.createElement('div', { ref: loadPreviousRef })
 }
 
-// ── 테스트 ───────────────────────────────────────────────────────────────────
+// ── Tests ───────────────────────────────────────────────────────────────────
 
 describe('useReverseInfiniteScroll', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
-  it('sentinel이 보이고 조건 충족 시 fetchPreviousPage 호출', () => {
+  it('calls fetchPreviousPage when sentinel is visible and conditions are met', () => {
     const { triggerIntersection } = setupIntersectionObserver()
     const fetchPreviousPage = vi.fn()
     const { el } = createScrollContainer()
@@ -123,7 +123,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(fetchPreviousPage).toHaveBeenCalledTimes(1)
   })
 
-  it('isFetchingPreviousPage=true이면 중복 fetch 방지', () => {
+  it('prevents duplicate fetch when isFetchingPreviousPage=true', () => {
     const { triggerIntersection } = setupIntersectionObserver()
     const fetchPreviousPage = vi.fn()
     const { el } = createScrollContainer()
@@ -143,7 +143,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(fetchPreviousPage).not.toHaveBeenCalled()
   })
 
-  it('prop 업데이트 전 같은 observer callback이 반복되어도 fetch는 한 번만 호출', () => {
+  it('calls fetch only once even when the same observer callback fires repeatedly before prop update', () => {
     const { triggerIntersection } = setupIntersectionObserver()
     const fetchPreviousPage = vi.fn()
     const { el } = createScrollContainer()
@@ -166,7 +166,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(fetchPreviousPage).toHaveBeenCalledTimes(1)
   })
 
-  it('hasPreviousPage=false이면 fetch 안 함', () => {
+  it('does not fetch when hasPreviousPage=false', () => {
     const { triggerIntersection } = setupIntersectionObserver()
     const fetchPreviousPage = vi.fn()
     const { el } = createScrollContainer()
@@ -186,7 +186,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(fetchPreviousPage).not.toHaveBeenCalled()
   })
 
-  it('enabled=false이면 IntersectionObserver를 생성하지 않음', () => {
+  it('does not create IntersectionObserver when enabled=false', () => {
     const { getConstructorCallCount } = setupIntersectionObserver()
     const { el } = createScrollContainer()
 
@@ -202,7 +202,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(getConstructorCallCount()).toBe(0)
   })
 
-  it('isIntersecting=false이면 fetch 안 함', () => {
+  it('does not fetch when isIntersecting=false', () => {
     const { triggerIntersection } = setupIntersectionObserver()
     const fetchPreviousPage = vi.fn()
     const { el } = createScrollContainer()
@@ -222,7 +222,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(fetchPreviousPage).not.toHaveBeenCalled()
   })
 
-  it('prepend 후 dependency 변화 시 scrollTop을 delta만큼 보정', () => {
+  it('adjusts scrollTop by delta when dependency changes after prepend', () => {
     const { triggerIntersection } = setupIntersectionObserver()
     const { el, state } = createScrollContainer(1000, 200)
 
@@ -238,13 +238,13 @@ describe('useReverseInfiniteScroll', () => {
       }),
     )
 
-    // fetch 트리거 → previousHeightRef.current = 1000
+    // trigger fetch → previousHeightRef.current = 1000
     act(() => { triggerIntersection(true) })
 
-    // prepend 시뮬레이션: scrollHeight 1000→1300
+    // simulate prepend: scrollHeight 1000→1300
     state.scrollHeight = 1300
 
-    // dependency 변화 → 보정 effect 실행 → scrollTop += (1300-1000)=300 → 500
+    // dependency change → correction effect runs → scrollTop += (1300-1000)=300 → 500
     act(() => {
       rerender(
         React.createElement(ReverseScrollHarness, {
@@ -262,7 +262,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(state.scrollTop).toBe(500)
   })
 
-  it('preserveScrollOffset=false이면 dependency 변화 시 scrollTop 보정 안 함', () => {
+  it('does not adjust scrollTop on dependency change when preserveScrollOffset=false', () => {
     const { triggerIntersection } = setupIntersectionObserver()
     const { el, state } = createScrollContainer(1000, 200)
 
@@ -298,7 +298,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(state.scrollTop).toBe(200)
   })
 
-  it('scrollHeight delta가 0 이하이면 scrollTop 보정 안 함', () => {
+  it('does not adjust scrollTop when scrollHeight delta is 0 or negative', () => {
     const { triggerIntersection } = setupIntersectionObserver()
     const { el, state } = createScrollContainer(1000, 200)
 
@@ -315,7 +315,7 @@ describe('useReverseInfiniteScroll', () => {
     )
 
     act(() => { triggerIntersection(true) })
-    // scrollHeight 변화 없음
+    // no scrollHeight change
 
     act(() => {
       rerender(
@@ -334,7 +334,7 @@ describe('useReverseInfiniteScroll', () => {
     expect(state.scrollTop).toBe(200)
   })
 
-  it('fetch 완료 후 isFetching 변화 시 observer를 재생성하지 않음 (ref 패턴)', () => {
+  it('does not recreate observer when isFetching changes after fetch completes (ref pattern)', () => {
     const { getConstructorCallCount, triggerIntersection } = setupIntersectionObserver()
     const fetchPreviousPage = vi.fn()
     const { el } = createScrollContainer()
@@ -354,7 +354,7 @@ describe('useReverseInfiniteScroll', () => {
 
     const creationCountBefore = getConstructorCallCount()
 
-    // isFetching: false→true→false (fetch 완료 시나리오)
+    // isFetching: false→true→false (fetch completion scenario)
     act(() => {
       rerender(
         React.createElement(ReverseScrollHarness, {
@@ -378,7 +378,7 @@ describe('useReverseInfiniteScroll', () => {
       )
     })
 
-    // ref 패턴: isFetchingPreviousPage가 observer deps에 없으므로 재생성 없음
+    // ref pattern: no observer recreation because isFetchingPreviousPage is not in observer deps
     expect(getConstructorCallCount()).toBe(creationCountBefore)
   })
 })

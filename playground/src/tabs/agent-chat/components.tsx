@@ -27,20 +27,20 @@ export function ChartArtifact({ title, points, color }: { title: ReactNode; poin
       <div className="h-48 rounded border border-border bg-background px-2 py-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={points} margin={{ top: 4, right: 8, bottom: 0, left: -22 }}>
-            <CartesianGrid stroke="var(--dg-border)" vertical={false} />
+            <CartesianGrid stroke="var(--gridkit-border)" vertical={false} />
             <XAxis
               dataKey="label"
               tickLine={false}
               axisLine={false}
-              tick={{ fill: 'var(--dg-muted-foreground)', fontSize: 11 }}
+              tick={{ fill: 'var(--gridkit-muted-foreground)', fontSize: 11 }}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
-              tick={{ fill: 'var(--dg-muted-foreground)', fontSize: 11 }}
+              tick={{ fill: 'var(--gridkit-muted-foreground)', fontSize: 11 }}
             />
-            <Tooltip cursor={{ fill: 'color-mix(in srgb, var(--dg-primary) 8%, transparent)' }} content={<ChartTooltip />} />
-            <Bar dataKey="value" fill={color ?? 'var(--dg-primary)'} radius={[3, 3, 0, 0]} />
+            <Tooltip cursor={{ fill: 'color-mix(in srgb, var(--gridkit-primary) 8%, transparent)' }} content={<ChartTooltip />} />
+            <Bar dataKey="value" fill={color ?? 'var(--gridkit-primary)'} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -97,7 +97,7 @@ export function JsonViewer({
     <div className="min-h-0 flex-1 overflow-auto bg-background">
       <div className="min-w-max py-2 font-mono text-[11px] leading-5">
         {lines.map((line, index) => {
-          const isTopLevelArrayItem = Array.isArray(value) && /^  (?:\{|\[|"|true|false|null|-?\d)/.test(line)
+          const isTopLevelArrayItem = Array.isArray(value) && /^ {2}(?:\{|\[|"|true|false|null|-?\d)/.test(line)
           const hint = isTopLevelArrayItem && indexLabel ? `${indexLabel}[${indexOffset + ++itemIndex}]` : ''
 
           return (

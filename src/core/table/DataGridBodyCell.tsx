@@ -3,7 +3,7 @@ import { useEditingCell } from '@/features/editing/EditingCellContext'
 import { EditableCellContent } from '@/features/editing/EditableCellContent'
 import { RowActionTrigger } from '@/features/actions/RowActionTrigger'
 import { cn } from '@/lib/utils'
-import type { DataGridClassNames } from '@/types'
+import type { DataGridClassNames, DataGridStyles } from '@/types'
 import { colStyle, isPinnedEdge } from './tableUtils'
 
 interface DataGridBodyCellProps<T extends object> {
@@ -16,6 +16,7 @@ interface DataGridBodyCellProps<T extends object> {
   pinning?: boolean
   onActionTrigger?: (row: T, el: HTMLElement) => void
   classNames?: DataGridClassNames
+  styles?: DataGridStyles
 }
 
 export function DataGridBodyCell<T extends object>({
@@ -28,6 +29,7 @@ export function DataGridBodyCell<T extends object>({
   pinning = true,
   onActionTrigger,
   classNames,
+  styles,
 }: DataGridBodyCellProps<T>) {
   const editingCtx = useEditingCell()
   const meta = cell.column.columnDef.meta
@@ -48,8 +50,8 @@ export function DataGridBodyCell<T extends object>({
       data-bordered={bordered ? 'true' : undefined}
       data-editing={isEditing ? 'true' : undefined}
       data-overflow={meta?.cellOverflow}
-      className={cn('dg-cell', classNames?.cell)}
-      style={{ ...colStyle(cell.column, { pinning }), ...(isFillCell && { flex: 1, width: 'auto' }) }}
+      className={cn('gridkit-cell', classNames?.cell)}
+      style={{ ...styles?.cell, ...colStyle(cell.column, { pinning }), ...(isFillCell && { flex: 1, width: 'auto' }) }}
       onDoubleClick={canEdit && !isEditing ? (e) => { e.stopPropagation(); editingCtx?.startEdit(cell.id) } : undefined}
     >
       {isEditing && meta?.editCell ? (

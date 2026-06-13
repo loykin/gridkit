@@ -56,7 +56,7 @@ describe('DataGridList virtualization', () => {
     expect(screen.getByText('Item 19')).toBeInTheDocument()
   })
 
-  it('applies dg-table-wrapper--fill when fillContainer is set', () => {
+  it('applies gridkit-frame--fill when fillContainer is set', () => {
     const { container } = render(
       <DataGridList
         data={makeItems(5)}
@@ -66,7 +66,7 @@ describe('DataGridList virtualization', () => {
         renderItem={(row) => <div>{row.original.label}</div>}
       />,
     )
-    expect(container.querySelector('.dg-list-container')).toHaveClass('dg-table-wrapper--fill')
+    expect(container.querySelector('.gridkit-frame')).toHaveClass('gridkit-frame--fill')
   })
 
   it('sets data-fill-parent when fillParent is set', () => {
@@ -79,7 +79,7 @@ describe('DataGridList virtualization', () => {
         renderItem={(row) => <div>{row.original.label}</div>}
       />,
     )
-    expect(container.querySelector('.dg-shell')).toHaveAttribute('data-fill-parent', 'true')
+    expect(container.querySelector('.gridkit-shell')).toHaveAttribute('data-fill-parent', 'true')
   })
 
   it('activates virtual mode with fillContainer (no explicit height)', () => {
@@ -95,7 +95,7 @@ describe('DataGridList virtualization', () => {
         renderItem={(row) => <div>{row.original.label}</div>}
       />,
     )
-    expect(container.querySelector('.dg-list-items')).toHaveAttribute('data-virtualized', 'true')
+    expect(container.querySelector('.gridkit-list-items')).toHaveAttribute('data-virtualized', 'true')
   })
 
   it('activates virtual mode with fillParent (no explicit height)', () => {
@@ -111,7 +111,7 @@ describe('DataGridList virtualization', () => {
         renderItem={(row) => <div>{row.original.label}</div>}
       />,
     )
-    expect(container.querySelector('.dg-list-items')).toHaveAttribute('data-virtualized', 'true')
+    expect(container.querySelector('.gridkit-list-items')).toHaveAttribute('data-virtualized', 'true')
   })
 
   it('renders a bounded window when virtualization is enabled', async () => {
@@ -128,12 +128,12 @@ describe('DataGridList virtualization', () => {
       />,
     )
 
-    const listContainer = container.querySelector('.dg-list-container') as HTMLElement
+    const listContainer = container.querySelector('.gridkit-frame') as HTMLElement
     setScrollMetrics(listContainer, { scrollHeight: 40000, clientHeight: 240, scrollTop: 0 })
 
-    expect(container.querySelector('.dg-list-items')?.getAttribute('data-virtualized')).toBe('true')
+    expect(container.querySelector('.gridkit-list-items')?.getAttribute('data-virtualized')).toBe('true')
     await waitFor(() => expect(screen.getByText('Item 0')).toBeInTheDocument())
     expect(screen.queryByText('Item 999')).not.toBeInTheDocument()
-    expect(container.querySelectorAll('.dg-list-item').length).toBeLessThan(1000)
+    expect(container.querySelectorAll('.gridkit-list-item').length).toBeLessThan(1000)
   })
 })

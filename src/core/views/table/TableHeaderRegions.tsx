@@ -29,6 +29,7 @@ interface TableHeaderRegionsProps<T extends object>
   virtual: boolean
   headerGroupLayout: HeaderGroupLayout
   classNames?: DataGridClassNames
+  styles?: import('@/types').DataGridStyles
   headerScrollRef: React.RefObject<HTMLDivElement | null>
   onCenterWheel?: React.WheelEventHandler<HTMLDivElement>
 }
@@ -49,6 +50,7 @@ export function TableHeaderRegions<T extends object>({
   enableColumnMenu,
   renderColumnMenu,
   classNames,
+  styles,
   headerScrollRef,
   onCenterWheel,
 }: TableHeaderRegionsProps<T>) {
@@ -103,17 +105,17 @@ export function TableHeaderRegions<T extends object>({
   )
 
   return (
-    <div className={cn('dg-header', classNames?.header)}>
-      <div className="dg-region-grid" style={{ gridTemplateColumns: layout.gridTemplateColumns }}>
+    <div className={cn('gridkit-header', classNames?.header)} style={styles?.header}>
+      <div className="gridkit-region-grid" style={{ gridTemplateColumns: layout.gridTemplateColumns }}>
         {layout.hasLeftRegion && (
-          <div className="dg-region dg-region--left" style={{ width: layout.regions.left.width }}>
+          <div className="gridkit-region gridkit-region--left" style={{ width: layout.regions.left.width }}>
             {renderHeaderRegion(layout.regions.left)}
             {renderFilters(layout.regions.left)}
           </div>
         )}
         <div
           ref={headerScrollRef}
-          className="dg-region dg-region--center"
+          className="gridkit-region gridkit-region--center"
           style={{ overflow: 'hidden' }}
           onWheel={onCenterWheel}
         >
@@ -123,7 +125,7 @@ export function TableHeaderRegions<T extends object>({
           </div>
         </div>
         {layout.hasRightRegion && (
-          <div className="dg-region dg-region--right" style={{ width: layout.regions.right.width }}>
+          <div className="gridkit-region gridkit-region--right" style={{ width: layout.regions.right.width }}>
             {renderHeaderRegion(layout.regions.right)}
             {renderFilters(layout.regions.right)}
           </div>

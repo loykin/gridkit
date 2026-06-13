@@ -168,7 +168,7 @@ export function ServerSideExample() {
           <select
             value={statusFilter ?? ''}
             onChange={(e) => setStatus(e.target.value || undefined)}
-            className="dg-select"
+            className="gridkit-select"
           >
             <option value="">All statuses</option>
             {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}

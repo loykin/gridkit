@@ -6,7 +6,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { ScrollTable } from '@/core/table/ScrollTable'
-import type { TableViewConfig } from '@/types'
+import type { DataGridStyles, TableViewConfig } from '@/types'
 import { useTableScrollSync } from '@/core/hooks/useTableScrollSync'
 import { useTableVirtualizer } from '@/core/hooks/useTableVirtualizer'
 import { useActionMenu } from '@/core/hooks/useActionMenu'
@@ -35,6 +35,7 @@ export interface DataGridTableViewProps<T extends object> extends TableViewConfi
    */
   onMeasureColumns?: () => void
   fillParent?: boolean
+  styles?: DataGridStyles
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -77,6 +78,7 @@ export function DataGridTableView<T extends object>({
   onCellValueChange,
   onMeasureColumns,
   classNames,
+  styles,
 }: DataGridTableViewProps<T>) {
   const effectiveEstimate = estimateRowHeight ?? rowHeight ?? 33
 
@@ -181,7 +183,7 @@ export function DataGridTableView<T extends object>({
 
     const measure = () => {
       const tableMaxHeight = Number.parseFloat(
-        getComputedStyle(tableWrapper).getPropertyValue('--dg-fill-table-max-height'),
+        getComputedStyle(tableWrapper).getPropertyValue('--gridkit-fill-table-max-height'),
       )
       if (!(tableMaxHeight > 0)) return
 
@@ -267,7 +269,7 @@ export function DataGridTableView<T extends object>({
     return (
       <div
         ref={scrollRef}
-        className={cn('dg-body-scroll', 'scrollbar-none', region.id !== 'center' && 'dg-body-scroll--pinned')}
+        className={cn('gridkit-body-scroll', 'scrollbar-none', region.id !== 'center' && 'gridkit-body-scroll--pinned')}
         style={region.id === 'center' ? bodyStyle : { overflow: 'hidden', minHeight: 0 }}
         onScroll={region.id === 'center' ? syncScroll : undefined}
       >
@@ -293,12 +295,13 @@ export function DataGridTableView<T extends object>({
                 renderDetailRow={renderDetailRow}
                 renderGroupRow={renderGroupRow}
                 classNames={classNames}
+                styles={styles}
               />
             </EditingCellContext>
           </DetailRowContext>
         </ScrollTable>
         {region.id === 'center' && loadMoreRef && (
-          <div ref={loadMoreRef} className={cn('dg-table-load-more', classNames?.loadMore)}>
+          <div ref={loadMoreRef} className={cn('gridkit-table-load-more', classNames?.loadMore)} style={styles?.loadMore}>
             {isFetchingNextPage && icons.loading}
           </div>
         )}
@@ -320,12 +323,10 @@ export function DataGridTableView<T extends object>({
           width: '100%',
           minWidth: 0,
           isolation: 'isolate',
-          // Limit reflow scope to this subtree.
-          // 'layout paint' isolates layout and paint without size containment,
-          // which is required since the outer div's height is determined by its children.
           contain: 'layout paint',
+          ...styles?.content,
         }}
-        className={cn('dg-container', fillContainer && !fillParent && 'dg-container--fill', classNames?.container)}
+        className={cn('gridkit-container', fillContainer && !fillParent && 'gridkit-container--fill', classNames?.content)}
       >
         {/* Header panel — split into pinned and horizontally scrollable regions. */}
         <TableHeaderRegions
@@ -344,6 +345,7 @@ export function DataGridTableView<T extends object>({
           enableColumnMenu={enableColumnMenu}
           renderColumnMenu={renderColumnMenu}
           classNames={classNames}
+          styles={styles}
           headerScrollRef={headerScrollRef}
           onCenterWheel={handleHeaderWheel}
         />
@@ -351,20 +353,20 @@ export function DataGridTableView<T extends object>({
         {/* Body scroll container + scrollbars */}
         <div
           ref={bodyWrapperRef}
-          className={cn('dg-body-wrapper', fillContainer && !fillParent && 'dg-body-wrapper--fill')}
-          style={bodyWrapperStyle}
+          className={cn('gridkit-body-wrapper', fillContainer && !fillParent && 'gridkit-body-wrapper--fill', classNames?.body)}
+          style={{ ...bodyWrapperStyle, ...styles?.body }}
         >
-          <div className="dg-region-grid dg-body-regions" style={{ gridTemplateColumns: layout.gridTemplateColumns, flex: 1, minHeight: 0 }}>
+          <div className="gridkit-region-grid gridkit-body-regions" style={{ gridTemplateColumns: layout.gridTemplateColumns, flex: 1, minHeight: 0 }}>
             {layout.hasLeftRegion && (
-              <div className="dg-region dg-region--left" style={{ width: layout.regions.left.width, minHeight: 0 }}>
+              <div className="gridkit-region gridkit-region--left" style={{ width: layout.regions.left.width, minHeight: 0 }}>
                 {renderBodyRegion({ region: layout.regions.left, scrollRef: leftBodyScrollRef })}
               </div>
             )}
-            <div className="dg-region dg-region--center" style={{ minHeight: 0, minWidth: 0 }}>
+            <div className="gridkit-region gridkit-region--center" style={{ minHeight: 0, minWidth: 0 }}>
               {renderBodyRegion({ region: layout.regions.center, scrollRef: bodyScrollRef })}
             </div>
             {layout.hasRightRegion && (
-              <div className="dg-region dg-region--right" style={{ width: layout.regions.right.width, minHeight: 0 }}>
+              <div className="gridkit-region gridkit-region--right" style={{ width: layout.regions.right.width, minHeight: 0 }}>
                 {renderBodyRegion({ region: layout.regions.right, scrollRef: rightBodyScrollRef })}
               </div>
             )}
@@ -394,7 +396,7 @@ export function DataGridTableView<T extends object>({
                 item.onClick(activeRow!)
                 setActionMenuOpen(false)
               }}
-              className="dg-action-item"
+              className="gridkit-action-item"
             >
               {item.icon}
               {item.label}

@@ -83,7 +83,7 @@ export function PopoverTrigger({ render, children, className }: PopoverTriggerPr
       type="button"
       {...rest}
       ref={ref as React.Ref<HTMLButtonElement>}
-      className={cn('dg-btn', className)}
+      className={cn('gridkit-btn', className)}
     >
       {children}
     </button>
@@ -108,7 +108,7 @@ function readGridKitVars(node: HTMLElement): React.CSSProperties {
 
   for (let index = 0; index < computed.length; index += 1) {
     const name = computed.item(index)
-    if (name.startsWith('--dg-')) {
+    if (name.startsWith('--gridkit-')) {
       ;(vars as Record<string, string>)[name] = computed.getPropertyValue(name).trim()
     }
   }
@@ -195,7 +195,7 @@ export function PopoverContent({
   return createPortal(
     <div
       ref={popupRef}
-      className={cn('dg-popover-content', className)}
+      className={cn('gridkit-popover-content', className)}
       style={{
         position: 'fixed',
         zIndex: 50,
@@ -217,19 +217,19 @@ export function PopoverHeader({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('dg-popover-header', className)} {...props} />
+  return <div className={cn('gridkit-popover-header', className)} {...props} />
 }
 
 export function PopoverTitle({
   className,
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <p className={cn('dg-popover-title', className)} {...props} />
+  return <p className={cn('gridkit-popover-title', className)} {...props} />
 }
 
 export function PopoverDescription({
   className,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn('dg-popover-description', className)} {...props} />
+  return <p className={cn('gridkit-popover-description', className)} {...props} />
 }

@@ -27,7 +27,7 @@ export function GlobalSearch<T extends object>({ table, placeholder = 'Search…
       <span
         style={{
           position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)',
-          width: 14, height: 14, color: 'var(--dg-muted-foreground)', pointerEvents: 'none',
+          width: 14, height: 14, color: 'var(--gridkit-muted-foreground)', pointerEvents: 'none',
           display: 'flex', alignItems: 'center',
         }}
       >

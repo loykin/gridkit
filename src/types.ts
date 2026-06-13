@@ -137,47 +137,79 @@ export interface CheckboxConfig<T extends object> {
   onSelectOne: (rowId: string, checked: boolean) => void
 }
 
-/**
- * Rendering props owned by DataGridTableView.
- * DataGridBaseProps and DataGridTableViewProps both extend this
- * so these are declared exactly once.
- */
-export interface DataGridClassNames {
-  container?: string
+/** Slot-based class names shared across all GridKit views. */
+export interface GridKitClassNames {
+  root?: string
+  toolbar?: string
+  frame?: string
+  content?: string
   header?: string
+  body?: string
   footer?: string
+  empty?: string
+  error?: string
+  loading?: string
+  loadMore?: string
+}
+
+/** Slot-based inline styles shared across all GridKit views. Same keys as GridKitClassNames. */
+export interface GridKitStyles {
+  root?: React.CSSProperties
+  toolbar?: React.CSSProperties
+  frame?: React.CSSProperties
+  content?: React.CSSProperties
+  header?: React.CSSProperties
+  body?: React.CSSProperties
+  footer?: React.CSSProperties
+  empty?: React.CSSProperties
+  error?: React.CSSProperties
+  loading?: React.CSSProperties
+  loadMore?: React.CSSProperties
+}
+
+export interface DataGridClassNames extends GridKitClassNames {
   headerCell?: string
   row?: string
   cell?: string
-  empty?: string
-  loadMore?: string
 }
 
-export interface DataGridCardClassNames {
-  container?: string
-  row?: string
-  empty?: string
-  loadMore?: string
-  footer?: string
+export interface DataGridStyles extends GridKitStyles {
+  headerCell?: React.CSSProperties
+  row?: React.CSSProperties
+  cell?: React.CSSProperties
 }
 
-export interface DataGridListClassNames {
-  container?: string
+export interface DataGridCardClassNames extends GridKitClassNames {
+  card?: string
+}
+
+export interface DataGridCardStyles extends GridKitStyles {
+  card?: React.CSSProperties
+}
+
+export interface DataGridListClassNames extends GridKitClassNames {
   item?: string
-  loadMore?: string
-  empty?: string
-  footer?: string
 }
 
-export interface DataGridChatClassNames {
-  container?: string
+export interface DataGridListStyles extends GridKitStyles {
+  item?: React.CSSProperties
+}
+
+// Note: loadMore is not used in Chat — chat loads backward via loadPrevious
+export interface DataGridChatClassNames extends GridKitClassNames {
   messageWrapper?: string
   daySeparator?: string
   unreadMarker?: string
   typingIndicator?: string
   loadPrevious?: string
-  empty?: string
-  footer?: string
+}
+
+export interface DataGridChatStyles extends GridKitStyles {
+  messageWrapper?: React.CSSProperties
+  daySeparator?: React.CSSProperties
+  unreadMarker?: React.CSSProperties
+  typingIndicator?: React.CSSProperties
+  loadPrevious?: React.CSSProperties
 }
 
 export interface DataGridAgentChatClassNames extends DataGridChatClassNames {
@@ -192,9 +224,26 @@ export interface DataGridAgentChatClassNames extends DataGridChatClassNames {
   system?: string
   tool?: string
   label?: string
-  content?: string
+  eventBody?: string
   code?: string
   actions?: string
+}
+
+export interface DataGridAgentChatStyles extends DataGridChatStyles {
+  event?: React.CSSProperties
+  message?: React.CSSProperties
+  toolCall?: React.CSSProperties
+  toolResult?: React.CSSProperties
+  artifact?: React.CSSProperties
+  status?: React.CSSProperties
+  user?: React.CSSProperties
+  assistant?: React.CSSProperties
+  system?: React.CSSProperties
+  tool?: React.CSSProperties
+  label?: React.CSSProperties
+  eventBody?: React.CSSProperties
+  code?: React.CSSProperties
+  actions?: React.CSSProperties
 }
 
 export type GridKitScrollbarMode = 'native' | 'custom' | 'hidden'
@@ -202,7 +251,7 @@ export type GridKitScrollbarMode = 'native' | 'custom' | 'hidden'
 export interface GridKitScrollbarConfig {
   /** Scrollbar rendering mode. Defaults to native for non-table views. */
   mode?: GridKitScrollbarMode
-  /** Track thickness when mode="custom". Defaults to var(--dg-scrollbar-size). */
+  /** Track thickness when mode="custom". Defaults to var(--gridkit-scrollbar-size). */
   size?: number | string
   /** Extra class for the custom scrollbar track. */
   trackClassName?: string
@@ -476,6 +525,8 @@ export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T
   renderGroupRow?: (row: Row<T>) => ReactNode
   /** Slot-based class injection for individual table elements */
   classNames?: DataGridClassNames
+  /** Slot-based inline styles for individual table elements */
+  styles?: DataGridStyles
 }
 
 export interface DataGridBaseProps<T extends object> extends GridKitCoreProps<T>, TableViewConfig<T> {
@@ -621,6 +672,8 @@ export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T
   footer?: ReactNode
   /** Slot-based class injection for card elements */
   classNames?: DataGridCardClassNames
+  /** Slot-based inline styles for card elements */
+  styles?: DataGridCardStyles
   /** Scrollbar rendering for the card scroll container. Defaults to native. */
   scrollbar?: GridKitScrollbarConfig
   /**
@@ -664,6 +717,8 @@ export interface DataGridListProps<T extends object> extends GridKitCoreProps<T>
   rootMargin?: string
   /** Slot-based class injection for list elements */
   classNames?: DataGridListClassNames
+  /** Slot-based inline styles for list elements */
+  styles?: DataGridListStyles
   /** Scrollbar rendering for the list scroll container. Defaults to native. */
   scrollbar?: GridKitScrollbarConfig
 }
@@ -685,9 +740,9 @@ export interface DataGridChatProps<T extends object> extends GridKitCoreProps<T>
   footer?: ReactNode
   /** Scrollbar rendering for the chat scroll container. Defaults to native. */
   scrollbar?: GridKitScrollbarConfig
-  /** Inline style for the chat scroll container. Useful for CSS token overrides. */
-  containerStyle?: React.CSSProperties
   classNames?: DataGridChatClassNames
+  /** Slot-based inline styles for chat elements */
+  styles?: DataGridChatStyles
 }
 
 export type AgentChatRole = 'user' | 'assistant' | 'system' | 'tool'
@@ -778,6 +833,8 @@ export interface DataGridAgentChatProps<
   renderEventActions?: (event: TEvent, context: AgentChatRenderContext<TEvent>) => ReactNode
   /** Slot and event-type class injection for chat shells, bubbles, content, code blocks, and actions. */
   classNames?: DataGridAgentChatClassNames
+  /** Slot-based inline styles for agent chat elements */
+  styles?: DataGridAgentChatStyles
   /** Per-event class hook. Useful for provider state, severity, pinned artifacts, or custom grouping. */
   getEventClassName?: (event: TEvent, context: AgentChatRenderContext<TEvent>) => string | undefined
   /** Per-event inline style hook for values that are naturally dynamic, such as accent colors or width. */

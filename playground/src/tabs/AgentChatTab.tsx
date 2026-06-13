@@ -20,43 +20,43 @@ const CHAT_TOKEN_PRESETS = {
   compact: {
     label: 'Compact',
     style: {
-      '--dg-chat-gap': '8px',
-      '--dg-chat-padding': '10px',
-      '--dg-agent-chat-font-size': '13px',
-      '--dg-agent-chat-event-gap': '4px',
-      '--dg-agent-chat-assistant-max-width': '680px',
-      '--dg-agent-chat-user-max-width': '560px',
-      '--dg-agent-chat-code-font-size': '11px',
+      '--gridkit-chat-gap': '8px',
+      '--gridkit-chat-padding': '10px',
+      '--gridkit-agent-chat-font-size': '13px',
+      '--gridkit-agent-chat-event-gap': '4px',
+      '--gridkit-agent-chat-assistant-max-width': '680px',
+      '--gridkit-agent-chat-user-max-width': '560px',
+      '--gridkit-agent-chat-code-font-size': '11px',
     },
   },
   balanced: {
     label: 'Balanced',
     style: {
-      '--dg-chat-gap': '12px',
-      '--dg-chat-padding': '16px',
-      '--dg-agent-chat-font-size': '14px',
-      '--dg-agent-chat-event-gap': '6px',
-      '--dg-agent-chat-assistant-max-width': '760px',
-      '--dg-agent-chat-user-max-width': '640px',
-      '--dg-agent-chat-code-font-size': '12px',
+      '--gridkit-chat-gap': '12px',
+      '--gridkit-chat-padding': '16px',
+      '--gridkit-agent-chat-font-size': '14px',
+      '--gridkit-agent-chat-event-gap': '6px',
+      '--gridkit-agent-chat-assistant-max-width': '760px',
+      '--gridkit-agent-chat-user-max-width': '640px',
+      '--gridkit-agent-chat-code-font-size': '12px',
     },
   },
   spacious: {
     label: 'Spacious',
     style: {
-      '--dg-chat-gap': '18px',
-      '--dg-chat-padding': '22px',
-      '--dg-agent-chat-font-size': '15px',
-      '--dg-agent-chat-event-gap': '8px',
-      '--dg-agent-chat-assistant-max-width': '860px',
-      '--dg-agent-chat-user-max-width': '720px',
-      '--dg-agent-chat-code-font-size': '12px',
+      '--gridkit-chat-gap': '18px',
+      '--gridkit-chat-padding': '22px',
+      '--gridkit-agent-chat-font-size': '15px',
+      '--gridkit-agent-chat-event-gap': '8px',
+      '--gridkit-agent-chat-assistant-max-width': '860px',
+      '--gridkit-agent-chat-user-max-width': '720px',
+      '--gridkit-agent-chat-code-font-size': '12px',
     },
   },
 } as const
 
 const CHART_COLORS = [
-  { label: 'Primary', value: 'var(--dg-primary)' },
+  { label: 'Primary', value: 'var(--gridkit-primary)' },
   { label: 'Teal', value: 'oklch(0.58 0.14 181)' },
   { label: 'Amber', value: 'oklch(0.68 0.16 70)' },
 ] as const
@@ -68,11 +68,11 @@ type CSSVariableStyle = CSSProperties & Record<`--${string}`, string>
 export function AgentChatTab() {
   const runtime = useAgentDemoRuntime()
   const [tokenPreset, setTokenPreset] = useState<ChatTokenPreset>('balanced')
-  const [chartColor, setChartColor] = useState<ChartColor>('var(--dg-primary)')
+  const [chartColor, setChartColor] = useState<ChartColor>('var(--gridkit-primary)')
   const chatStyle = {
     ...CHAT_TOKEN_PRESETS[tokenPreset].style,
-    '--dg-agent-chat-user-background': 'color-mix(in srgb, var(--dg-primary) 9%, var(--dg-background))',
-    '--dg-agent-chat-user-border': 'color-mix(in srgb, var(--dg-primary) 30%, var(--dg-border))',
+    '--gridkit-agent-chat-user-background': 'color-mix(in srgb, var(--gridkit-primary) 9%, var(--gridkit-background))',
+    '--gridkit-agent-chat-user-border': 'color-mix(in srgb, var(--gridkit-primary) 30%, var(--gridkit-border))',
   } satisfies CSSVariableStyle
   const adapterStats = useMemo(() => {
     const normalized = runtime.normalizedEvents
@@ -201,7 +201,7 @@ export function AgentChatTab() {
             containerHeight="100%"
             fillParent
             scrollbar={{ mode: 'custom' }}
-            containerStyle={chatStyle as CSSProperties}
+            styles={{ frame: chatStyle as CSSProperties }}
             searchableColumns={['type', 'role', 'status', 'name', 'content']}
             headerRight={(table) => <GlobalSearch table={table} placeholder="Search agent events..." />}
             classNames={{

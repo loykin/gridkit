@@ -20,6 +20,8 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
     itemPadding,
     containerHeight,
     tableHeight,
+    maxTableHeight,
+    minTableHeight,
     fillContainer,
     fillParent,
     enableVirtualization,
@@ -62,15 +64,12 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
   const virtualInitialHeight =
     typeof effectiveContainerHeight === 'number' ? effectiveContainerHeight : undefined
 
-  if (effectiveError) {
-    return <div className="dg-error">{effectiveError.message}</div>
-  }
-
   return (
     <IconsProvider icons={icons}>
       <DataGridListView
         wrapperRef={wrapperRef}
         containerRef={containerRef}
+        error={effectiveError}
         table={table}
         rows={rows}
         headerLeft={headerLeft}
@@ -85,6 +84,8 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
         itemPadding={itemPadding}
         containerHeight={containerHeight}
         tableHeight={tableHeight}
+        maxTableHeight={maxTableHeight}
+        minTableHeight={minTableHeight}
         fillContainer={fillContainer}
         fillParent={fillParent}
         virtual={virtual}
@@ -98,6 +99,7 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
         emptyMessage={props.emptyMessage}
         emptyContent={props.emptyContent}
         classNames={classNames}
+        styles={props.styles}
       />
     </IconsProvider>
   )

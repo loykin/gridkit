@@ -3,7 +3,7 @@ import type { Column, Row, Table } from '@tanstack/react-table'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
-import type { DataGridClassNames, TableViewConfig, TableWidthMode } from '@/types'
+import type { DataGridClassNames, DataGridStyles, TableViewConfig, TableWidthMode } from '@/types'
 import { RowWrapperContext } from '@/features/reordering/RowWrapperContext'
 import { useDetailRow } from '@/features/expanding/DetailRowContext'
 import { colStyle } from './tableUtils'
@@ -23,6 +23,7 @@ interface DataGridBodyProps<T extends object>
   pinning?: boolean
   measureRows?: boolean
   classNames?: DataGridClassNames
+  styles?: DataGridStyles
 }
 
 export function DataGridBody<T extends object>({
@@ -44,6 +45,7 @@ export function DataGridBody<T extends object>({
   renderDetailRow,
   renderGroupRow,
   classNames,
+  styles,
 }: DataGridBodyProps<T>) {
   const showSpacer = tableWidthMode === 'spacer'
   const fillLast = tableWidthMode === 'fill-last'
@@ -58,12 +60,12 @@ export function DataGridBody<T extends object>({
 
   if (isLoading) {
     return (
-      <div role="rowgroup" style={{ display: 'block' }}>
+      <div role="rowgroup" className={classNames?.loading} style={{ display: 'block', ...styles?.loading }}>
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             role="row"
             key={i}
-            className="dg-row"
+            className="gridkit-row"
             data-last={i === 5 ? 'true' : undefined}
             style={{ minHeight: rowHeight }}
           >
@@ -76,13 +78,13 @@ export function DataGridBody<T extends object>({
                   key={col.id}
                   data-col-id={col.id}
                   data-last-col={isLast ? 'true' : undefined}
-                  className={cn('dg-loading-cell', bordered && 'dg-loading-cell--bordered')}
+                  className={cn('gridkit-loading-cell', bordered && 'gridkit-loading-cell--bordered')}
                   style={{
                     ...colStyle(col, { pinning }),
                     ...(isFillCell && { flex: 1, width: 'auto' }),
                   }}
                 >
-                  <div className="dg-loading-pulse" />
+                  <div className="gridkit-loading-pulse" />
                 </div>
               )
             })}
@@ -96,9 +98,9 @@ export function DataGridBody<T extends object>({
   if (rows.length === 0) {
     return (
       <div role="rowgroup" style={{ display: 'block' }}>
-        <div role="row" className="dg-empty-row">
-          <div role="gridcell" className="dg-empty-cell">
-            <div className={cn('dg-empty', classNames?.empty)}>{emptyContent ?? emptyMessage}</div>
+        <div role="row" className="gridkit-empty-row">
+          <div role="gridcell" className="gridkit-empty-cell">
+            <div className={cn('gridkit-empty', classNames?.empty)} style={styles?.empty}>{emptyContent ?? emptyMessage}</div>
           </div>
         </div>
       </div>
@@ -135,8 +137,8 @@ export function DataGridBody<T extends object>({
   const renderGroupRowLabel = (row: Row<T>) =>
     renderGroupRow ? renderGroupRow(row) : (
       <>
-        <span className="dg-group-label">{String(row.groupingValue ?? '')}</span>
-        <span className="dg-group-count">({row.subRows.length})</span>
+        <span className="gridkit-group-label">{String(row.groupingValue ?? '')}</span>
+        <span className="gridkit-group-count">({row.subRows.length})</span>
       </>
     )
 
@@ -149,15 +151,15 @@ export function DataGridBody<T extends object>({
               <div
                 key={row.id}
                 role="row"
-                className="dg-group-row"
+                className="gridkit-group-row"
                 data-depth={row.depth}
                 style={rowStyle}
                 ref={measureRef ? (el) => measureRef(el) : undefined}
                 data-index={dataIndex}
               >
-                <div role="gridcell" className="dg-group-cell">
+                <div role="gridcell" className="gridkit-group-cell">
                   <button
-                    className="dg-group-toggle"
+                    className="gridkit-group-toggle"
                     onClick={row.getToggleExpandedHandler()}
                     aria-expanded={row.getIsExpanded()}
                     aria-label={row.getIsExpanded() ? 'Collapse group' : 'Expand group'}
@@ -173,7 +175,7 @@ export function DataGridBody<T extends object>({
 
           const isDetailExpanded = renderDetailRow && detailRowCtx?.expandedRows.has(row.id)
           const detailPanel = isDetailExpanded ? (
-            <div role="row" className="dg-detail-row">
+            <div role="row" className="gridkit-detail-row">
               <div role="gridcell" style={{ width: '100%' }}>
                 {renderDetailRow(row as Row<unknown>)}
               </div>
@@ -203,6 +205,7 @@ export function DataGridBody<T extends object>({
                   onActionTrigger={onActionTrigger}
                   isLastRow={index === rows.length - 1}
                   classNames={classNames}
+                  styles={styles}
                 />
                 {detailPanel}
               </div>
@@ -225,6 +228,7 @@ export function DataGridBody<T extends object>({
                 onActionTrigger={onActionTrigger}
                 isLastRow={index === rows.length - 1}
                 classNames={classNames}
+                styles={styles}
               />
               {detailPanel}
             </React.Fragment>
@@ -245,10 +249,10 @@ export function DataGridBody<T extends object>({
           Rendered in both virtual and non-virtual modes so the last-row separator
           appears even when virtualization is active. */}
       <div
-        className="dg-fill-row"
+        className="gridkit-fill-row"
         style={{
           background:
-            'linear-gradient(to bottom, var(--dg-border) 0px, var(--dg-border) 1px, transparent 1px)',
+            'linear-gradient(to bottom, var(--gridkit-border) 0px, var(--gridkit-border) 1px, transparent 1px)',
         }}
       >
         {visibleLeafColumns.map((col, colIdx) => {
@@ -258,7 +262,7 @@ export function DataGridBody<T extends object>({
             <div
               key={col.id}
               data-last-col={isLast ? 'true' : undefined}
-              className={cn(bordered && 'dg-fill-cell--bordered')}
+              className={cn(bordered && 'gridkit-fill-cell--bordered')}
               style={{
                 ...colStyle(col, { pinning }),
                 ...(isFillCell && { flex: 1, width: 'auto' }),

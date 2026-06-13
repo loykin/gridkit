@@ -73,7 +73,7 @@ function makeMessages(start: number, count: number) {
 }
 
 describe('DataGridChat fill props', () => {
-  it('applies dg-table-wrapper--fill when fillContainer is set', () => {
+  it('applies gridkit-frame--fill when fillContainer is set', () => {
     const { container } = render(
       <DataGridChat
         data={makeMessages(0, 5)}
@@ -83,7 +83,7 @@ describe('DataGridChat fill props', () => {
         renderMessage={(row) => <div>{row.original.body}</div>}
       />,
     )
-    expect(container.querySelector('.dg-chat-container')).toHaveClass('dg-table-wrapper--fill')
+    expect(container.querySelector('.gridkit-frame')).toHaveClass('gridkit-frame--fill')
   })
 
   it('sets data-fill-parent when fillParent is set', () => {
@@ -96,7 +96,7 @@ describe('DataGridChat fill props', () => {
         renderMessage={(row) => <div>{row.original.body}</div>}
       />,
     )
-    expect(container.querySelector('.dg-shell')).toHaveAttribute('data-fill-parent', 'true')
+    expect(container.querySelector('.gridkit-shell')).toHaveAttribute('data-fill-parent', 'true')
   })
 })
 
@@ -129,7 +129,7 @@ describe('DataGridChat scroll behavior', () => {
     }
 
     const { container } = render(<Harness />)
-    const chatContainer = container.querySelector('.dg-chat-container') as HTMLElement
+    const chatContainer = container.querySelector('.gridkit-frame') as HTMLElement
     setScrollMetrics(chatContainer, metrics)
 
     act(() => {
@@ -169,7 +169,7 @@ describe('DataGridChat scroll behavior', () => {
     }
 
     const { container } = render(<Harness />)
-    const chatContainer = container.querySelector('.dg-chat-container') as HTMLElement
+    const chatContainer = container.querySelector('.gridkit-frame') as HTMLElement
     setScrollMetrics(chatContainer, metrics)
 
     act(() => {
@@ -209,7 +209,7 @@ describe('DataGridChat scroll behavior', () => {
     }
 
     const { container } = render(<Harness />)
-    const chatContainer = container.querySelector('.dg-chat-container') as HTMLElement
+    const chatContainer = container.querySelector('.gridkit-frame') as HTMLElement
     setScrollMetrics(chatContainer, metrics)
 
     act(() => {

@@ -57,22 +57,22 @@ function CustomMenu<T extends object>({
 
   return (
     <div style={{ padding: '4px 0' }}>
-      <div style={{ padding: '4px 8px 6px', fontSize: 11, fontWeight: 600, color: 'var(--dg-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+      <div style={{ padding: '4px 8px 6px', fontSize: 11, fontWeight: 600, color: 'var(--gridkit-muted-foreground)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
         {String(col.columnDef.header ?? col.id)}
       </div>
       {ctx.canSort && (
         <>
-          <button className="dg-popover-option" data-active={sorted === 'asc' ? 'true' : undefined} onClick={() => { col.toggleSorting(false); close() }}>↑ Sort A → Z</button>
-          <button className="dg-popover-option" data-active={sorted === 'desc' ? 'true' : undefined} onClick={() => { col.toggleSorting(true); close() }}>↓ Sort Z → A</button>
-          {sorted && <button className="dg-popover-option" onClick={() => { col.clearSorting(); close() }}>✕ Clear Sort</button>}
-          {ctx.canPin && <div className="dg-col-menu-divider" />}
+          <button className="gridkit-popover-option" data-active={sorted === 'asc' ? 'true' : undefined} onClick={() => { col.toggleSorting(false); close() }}>↑ Sort A → Z</button>
+          <button className="gridkit-popover-option" data-active={sorted === 'desc' ? 'true' : undefined} onClick={() => { col.toggleSorting(true); close() }}>↓ Sort Z → A</button>
+          {sorted && <button className="gridkit-popover-option" onClick={() => { col.clearSorting(); close() }}>✕ Clear Sort</button>}
+          {ctx.canPin && <div className="gridkit-col-menu-divider" />}
         </>
       )}
       {ctx.canPin && (
         <>
-          <button className="dg-popover-option" data-active={pinned === 'left' ? 'true' : undefined} onClick={() => { col.pin('left'); close() }}>← Pin Left</button>
-          <button className="dg-popover-option" data-active={pinned === 'right' ? 'true' : undefined} onClick={() => { col.pin('right'); close() }}>→ Pin Right</button>
-          {pinned && <button className="dg-popover-option" onClick={() => { col.pin(false); close() }}>Unpin</button>}
+          <button className="gridkit-popover-option" data-active={pinned === 'left' ? 'true' : undefined} onClick={() => { col.pin('left'); close() }}>← Pin Left</button>
+          <button className="gridkit-popover-option" data-active={pinned === 'right' ? 'true' : undefined} onClick={() => { col.pin('right'); close() }}>→ Pin Right</button>
+          {pinned && <button className="gridkit-popover-option" onClick={() => { col.pin(false); close() }}>Unpin</button>}
         </>
       )}
     </div>
