@@ -92,7 +92,7 @@ async function openTab(page, label) {
 
 async function leafHeaderIds(page) {
   return page
-    .locator('.dg-header .dg-header-row')
+    .locator('.gridkit-header .gridkit-header-row')
     .first()
     .locator('[role="columnheader"][data-col-id]')
     .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-col-id')))
@@ -105,12 +105,12 @@ test('column resize does not trigger column reorder', async () => {
   await page.reload()
   await openTab(page, 'State Persistence')
 
-  const nameHeader = page.locator('.dg-header [role="columnheader"][data-col-id="name"]').first()
+  const nameHeader = page.locator('.gridkit-header [role="columnheader"][data-col-id="name"]').first()
   const beforeBox = await nameHeader.boundingBox()
   assert.ok(beforeBox)
 
   const beforeOrder = await leafHeaderIds(page)
-  const handle = nameHeader.locator('.dg-resize-handle')
+  const handle = nameHeader.locator('.gridkit-resize-handle')
   const handleBox = await handle.boundingBox()
   assert.ok(handleBox)
 
@@ -124,7 +124,7 @@ test('column resize does not trigger column reorder', async () => {
       const node = globalThis.document.querySelector(selector)
       return !!node && node.getBoundingClientRect().width < width - 20
     },
-    { selector: '.dg-header [role="columnheader"][data-col-id="name"]', width: beforeBox.width },
+    { selector: '.gridkit-header [role="columnheader"][data-col-id="name"]', width: beforeBox.width },
     { timeout: 1000 },
   )
   const afterBox = await nameHeader.boundingBox()
@@ -165,20 +165,20 @@ test('header theme tokens style header cells and filter row', async () => {
 
   await page.addStyleTag({
     content: `
-      .dg-token-test {
-        --dg-header-background: rgb(1 2 3);
-        --dg-header-foreground: rgb(250 251 252);
-        --dg-header-border: rgb(70 80 90);
-        --dg-header-control-background: rgb(10 20 30);
-        --dg-header-control-foreground: rgb(230 240 250);
-        --dg-header-control-border: rgb(40 50 60);
-        --dg-header-popover-background: rgb(4 5 6);
-        --dg-header-popover-foreground: rgb(240 241 242);
-        --dg-header-popover-border: rgb(90 91 92);
+      .gridkit-token-test {
+        --gridkit-header-background: rgb(1 2 3);
+        --gridkit-header-foreground: rgb(250 251 252);
+        --gridkit-header-border: rgb(70 80 90);
+        --gridkit-header-control-background: rgb(10 20 30);
+        --gridkit-header-control-foreground: rgb(230 240 250);
+        --gridkit-header-control-border: rgb(40 50 60);
+        --gridkit-header-popover-background: rgb(4 5 6);
+        --gridkit-header-popover-foreground: rgb(240 241 242);
+        --gridkit-header-popover-border: rgb(90 91 92);
       }
     `,
   })
-  await page.locator('[data-testid="fill-long-case"] .dg-shell').evaluate((node) => node.classList.add('dg-token-test'))
+  await page.locator('[data-testid="fill-long-case"] .gridkit-shell').evaluate((node) => node.classList.add('gridkit-token-test'))
   await page.evaluate(() => {
     if (globalThis.document.activeElement instanceof globalThis.HTMLElement) {
       globalThis.document.activeElement.blur()
@@ -186,13 +186,13 @@ test('header theme tokens style header cells and filter row', async () => {
   })
 
   const styles = await page.evaluate(() => {
-    const header = globalThis.document.querySelector('.dg-token-test .dg-header')
-    const leafCell = globalThis.document.querySelector('.dg-token-test .dg-header-cell[data-col-id="id"]')
-    const groupCell = globalThis.document.querySelector('.dg-token-test .dg-header-cell[data-header-group="true"]')
-    const filterRow = globalThis.document.querySelector('.dg-token-test .dg-filter-row')
-    const input = Array.from(globalThis.document.querySelectorAll('.dg-token-test .dg-filter-row .dg-input'))
+    const header = globalThis.document.querySelector('.gridkit-token-test .gridkit-header')
+    const leafCell = globalThis.document.querySelector('.gridkit-token-test .gridkit-header-cell[data-col-id="id"]')
+    const groupCell = globalThis.document.querySelector('.gridkit-token-test .gridkit-header-cell[data-header-group="true"]')
+    const filterRow = globalThis.document.querySelector('.gridkit-token-test .gridkit-filter-row')
+    const input = Array.from(globalThis.document.querySelectorAll('.gridkit-token-test .gridkit-filter-row .gridkit-input'))
       .find((node) => node !== globalThis.document.activeElement)
-    const select = globalThis.document.querySelector('.dg-token-test .dg-filter-row .dg-select')
+    const select = globalThis.document.querySelector('.gridkit-token-test .gridkit-filter-row .gridkit-select')
     const read = (node) => {
       const style = getComputedStyle(node)
       return {
@@ -200,8 +200,8 @@ test('header theme tokens style header cells and filter row', async () => {
         color: style.color,
         borderColor: style.borderColor,
         borderBottomColor: style.borderBottomColor,
-        controlBorder: style.getPropertyValue('--dg-control-border').trim(),
-        headerControlBorder: style.getPropertyValue('--dg-header-control-border').trim(),
+        controlBorder: style.getPropertyValue('--gridkit-control-border').trim(),
+        headerControlBorder: style.getPropertyValue('--gridkit-header-control-border').trim(),
       }
     }
 
@@ -230,7 +230,7 @@ test('header theme tokens style header cells and filter row', async () => {
   assert.equal(styles.select.headerControlBorder, 'rgb(40 50 60)')
 
   await page.locator('[data-testid="fill-long-case"]').getByRole('button', { name: 'Pin options for id' }).click()
-  const popover = page.locator('.dg-header-popover').last()
+  const popover = page.locator('.gridkit-header-popover').last()
   await popover.waitFor({ state: 'visible', timeout: 1000 })
   const popoverStyles = await popover.evaluate((node) => {
     const style = getComputedStyle(node)
@@ -253,10 +253,10 @@ test('fillContainer preserves natural height until body overflow', async () => {
   await openTab(page, 'Fill Container')
 
   const readCase = async (testId) => page.locator(`[data-testid="${testId}"]`).evaluate((root) => {
-    const shell = root.querySelector('.dg-shell')
-    const tableWrapper = root.querySelector('.dg-table-wrapper')
-    const body = root.querySelector('.dg-body-scroll')
-    const footer = root.querySelector('.dg-footer')
+    const shell = root.querySelector('.gridkit-shell')
+    const tableWrapper = root.querySelector('.gridkit-frame')
+    const body = root.querySelector('.gridkit-body-scroll')
+    const footer = root.querySelector('.gridkit-footer')
     const rect = (node) => {
       const box = node.getBoundingClientRect()
       return { top: box.top, bottom: box.bottom, height: box.height }
@@ -298,11 +298,11 @@ test('fillContainer row date filters and horizontal scrollbar stay within layout
 
   const layout = await page.evaluate(() => {
     const root = globalThis.document.querySelector('[data-testid="fill-long-case"]')
-    const bodyCenter = root?.querySelector('.dg-region.dg-region--center > .dg-body-scroll')
-    const headerCenter = root?.querySelector('.dg-header .dg-region.dg-region--center')
-    const hTrack = root?.querySelector('.dg-scrollbar-track:not([style*="absolute"])')
-    const dateButton = root?.querySelector('.dg-filter-cell [aria-label="Filter startDate by date"]')
-    const dateCell = dateButton?.closest('.dg-filter-cell')
+    const bodyCenter = root?.querySelector('.gridkit-region.gridkit-region--center > .gridkit-body-scroll')
+    const headerCenter = root?.querySelector('.gridkit-header .gridkit-region.gridkit-region--center')
+    const hTrack = root?.querySelector('.gridkit-scrollbar-track:not([style*="absolute"])')
+    const dateButton = root?.querySelector('.gridkit-filter-cell [aria-label="Filter startDate by date"]')
+    const dateCell = dateButton?.closest('.gridkit-filter-cell')
     const rect = (node) => {
       const box = node?.getBoundingClientRect()
       return box ? { width: box.width, height: box.height, top: box.top, bottom: box.bottom } : null
@@ -314,7 +314,7 @@ test('fillContainer row date filters and horizontal scrollbar stay within layout
     }
 
     return {
-      dateInputsInRow: root?.querySelectorAll('.dg-filter-cell input[type="date"]').length ?? 0,
+      dateInputsInRow: root?.querySelectorAll('.gridkit-filter-cell input[type="date"]').length ?? 0,
       dateCell: rect(dateCell),
       dateCellScrollWidth: dateCell?.scrollWidth ?? null,
       dateCellClientWidth: dateCell?.clientWidth ?? null,
@@ -335,7 +335,7 @@ test('fillContainer row date filters and horizontal scrollbar stay within layout
   assert.equal(layout.headerScrollLeft, layout.bodyScrollLeft)
 
   await page.locator('[data-testid="fill-long-case"]').getByRole('button', { name: 'Filter startDate by date' }).click()
-  const popoverInputs = page.locator('.dg-header-popover input[type="date"]')
+  const popoverInputs = page.locator('.gridkit-header-popover input[type="date"]')
   assert.equal(await popoverInputs.count(), 2)
 
   await closePage(page)
@@ -346,10 +346,10 @@ test('fillParent fills parent height and virtualizes overflowing rows', async ()
   await openTab(page, 'Fill Parent')
 
   const readCase = async (testId) => page.locator(`[data-testid="${testId}"]`).evaluate((root) => {
-    const shell = root.querySelector('.dg-shell')
-    const body = root.querySelector('.dg-body-scroll')
-    const footer = root.querySelector('.dg-footer')
-    const rows = root.querySelectorAll('.dg-row')
+    const shell = root.querySelector('.gridkit-shell')
+    const body = root.querySelector('.gridkit-body-scroll')
+    const footer = root.querySelector('.gridkit-footer')
+    const rows = root.querySelectorAll('.gridkit-row')
     const rect = (node) => {
       const box = node.getBoundingClientRect()
       return { top: box.top, bottom: box.bottom, height: box.height }
@@ -393,10 +393,10 @@ test('datetime range popover shows seconds inputs without clipping', async () =>
   const page = await newPage()
   await openTab(page, 'Log Stream')
 
-  const timeHeader = page.locator('.dg-header [role="columnheader"][data-col-id="timestamp"]').first()
+  const timeHeader = page.locator('.gridkit-header [role="columnheader"][data-col-id="timestamp"]').first()
   await timeHeader.locator('button').click()
 
-  const popover = page.locator('.dg-popover-content').last()
+  const popover = page.locator('.gridkit-popover-content').last()
   const inputs = popover.locator('input[type="datetime-local"]')
   await assert.doesNotReject(async () => {
     await popover.waitFor({ state: 'visible', timeout: 1000 })
@@ -420,12 +420,12 @@ test('state persistence restores column sizing after reload', async () => {
   await page.evaluate(() => localStorage.removeItem('gridkit:playground:persisted-state'))
   await openTab(page, 'State Persistence')
 
-  const nameHeader = page.locator('.dg-header [role="columnheader"][data-col-id="name"]').first()
+  const nameHeader = page.locator('.gridkit-header [role="columnheader"][data-col-id="name"]').first()
   await nameHeader.waitFor({ state: 'visible', timeout: 1000 })
   const beforeBox = await nameHeader.boundingBox()
   assert.ok(beforeBox)
 
-  const handle = nameHeader.locator('.dg-resize-handle')
+  const handle = nameHeader.locator('.gridkit-resize-handle')
   await handle.waitFor({ state: 'visible', timeout: 1000 })
   const handleBox = await handle.boundingBox()
   assert.ok(handleBox)
@@ -453,7 +453,7 @@ test('column visibility dropdown hides and restores a column', async () => {
   await page.reload()
   await openTab(page, 'State Persistence')
 
-  const departmentHeader = page.locator('.dg-header [role="columnheader"][data-col-id="department"]').first()
+  const departmentHeader = page.locator('.gridkit-header [role="columnheader"][data-col-id="department"]').first()
   await assert.doesNotReject(async () => {
     assert.ok(await departmentHeader.isVisible())
   })
@@ -475,7 +475,7 @@ test('column pinning marks pinned headers as pinned', async () => {
   const page = await newPage()
   await openTab(page, 'Pinning UI')
 
-  const nameHeader = page.locator('.dg-header [role="columnheader"][data-col-id="name"]').first()
+  const nameHeader = page.locator('.gridkit-header [role="columnheader"][data-col-id="name"]').first()
   await nameHeader.getByRole('button', { name: 'Pin options for name' }).click()
   await page.getByRole('button', { name: 'Pin Left' }).click()
 
@@ -493,14 +493,14 @@ test('runtime right-pinned header aligns with body immediately after pinning', a
   await page.setViewportSize({ width: 900, height: 900 })
   await openTab(page, 'Pinning UI')
 
-  const statusHeader = page.locator('.dg-header [role="columnheader"][data-col-id="status"]').first()
+  const statusHeader = page.locator('.gridkit-header [role="columnheader"][data-col-id="status"]').first()
   await statusHeader.getByRole('button', { name: 'Pin options for status' }).click()
   await page.getByRole('button', { name: 'Pin Right' }).click()
   await page.waitForTimeout(100)
 
   const positions = await page.evaluate(() => {
-    const header = globalThis.document.querySelector('.dg-header [role="columnheader"][data-col-id="status"]')
-    const cell = globalThis.document.querySelector('.dg-body-scroll [role="gridcell"][data-col-id="status"]')
+    const header = globalThis.document.querySelector('.gridkit-header [role="columnheader"][data-col-id="status"]')
+    const cell = globalThis.document.querySelector('.gridkit-body-scroll [role="gridcell"][data-col-id="status"]')
     const rect = (node) => {
       const box = node?.getBoundingClientRect()
       return box ? { left: box.left, right: box.right, width: box.width } : null
@@ -533,8 +533,8 @@ test('pinned body cells stay aligned while horizontally scrolling', async () => 
 
   const readPinned = async () => page.evaluate(() => {
     const readColumn = (id) => {
-      const header = globalThis.document.querySelector(`.dg-header [role="columnheader"][data-col-id="${id}"]`)
-      const cell = globalThis.document.querySelector(`.dg-body-scroll [role="gridcell"][data-col-id="${id}"]`)
+      const header = globalThis.document.querySelector(`.gridkit-header [role="columnheader"][data-col-id="${id}"]`)
+      const cell = globalThis.document.querySelector(`.gridkit-body-scroll [role="gridcell"][data-col-id="${id}"]`)
       const rect = (node) => {
         const box = node?.getBoundingClientRect()
         return box ? { left: box.left, right: box.right, width: box.width } : null
@@ -550,7 +550,7 @@ test('pinned body cells stay aligned while horizontally scrolling', async () => 
       }
     }
 
-    const scroller = globalThis.document.querySelector('.dg-region.dg-region--center > .dg-body-scroll')
+    const scroller = globalThis.document.querySelector('.gridkit-region.gridkit-region--center > .gridkit-body-scroll')
 
     return {
       scrollLeft: scroller?.scrollLeft ?? 0,
@@ -579,7 +579,7 @@ test('pinned body cells stay aligned while horizontally scrolling', async () => 
     `Initial Status body cell is not aligned with header: cell ${before.status.cell.right}, header ${before.status.header.right}`,
   )
 
-  await page.locator('.dg-region.dg-region--center > .dg-body-scroll').evaluate((node) => {
+  await page.locator('.gridkit-region.gridkit-region--center > .gridkit-body-scroll').evaluate((node) => {
     node.scrollLeft = 100
     node.dispatchEvent(new globalThis.Event('scroll', { bubbles: true }))
   })
@@ -616,8 +616,8 @@ test('right-pinned column resizes from the inner edge', async () => {
   await page.setViewportSize({ width: 900, height: 900 })
   await page.getByRole('button', { name: 'Column Pinning', exact: true }).click()
 
-  const statusHeader = page.locator('.dg-header [role="columnheader"][data-col-id="status"]').first()
-  const handle = statusHeader.locator('.dg-resize-handle')
+  const statusHeader = page.locator('.gridkit-header [role="columnheader"][data-col-id="status"]').first()
+  const handle = statusHeader.locator('.gridkit-resize-handle')
   assert.equal(await handle.getAttribute('data-side'), 'left')
 
   const beforeBox = await statusHeader.boundingBox()
@@ -653,7 +653,7 @@ test('row actions menu opens and exposes action items', async () => {
   const actionsButton = page.getByRole('button', { name: /Open row actions for row/ }).first()
   await actionsButton.click()
 
-  const menu = page.locator('.dg-action-menu')
+  const menu = page.locator('.gridkit-action-menu')
   await assert.doesNotReject(async () => {
     await menu.waitFor({ state: 'visible', timeout: 1000 })
   })
@@ -684,7 +684,7 @@ test('inline edit commits a changed cell value', async () => {
   const page = await newPage()
   await openTab(page, 'Inline Edit')
 
-  const nameCell = page.locator('.dg-row [role="gridcell"][data-col-id="name"]').first()
+  const nameCell = page.locator('.gridkit-row [role="gridcell"][data-col-id="name"]').first()
   await nameCell.dblclick()
   const editor = nameCell.locator('input')
   await editor.fill('Edited Employee')
@@ -706,7 +706,7 @@ test('tree rows expand nested children', async () => {
     await page.getByText('Kubernetes').waitFor({ state: 'visible', timeout: 1000 })
   })
 
-  await page.locator('.dg-row').filter({ hasText: 'Kubernetes' }).getByRole('button', { name: 'Expand row' }).click()
+  await page.locator('.gridkit-row').filter({ hasText: 'Kubernetes' }).getByRole('button', { name: 'Expand row' }).click()
   await assert.doesNotReject(async () => {
     await page.getByText('Node Exporter').waitFor({ state: 'visible', timeout: 1000 })
   })
