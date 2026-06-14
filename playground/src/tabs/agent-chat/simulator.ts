@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { AgentChatAdapter, AgentChatEvent, DataGridColumnDef } from '@loykin/gridkit'
+import type { AgentChatAdapter, AgentChatEvent, GridKitTablePayload } from '@loykin/gridkit'
 
 export type ProviderEvent =
   | { uid: string; kind: 'user'; text: string }
@@ -7,18 +7,12 @@ export type ProviderEvent =
   | { uid: string; kind: 'tool'; tool: string; args: unknown; state: 'running' | 'complete' | 'error' }
   | { uid: string; kind: 'tool_result'; tool: string; result: unknown }
   | { uid: string; kind: 'chart'; title: string; points: ChartPoint[] }
-  | { uid: string; kind: 'table'; title: string; rows: MetricRow[] }
+  | { uid: string; kind: 'table'; payload: GridKitTablePayload }
   | { uid: string; kind: 'status'; state: 'running' | 'complete' | 'error'; label: string }
 
 export interface ChartPoint {
   label: string
   value: number
-}
-
-export interface MetricRow {
-  metric: string
-  value: string
-  delta: string
 }
 
 interface AgentScenario {
@@ -31,10 +25,7 @@ interface AgentScenario {
     title: string
     points: ChartPoint[]
   }
-  table?: {
-    title: string
-    rows: MetricRow[]
-  }
+  table?: GridKitTablePayload
   statusNote?: string
   finalPartial: string
   finalComplete: string
@@ -97,7 +88,7 @@ export function toAgentEvents(events: ProviderEvent[]) {
     }
 
     if (event.kind === 'table') {
-      return { id: event.uid, type: 'artifact', kind: 'table', title: event.title, data: event.rows }
+      return { id: event.uid, type: 'artifact', kind: 'table', title: event.payload.title, data: event.payload }
     }
 
     return { id: event.uid, type: 'status', status: event.state, label: event.label }
@@ -157,18 +148,12 @@ function AgentChat() {
       footer={<Composer onSubmit={agent.submit} onStop={agent.stop} />}
       renderArtifact={(event) => {
         if (event.kind === 'chart') return <Chart data={event.data} />
-        if (event.kind === 'table') return <DataGrid data={event.data.rows} columns={event.data.columns} />
+            if (event.kind === 'table') return <GridKitAutoTable payload={event.data} enableSorting />
         return null
       }}
     />
   )
 }`
-
-export const metricColumns: DataGridColumnDef<MetricRow>[] = [
-  { accessorKey: 'metric', header: 'Metric' },
-  { accessorKey: 'value', header: 'Value' },
-  { accessorKey: 'delta', header: 'Delta' },
-]
 
 function buildScenario(prompt: string): AgentScenario {
   const text = prompt.toLowerCase()
@@ -190,7 +175,13 @@ function buildScenario(prompt: string): AgentScenario {
         ],
       },
       table: {
+        type: 'gridkit-table',
         title: 'Incident signals',
+        columns: [
+          { key: 'metric', label: 'Metric' },
+          { key: 'value', label: 'Value' },
+          { key: 'delta', label: 'Delta' },
+        ],
         rows: [
           { metric: 'peak error rate', value: '3.8%', delta: '+3.1%' },
           { metric: 'retry volume', value: '18.2k', delta: '+42%' },
@@ -221,7 +212,13 @@ function buildScenario(prompt: string): AgentScenario {
         ],
       },
       table: {
+        type: 'gridkit-table',
         title: 'Comparison metrics',
+        columns: [
+          { key: 'metric', label: 'Metric' },
+          { key: 'value', label: 'Value' },
+          { key: 'delta', label: 'Delta' },
+        ],
         rows: [
           { metric: 'p95 latency', value: '211 ms', delta: '+18 ms' },
           { metric: 'saturation', value: '67%', delta: '+6%' },
@@ -252,7 +249,13 @@ function buildScenario(prompt: string): AgentScenario {
         ],
       },
       table: {
+        type: 'gridkit-table',
         title: 'Promotion gates',
+        columns: [
+          { key: 'metric', label: 'Metric' },
+          { key: 'value', label: 'Value' },
+          { key: 'delta', label: 'Delta' },
+        ],
         rows: [
           { metric: 'error gate', value: 'pass', delta: '-1.1%' },
           { metric: 'latency gate', value: 'pass', delta: '+12 ms' },
@@ -281,7 +284,13 @@ function buildScenario(prompt: string): AgentScenario {
       ],
     },
     table: {
+      type: 'gridkit-table',
       title: 'Key metrics',
+      columns: [
+        { key: 'metric', label: 'Metric' },
+        { key: 'value', label: 'Value' },
+        { key: 'delta', label: 'Delta' },
+      ],
       rows: [
         { metric: 'p95 latency', value: '184 ms', delta: '+12 ms' },
         { metric: 'error rate', value: '0.8%', delta: '-1.1%' },
@@ -308,8 +317,7 @@ function nextRunEvents(prompt: string, runId: number) {
     artifacts.push({
       uid: `${runId}-table`,
       kind: 'table',
-      title: scenario.table.title,
-      rows: scenario.table.rows,
+      payload: scenario.table,
     })
   }
 

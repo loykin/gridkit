@@ -1,12 +1,10 @@
 import { useMemo, useState, type CSSProperties } from 'react'
-import { DataGrid, DataGridAgentChat, GlobalSearch } from '@loykin/gridkit'
+import { DataGridAgentChat, GlobalSearch } from '@loykin/gridkit'
 import {
   adapter,
-  metricColumns,
   promptExamples,
   useAgentDemoRuntime,
   type ChartPoint,
-  type MetricRow,
 } from './agent-chat/simulator'
 import {
   ChartArtifact,
@@ -174,7 +172,7 @@ export function AgentChatTab() {
         <div className="rounded border border-border bg-background p-3">
           <div className="mb-2 text-xs font-semibold">Artifact Renderer</div>
           <div className="text-[11px] leading-4 text-muted-foreground">
-            <code>renderArtifact</code> renders chart events with Recharts and table events with DataGrid.
+            <code>renderArtifact</code> renders chart events with Recharts. Table events with <code>kind: "table"</code> and <code>GridKitTablePayload</code> data are rendered automatically by <code>GridKitAutoTable</code>.
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {CHART_COLORS.map((color) => (
@@ -253,23 +251,6 @@ export function AgentChatTab() {
               if (event.kind === 'chart') {
                 return <ChartArtifact title={event.title} points={event.data as ChartPoint[]} color={chartColor} />
               }
-
-              if (event.kind === 'table') {
-                return (
-                  <div className="flex min-w-0 flex-col gap-2">
-                    <div className="text-xs font-semibold text-muted-foreground">{event.title}</div>
-                    <DataGrid
-                      data={event.data as MetricRow[]}
-                      columns={metricColumns}
-                      showHeader
-                      bordered
-                      tableHeight="auto"
-                      enableSorting={false}
-                    />
-                  </div>
-                )
-              }
-
               return null
             }}
             renderEventActions={(event) =>
