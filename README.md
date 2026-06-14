@@ -225,65 +225,125 @@ GridKit has two customization surfaces:
 | `--gridkit-footer-background` | Footer surface background. Defaults to `--gridkit-background` |
 | `--gridkit-footer-foreground` | Footer text color. Defaults to `--gridkit-muted-foreground` |
 | `--gridkit-footer-border` | Footer border color token for custom footer styles. Defaults to `--gridkit-border`; the built-in footer wrapper does not draw a border by default |
+| `--gridkit-container-border` | Outer frame border color. Defaults to `--gridkit-border`. Set to `transparent` to hide; use `styles={{ frame: { border: 'none' } }}` to remove the border entirely (no 1 px space) |
 | `--gridkit-ring` | Focus ring color |
 | `--gridkit-radius` | Border radius base value |
 
-### `classNames` Reference
+### `classNames` and `styles` Reference
 
-Each view variant accepts a `classNames` prop with slots specific to its structure.
+Each view accepts a `classNames` prop for class injection and a `styles` prop for inline `CSSProperties`. Both share the same slot keys.
 
-**`DataGridClassNames`** — `DataGrid`, `DataGridInfinity`, `DataGridDrag`
+#### Base slots — all views
 
 ```ts
-interface DataGridClassNames {
-  container?: string  // scroll container
-  header?: string     // header panel
-  footer?: string     // footer wrapper
-  headerCell?: string // individual header cell
-  row?: string        // body row
-  cell?: string       // body cell
-  empty?: string      // empty state wrapper
-  loadMore?: string   // infinite scroll sentinel wrapper
+interface GridKitClassNames {
+  root?: string      // outermost shell (.gridkit-shell)
+  toolbar?: string   // toolbar wrapper (.gridkit-toolbar-frame)
+  frame?: string     // bordered outer frame — carries border/radius (.gridkit-frame)
+  content?: string   // inner data region (view-specific element)
+  header?: string    // header area (.gridkit-header) — Table only
+  body?: string      // body wrapper (.gridkit-body-wrapper) — Table only
+  footer?: string    // footer area (.gridkit-footer)
+  empty?: string     // empty state (.gridkit-empty)
+  error?: string     // error state (.gridkit-error)
+  loading?: string   // loading skeleton (.gridkit-loading-cell)
+  loadMore?: string  // infinite scroll trigger — Table, Card, List
 }
 ```
 
-**`DataGridCardClassNames`** — `DataGridCard`
+`header` and `body` are Table-only slots. On Card/List/Chat they are accepted but ignored.
+
+#### `DataGridClassNames` — `DataGrid`, `DataGridInfinity`, `DataGridDrag`
 
 ```ts
-interface DataGridCardClassNames {
-  container?: string  // card container
-  row?: string        // individual card wrapper
-  empty?: string      // empty state wrapper
-  loadMore?: string   // infinite scroll sentinel wrapper
-  footer?: string     // footer wrapper
+interface DataGridClassNames extends GridKitClassNames {
+  headerCell?: string  // individual header cell (.gridkit-header-cell)
+  row?: string         // body row (.gridkit-row)
+  cell?: string        // body cell (.gridkit-cell)
 }
 ```
 
-**`DataGridListClassNames`** — `DataGridList`
+#### `DataGridCardClassNames` — `DataGridCard`
 
 ```ts
-interface DataGridListClassNames {
-  container?: string  // list container
-  item?: string       // individual list item wrapper
-  empty?: string      // empty state wrapper
-  loadMore?: string   // infinite scroll sentinel wrapper
-  footer?: string     // footer wrapper
+interface DataGridCardClassNames extends GridKitClassNames {
+  card?: string  // individual card item (.gridkit-card)
 }
 ```
 
-**`DataGridChatClassNames`** — `DataGridChat`
+#### `DataGridListClassNames` — `DataGridList`
 
 ```ts
-interface DataGridChatClassNames {
-  container?: string       // chat container
-  messageWrapper?: string  // individual message wrapper
-  daySeparator?: string    // day separator injected between messages
-  unreadMarker?: string    // unread marker injected before a message
-  typingIndicator?: string // typing indicator at the bottom
-  loadPrevious?: string    // load-previous sentinel wrapper
-  empty?: string           // empty state wrapper
-  footer?: string          // footer wrapper
+interface DataGridListClassNames extends GridKitClassNames {
+  item?: string  // individual list item (.gridkit-list-item)
 }
+```
+
+#### `DataGridChatClassNames` — `DataGridChat`
+
+```ts
+interface DataGridChatClassNames extends GridKitClassNames {
+  messageWrapper?: string   // per-message wrapper
+  daySeparator?: string     // separator injected between days
+  unreadMarker?: string     // unread marker injected before a message
+  typingIndicator?: string  // typing indicator rendered after the latest message
+  loadPrevious?: string     // load-previous sentinel wrapper
+  // note: loadMore is not used in Chat — chat loads backward via loadPrevious
+}
+```
+
+#### `DataGridAgentChatClassNames` — `DataGridAgentChat`
+
+```ts
+interface DataGridAgentChatClassNames extends DataGridChatClassNames {
+  event?: string      // per-event shell
+  message?: string    // message bubble
+  toolCall?: string   // tool call event
+  toolResult?: string // tool result event
+  artifact?: string   // artifact event
+  status?: string     // status event
+  user?: string       // user-role message
+  assistant?: string  // assistant-role message
+  system?: string     // system-role message
+  tool?: string       // tool name label
+  label?: string      // event type label
+  eventBody?: string  // event body content
+  code?: string       // code/JSON block
+  actions?: string    // per-event action buttons
+}
+```
+
+#### `styles` merge policy
+
+Internal styles (virtualization positions, column widths) are applied first; user `styles` override on top:
+
+```ts
+style={{ ...internalStyle, ...styles?.row }}
+```
+
+The following properties are structural — overriding them will break layout:
+
+| Slot | Protected properties |
+|---|---|
+| `row` | `transform`, `position`, `height`, `width` |
+| `cell` | `width`, `position`, `left`, `right` |
+| `frame` | `overflow`, `height`, `maxHeight` |
+| `body` | `overflow`, `height` |
+
+Use CSS variables (`--gridkit-*`) for colors, spacing, and typography. Reserve `styles` for CSS variable injection or cases where no token exists:
+
+```tsx
+// Scope a CSS variable to one grid instance
+<DataGrid
+  styles={{ frame: { '--gridkit-radius': '0px' } as React.CSSProperties }}
+  ...
+/>
+
+// Remove the outer border entirely (including its 1 px space)
+<DataGrid
+  styles={{ frame: { border: 'none' } }}
+  ...
+/>
 ```
 
 ---
@@ -662,7 +722,8 @@ List views use the shared row/data/filtering props, but omit table-only options 
 | `isFetchingNextPage` | `boolean` | — | Show loading indicator at the bottom |
 | `fetchNextPage` | `() => void` | — | Called when the sentinel enters the viewport |
 | `rootMargin` | `string` | `'100px'` | IntersectionObserver `rootMargin` for early trigger |
-| `classNames` | `DataGridListClassNames` | — | Slot-based class injection for list elements |
+| `classNames` | `DataGridListClassNames` | — | Slot-based class injection (`root`, `frame`, `item`, `footer`, …) |
+| `styles` | `DataGridListStyles` | — | Slot-based inline styles — same keys as `classNames` |
 
 ### List CSS variables
 
@@ -723,7 +784,8 @@ Chat views use the shared row/data/filtering props, but omit table-only options 
 | `containerHeight` | `string \| number \| 'auto'` | `'auto'` | Preferred chat container height |
 | `tableHeight` | `string \| number \| 'auto'` | `'auto'` | Compatibility alias for `containerHeight` |
 | `footer` | `ReactNode` | — | Static content below the chat container |
-| `classNames` | `DataGridChatClassNames` | — | Slot-based class injection for chat elements |
+| `classNames` | `DataGridChatClassNames` | — | Slot-based class injection (`root`, `frame`, `messageWrapper`, `loadPrevious`, …) |
+| `styles` | `DataGridChatStyles` | — | Slot-based inline styles — same keys as `classNames` |
 
 ---
 
@@ -812,7 +874,8 @@ Inherits all `DataGridChat` props except `data`, `columns`, `renderMessage`, and
 | `renderArtifact` | `(event, ctx) => ReactNode` | Override artifact rendering |
 | `renderStatus` | `(event, ctx) => ReactNode` | Override status event rendering |
 | `renderEventActions` | `(event, ctx) => ReactNode` | Inject action buttons into any event |
-| `classNames` | `DataGridAgentChatClassNames` | Slot-based class injection for event shells, bubbles, labels, code blocks, and actions |
+| `classNames` | `DataGridAgentChatClassNames` | Slot-based class injection (`root`, `frame`, `event`, `message`, `toolCall`, `eventBody`, `code`, `actions`, …) |
+| `styles` | `DataGridAgentChatStyles` | Slot-based inline styles — same keys as `classNames` |
 | `getEventClassName` | `(event, ctx) => string` | Per-event class hook |
 | `getEventStyle` | `(event, ctx) => CSSProperties` | Per-event inline style hook |
 
@@ -907,7 +970,8 @@ All [shared props](#shared-props-datagrid-datagridinfinity-datagriddag-datagridc
 | `fetchNextPage` | `() => void` | — | Called when the sentinel enters the viewport |
 | `rootMargin` | `string` | `'100px'` | IntersectionObserver `rootMargin` for early trigger |
 | `footer` | `ReactNode` | — | Static content below the card container |
-| `classNames` | `DataGridCardClassNames` | — | Slot-based class injection for card elements |
+| `classNames` | `DataGridCardClassNames` | — | Slot-based class injection (`root`, `frame`, `card`, `footer`, …) |
+| `styles` | `DataGridCardStyles` | — | Slot-based inline styles — same keys as `classNames` |
 
 ### Card CSS variables
 
@@ -1084,7 +1148,8 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `tableWidthMode` | `'spacer' \| 'fill-last' \| 'independent'` | `'spacer'` | How remaining horizontal space is distributed |
 | `onRowClick` | `(row: T) => void` | — | Row click handler |
 | `rowCursor` | `boolean` | `false` | Show pointer cursor on rows |
-| `classNames` | `DataGridClassNames` | — | Slot-based class injection for table elements |
+| `classNames` | `DataGridClassNames` | — | Slot-based class injection (`root`, `frame`, `header`, `body`, `footer`, `row`, `cell`, …) |
+| `styles` | `DataGridStyles` | — | Slot-based inline styles — same keys as `classNames`. Use for CSS variable injection or structural overrides |
 | `icons` | `DataGridIcons` | — | Override any built-in icon slot |
 
 #### Headers
