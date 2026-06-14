@@ -10,6 +10,7 @@ export { DataGridCard } from './DataGridCard'
 export { DataGridList } from './DataGridList'
 export { DataGridChat } from './DataGridChat'
 export { DataGridAgentChat } from './DataGridAgentChat'
+export { GridKitAutoTable } from './GridKitAutoTable'
 export { DataGridPaginationBar } from './core/controls/DataGridPaginationBar'
 export { DataGridPaginationCompact } from './core/controls/DataGridPaginationCompact'
 export { DataGridPaginationPages } from './core/controls/DataGridPaginationPages'
@@ -101,4 +102,9 @@ export type {
   AgentChatToolResultEvent,
   DataGridIcons,
   ColumnMenuContext,
+  GridKitTablePayload,
+  GridKitTableColumn,
+  GridKitTableColumnType,
 } from './types'
+
+export { GridKitTablePayloadSchema } from './types'

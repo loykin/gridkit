@@ -40,6 +40,7 @@ entry, a spreadsheet-focused grid such as `react-data-grid` may be a better fit.
 | `DataGridList` | Custom item renderer in a list | Filtering, sorting, search, infinite scroll |
 | `DataGridChat` | Message timeline (top-load, stick-to-bottom) | Filtering, sorting, search |
 | `DataGridAgentChat` | Agent event stream (messages, tool calls, artifacts, status) | Filtering, sorting, search |
+| `GridKitAutoTable` | Renders `GridKitTablePayload` JSON from an LLM directly as a DataGrid | Sorting, all DataGrid props |
 
 All variants share the same column definition, DataStore, and filter/sort/search pipeline.
 
@@ -890,6 +891,159 @@ Inherits all `DataGridChat` props except `data`, `columns`, `renderMessage`, and
 | `--gridkit-agent-chat-code-font-size` | `12px` | Font size for JSON/code preview blocks |
 | `--gridkit-agent-chat-user-background` | — | User message bubble background |
 | `--gridkit-agent-chat-user-border` | — | User message bubble border color |
+
+---
+
+## GridKitAutoTable (AI-Generated Tables)
+
+`GridKitAutoTable` renders a `GridKitTablePayload` — a lightweight JSON format designed for LLM output — directly as a sortable DataGrid. The intended flow is:
+
+1. Add the format spec to your system prompt so the AI outputs `gridkit-table` JSON.
+2. Parse the response and pass it to `<GridKitAutoTable payload={...} />`.
+3. Sorting, filtering, and all other DataGrid props work as normal.
+
+### System Prompt
+
+Add this to your LLM system prompt:
+
+```
+When returning tabular data, always use this exact JSON format:
+
+{
+  "type": "gridkit-table",
+  "title": "<optional table title>",
+  "columns": [
+    {
+      "key": "<property name used in rows>",
+      "label": "<display header>",
+      "type": "<text | number | date | boolean>",
+      "align": "<left | center | right>"
+    }
+  ],
+  "rows": [
+    { "<key>": <value>, ... }
+  ]
+}
+
+Rules:
+- "type" must always be "gridkit-table"
+- "key" values in columns must match the property names in rows
+- Column "type" and "align" are optional; omit if not applicable
+- Do not wrap the JSON in markdown code fences
+```
+
+### Usage
+
+```tsx
+import { GridKitAutoTable } from '@loykin/gridkit'
+import type { GridKitTablePayload } from '@loykin/gridkit'
+
+// Example AI response (parsed from LLM output)
+const payload: GridKitTablePayload = {
+  type: 'gridkit-table',
+  title: 'Q1 Sales Report',
+  columns: [
+    { key: 'rep',      label: 'Sales Rep' },
+    { key: 'region',   label: 'Region' },
+    { key: 'revenue',  label: 'Revenue',    type: 'number', align: 'right' },
+    { key: 'closedAt', label: 'Last Close', type: 'date' },
+    { key: 'active',   label: 'Active',     type: 'boolean', align: 'center' },
+  ],
+  rows: [
+    { rep: 'Alice Kim', region: 'APAC', revenue: 1820000, closedAt: '2024-03-28', active: true },
+    { rep: 'Bob Choi',  region: 'NA',   revenue: 2540000, closedAt: '2024-03-30', active: true },
+  ],
+}
+
+export function AiResponseTable() {
+  return (
+    <GridKitAutoTable
+      payload={payload}
+      enableSorting
+      tableHeight={400}
+    />
+  )
+}
+```
+
+### Column types
+
+| `type` | Rendering |
+|--------|-----------|
+| `text` (default) | Raw string value |
+| `number` | `toLocaleString()` formatted |
+| `date` | `toLocaleDateString()` formatted |
+| `boolean` | `Yes` / `No` |
+
+### `GridKitTablePayload`
+
+```ts
+interface GridKitTablePayload {
+  type: 'gridkit-table'
+  title?: string
+  columns: GridKitTableColumn[]
+  rows: Record<string, unknown>[]
+}
+
+interface GridKitTableColumn {
+  key: string
+  label: string
+  type?: 'text' | 'number' | 'date' | 'boolean'
+  align?: 'left' | 'center' | 'right'
+}
+```
+
+All standard `DataGrid` props (sorting, filtering, height, `classNames`, etc.) are supported — `data` and `columns` are the only omitted props since they are derived from the payload.
+
+### `GridKitTablePayloadSchema`
+
+A ready-made JSON Schema object is exported alongside the TypeScript types. Use it directly as an AI tool/structured-output schema — no Zod or extra dependencies required.
+
+```ts
+import { GridKitTablePayloadSchema } from '@loykin/gridkit'
+
+// Anthropic tool
+const response = await client.messages.create({
+  tools: [{
+    name: 'return_table',
+    description: 'Return tabular data as a gridkit-table',
+    input_schema: GridKitTablePayloadSchema,
+  }],
+})
+
+// OpenAI structured output
+const response = await client.chat.completions.create({
+  response_format: {
+    type: 'json_schema',
+    json_schema: { name: 'gridkit_table', schema: GridKitTablePayloadSchema },
+  },
+})
+
+// Zod (v4) — if you want runtime validation on the consumer side
+import { z } from 'zod'
+const schema = z.fromJSONSchema(GridKitTablePayloadSchema)
+const result = schema.safeParse(rawResponse)
+```
+
+### Embedding in `DataGridAgentChat`
+
+Pass `GridKitAutoTable` inside `renderMessage` to render AI-returned tables inline in a chat view:
+
+```tsx
+import { DataGridAgentChat, GridKitAutoTable } from '@loykin/gridkit'
+import type { GridKitTablePayload } from '@loykin/gridkit'
+
+<DataGridAgentChat
+  adapter={adapter}
+  renderMessage={(row) => {
+    const msg = row.original
+    if (msg.type === 'tool_result' && isGridKitTable(msg.output)) {
+      return <GridKitAutoTable payload={msg.output as GridKitTablePayload} enableSorting />
+    }
+    return <div>{msg.content}</div>
+  }}
+/>
+```
 
 ---
 

@@ -775,6 +775,51 @@ export interface AgentChatToolResultEvent extends AgentChatEventBase {
   output: unknown
 }
 
+export type GridKitTableColumnType = 'text' | 'number' | 'date' | 'boolean'
+
+export interface GridKitTableColumn {
+  key: string
+  label: string
+  type?: GridKitTableColumnType
+  align?: 'left' | 'center' | 'right'
+}
+
+export interface GridKitTablePayload {
+  type: 'gridkit-table'
+  title?: string
+  columns: GridKitTableColumn[]
+  rows: Record<string, unknown>[]
+}
+
+/** JSON Schema for GridKitTablePayload — use directly as an AI tool/structured-output schema. */
+export const GridKitTablePayloadSchema = {
+  type: 'object',
+  required: ['type', 'columns', 'rows'],
+  additionalProperties: false,
+  properties: {
+    type:    { type: 'string', enum: ['gridkit-table'] },
+    title:   { type: 'string' },
+    columns: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['key', 'label'],
+        additionalProperties: false,
+        properties: {
+          key:   { type: 'string' },
+          label: { type: 'string' },
+          type:  { type: 'string', enum: ['text', 'number', 'date', 'boolean'] },
+          align: { type: 'string', enum: ['left', 'center', 'right'] },
+        },
+      },
+    },
+    rows: {
+      type: 'array',
+      items: { type: 'object', additionalProperties: true },
+    },
+  },
+} as const
+
 export interface AgentChatArtifactEvent extends AgentChatEventBase {
   type: 'artifact'
   kind: 'chart' | 'table' | 'image' | 'code' | string

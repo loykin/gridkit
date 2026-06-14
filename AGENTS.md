@@ -28,6 +28,7 @@ pnpm test:e2e      # node --test e2e/*.test.mjs
 - `src/DataGridInfinity.tsx` — infinite scroll variant
 - `src/DataGridCard.tsx`, `src/DataGridList.tsx`, `src/DataGridChat.tsx` — layout variants
 - `src/DataGridAgentChat.tsx` — agent event stream variant (builds on DataGridChat)
+- `src/GridKitAutoTable.tsx` — renders `GridKitTablePayload` (LLM-generated JSON) as a DataGrid
 - `src/index.ts` — public API exports
 
 ### Core Render Tree

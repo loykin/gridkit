@@ -35,6 +35,7 @@ import { CardListTab } from './tabs/CardListTab'
 import { ListTab } from './tabs/ListTab'
 import { ChatTab } from './tabs/ChatTab'
 import { AgentChatTab } from './tabs/AgentChatTab'
+import { AutoTableTab } from './tabs/AutoTableTab'
 import { AgentTraceTab } from './tabs/AgentTraceTab'
 import { EvalReviewTab } from './tabs/EvalReviewTab'
 import { HeaderGroupsTab } from './tabs/HeaderGroupsTab'
@@ -83,6 +84,7 @@ const TABS = [
   { id: 'list',              label: 'List',              content: <ListTab /> },
   { id: 'chat',              label: 'Chat',              content: <ChatTab /> },
   { id: 'agent-chat',        label: 'Agent Chat',        content: <AgentChatTab /> },
+  { id: 'auto-table',        label: 'Auto Table',        content: <AutoTableTab /> },
   { id: 'log-stream',        label: 'Log Stream',        content: <LogStreamTab /> },
   { id: 'agent-trace',       label: 'Agent Trace',       content: <AgentTraceTab /> },
   { id: 'eval-review',       label: 'Eval Review',       content: <EvalReviewTab /> },
@@ -169,6 +171,7 @@ const NAV: NavGroup[] = [
     items: [
       { id: 'chat',       label: 'Chat' },
       { id: 'agent-chat', label: 'Agent Chat' },
+      { id: 'auto-table', label: 'Auto Table' },
     ],
   },
 ]
