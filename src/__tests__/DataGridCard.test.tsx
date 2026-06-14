@@ -144,7 +144,7 @@ describe('DataGridCard virtualization', () => {
       />,
     )
 
-    expect(container.querySelector('.gridkit-frame')?.getAttribute('data-scrollbar')).toBe('custom')
+    expect(container.querySelector('.gridkit-frame-inner')?.getAttribute('data-scrollbar')).toBe('custom')
     expect(container.querySelector('.gridkit-scroll-frame')).toBeInTheDocument()
     expect(container.querySelector('.gridkit-scrollbar-track')).toBeInTheDocument()
   })

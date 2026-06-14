@@ -367,38 +367,51 @@
   color: var(--gridkit-footer-foreground);
   overflow: hidden;
 }
+/* Outer: border + background only — no overflow, no clipping */
 .gridkit-frame {
   min-width: 0;
-  overflow: hidden;
+  display: flex;
   border: 1px solid var(--gridkit-container-border);
   border-radius: var(--gridkit-radius);
   background: var(--gridkit-background);
+  background-clip: padding-box;
 }
 .gridkit-frame--fill {
   min-height: 0;
 }
-/* Card / List / Chat: the frame is the scroll container */
-.gridkit-frame[data-view="card"].gridkit-frame--fill,
-.gridkit-frame[data-view="list"].gridkit-frame--fill,
-.gridkit-frame[data-view="chat"].gridkit-frame--fill {
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-}
 .gridkit-frame--hidden {
   visibility: hidden;
-  overflow: hidden;
 }
 .gridkit-shell[data-fill-parent="true"] .gridkit-frame {
-  display: flex;
-  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
 }
-.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="card"],
-.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="list"],
-.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="chat"] {
+
+/* Inner: overflow clipping + scroll container */
+.gridkit-frame-inner {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: max(0px, calc(var(--gridkit-radius) - 1px));
+}
+/* Card / List / Chat: inner is the scroll container */
+.gridkit-frame[data-view="card"].gridkit-frame--fill .gridkit-frame-inner,
+.gridkit-frame[data-view="list"].gridkit-frame--fill .gridkit-frame-inner,
+.gridkit-frame[data-view="chat"].gridkit-frame--fill .gridkit-frame-inner {
+  display: flex;
+  flex-direction: column;
   overflow: auto;
+}
+.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="card"] .gridkit-frame-inner,
+.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="list"] .gridkit-frame-inner,
+.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="chat"] .gridkit-frame-inner {
+  overflow: auto;
+}
+/* Table fill: inner participates in flex to fill height */
+.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="table"] .gridkit-frame-inner {
+  display: flex;
+  flex-direction: column;
 }
 .gridkit-scroll-frame {
   position: relative;

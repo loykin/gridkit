@@ -77,9 +77,11 @@ export function GridKitShell<T extends object>({
 
   const toolbarFrameRef = useRef<HTMLDivElement | null>(null)
   const tableWrapperRef = useRef<HTMLDivElement | null>(null)
+  // Inner frame: the actual scroll/clip container (used by Card/List/Chat virtualization and custom scrollbar)
+  const innerFrameRef = useRef<HTMLDivElement | null>(null)
   const footerFrameRef = useRef<HTMLDivElement | null>(null)
   const [fillTableMaxHeight, setFillTableMaxHeight] = useState<number | undefined>()
-  const heightStyle = resolveContainerHeight(containerHeight ?? tableHeight, maxTableHeight, minTableHeight)
+
   const hasToolbar = headerLeft != null || headerRight != null
   const effectiveFillContainer = fillContainer && !fillParent
 
@@ -129,33 +131,49 @@ export function GridKitShell<T extends object>({
       } as React.CSSProperties)
     : undefined
 
-  // Internal styles first, user styles override (escape hatch — see docs/api-v0.2-styling.md)
-  const frameStyle = effectiveFillContainer
+  // Height/max-height go on the outer frame; overflow (from resolveContainerHeight) goes on the inner.
+  const { overflow: innerOverflow, ...heightStyle } = resolveContainerHeight(
+    containerHeight ?? tableHeight,
+    maxTableHeight,
+    minTableHeight,
+  )
+
+  const outerFrameStyle: React.CSSProperties = effectiveFillContainer
     ? { ...heightStyle, ...fillStyle, ...styles?.frame }
     : { ...heightStyle, ...styles?.frame }
 
+  const innerFrameStyle: React.CSSProperties | undefined = innerOverflow
+    ? { overflow: innerOverflow as string }
+    : undefined
+
   const scrollbarMode = scrollbar?.mode ?? 'native'
+
   const scrollContainer = (
     <div
-      ref={(node) => {
-        tableWrapperRef.current = node
-        if (containerRef) {
-          ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
-        }
-      }}
+      ref={tableWrapperRef}
       className={cn(
         'gridkit-frame',
-        'gridkit-scroll-container',
         frameExtra,
         classNames?.frame,
         effectiveFillContainer && 'gridkit-frame--fill',
         frameHidden && 'gridkit-frame--hidden',
       )}
       data-view={frameView}
-      data-scrollbar={scrollbarMode === 'native' ? undefined : scrollbarMode}
-      style={frameStyle}
+      style={outerFrameStyle}
     >
-      {children}
+      <div
+        ref={(node) => {
+          innerFrameRef.current = node
+          if (containerRef) {
+            ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+          }
+        }}
+        className={cn('gridkit-frame-inner', 'gridkit-scroll-container')}
+        data-scrollbar={scrollbarMode === 'native' ? undefined : scrollbarMode}
+        style={innerFrameStyle}
+      >
+        {children}
+      </div>
     </div>
   )
 
@@ -177,7 +195,7 @@ export function GridKitShell<T extends object>({
           <div className={cn('gridkit-scroll-frame', effectiveFillContainer && 'gridkit-scroll-frame--fill')}>
             {scrollContainer}
             <CustomScrollbar
-              scrollRef={tableWrapperRef}
+              scrollRef={innerFrameRef}
               direction="vertical"
               size={scrollbar?.size}
               trackClassName={scrollbar?.trackClassName}

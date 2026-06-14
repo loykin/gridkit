@@ -129,7 +129,7 @@ describe('DataGridChat scroll behavior', () => {
     }
 
     const { container } = render(<Harness />)
-    const chatContainer = container.querySelector('.gridkit-frame') as HTMLElement
+    const chatContainer = container.querySelector('.gridkit-frame-inner') as HTMLElement
     setScrollMetrics(chatContainer, metrics)
 
     act(() => {
@@ -169,7 +169,7 @@ describe('DataGridChat scroll behavior', () => {
     }
 
     const { container } = render(<Harness />)
-    const chatContainer = container.querySelector('.gridkit-frame') as HTMLElement
+    const chatContainer = container.querySelector('.gridkit-frame-inner') as HTMLElement
     setScrollMetrics(chatContainer, metrics)
 
     act(() => {
@@ -209,7 +209,7 @@ describe('DataGridChat scroll behavior', () => {
     }
 
     const { container } = render(<Harness />)
-    const chatContainer = container.querySelector('.gridkit-frame') as HTMLElement
+    const chatContainer = container.querySelector('.gridkit-frame-inner') as HTMLElement
     setScrollMetrics(chatContainer, metrics)
 
     act(() => {

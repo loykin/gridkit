@@ -128,7 +128,7 @@ describe('DataGridList virtualization', () => {
       />,
     )
 
-    const listContainer = container.querySelector('.gridkit-frame') as HTMLElement
+    const listContainer = container.querySelector('.gridkit-frame-inner') as HTMLElement
     setScrollMetrics(listContainer, { scrollHeight: 40000, clientHeight: 240, scrollTop: 0 })
 
     expect(container.querySelector('.gridkit-list-items')?.getAttribute('data-virtualized')).toBe('true')
