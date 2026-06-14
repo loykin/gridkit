@@ -200,7 +200,6 @@ export function AgentChatTab() {
             adapter={adapter}
             containerHeight="100%"
             fillParent
-            scrollbar={{ mode: 'custom' }}
             styles={{ frame: chatStyle as CSSProperties }}
             searchableColumns={['type', 'role', 'status', 'name', 'content']}
             headerRight={(table) => <GlobalSearch table={table} placeholder="Search agent events..." />}

@@ -46,7 +46,6 @@ export function CardTab() {
         containerHeight={560}
         minCardWidth={220}
         minColumns={2}
-        scrollbar={{ mode: 'custom' }}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetching}
         fetchNextPage={fetchNextPage}

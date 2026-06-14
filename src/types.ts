@@ -249,7 +249,7 @@ export interface DataGridAgentChatStyles extends DataGridChatStyles {
 export type GridKitScrollbarMode = 'native' | 'custom' | 'hidden'
 
 export interface GridKitScrollbarConfig {
-  /** Scrollbar rendering mode. Defaults to native for non-table views. */
+  /** Scrollbar rendering mode. Defaults to custom for non-table views. */
   mode?: GridKitScrollbarMode
   /** Track thickness when mode="custom". Defaults to var(--gridkit-scrollbar-size). */
   size?: number | string
@@ -674,7 +674,7 @@ export interface DataGridCardProps<T extends object> extends DataGridBaseProps<T
   classNames?: DataGridCardClassNames
   /** Slot-based inline styles for card elements */
   styles?: DataGridCardStyles
-  /** Scrollbar rendering for the card scroll container. Defaults to native. */
+  /** Scrollbar rendering for the card scroll container. Defaults to custom. */
   scrollbar?: GridKitScrollbarConfig
   /**
    * Enable row-group virtualization.
@@ -719,7 +719,7 @@ export interface DataGridListProps<T extends object> extends GridKitCoreProps<T>
   classNames?: DataGridListClassNames
   /** Slot-based inline styles for list elements */
   styles?: DataGridListStyles
-  /** Scrollbar rendering for the list scroll container. Defaults to native. */
+  /** Scrollbar rendering for the list scroll container. Defaults to custom. */
   scrollbar?: GridKitScrollbarConfig
 }
 
@@ -738,7 +738,7 @@ export interface DataGridChatProps<T extends object> extends GridKitCoreProps<T>
   onAtBottomChange?: (atBottom: boolean) => void
   /** Static footer content rendered below the chat container. */
   footer?: ReactNode
-  /** Scrollbar rendering for the chat scroll container. Defaults to native. */
+  /** Scrollbar rendering for the chat scroll container. Defaults to custom. */
   scrollbar?: GridKitScrollbarConfig
   classNames?: DataGridChatClassNames
   /** Slot-based inline styles for chat elements */

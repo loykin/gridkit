@@ -146,7 +146,7 @@ export function GridKitShell<T extends object>({
     ? { overflow: innerOverflow as string }
     : undefined
 
-  const scrollbarMode = scrollbar?.mode ?? 'native'
+  const scrollbarMode = scrollbar?.mode ?? 'custom'
 
   const scrollContainer = (
     <div

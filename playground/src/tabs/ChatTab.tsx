@@ -102,7 +102,6 @@ export function ChatTab() {
         columns={columns}
         getRowId={(message) => message.id}
         containerHeight={560}
-        scrollbar={{ mode: 'custom' }}
         searchableColumns={['author', 'body']}
         hasPreviousPage={hasPreviousPage}
         isFetchingPreviousPage={isFetchingPrevious}

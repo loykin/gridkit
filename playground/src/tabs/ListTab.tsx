@@ -45,7 +45,6 @@ export function ListTab() {
         columns={columns}
         enableSorting
         containerHeight={560}
-        scrollbar={{ mode: 'custom' }}
         itemGap={0}
         enableVirtualization
         estimateRowHeight={58}

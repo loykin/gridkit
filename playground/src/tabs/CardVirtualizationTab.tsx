@@ -32,7 +32,6 @@ export function CardVirtualizationTab() {
         enableVirtualization
         estimateCardHeight={132}
         overscan={2}
-        scrollbar={{ mode: 'custom' }}
         emptyMessage="No employees found"
         headerRight={(table) => <GlobalSearch table={table} placeholder="Search virtualized cards..." />}
         renderCard={(row) => {
