@@ -21,6 +21,7 @@ scratch. CSS variables handle most theming; `classNames` slots cover the rest.
 - You have an existing design system and need the grid to **adopt its colors and spacing** — not fight them.
 - You need **more than a table** — list, card grid, or chat timeline with the same filtering and data pipeline.
 - You are building admin tools, dashboards, resource browsers, datasource lists, product catalogs, or other data-heavy product screens.
+- You are building an **LLM or AI agent UI** — GridKit ships a chat timeline view (`DataGridAgentChat`) and a structured-output table renderer (`GridKitAutoTable`) that turns AI-returned JSON directly into a sortable, filterable grid.
 
 If you want full rendering control with zero default markup, use TanStack Table directly. GridKit is the layer above it.
 
