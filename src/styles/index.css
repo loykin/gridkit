@@ -376,6 +376,13 @@
   background: var(--gridkit-background);
   background-clip: padding-box;
 }
+/* Card and list views: no outer border — the cards/items are the visual units */
+.gridkit-frame[data-view="card"],
+.gridkit-frame[data-view="list"] {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
 .gridkit-frame--fill {
   min-height: 0;
 }
