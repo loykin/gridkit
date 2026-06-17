@@ -782,6 +782,8 @@ export interface GridKitTableColumn {
   label: string
   type?: GridKitTableColumnType
   align?: 'left' | 'center' | 'right'
+  /** Flex ratio for proportional column width. Defaults to 1 when not set. */
+  flex?: number
 }
 
 export interface GridKitTablePayload {
@@ -810,6 +812,7 @@ export const GridKitTablePayloadSchema = {
           label: { type: 'string' },
           type:  { type: 'string', enum: ['text', 'number', 'date', 'boolean'] },
           align: { type: 'string', enum: ['left', 'center', 'right'] },
+          flex:  { type: 'number' },
         },
       },
     },
@@ -819,6 +822,29 @@ export const GridKitTablePayloadSchema = {
     },
   },
 } as const
+
+/** JSON definition for a GridKit table block in a page template. */
+export interface GridKitTableDef<TQuery = unknown> {
+  type: 'gridkit-table'
+  title?: string
+  /** Opaque query value passed to prepare/executor. Format is user-defined. */
+  query: TQuery
+}
+
+/**
+ * Transforms a raw template query into an executable query.
+ * Called before executor on every data load — use this to inject filters,
+ * sort, pagination, or template variable substitution.
+ */
+export type GridKitQueryPrepare<TQuery> = (
+  query: TQuery,
+  params: import('./core/engine/store/DataStoreBackend').QueryParams,
+) => TQuery
+
+/** Executes a prepared query and returns raw rows. */
+export type GridKitQueryExecutor<TQuery = unknown> = (
+  query: TQuery,
+) => Promise<Record<string, unknown>[]>
 
 export interface AgentChatArtifactEvent extends AgentChatEventBase {
   type: 'artifact'

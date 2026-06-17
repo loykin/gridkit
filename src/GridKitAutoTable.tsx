@@ -41,7 +41,7 @@ export function GridKitAutoTable({ payload, ...props }: GridKitAutoTableProps) {
           accessorKey: col.key,
           header: col.label,
           ...(cell ? { cell } : {}),
-          meta: { align: col.align },
+          meta: { align: col.align, flex: col.flex ?? 1 },
         }
       }),
     [payload.columns],

@@ -11,6 +11,9 @@ export { DataGridList } from './DataGridList'
 export { DataGridChat } from './DataGridChat'
 export { DataGridAgentChat } from './DataGridAgentChat'
 export { GridKitAutoTable } from './GridKitAutoTable'
+export { GridKitTable } from './GridKitTable'
+export { inferTablePayload } from './core/utils/inferTablePayload'
+export type { InferTablePayloadOptions } from './core/utils/inferTablePayload'
 export { DataGridPaginationBar } from './core/controls/DataGridPaginationBar'
 export { DataGridPaginationCompact } from './core/controls/DataGridPaginationCompact'
 export { DataGridPaginationPages } from './core/controls/DataGridPaginationPages'
@@ -105,6 +108,9 @@ export type {
   GridKitTablePayload,
   GridKitTableColumn,
   GridKitTableColumnType,
+  GridKitTableDef,
+  GridKitQueryPrepare,
+  GridKitQueryExecutor,
 } from './types'
 
 export { GridKitTablePayloadSchema } from './types'

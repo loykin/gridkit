@@ -29,6 +29,8 @@ pnpm test:e2e      # node --test e2e/*.test.mjs
 - `src/DataGridCard.tsx`, `src/DataGridList.tsx`, `src/DataGridChat.tsx` — layout variants
 - `src/DataGridAgentChat.tsx` — agent event stream variant (builds on DataGridChat)
 - `src/GridKitAutoTable.tsx` — renders `GridKitTablePayload` (LLM-generated JSON) as a DataGrid
+- `src/GridKitTable.tsx` — query-driven table: takes `GridKitTableDef` + `executor`, fetches and renders automatically
+- `src/core/utils/inferTablePayload.ts` — infers `GridKitTablePayload` columns from raw rows (type, label, align)
 - `src/index.ts` — public API exports
 
 ### Core Render Tree
@@ -67,6 +69,24 @@ DataGrid
 - `TableViewConfig<T>` — shared view props flowing through all render components via `...viewConfig` spread
 - `DataGridColumnDef<T>` — column definition type (wraps TanStack `ColumnDef`)
 - `DataGridIcons` interface in `src/types.ts` — icon slot overrides; add new slots here AND in `defaultIcons` in `src/core/IconsContext.tsx`
+
+### Query-driven / Page Template API
+For building LLM/MCP-driven UIs where page layout is stored as JSON (Grafana-panel-style):
+
+- `GridKitTableDef<TQuery>` — JSON block definition (`{ type, title, query }`) stored in page templates
+- `GridKitQueryExecutor<TQuery>` — `(query) => Promise<rows[]>` — user-provided backend/MCP connector
+- `GridKitQueryPrepare<TQuery>` — `(query, QueryParams) => query` — optional transform for injecting filters/sort/pagination before execution
+- `inferTablePayload(rows, options?)` — converts raw DB rows into `GridKitTablePayload` by inferring column types, labels, and alignment
+- `GridKitTable` — wraps `GridKitAutoTable`; owns the full fetch → infer → render lifecycle
+
+Flow:
+```
+GridKitTableDef (from template JSON)
+  → prepare?(query, QueryParams) → executable query
+  → executor(query) → raw rows[]
+  → inferTablePayload(rows) → GridKitTablePayload
+  → GridKitAutoTable → DataGrid
+```
 
 ### Context Providers
 - `DetailRowContext` — master-detail expansion state
