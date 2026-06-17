@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import type React from 'react'
-import { DataGrid, DataGridPaginationBar } from '@loykin/gridkit'
+import { DataGrid, DataGridCard, DataGridChat, DataGridPaginationBar } from '@loykin/gridkit'
 import type { DataGridColumnDef } from '@loykin/gridkit'
 import { SMALL_DATA, type Employee } from '../data/employees'
 
-const columns: DataGridColumnDef<Employee>[] = [
+// ── Table preview ────────────────────────────────────────────────────────────
+
+const tableColumns: DataGridColumnDef<Employee>[] = [
   {
     id: 'identity',
     header: 'Identity',
@@ -36,6 +38,50 @@ const columns: DataGridColumnDef<Employee>[] = [
     ],
   },
 ]
+
+// ── Card preview ─────────────────────────────────────────────────────────────
+
+const cardColumns: DataGridColumnDef<Employee>[] = [
+  { accessorKey: 'id' },
+  { accessorKey: 'name' },
+  { accessorKey: 'department' },
+  { accessorKey: 'role' },
+  { accessorKey: 'salary' },
+  { accessorKey: 'status' },
+]
+
+const STATUS_COLOR: Record<Employee['status'], string> = {
+  Active: 'bg-green-100 text-green-800',
+  'On Leave': 'bg-yellow-100 text-yellow-800',
+  Terminated: 'bg-red-100 text-red-800',
+}
+
+// ── Chat preview ──────────────────────────────────────────────────────────────
+
+interface PreviewMessage {
+  id: string
+  author: string
+  body: string
+  mine: boolean
+}
+
+const PREVIEW_MESSAGES: PreviewMessage[] = [
+  { id: '1', author: 'Alice', body: 'Hey, can you review this PR?', mine: false },
+  { id: '2', author: 'Me', body: "Sure, I'll take a look now.", mine: true },
+  { id: '3', author: 'Alice', body: 'It touches the auth flow, be careful.', mine: false },
+  { id: '4', author: 'Me', body: 'Got it. Tests are passing locally.', mine: true },
+  { id: '5', author: 'Alice', body: 'Great! The tests are in /auth/__tests__', mine: false },
+  { id: '6', author: 'Me', body: 'Left a comment on line 42.', mine: true },
+  { id: '7', author: 'Alice', body: 'Good catch, fixing it now.', mine: false },
+  { id: '8', author: 'Me', body: 'Approved once that is resolved.', mine: true },
+]
+
+const chatColumns: DataGridColumnDef<PreviewMessage>[] = [
+  { accessorKey: 'author' },
+  { accessorKey: 'body' },
+]
+
+// ── Theme presets ─────────────────────────────────────────────────────────────
 
 const presets = [
   {
@@ -158,6 +204,7 @@ const presets = [
 ] as const
 
 type ThemeValues = (typeof presets)[number]['values']
+type PreviewTab = 'table' | 'card' | 'chat'
 
 function TokenInput({
   label,
@@ -199,6 +246,15 @@ export function ThemeTokensTab() {
   const [scrollbarThumbOpacity, setScrollbarThumbOpacity] = useState(0.3)
   const [scrollbarThumbHoverOpacity, setScrollbarThumbHoverOpacity] = useState(0.6)
   const [scrollbarSize, setScrollbarSize] = useState(8)
+  const [previewTab, setPreviewTab] = useState<PreviewTab>('table')
+
+  // Card tokens
+  const [cardGap, setCardGap] = useState(16)
+  const [cardPadding, setCardPadding] = useState(16)
+
+  // Chat tokens
+  const [chatGap, setChatGap] = useState(8)
+  const [chatPadding, setChatPadding] = useState(12)
 
   const setToken = (key: keyof ThemeValues, value: string) => {
     setTheme((current) => ({ ...current, [key]: value }))
@@ -244,6 +300,10 @@ export function ThemeTokensTab() {
     '--gridkit-scrollbar-thumb': scrollbarThumb,
     '--gridkit-scrollbar-thumb-opacity': String(scrollbarThumbOpacity),
     '--gridkit-scrollbar-thumb-hover-opacity': String(scrollbarThumbHoverOpacity),
+    '--gridkit-card-gap': `${cardGap}px`,
+    '--gridkit-card-padding': `${cardPadding}px`,
+    '--gridkit-chat-gap': `${chatGap}px`,
+    '--gridkit-chat-padding': `${chatPadding}px`,
     fontFamily,
   } as React.CSSProperties
 
@@ -269,6 +329,10 @@ export function ThemeTokensTab() {
   --gridkit-primary: ${theme.primary};
   --gridkit-border: ${theme.border};
   --gridkit-container-border: ${theme.containerBorder};
+  --gridkit-card-gap: ${cardGap}px;
+  --gridkit-card-padding: ${cardPadding}px;
+  --gridkit-chat-gap: ${chatGap}px;
+  --gridkit-chat-padding: ${chatPadding}px;
   --gridkit-scrollbar-size: ${scrollbarSize}px;
   --gridkit-scrollbar-track: ${scrollbarTrack};
   --gridkit-scrollbar-thumb: ${scrollbarThumb};
@@ -282,11 +346,12 @@ export function ThemeTokensTab() {
       <div>
         <p className="text-sm font-semibold">Theme Tokens</p>
         <p className="text-sm text-muted-foreground">
-          Adjust GridKit CSS variables and see the table update live. Typography is inherited from the app, not a GridKit token.
+          Adjust GridKit CSS variables and see the component update live. Typography is inherited from the app, not a GridKit token.
         </p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[360px_minmax(0,1fr)] gap-5 xl:items-start">
+        {/* ── Left: controls ───────────────────────────────────────────── */}
         <section className="space-y-3 rounded border border-border p-4 xl:max-h-[calc(100vh-160px)] xl:overflow-y-auto">
           <div className="flex flex-wrap gap-2">
             {presets.map((preset) => (
@@ -301,27 +366,15 @@ export function ThemeTokensTab() {
             ))}
           </div>
 
+          {/* ── Shared: always visible ── */}
           <TokenSection title="Base">
             <TokenInput label="Background" value={theme.background} onChange={(value) => setToken('background', value)} />
             <TokenInput label="Foreground" value={theme.foreground} onChange={(value) => setToken('foreground', value)} />
             <TokenInput label="Border" value={theme.border} onChange={(value) => setToken('border', value)} />
-            <div className="grid grid-cols-[1fr_44px] items-center gap-2 text-xs text-muted-foreground">
-              <span>Container border</span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={containerBorderVisible}
-                onClick={() => setContainerBorderVisible((v) => !v)}
-                className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors ${containerBorderVisible ? 'bg-primary' : 'bg-muted-foreground/40'}`}
-              >
-                <span className={`block h-4 w-4 rounded-full bg-white shadow-lg transition-transform ${containerBorderVisible ? 'translate-x-4' : 'translate-x-0'}`} />
-              </button>
-            </div>
-            {containerBorderVisible && (
-              <TokenInput label="Container border color" value={theme.containerBorder} onChange={(value) => setToken('containerBorder', value)} />
-            )}
-            <TokenInput label="Input border fallback" value={theme.input} onChange={(value) => setToken('input', value)} />
-            <TokenInput label="Ring" value={theme.ring} onChange={(value) => setToken('ring', value)} />
+            <TokenInput label="Primary" value={theme.primary} onChange={(value) => setToken('primary', value)} />
+            <TokenInput label="Primary foreground" value={theme.primaryForeground} onChange={(value) => setToken('primaryForeground', value)} />
+            <TokenInput label="Muted" value={theme.muted} onChange={(value) => setToken('muted', value)} />
+            <TokenInput label="Muted foreground" value={theme.mutedForeground} onChange={(value) => setToken('mutedForeground', value)} />
             <label className="grid gap-1 text-xs text-muted-foreground">
               Radius: {theme.radius}
               <input
@@ -334,81 +387,110 @@ export function ThemeTokensTab() {
             </label>
           </TokenSection>
 
-          <TokenSection title="Header">
-            <TokenInput label="Header background" value={theme.headerBackground} onChange={(value) => setToken('headerBackground', value)} />
-            <TokenInput label="Header foreground" value={theme.headerForeground} onChange={(value) => setToken('headerForeground', value)} />
-            <TokenInput label="Header border" value={theme.headerBorder} onChange={(value) => setToken('headerBorder', value)} />
-            <TokenInput label="Filter control background" value={theme.headerControlBackground} onChange={(value) => setToken('headerControlBackground', value)} />
-            <TokenInput label="Filter control foreground" value={theme.headerControlForeground} onChange={(value) => setToken('headerControlForeground', value)} />
-            <TokenInput label="Filter control border" value={theme.headerControlBorder} onChange={(value) => setToken('headerControlBorder', value)} />
-            <TokenInput label="Filter control placeholder" value={theme.headerControlPlaceholder} onChange={(value) => setToken('headerControlPlaceholder', value)} />
-            <TokenInput label="Header popover background" value={theme.headerPopoverBackground} onChange={(value) => setToken('headerPopoverBackground', value)} />
-            <TokenInput label="Header popover foreground" value={theme.headerPopoverForeground} onChange={(value) => setToken('headerPopoverForeground', value)} />
-            <TokenInput label="Header popover border" value={theme.headerPopoverBorder} onChange={(value) => setToken('headerPopoverBorder', value)} />
-          </TokenSection>
+          {/* ── Table-specific ── */}
+          {previewTab === 'table' && (
+            <>
+              <TokenSection title="Header">
+                <TokenInput label="Background" value={theme.headerBackground} onChange={(value) => setToken('headerBackground', value)} />
+                <TokenInput label="Foreground" value={theme.headerForeground} onChange={(value) => setToken('headerForeground', value)} />
+                <TokenInput label="Border" value={theme.headerBorder} onChange={(value) => setToken('headerBorder', value)} />
+                <TokenInput label="Filter background" value={theme.headerControlBackground} onChange={(value) => setToken('headerControlBackground', value)} />
+                <TokenInput label="Filter foreground" value={theme.headerControlForeground} onChange={(value) => setToken('headerControlForeground', value)} />
+                <TokenInput label="Filter border" value={theme.headerControlBorder} onChange={(value) => setToken('headerControlBorder', value)} />
+                <TokenInput label="Filter placeholder" value={theme.headerControlPlaceholder} onChange={(value) => setToken('headerControlPlaceholder', value)} />
+                <TokenInput label="Popover background" value={theme.headerPopoverBackground} onChange={(value) => setToken('headerPopoverBackground', value)} />
+                <TokenInput label="Popover foreground" value={theme.headerPopoverForeground} onChange={(value) => setToken('headerPopoverForeground', value)} />
+                <TokenInput label="Popover border" value={theme.headerPopoverBorder} onChange={(value) => setToken('headerPopoverBorder', value)} />
+              </TokenSection>
 
-          <TokenSection title="Footer">
-            <TokenInput label="Footer background" value={theme.footerBackground} onChange={(value) => setToken('footerBackground', value)} />
-            <TokenInput label="Footer foreground" value={theme.footerForeground} onChange={(value) => setToken('footerForeground', value)} />
-            <TokenInput label="Footer border" value={theme.footerBorder} onChange={(value) => setToken('footerBorder', value)} />
-          </TokenSection>
+              <TokenSection title="Footer">
+                <TokenInput label="Background" value={theme.footerBackground} onChange={(value) => setToken('footerBackground', value)} />
+                <TokenInput label="Foreground" value={theme.footerForeground} onChange={(value) => setToken('footerForeground', value)} />
+                <TokenInput label="Border" value={theme.footerBorder} onChange={(value) => setToken('footerBorder', value)} />
+              </TokenSection>
 
-          <TokenSection title="Controls">
-            <TokenInput label="Control background" value={theme.controlBackground} onChange={(value) => setToken('controlBackground', value)} />
-            <TokenInput label="Control foreground" value={theme.controlForeground} onChange={(value) => setToken('controlForeground', value)} />
-            <TokenInput label="Control border" value={theme.controlBorder} onChange={(value) => setToken('controlBorder', value)} />
-            <TokenInput label="Primary" value={theme.primary} onChange={(value) => setToken('primary', value)} />
-            <TokenInput label="Primary foreground" value={theme.primaryForeground} onChange={(value) => setToken('primaryForeground', value)} />
-            <TokenInput label="Secondary" value={theme.secondary} onChange={(value) => setToken('secondary', value)} />
-            <TokenInput label="Secondary foreground" value={theme.secondaryForeground} onChange={(value) => setToken('secondaryForeground', value)} />
-            <TokenInput label="Muted" value={theme.muted} onChange={(value) => setToken('muted', value)} />
-            <TokenInput label="Muted foreground" value={theme.mutedForeground} onChange={(value) => setToken('mutedForeground', value)} />
-            <TokenInput label="Accent" value={theme.accent} onChange={(value) => setToken('accent', value)} />
-            <TokenInput label="Accent foreground" value={theme.accentForeground} onChange={(value) => setToken('accentForeground', value)} />
-            <TokenInput label="Destructive" value={theme.destructive} onChange={(value) => setToken('destructive', value)} />
-          </TokenSection>
+              <TokenSection title="Controls">
+                <TokenInput label="Background" value={theme.controlBackground} onChange={(value) => setToken('controlBackground', value)} />
+                <TokenInput label="Foreground" value={theme.controlForeground} onChange={(value) => setToken('controlForeground', value)} />
+                <TokenInput label="Border" value={theme.controlBorder} onChange={(value) => setToken('controlBorder', value)} />
+                <TokenInput label="Secondary" value={theme.secondary} onChange={(value) => setToken('secondary', value)} />
+                <TokenInput label="Secondary foreground" value={theme.secondaryForeground} onChange={(value) => setToken('secondaryForeground', value)} />
+                <TokenInput label="Accent" value={theme.accent} onChange={(value) => setToken('accent', value)} />
+                <TokenInput label="Accent foreground" value={theme.accentForeground} onChange={(value) => setToken('accentForeground', value)} />
+                <TokenInput label="Destructive" value={theme.destructive} onChange={(value) => setToken('destructive', value)} />
+                <TokenInput label="Ring" value={theme.ring} onChange={(value) => setToken('ring', value)} />
+                <TokenInput label="Input border" value={theme.input} onChange={(value) => setToken('input', value)} />
+              </TokenSection>
 
+              <TokenSection title="Container">
+                <div className="grid grid-cols-[1fr_44px] items-center gap-2 text-xs text-muted-foreground">
+                  <span>Container border</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={containerBorderVisible}
+                    onClick={() => setContainerBorderVisible((v) => !v)}
+                    className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors ${containerBorderVisible ? 'bg-primary' : 'bg-muted-foreground/40'}`}
+                  >
+                    <span className={`block h-4 w-4 rounded-full bg-white shadow-lg transition-transform ${containerBorderVisible ? 'translate-x-4' : 'translate-x-0'}`} />
+                  </button>
+                </div>
+                {containerBorderVisible && (
+                  <TokenInput label="Container border color" value={theme.containerBorder} onChange={(value) => setToken('containerBorder', value)} />
+                )}
+              </TokenSection>
+
+              <TokenSection title="Popover">
+                <TokenInput label="Background" value={theme.popover} onChange={(value) => setToken('popover', value)} />
+                <TokenInput label="Foreground" value={theme.popoverForeground} onChange={(value) => setToken('popoverForeground', value)} />
+              </TokenSection>
+            </>
+          )}
+
+          {/* ── Card-specific ── */}
+          {previewTab === 'card' && (
+            <TokenSection title="Card layout">
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Gap between cards: {cardGap}px
+                <input type="range" min={0} max={32} step={2} value={cardGap} onChange={(event) => setCardGap(Number(event.target.value))} />
+              </label>
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Grid padding: {cardPadding}px
+                <input type="range" min={0} max={32} step={2} value={cardPadding} onChange={(event) => setCardPadding(Number(event.target.value))} />
+              </label>
+            </TokenSection>
+          )}
+
+          {/* ── Chat-specific ── */}
+          {previewTab === 'chat' && (
+            <TokenSection title="Chat layout">
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Gap between messages: {chatGap}px
+                <input type="range" min={0} max={32} step={2} value={chatGap} onChange={(event) => setChatGap(Number(event.target.value))} />
+              </label>
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Container padding: {chatPadding}px
+                <input type="range" min={0} max={32} step={2} value={chatPadding} onChange={(event) => setChatPadding(Number(event.target.value))} />
+              </label>
+            </TokenSection>
+          )}
+
+          {/* ── Shared: always visible ── */}
           <TokenSection title="Scrollbar">
             <TokenInput label="Track" value={scrollbarTrack} onChange={setScrollbarTrack} />
             <TokenInput label="Thumb" value={scrollbarThumb} onChange={setScrollbarThumb} />
             <label className="grid gap-1 text-xs text-muted-foreground">
               Size: {scrollbarSize}px
-              <input
-                type="range"
-                min={4}
-                max={16}
-                step={1}
-                value={scrollbarSize}
-                onChange={(event) => setScrollbarSize(Number(event.target.value))}
-              />
+              <input type="range" min={4} max={16} step={1} value={scrollbarSize} onChange={(event) => setScrollbarSize(Number(event.target.value))} />
             </label>
             <label className="grid gap-1 text-xs text-muted-foreground">
               Thumb opacity: {scrollbarThumbOpacity.toFixed(2)}
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={scrollbarThumbOpacity}
-                onChange={(event) => setScrollbarThumbOpacity(Number(event.target.value))}
-              />
+              <input type="range" min={0} max={1} step={0.05} value={scrollbarThumbOpacity} onChange={(event) => setScrollbarThumbOpacity(Number(event.target.value))} />
             </label>
             <label className="grid gap-1 text-xs text-muted-foreground">
               Thumb hover opacity: {scrollbarThumbHoverOpacity.toFixed(2)}
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={scrollbarThumbHoverOpacity}
-                onChange={(event) => setScrollbarThumbHoverOpacity(Number(event.target.value))}
-              />
+              <input type="range" min={0} max={1} step={0.05} value={scrollbarThumbHoverOpacity} onChange={(event) => setScrollbarThumbHoverOpacity(Number(event.target.value))} />
             </label>
-          </TokenSection>
-
-          <TokenSection title="Popover">
-            <TokenInput label="Popover" value={theme.popover} onChange={(value) => setToken('popover', value)} />
-            <TokenInput label="Popover foreground" value={theme.popoverForeground} onChange={(value) => setToken('popoverForeground', value)} />
           </TokenSection>
 
           <TokenSection title="Typography">
@@ -431,19 +513,98 @@ export function ThemeTokensTab() {
           </TokenSection>
         </section>
 
+        {/* ── Right: preview ───────────────────────────────────────────── */}
         <section className="space-y-3" style={themeStyle}>
-          <p className="text-xs font-medium text-muted-foreground">Live DataGrid preview</p>
-          <DataGrid
-            data={SMALL_DATA}
-            columns={columns}
-            headerGroupLayout="span"
-            enableColumnFilters
-            bordered
-            tableHeight={320}
-            pagination={{ pageSize: 10 }}
-            footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20, 50]} />}
-            tableKey="theme-tokens-custom"
-          />
+          <div className="flex items-center gap-1">
+            {(['table', 'card', 'chat'] as PreviewTab[]).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setPreviewTab(tab)}
+                className={`rounded px-3 py-1 text-xs capitalize ${
+                  previewTab === tab
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border border-border text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+
+          {previewTab === 'table' && (
+            <DataGrid
+              data={SMALL_DATA}
+              columns={tableColumns}
+              headerGroupLayout="span"
+              enableColumnFilters
+              bordered
+              tableHeight={320}
+              pagination={{ pageSize: 10 }}
+              footer={(table) => <DataGridPaginationBar table={table} className="pt-2" pageSizes={[10, 20, 50]} />}
+              tableKey="theme-tokens-table"
+            />
+          )}
+
+          {previewTab === 'card' && (
+            <DataGridCard
+              data={SMALL_DATA}
+              columns={cardColumns}
+              minCardWidth={200}
+              minColumns={2}
+              containerHeight={320}
+              tableKey="theme-tokens-card"
+              renderCard={(row) => {
+                const e = row.original
+                return (
+                  <div className="flex flex-col gap-2 rounded-lg border border-border bg-background p-4 shadow-sm">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: 'var(--gridkit-foreground)' }}>{e.name}</p>
+                        <p className="text-xs" style={{ color: 'var(--gridkit-muted-foreground)' }}>{e.role}</p>
+                      </div>
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLOR[e.status]}`}>
+                        {e.status}
+                      </span>
+                    </div>
+                    <p className="text-xs" style={{ color: 'var(--gridkit-muted-foreground)' }}>{e.department}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium" style={{ color: 'var(--gridkit-foreground)' }}>${e.salary.toLocaleString()}</span>
+                      <span className="text-xs" style={{ color: 'var(--gridkit-muted-foreground)' }}>#{e.id}</span>
+                    </div>
+                  </div>
+                )
+              }}
+            />
+          )}
+
+          {previewTab === 'chat' && (
+            <DataGridChat
+              data={PREVIEW_MESSAGES}
+              columns={chatColumns}
+              getRowId={(m) => m.id}
+              containerHeight={320}
+              tableKey="theme-tokens-chat"
+              renderMessage={(row) => {
+                const m = row.original
+                return (
+                  <div className={`flex ${m.mine ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className="max-w-[72%] rounded-lg px-3 py-2 text-sm"
+                      style={
+                        m.mine
+                          ? { background: 'var(--gridkit-primary)', color: 'var(--gridkit-primary-foreground)' }
+                          : { background: 'var(--gridkit-muted)', color: 'var(--gridkit-foreground)' }
+                      }
+                    >
+                      <p className="mb-0.5 text-[11px] opacity-70">{m.author}</p>
+                      <p>{m.body}</p>
+                    </div>
+                  </div>
+                )
+              }}
+            />
+          )}
         </section>
       </div>
 

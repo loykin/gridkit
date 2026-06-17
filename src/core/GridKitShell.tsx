@@ -153,6 +153,7 @@ export function GridKitShell<T extends object>({
       ref={tableWrapperRef}
       className={cn(
         'gridkit-frame',
+        `gridkit-frame-${frameView}`,
         frameExtra,
         classNames?.frame,
         effectiveFillContainer && 'gridkit-frame--fill',

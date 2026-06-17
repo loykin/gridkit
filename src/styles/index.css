@@ -371,17 +371,12 @@
 .gridkit-frame {
   min-width: 0;
   display: flex;
+}
+.gridkit-frame-table {
   border: 1px solid var(--gridkit-container-border);
   border-radius: var(--gridkit-radius);
   background: var(--gridkit-background);
   background-clip: padding-box;
-}
-/* Card and list views: no outer border — the cards/items are the visual units */
-.gridkit-frame[data-view="card"],
-.gridkit-frame[data-view="list"] {
-  border: none;
-  border-radius: 0;
-  background: transparent;
 }
 .gridkit-frame--fill {
   min-height: 0;
@@ -403,20 +398,20 @@
   border-radius: max(0px, calc(var(--gridkit-radius) - 1px));
 }
 /* Card / List / Chat: inner is the scroll container */
-.gridkit-frame[data-view="card"].gridkit-frame--fill .gridkit-frame-inner,
-.gridkit-frame[data-view="list"].gridkit-frame--fill .gridkit-frame-inner,
-.gridkit-frame[data-view="chat"].gridkit-frame--fill .gridkit-frame-inner {
+.gridkit-frame-card.gridkit-frame--fill .gridkit-frame-inner,
+.gridkit-frame-list.gridkit-frame--fill .gridkit-frame-inner,
+.gridkit-frame-chat.gridkit-frame--fill .gridkit-frame-inner {
   display: flex;
   flex-direction: column;
   overflow: auto;
 }
-.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="card"] .gridkit-frame-inner,
-.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="list"] .gridkit-frame-inner,
-.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="chat"] .gridkit-frame-inner {
+.gridkit-shell[data-fill-parent="true"] .gridkit-frame-card .gridkit-frame-inner,
+.gridkit-shell[data-fill-parent="true"] .gridkit-frame-list .gridkit-frame-inner,
+.gridkit-shell[data-fill-parent="true"] .gridkit-frame-chat .gridkit-frame-inner {
   overflow: auto;
 }
 /* Table fill: inner participates in flex to fill height */
-.gridkit-shell[data-fill-parent="true"] .gridkit-frame[data-view="table"] .gridkit-frame-inner {
+.gridkit-shell[data-fill-parent="true"] .gridkit-frame-table .gridkit-frame-inner {
   display: flex;
   flex-direction: column;
 }
