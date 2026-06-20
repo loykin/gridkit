@@ -33,6 +33,7 @@ interface DataGridCardViewProps<T extends object>
     | 'minTableHeight'
     | 'fillContainer'
     | 'fillParent'
+    | 'openBottom'
     | 'enableVirtualization'
     | 'estimateCardHeight'
     | 'overscan'
@@ -81,6 +82,7 @@ export function DataGridCardView<T extends object>({
   minTableHeight,
   fillContainer,
   fillParent,
+  openBottom,
   enableVirtualization = false,
   estimateCardHeight = 200,
   overscan = 3,
@@ -242,6 +244,7 @@ export function DataGridCardView<T extends object>({
       minTableHeight={minTableHeight}
       fillContainer={fillContainer}
       fillParent={fillParent}
+      openBottom={openBottom}
       frameView="card"
       classNames={classNames}
       styles={styles}

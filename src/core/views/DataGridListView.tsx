@@ -25,6 +25,7 @@ interface DataGridListViewProps<T extends object>
     | 'minTableHeight'
     | 'fillContainer'
     | 'fillParent'
+    | 'openBottom'
     | 'error'
     | 'isFetchingNextPage'
     | 'headerLeft'
@@ -70,6 +71,7 @@ export function DataGridListView<T extends object>({
   minTableHeight,
   fillContainer,
   fillParent,
+  openBottom,
   onRowClick,
   rowCursor,
   classNames,
@@ -197,6 +199,7 @@ export function DataGridListView<T extends object>({
       minTableHeight={minTableHeight}
       fillContainer={fillContainer}
       fillParent={fillParent}
+      openBottom={openBottom}
       frameView="list"
       classNames={classNames}
       styles={styles}

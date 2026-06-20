@@ -438,6 +438,7 @@ export function ThemeTokensTab() {
                 {containerBorderVisible && (
                   <TokenInput label="Container border color" value={theme.containerBorder} onChange={(value) => setToken('containerBorder', value)} />
                 )}
+
               </TokenSection>
 
               <TokenSection title="Popover">

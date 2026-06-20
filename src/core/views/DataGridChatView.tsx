@@ -25,6 +25,7 @@ interface DataGridChatViewProps<T extends object>
     | 'minTableHeight'
     | 'fillContainer'
     | 'fillParent'
+    | 'openBottom'
     | 'scrollbar'
     | 'classNames'
     | 'styles'
@@ -52,6 +53,7 @@ export function DataGridChatView<T extends object>({
   minTableHeight,
   fillContainer,
   fillParent,
+  openBottom,
   scrollbar,
   isFetchingPreviousPage,
   isLoading,
@@ -134,6 +136,7 @@ export function DataGridChatView<T extends object>({
       minTableHeight={minTableHeight}
       fillContainer={fillContainer}
       fillParent={fillParent}
+      openBottom={openBottom}
       frameView="chat"
       classNames={classNames}
       styles={styles}

@@ -35,6 +35,7 @@ interface GridKitShellProps<T extends object> {
   minTableHeight?: string | number
   fillContainer?: boolean
   fillParent?: boolean
+  openBottom?: boolean
   /** data-view attribute on the frame element — used for view-specific fill CSS */
   frameView?: 'table' | 'card' | 'list' | 'chat'
   /** Hides the frame before column measurement completes (table view only) */
@@ -60,6 +61,7 @@ export function GridKitShell<T extends object>({
   minTableHeight,
   fillContainer,
   fillParent,
+  openBottom,
   frameView = 'table',
   frameHidden,
   frameExtra,
@@ -142,9 +144,10 @@ export function GridKitShell<T extends object>({
     ? { ...heightStyle, ...fillStyle, ...styles?.frame }
     : { ...heightStyle, ...styles?.frame }
 
-  const innerFrameStyle: React.CSSProperties | undefined = innerOverflow
-    ? { overflow: innerOverflow as string }
-    : undefined
+  const innerFrameStyle: React.CSSProperties | undefined =
+    innerOverflow || styles?.frameInner
+      ? { ...(innerOverflow ? { overflow: innerOverflow as string } : undefined), ...styles?.frameInner }
+      : undefined
 
   const scrollbarMode = scrollbar?.mode ?? 'custom'
 
@@ -160,6 +163,7 @@ export function GridKitShell<T extends object>({
         frameHidden && 'gridkit-frame--hidden',
       )}
       data-view={frameView}
+      data-open-bottom={openBottom ? 'true' : undefined}
       style={outerFrameStyle}
     >
       <div
@@ -169,7 +173,7 @@ export function GridKitShell<T extends object>({
             ;(containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node
           }
         }}
-        className={cn('gridkit-frame-inner', 'gridkit-scroll-container')}
+        className={cn('gridkit-frame-inner', 'gridkit-scroll-container', classNames?.frameInner)}
         data-scrollbar={scrollbarMode === 'native' ? undefined : scrollbarMode}
         style={innerFrameStyle}
       >

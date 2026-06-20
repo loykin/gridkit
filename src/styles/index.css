@@ -378,6 +378,11 @@
   background: var(--gridkit-background);
   background-clip: padding-box;
 }
+.gridkit-frame[data-open-bottom="true"] {
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
 .gridkit-frame--fill {
   min-height: 0;
 }

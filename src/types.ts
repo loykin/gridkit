@@ -142,6 +142,7 @@ export interface GridKitClassNames {
   root?: string
   toolbar?: string
   frame?: string
+  frameInner?: string
   content?: string
   header?: string
   body?: string
@@ -157,6 +158,7 @@ export interface GridKitStyles {
   root?: React.CSSProperties
   toolbar?: React.CSSProperties
   frame?: React.CSSProperties
+  frameInner?: React.CSSProperties
   content?: React.CSSProperties
   header?: React.CSSProperties
   body?: React.CSSProperties
@@ -369,6 +371,12 @@ export interface GridKitDisplayProps<T extends object> {
    * chain that includes `min-height: 0`.
    */
   fillParent?: boolean
+  /**
+   * Removes the bottom border and border-radius from the frame.
+   * Use when the grid fills to the edge of its container and content
+   * should appear to continue off-screen (e.g. infinite scroll in a full-height layout).
+   */
+  openBottom?: boolean
   tableHeight?: string | number | 'auto'
   /** Cap the container height — content shorter than this grows naturally, taller gets a scrollbar. */
   maxTableHeight?: string | number

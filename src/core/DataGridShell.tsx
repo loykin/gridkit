@@ -36,6 +36,7 @@ export function DataGridShell<T extends object>({
   footer,
   fillContainer,
   fillParent,
+  openBottom,
   classNames,
   styles,
   ...viewConfig
@@ -48,6 +49,7 @@ export function DataGridShell<T extends object>({
       headerRight={headerRight}
       fillContainer={fillContainer}
       fillParent={fillParent}
+      openBottom={openBottom}
       frameView="table"
       frameHidden={!isSized}
       classNames={classNames}

@@ -73,6 +73,30 @@ describe('DataGrid (Table) slot contracts', () => {
     )
     expect(container.querySelector('.my-empty')).toBeInTheDocument()
   })
+
+  it('applies classNames.frameInner to the inner frame element', () => {
+    const { container } = render(
+      <DataGrid
+        data={[]}
+        columns={columns}
+        getRowId={getRowId}
+        classNames={{ frameInner: 'my-frame-inner' }}
+      />,
+    )
+    expect(container.querySelector('.gridkit-frame-inner')).toHaveClass('my-frame-inner')
+  })
+
+  it('applies styles.frameInner to the inner frame element', () => {
+    const { container } = render(
+      <DataGrid
+        data={[]}
+        columns={columns}
+        getRowId={getRowId}
+        styles={{ frameInner: { borderRadius: '0px' } }}
+      />,
+    )
+    expect(container.querySelector('.gridkit-frame-inner')).toHaveStyle({ borderRadius: '0px' })
+  })
 })
 
 // ── Card: error inside shell ───────────────────────────────────────────────────
