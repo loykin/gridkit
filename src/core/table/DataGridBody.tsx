@@ -27,8 +27,10 @@ interface DataGridBodyProps<T extends object>
   classNames?: DataGridClassNames
   styles?: DataGridStyles
   focusedCell?: GridFocusCell
+  activeFocusedCell?: GridFocusCell
   columnIndexById?: Map<string, number>
   onCellKeyDown?: ((event: React.KeyboardEvent<HTMLElement>, cell: GridFocusCell) => void) | undefined
+  onCellFocus?: ((cell: GridFocusCell) => void) | undefined
 }
 
 export function DataGridBody<T extends object>({
@@ -52,8 +54,10 @@ export function DataGridBody<T extends object>({
   classNames,
   styles,
   focusedCell,
+  activeFocusedCell,
   columnIndexById,
   onCellKeyDown,
+  onCellFocus,
 }: DataGridBodyProps<T>) {
   const showSpacer = tableWidthMode === 'spacer'
   const fillLast = tableWidthMode === 'fill-last'
@@ -217,8 +221,10 @@ export function DataGridBody<T extends object>({
                   styles={styles}
                   rowIndex={index}
                   focusedCell={focusedCell}
+                  activeFocusedCell={activeFocusedCell}
                   columnIndexById={columnIndexById}
                   onCellKeyDown={onCellKeyDown}
+                  onCellFocus={onCellFocus}
                 />
                 {detailPanel}
               </div>
@@ -244,8 +250,10 @@ export function DataGridBody<T extends object>({
                 styles={styles}
                 rowIndex={index}
                 focusedCell={focusedCell}
+                activeFocusedCell={activeFocusedCell}
                 columnIndexById={columnIndexById}
                 onCellKeyDown={onCellKeyDown}
+                onCellFocus={onCellFocus}
               />
               {detailPanel}
             </React.Fragment>

@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { DataGrid } from '@/DataGrid'
 import { ColumnVisibilityDropdown } from '@/core/controls/ColumnVisibilityDropdown'
 import { DataGridPaginationBar } from '@/core/controls/DataGridPaginationBar'
+import { useGridKitRovingFocus } from '@/core/view-sdk/useGridKitRovingFocus'
 import type { DataGridColumnDef } from '@/types'
+import type { Row } from '@tanstack/react-table'
 
 interface Person {
   id: string
@@ -132,7 +135,7 @@ describe('DataGrid accessibility labels', () => {
     expect(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeInTheDocument()
   })
 
-  it('supports roving cell focus with arrow keys and Space row selection', () => {
+  it('supports roving cell focus with arrow keys and Space row selection', async () => {
     const onSelectOne = vi.fn()
     const columns: DataGridColumnDef<Person>[] = [
       { accessorKey: 'name', header: 'Name' },
@@ -158,9 +161,11 @@ describe('DataGrid accessibility labels', () => {
 
     expect(screen.getByRole('grid')).toHaveAttribute('aria-rowcount', '2')
     expect(firstCell).toHaveAttribute('tabindex', '0')
-    expect(firstCell).toHaveAttribute('data-focused', 'true')
+    expect(firstCell).not.toHaveAttribute('data-focused')
 
     firstCell?.focus()
+    await waitFor(() => expect(firstCell).toHaveAttribute('data-focused', 'true'))
+
     fireEvent.keyDown(firstCell!, { key: 'ArrowDown' })
 
     expect(firstCell).not.toHaveAttribute('data-focused')
@@ -196,10 +201,8 @@ describe('DataGrid accessibility labels', () => {
         accessorKey: 'name',
         header: 'Name',
         meta: {
-          editCell: ({ value, onCancel }) => (
-            <input aria-label="Edit name" value={String(value)} onChange={() => undefined} onKeyDown={(event) => {
-              if (event.key === 'Escape') onCancel()
-            }} />
+          editCell: ({ value }) => (
+            <input aria-label="Edit name" value={String(value)} onChange={() => undefined} />
           ),
         },
       },
@@ -223,5 +226,76 @@ describe('DataGrid accessibility labels', () => {
 
     fireEvent.keyDown(input, { key: 'Escape' })
     expect(screen.queryByRole('textbox', { name: 'Edit name' })).not.toBeInTheDocument()
+  })
+
+  it('moves DOM focus in the headless roving focus helper', async () => {
+    const rows = [
+      { id: 'a' },
+      { id: 'b' },
+      { id: 'c' },
+    ] as Row<{ id: string }>[]
+
+    function RovingDemo() {
+      const roving = useGridKitRovingFocus({ rows })
+      return (
+        <div>
+          {rows.map((row, index) => (
+            <button key={row.id} type="button" {...roving.getItemProps(index)}>
+              {row.id.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    render(<RovingDemo />)
+
+    const first = screen.getByRole('button', { name: 'A' })
+    const second = screen.getByRole('button', { name: 'B' })
+    const third = screen.getByRole('button', { name: 'C' })
+
+    first.focus()
+    fireEvent.keyDown(first, { key: 'ArrowDown' })
+    await waitFor(() => expect(second).toHaveFocus())
+
+    fireEvent.keyDown(second, { key: 'ArrowDown' })
+    await waitFor(() => expect(third).toHaveFocus())
+  })
+
+  it('keeps a tab stop when headless roving rows shrink', async () => {
+    function ShrinkingRovingDemo() {
+      const [items, setItems] = useState([
+        { id: 'a' },
+        { id: 'b' },
+        { id: 'c' },
+      ])
+      const rows = items as Row<{ id: string }>[]
+      const roving = useGridKitRovingFocus({ rows, initialIndex: 2 })
+
+      return (
+        <div>
+          <button type="button" onClick={() => setItems((current) => current.slice(0, 1))}>
+            Shrink
+          </button>
+          <span data-testid="focused-index">{roving.focusedIndex}</span>
+          {rows.map((row, index) => (
+            <button key={row.id} type="button" {...roving.getItemProps(index)}>
+              {row.id.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    render(<ShrinkingRovingDemo />)
+
+    expect(screen.getByRole('button', { name: 'C' })).toHaveAttribute('tabindex', '0')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Shrink' }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('focused-index')).toHaveTextContent('0')
+      expect(screen.getByRole('button', { name: 'A' })).toHaveAttribute('tabindex', '0')
+    })
   })
 })

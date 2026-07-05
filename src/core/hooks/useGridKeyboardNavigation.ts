@@ -39,6 +39,7 @@ export function useGridKeyboardNavigation<T extends object>({
   const maxRowIndex = Math.max(rows.length - 1, 0)
   const maxColIndex = Math.max(visibleLeafColumns.length - 1, 0)
   const [focusedCell, setFocusedCell] = useState<GridFocusCell>({ rowIndex: 0, colIndex: 0 })
+  const [focusActive, setFocusActive] = useState(false)
   const pendingFocusRef = useRef<GridFocusCell | null>(null)
 
   const columnIndexById = useMemo(() => {
@@ -65,6 +66,7 @@ export function useGridKeyboardNavigation<T extends object>({
   const moveFocus = useCallback((nextCell: GridFocusCell) => {
     const next = clampCell(nextCell)
     setFocusedCell(next)
+    setFocusActive(true)
     pendingFocusRef.current = next
     rowVirtualizer?.scrollToIndex(next.rowIndex, { align: 'auto' })
 
@@ -74,6 +76,11 @@ export function useGridKeyboardNavigation<T extends object>({
       }
     })
   }, [clampCell, focusCellElement, rowVirtualizer])
+
+  const handleCellFocus = useCallback((cell: GridFocusCell) => {
+    setFocusedCell(clampCell(cell))
+    setFocusActive(true)
+  }, [clampCell])
 
   useEffect(() => {
     const pending = pendingFocusRef.current
@@ -88,7 +95,6 @@ export function useGridKeyboardNavigation<T extends object>({
 
   const handleCellKeyDown = useCallback((event: React.KeyboardEvent<HTMLElement>, cell: GridFocusCell) => {
     if (!enabled) return
-    if (isEditableTarget(event.target)) return
 
     if (editingCellId) {
       if (event.key === 'Escape') {
@@ -97,6 +103,8 @@ export function useGridKeyboardNavigation<T extends object>({
       }
       return
     }
+
+    if (isEditableTarget(event.target)) return
 
     let next: GridFocusCell | null = null
     if (event.key === 'ArrowRight') next = { ...cell, colIndex: cell.colIndex + 1 }
@@ -138,7 +146,9 @@ export function useGridKeyboardNavigation<T extends object>({
 
   return {
     focusedCell: enabled ? focusedCell : undefined,
+    activeFocusedCell: enabled && focusActive ? focusedCell : undefined,
     columnIndexById: enabled ? columnIndexById : undefined,
     handleCellKeyDown: enabled ? handleCellKeyDown : undefined,
+    handleCellFocus: enabled ? handleCellFocus : undefined,
   }
 }

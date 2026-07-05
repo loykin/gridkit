@@ -312,8 +312,10 @@ export function DataGridTableView<T extends object>({
                 classNames={classNames}
                 styles={styles}
                 focusedCell={keyboard.focusedCell}
+                activeFocusedCell={keyboard.activeFocusedCell}
                 columnIndexById={keyboard.columnIndexById}
                 onCellKeyDown={keyboard.handleCellKeyDown}
+                onCellFocus={keyboard.handleCellFocus}
               />
             </EditingCellContext>
           </DetailRowContext>

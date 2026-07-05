@@ -24,8 +24,10 @@ interface DataGridBodyRowProps<T extends object>
   styles?: DataGridStyles
   rowIndex?: number
   focusedCell?: GridFocusCell
+  activeFocusedCell?: GridFocusCell
   columnIndexById?: Map<string, number>
   onCellKeyDown?: ((event: React.KeyboardEvent<HTMLElement>, cell: GridFocusCell) => void) | undefined
+  onCellFocus?: ((cell: GridFocusCell) => void) | undefined
 }
 
 export function DataGridBodyRow<T extends object>({
@@ -48,8 +50,10 @@ export function DataGridBodyRow<T extends object>({
   styles,
   rowIndex,
   focusedCell,
+  activeFocusedCell,
   columnIndexById,
   onCellKeyDown,
+  onCellFocus,
 }: DataGridBodyRowProps<T>) {
   const visibleCells = visibleColumnIds
     ? row.getVisibleCells().filter((cell) => visibleColumnIds.has(cell.column.id))
@@ -88,7 +92,9 @@ export function DataGridBodyRow<T extends object>({
             rowIndex={rowIndex}
             colIndex={columnIndexById?.get(cell.column.id)}
             focusedCell={focusedCell}
+            activeFocusedCell={activeFocusedCell}
             onCellKeyDown={onCellKeyDown}
+            onCellFocus={onCellFocus}
           />
         )
       })}

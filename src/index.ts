@@ -27,7 +27,7 @@ export { useCSVExport } from './features/export/useCSVExport'
 export { useGridKitView } from './core/view-sdk/useGridKitView'
 export { useGridKitRovingFocus } from './core/view-sdk/useGridKitRovingFocus'
 export { GridKitShell } from './core/GridKitShell'
-export { defaultLabels, useGridKitLabels } from './core/LabelsContext'
+export { defaultLabels, LabelsProvider, useGridKitLabels } from './core/LabelsContext'
 export type { GridKitViewContext, GridKitViewOptions } from './core/view-sdk/useGridKitView'
 export type {
   GridKitRovingFocusItemOptions,

@@ -22,7 +22,9 @@ interface DataGridBodyCellProps<T extends object> {
   rowIndex?: number
   colIndex?: number
   focusedCell?: GridFocusCell
+  activeFocusedCell?: GridFocusCell
   onCellKeyDown?: ((event: React.KeyboardEvent<HTMLElement>, cell: GridFocusCell) => void) | undefined
+  onCellFocus?: ((cell: GridFocusCell) => void) | undefined
 }
 
 export function DataGridBodyCell<T extends object>({
@@ -39,7 +41,9 @@ export function DataGridBodyCell<T extends object>({
   rowIndex,
   colIndex,
   focusedCell,
+  activeFocusedCell,
   onCellKeyDown,
+  onCellFocus,
 }: DataGridBodyCellProps<T>) {
   const editingCtx = useEditingCell()
   const meta = cell.column.columnDef.meta
@@ -48,12 +52,13 @@ export function DataGridBodyCell<T extends object>({
   const isEditing = editingCtx?.editingCellId === cell.id
   const canEdit = !!meta?.editCell
   const isFocusable = rowIndex != null && colIndex != null && onCellKeyDown != null
-  const isFocused = isFocusable && focusedCell?.rowIndex === rowIndex && focusedCell.colIndex === colIndex
+  const isRovingTabStop = isFocusable && focusedCell?.rowIndex === rowIndex && focusedCell.colIndex === colIndex
+  const isVisuallyFocused = isFocusable && activeFocusedCell?.rowIndex === rowIndex && activeFocusedCell.colIndex === colIndex
 
   return (
     <div
       role="gridcell"
-      tabIndex={isFocusable ? (isFocused ? 0 : -1) : undefined}
+      tabIndex={isFocusable ? (isRovingTabStop ? 0 : -1) : undefined}
       data-gridkit-cell={isFocusable ? 'true' : undefined}
       data-row-index={rowIndex}
       data-col-index={colIndex}
@@ -65,11 +70,12 @@ export function DataGridBodyCell<T extends object>({
       data-last-col={isLast ? 'true' : undefined}
       data-bordered={bordered ? 'true' : undefined}
       data-editing={isEditing ? 'true' : undefined}
-      data-focused={isFocused ? 'true' : undefined}
+      data-focused={isVisuallyFocused ? 'true' : undefined}
       data-overflow={meta?.cellOverflow}
       className={cn('gridkit-cell', classNames?.cell)}
       style={{ ...styles?.cell, ...colStyle(cell.column, { pinning }), ...(isFillCell && { flex: 1, width: 'auto' }) }}
       onKeyDown={isFocusable ? (event) => onCellKeyDown?.(event, { rowIndex, colIndex }) : undefined}
+      onFocus={isFocusable ? () => onCellFocus?.({ rowIndex, colIndex }) : undefined}
       onDoubleClick={canEdit && !isEditing ? (e) => { e.stopPropagation(); editingCtx?.startEdit(cell.id) } : undefined}
     >
       {isEditing && meta?.editCell ? (
