@@ -2,6 +2,8 @@
 
 GridKit is a React data view library built on TanStack Table.
 
+[npm package](https://www.npmjs.com/package/@loykin/gridkit)
+
 TanStack Table gives you the engine. GridKit gives you the rendered UI: tables,
 lists, cards, chat timelines, and agent event streams — all sharing the same
 sorting, filtering, search, pagination, virtualization, backend query state,
@@ -82,6 +84,34 @@ npm install @loykin/gridkit
 
 ```bash
 npm install react react-dom @tanstack/react-table @tanstack/react-virtual
+```
+
+## Quick Start
+
+```tsx
+import { DataGrid, type DataGridColumnDef } from '@loykin/gridkit'
+import '@loykin/gridkit/styles'
+
+type User = {
+  id: number
+  name: string
+  email: string
+}
+
+const columns: DataGridColumnDef<User>[] = [
+  { accessorKey: 'id', header: 'ID' },
+  { accessorKey: 'name', header: 'Name' },
+  { accessorKey: 'email', header: 'Email' },
+]
+
+const rows: User[] = [
+  { id: 1, name: 'Ada Lovelace', email: 'ada@example.com' },
+  { id: 2, name: 'Grace Hopper', email: 'grace@example.com' },
+]
+
+export function UsersGrid() {
+  return <DataGrid data={rows} columns={columns} tableHeight={400} />
+}
 ```
 
 ---
