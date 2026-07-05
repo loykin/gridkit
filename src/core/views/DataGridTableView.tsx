@@ -79,7 +79,7 @@ export function DataGridTableView<T extends object>({
   renderGroupRow,
   onCellValueChange,
   onMeasureColumns,
-  enableKeyboardNavigation = true,
+  enableKeyboardNavigation = false,
   classNames,
   styles,
 }: DataGridTableViewProps<T>) {

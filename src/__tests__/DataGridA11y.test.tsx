@@ -153,6 +153,7 @@ describe('DataGrid accessibility labels', () => {
           onSelectAll: vi.fn(),
           onSelectOne,
         }}
+        enableKeyboardNavigation
       />,
     )
 
@@ -176,7 +177,7 @@ describe('DataGrid accessibility labels', () => {
     expect(onSelectOne).toHaveBeenCalledWith('2', true)
   })
 
-  it('can disable keyboard cell navigation', () => {
+  it('keeps keyboard cell navigation disabled by default', () => {
     const columns: DataGridColumnDef<Person>[] = [
       { accessorKey: 'name', header: 'Name' },
       { accessorKey: 'age', header: 'Age' },
@@ -187,7 +188,6 @@ describe('DataGrid accessibility labels', () => {
         data={data}
         columns={columns}
         getRowId={(row) => row.id}
-        enableKeyboardNavigation={false}
       />,
     )
 
@@ -214,6 +214,7 @@ describe('DataGrid accessibility labels', () => {
         columns={columns}
         getRowId={(row) => row.id}
         onCellValueChange={vi.fn()}
+        enableKeyboardNavigation
       />,
     )
 

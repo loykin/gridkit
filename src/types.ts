@@ -561,7 +561,7 @@ export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T
    * Enable roving cell focus and keyboard navigation for table-based views.
    * Applies to DataGrid, DataGridInfinity, and DataGridDrag. Card/List/Chat
    * views own different interaction models and ignore this prop.
-   * Defaults to true.
+   * Defaults to false.
    */
   enableKeyboardNavigation?: boolean
   /** Custom renderer for group header rows. Defaults to showing column value and sub-row count. */
