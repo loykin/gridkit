@@ -1,6 +1,7 @@
 import type { Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -10,11 +11,12 @@ interface Props<T extends object> {
 
 export function ColumnVisibilityDropdown<T extends object>({ table }: Props<T>) {
   const icons = useIcons()
+  const labels = useGridKitLabels()
   return (
     <Popover>
       <PopoverTrigger
         render={(props) => (
-          <Button {...props} aria-label="Choose visible columns" variant="outline" size="sm">
+          <Button {...props} aria-label={labels.chooseVisibleColumns} variant="outline" size="sm">
             {icons.columnVisibility}
             Columns
           </Button>
@@ -31,7 +33,7 @@ export function ColumnVisibilityDropdown<T extends object>({ table }: Props<T>) 
                 style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13 }}
               >
                 <Checkbox
-                  aria-label={`Toggle ${typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id} column visibility`}
+                  aria-label={labels.toggleColumnVisibility(typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id)}
                   checked={col.getIsVisible()}
                   onCheckedChange={col.toggleVisibility}
                 />

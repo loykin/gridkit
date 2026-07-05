@@ -23,7 +23,7 @@ export function resolveContainerHeight(
   return { ...min }
 }
 
-interface GridKitShellProps<T extends object> {
+export interface GridKitShellProps<T extends object> {
   wrapperRef: React.RefObject<HTMLDivElement | null>
   containerRef?: React.RefObject<HTMLDivElement | null>
   table: Table<T>

@@ -1,9 +1,11 @@
 import { type Cell, type Row, type Table } from '@tanstack/react-table'
+import type React from 'react'
 import { useEditingCell } from '@/features/editing/EditingCellContext'
 import { EditableCellContent } from '@/features/editing/EditableCellContent'
 import { RowActionTrigger } from '@/features/actions/RowActionTrigger'
 import { cn } from '@/lib/utils'
 import type { DataGridClassNames, DataGridStyles } from '@/types'
+import type { GridFocusCell } from '@/core/hooks/useGridKeyboardNavigation'
 import { colStyle, isPinnedEdge } from './tableUtils'
 
 interface DataGridBodyCellProps<T extends object> {
@@ -17,6 +19,10 @@ interface DataGridBodyCellProps<T extends object> {
   onActionTrigger?: (row: T, el: HTMLElement) => void
   classNames?: DataGridClassNames
   styles?: DataGridStyles
+  rowIndex?: number
+  colIndex?: number
+  focusedCell?: GridFocusCell
+  onCellKeyDown?: ((event: React.KeyboardEvent<HTMLElement>, cell: GridFocusCell) => void) | undefined
 }
 
 export function DataGridBodyCell<T extends object>({
@@ -30,6 +36,10 @@ export function DataGridBodyCell<T extends object>({
   onActionTrigger,
   classNames,
   styles,
+  rowIndex,
+  colIndex,
+  focusedCell,
+  onCellKeyDown,
 }: DataGridBodyCellProps<T>) {
   const editingCtx = useEditingCell()
   const meta = cell.column.columnDef.meta
@@ -37,10 +47,16 @@ export function DataGridBodyCell<T extends object>({
   const edge = isPinnedEdge(cell.column, table)
   const isEditing = editingCtx?.editingCellId === cell.id
   const canEdit = !!meta?.editCell
+  const isFocusable = rowIndex != null && colIndex != null && onCellKeyDown != null
+  const isFocused = isFocusable && focusedCell?.rowIndex === rowIndex && focusedCell.colIndex === colIndex
 
   return (
     <div
       role="gridcell"
+      tabIndex={isFocusable ? (isFocused ? 0 : -1) : undefined}
+      data-gridkit-cell={isFocusable ? 'true' : undefined}
+      data-row-index={rowIndex}
+      data-col-index={colIndex}
       data-col-id={cell.column.id}
       data-align={meta?.align ?? undefined}
       data-wrap={meta?.wrap ? 'true' : undefined}
@@ -49,9 +65,11 @@ export function DataGridBodyCell<T extends object>({
       data-last-col={isLast ? 'true' : undefined}
       data-bordered={bordered ? 'true' : undefined}
       data-editing={isEditing ? 'true' : undefined}
+      data-focused={isFocused ? 'true' : undefined}
       data-overflow={meta?.cellOverflow}
       className={cn('gridkit-cell', classNames?.cell)}
       style={{ ...styles?.cell, ...colStyle(cell.column, { pinning }), ...(isFillCell && { flex: 1, width: 'auto' }) }}
+      onKeyDown={isFocusable ? (event) => onCellKeyDown?.(event, { rowIndex, colIndex }) : undefined}
       onDoubleClick={canEdit && !isEditing ? (e) => { e.stopPropagation(); editingCtx?.startEdit(cell.id) } : undefined}
     >
       {isEditing && meta?.editCell ? (

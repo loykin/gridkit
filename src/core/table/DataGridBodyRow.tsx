@@ -1,7 +1,9 @@
+import type React from 'react'
 import type { CSSProperties } from 'react'
 import type { Row, Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import type { DataGridClassNames, DataGridStyles, TableViewConfig } from '@/types'
+import type { GridFocusCell } from '@/core/hooks/useGridKeyboardNavigation'
 import { DataGridBodyCell } from './DataGridBodyCell'
 
 interface DataGridBodyRowProps<T extends object>
@@ -20,6 +22,10 @@ interface DataGridBodyRowProps<T extends object>
   isLastRow?: boolean
   classNames?: DataGridClassNames
   styles?: DataGridStyles
+  rowIndex?: number
+  focusedCell?: GridFocusCell
+  columnIndexById?: Map<string, number>
+  onCellKeyDown?: ((event: React.KeyboardEvent<HTMLElement>, cell: GridFocusCell) => void) | undefined
 }
 
 export function DataGridBodyRow<T extends object>({
@@ -40,6 +46,10 @@ export function DataGridBodyRow<T extends object>({
   isLastRow = false,
   classNames,
   styles,
+  rowIndex,
+  focusedCell,
+  columnIndexById,
+  onCellKeyDown,
 }: DataGridBodyRowProps<T>) {
   const visibleCells = visibleColumnIds
     ? row.getVisibleCells().filter((cell) => visibleColumnIds.has(cell.column.id))
@@ -75,6 +85,10 @@ export function DataGridBodyRow<T extends object>({
             onActionTrigger={onActionTrigger}
             classNames={classNames}
             styles={styles}
+            rowIndex={rowIndex}
+            colIndex={columnIndexById?.get(cell.column.id)}
+            focusedCell={focusedCell}
+            onCellKeyDown={onCellKeyDown}
           />
         )
       })}

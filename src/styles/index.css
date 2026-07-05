@@ -47,6 +47,8 @@
   --gridkit-popover-option-hover-background: var(--gridkit-muted);
   --gridkit-popover-section-foreground: var(--gridkit-muted-foreground);
   --gridkit-ring:                 var(--ring,                oklch(0.708 0 0));
+  --gridkit-cell-focus-ring:      var(--gridkit-ring);
+  --gridkit-cell-focus-background: transparent;
   --gridkit-radius:               var(--radius,              0rem);
   --gridkit-scrollbar-size:        8px;
   --gridkit-scrollbar-track:       var(--gridkit-muted);
@@ -93,6 +95,8 @@
   --gridkit-popover-option-hover-background: var(--gridkit-muted);
   --gridkit-popover-section-foreground: var(--gridkit-muted-foreground);
   --gridkit-ring:                 var(--ring,                oklch(0.556 0 0));
+  --gridkit-cell-focus-ring:      var(--gridkit-ring);
+  --gridkit-cell-focus-background: transparent;
 }
 
 /* ── Spinner animation ──────────────────────────────────────────────────────── */
@@ -246,6 +250,13 @@
   border-radius: var(--gridkit-radius);
   border: 1px solid var(--gridkit-control-border);
   accent-color: var(--gridkit-primary);
+  outline: none;
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+.gridkit-checkbox:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--gridkit-ring) 35%, transparent);
 }
 
 /* ── gridkit-select ──────────────────────────────────────────────────────────────── */
@@ -748,6 +759,16 @@
   padding: 4px 12px;
   font-size: 13px;
   background: var(--_row-bg, var(--gridkit-background));
+}
+.gridkit-cell:focus {
+  outline: none;
+}
+.gridkit-cell:focus-visible,
+.gridkit-cell[data-focused="true"] {
+  background: var(--gridkit-cell-focus-background, var(--_row-bg, var(--gridkit-background)));
+  box-shadow: inset 0 0 0 2px var(--gridkit-cell-focus-ring, var(--gridkit-ring));
+  position: relative;
+  z-index: 1;
 }
 .gridkit-cell[data-align="right"]  { justify-content: flex-end; }
 .gridkit-cell[data-align="center"] { justify-content: center; }

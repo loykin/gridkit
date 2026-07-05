@@ -2,6 +2,7 @@ import type { Column } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 
 interface Props<T extends object> {
   col: Column<T>
@@ -10,6 +11,7 @@ interface Props<T extends object> {
 
 export function DateFilterContent<T extends object>({ col, mode }: Props<T>) {
   const icons = useIcons()
+  const labels = useGridKitLabels()
   const value = col.getFilterValue()
   const singleValue = typeof value === 'string' ? value : ''
   const rangeValue = Array.isArray(value) && value.length === 2
@@ -30,7 +32,7 @@ export function DateFilterContent<T extends object>({ col, mode }: Props<T>) {
         />
         {singleValue && (
           <Button
-            aria-label="Clear date filter"
+            aria-label={labels.clearDateFilter}
             variant="ghost"
             size="icon-xs"
             onClick={() => col.setFilterValue(undefined)}
@@ -66,7 +68,7 @@ export function DateFilterContent<T extends object>({ col, mode }: Props<T>) {
       {(rangeValue[0] || rangeValue[1]) && (
         <Button variant="ghost" size="sm" onClick={() => col.setFilterValue(undefined)}>
           {icons.clearFilter}
-          Clear
+          {labels.clear}
         </Button>
       )}
     </div>

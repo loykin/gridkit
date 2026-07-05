@@ -24,6 +24,18 @@ export { TreeCell } from './features/expanding/TreeCell'
 export { ExpandToggleCell } from './features/expanding/ExpandToggleCell'
 export { DragHandleCell } from './features/reordering/DragHandleCell'
 export { useCSVExport } from './features/export/useCSVExport'
+export { useGridKitView } from './core/view-sdk/useGridKitView'
+export { useGridKitRovingFocus } from './core/view-sdk/useGridKitRovingFocus'
+export { GridKitShell } from './core/GridKitShell'
+export { defaultLabels, useGridKitLabels } from './core/LabelsContext'
+export type { GridKitViewContext, GridKitViewOptions } from './core/view-sdk/useGridKitView'
+export type {
+  GridKitRovingFocusItemOptions,
+  GridKitRovingFocusItemProps,
+  GridKitRovingFocusOptions,
+  GridKitRovingFocusOrientation,
+} from './core/view-sdk/useGridKitRovingFocus'
+export type { GridKitShellProps } from './core/GridKitShell'
 
 // DataStore API
 export { useDataStore } from './core/engine/hooks/useDataStore'
@@ -82,6 +94,7 @@ export type {
   DataGridBaseProps,
   GridKitClassNames,
   GridKitStyles,
+  GridKitLabels,
   DataGridClassNames,
   DataGridStyles,
   DataGridCardClassNames,

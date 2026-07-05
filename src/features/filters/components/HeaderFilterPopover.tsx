@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import type { Column, Table } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { SelectFilterCell } from './SelectFilterCell'
@@ -19,6 +20,7 @@ interface Props<T extends object> {
 export function HeaderFilterPopover<T extends object>({ col, table, customFilterComponents }: Props<T>) {
   const [open, setOpen] = useState(false)
   const icons = useIcons()
+  const labels = useGridKitLabels()
   // Stable ref callback — an inline arrow would create a new reference on every render,
   // causing React to call it as null→el each time, re-triggering focus()
   const focusRef = useCallback((el: HTMLInputElement | null) => {
@@ -42,7 +44,7 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
           render={(props) => (
             <Button
               {...props}
-              aria-label={`Filter ${col.id}`}
+              aria-label={labels.filterColumn(col.id)}
               variant="ghost"
               size="icon-xs"
               className={hasFilter ? 'gridkit-btn--filter-active' : 'gridkit-btn--filter-inactive'}
@@ -81,7 +83,7 @@ export function HeaderFilterPopover<T extends object>({ col, table, customFilter
               />
               {filterValue && (
                 <Button
-                  aria-label={`Clear ${col.id} filter`}
+                  aria-label={labels.clearColumnFilter(col.id)}
                   variant="ghost"
                   size="icon-xs"
                   onClick={() => col.setFilterValue(undefined)}

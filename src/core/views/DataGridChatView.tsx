@@ -3,6 +3,7 @@ import type { Row, Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { GridKitShell } from '@/core/GridKitShell'
+import { useGridKitLabels } from '@/core/LabelsContext'
 import type { DataGridChatProps } from '@/types'
 
 interface DataGridChatViewProps<T extends object>
@@ -58,7 +59,7 @@ export function DataGridChatView<T extends object>({
   isFetchingPreviousPage,
   isLoading,
   error,
-  emptyMessage = 'No messages',
+  emptyMessage,
   emptyContent,
   renderMessage,
   renderDaySeparator,
@@ -68,6 +69,8 @@ export function DataGridChatView<T extends object>({
   styles,
 }: DataGridChatViewProps<T>) {
   const icons = useIcons()
+  const labels = useGridKitLabels()
+  const effectiveEmptyMessage = emptyMessage ?? labels.noMessages
 
   const renderContent = () => {
     if (isLoading) {
@@ -85,7 +88,7 @@ export function DataGridChatView<T extends object>({
     if (rows.length === 0) {
       return (
         <div className={cn('gridkit-empty', classNames?.empty)} style={styles?.empty}>
-          {emptyContent ?? emptyMessage}
+          {emptyContent ?? effectiveEmptyMessage}
         </div>
       )
     }

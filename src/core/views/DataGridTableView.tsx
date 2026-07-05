@@ -5,11 +5,13 @@ import {
 } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 import { ScrollTable } from '@/core/table/ScrollTable'
 import type { DataGridStyles, TableViewConfig } from '@/types'
 import { useTableScrollSync } from '@/core/hooks/useTableScrollSync'
 import { useTableVirtualizer } from '@/core/hooks/useTableVirtualizer'
 import { useActionMenu } from '@/core/hooks/useActionMenu'
+import { useGridKeyboardNavigation } from '@/core/hooks/useGridKeyboardNavigation'
 import { DataGridBody } from '@/core/table/DataGridBody'
 import { buildTableLayoutModel } from '@/core/table/layout/buildTableLayoutModel'
 import type { ColumnRegionModel } from '@/core/table/layout/tableLayoutTypes'
@@ -47,7 +49,7 @@ export function DataGridTableView<T extends object>({
   rows,
   containerRef,
   isLoading,
-  emptyMessage = 'No data',
+  emptyMessage,
   emptyContent,
   showHeader = true,
   headerGroupLayout = 'padded',
@@ -77,10 +79,13 @@ export function DataGridTableView<T extends object>({
   renderGroupRow,
   onCellValueChange,
   onMeasureColumns,
+  enableKeyboardNavigation = true,
   classNames,
   styles,
 }: DataGridTableViewProps<T>) {
   const effectiveEstimate = estimateRowHeight ?? rowHeight ?? 33
+  const labels = useGridKitLabels()
+  const effectiveEmptyMessage = emptyMessage ?? labels.noData
 
   const headerGroups = table.getHeaderGroups()
   const visibleLeafColumns = table.getVisibleLeafColumns()
@@ -136,6 +141,16 @@ export function DataGridTableView<T extends object>({
     bodyScrollRef,
     estimateSize: effectiveEstimate,
     overscan,
+  })
+  const keyboard = useGridKeyboardNavigation({
+    enabled: enableKeyboardNavigation,
+    rows,
+    table,
+    containerRef,
+    rowVirtualizer: virtual ? rowVirtualizer : undefined,
+    editingCellId,
+    startEdit: editingCtx.startEdit,
+    stopEdit: editingCtx.stopEdit,
   })
 
   // ── After each render, trigger column auto-measurement ─────────────────────
@@ -282,7 +297,7 @@ export function DataGridTableView<T extends object>({
                 visibleLeafColumns={region.columns}
                 rowVirtualizer={virtual ? rowVirtualizer : undefined}
                 isLoading={isLoading}
-                emptyMessage={emptyMessage}
+                emptyMessage={effectiveEmptyMessage}
                 emptyContent={emptyContent}
                 onRowClick={onRowClick}
                 rowCursor={rowCursor}
@@ -296,6 +311,9 @@ export function DataGridTableView<T extends object>({
                 renderGroupRow={renderGroupRow}
                 classNames={classNames}
                 styles={styles}
+                focusedCell={keyboard.focusedCell}
+                columnIndexById={keyboard.columnIndexById}
+                onCellKeyDown={keyboard.handleCellKeyDown}
               />
             </EditingCellContext>
           </DetailRowContext>
@@ -327,6 +345,10 @@ export function DataGridTableView<T extends object>({
           ...styles?.content,
         }}
         className={cn('gridkit-container', fillContainer && !fillParent && 'gridkit-container--fill', classNames?.content)}
+        role="grid"
+        aria-label={labels.grid}
+        aria-rowcount={rows.length}
+        aria-colcount={visibleLeafColumns.length}
       >
         {/* Header panel — split into pinned and horizontally scrollable regions. */}
         <TableHeaderRegions

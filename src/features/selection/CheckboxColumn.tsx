@@ -27,7 +27,7 @@ function IndeterminateCheckbox({ checked, indeterminate, onChange, label }: Inde
       aria-label={label}
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
-      className="size-4 cursor-pointer rounded border-[var(--gridkit-control-border)] accent-[var(--gridkit-primary)]"
+      className="gridkit-checkbox"
     />
   )
 }
@@ -69,7 +69,7 @@ export function createCheckboxColumn<T extends object>(
           checked={selectedIds.has(id)}
           onChange={(e) => onSelectOne(id, e.target.checked)}
           onClick={(e) => e.stopPropagation()}
-          className="size-4 cursor-pointer rounded border-[var(--gridkit-control-border)] accent-[var(--gridkit-primary)]"
+          className="gridkit-checkbox"
         />
       )
     },

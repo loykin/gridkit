@@ -16,6 +16,7 @@ import { DataGridShell } from '@/core/DataGridShell'
 import { RowWrapperContext } from '@/features/reordering/RowWrapperContext'
 import { SortableRow } from '@/features/reordering/SortableRow'
 import { IconsProvider } from '@/core/IconsContext'
+import { LabelsProvider } from '@/core/LabelsContext'
 
 export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
   const { data = [], onRowReorder, getRowId, icons } = props
@@ -63,37 +64,39 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
   const activeRow = activeRowId ? rows.find((r) => r.id === activeRowId) : null
 
   return (
-    <IconsProvider icons={icons}>
-    <RowWrapperContext.Provider value={SortableRow}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
-          <DataGridShell
-            {...props}
-            wrapperRef={wrapperRef}
-            containerRef={containerRef}
-            table={table}
-            rows={rows}
-            isSized={isSized}
-            measure={measure}
-          />
-        </SortableContext>
+    <LabelsProvider labels={props.labels}>
+      <IconsProvider icons={icons}>
+        <RowWrapperContext.Provider value={SortableRow}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
+              <DataGridShell
+                {...props}
+                wrapperRef={wrapperRef}
+                containerRef={containerRef}
+                table={table}
+                rows={rows}
+                isSized={isSized}
+                measure={measure}
+              />
+            </SortableContext>
 
-        {/* Portal overlay — renders outside scroll container so it's never clipped */}
-        <DragOverlay>
-          {activeRow && (
-            <div
-              className="rounded border border-[var(--gridkit-primary)]/40 bg-[var(--gridkit-primary)]/5 shadow-xl ring-1 ring-primary/20"
-              style={{ height: props.rowHeight ?? 36 }}
-            />
-          )}
-        </DragOverlay>
-      </DndContext>
-    </RowWrapperContext.Provider>
-    </IconsProvider>
+            {/* Portal overlay — renders outside scroll container so it's never clipped */}
+            <DragOverlay>
+              {activeRow && (
+                <div
+                  className="rounded border border-[var(--gridkit-primary)]/40 bg-[var(--gridkit-primary)]/5 shadow-xl ring-1 ring-primary/20"
+                  style={{ height: props.rowHeight ?? 36 }}
+                />
+              )}
+            </DragOverlay>
+          </DndContext>
+        </RowWrapperContext.Provider>
+      </IconsProvider>
+    </LabelsProvider>
   )
 }

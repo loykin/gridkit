@@ -4,6 +4,7 @@ import type { Virtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { GridKitShell } from '@/core/GridKitShell'
+import { useGridKitLabels } from '@/core/LabelsContext'
 import { GridKitError } from '@/core/GridKitError'
 import type { DataGridListProps } from '@/types'
 
@@ -59,7 +60,7 @@ export function DataGridListView<T extends object>({
   isFetchingNextPage,
   isLoading,
   error,
-  emptyMessage = 'No data',
+  emptyMessage,
   emptyContent,
   renderItem,
   itemKey,
@@ -84,6 +85,8 @@ export function DataGridListView<T extends object>({
   virtualOverscan = 10,
 }: DataGridListViewProps<T>) {
   const icons = useIcons()
+  const labels = useGridKitLabels()
+  const effectiveEmptyMessage = emptyMessage ?? labels.noData
   const listStyle = {
     '--gridkit-list-gap': `${itemGap}px`,
     '--gridkit-list-padding': `${itemPadding}px`,
@@ -131,7 +134,7 @@ export function DataGridListView<T extends object>({
     if (rows.length === 0) {
       return (
         <div className={cn('gridkit-empty', classNames?.empty)} style={styles?.empty}>
-          {emptyContent ?? emptyMessage}
+          {emptyContent ?? effectiveEmptyMessage}
         </div>
       )
     }

@@ -3,6 +3,7 @@ import type { Table } from '@tanstack/react-table'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 
 interface Props<T extends object> {
   table: Table<T>
@@ -12,6 +13,7 @@ interface Props<T extends object> {
 
 export function GlobalSearch<T extends object>({ table, placeholder = 'Search…', className }: Props<T>) {
   const icons = useIcons()
+  const labels = useGridKitLabels()
   const [value, setValue] = useState(String(table.getState().globalFilter ?? ''))
 
   const externalFilter = String(table.getState().globalFilter ?? '')
@@ -41,7 +43,7 @@ export function GlobalSearch<T extends object>({ table, placeholder = 'Search…
       />
       {value && (
         <Button
-          aria-label="Clear search"
+          aria-label={labels.clearSearch}
           variant="ghost"
           size="icon-xs"
           onClick={() => { setValue(''); table.setGlobalFilter(undefined) }}

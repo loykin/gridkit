@@ -3,6 +3,7 @@ import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { useInfiniteScroll } from '@/core/hooks/useInfiniteScroll'
 import { DataGridShell } from '@/core/DataGridShell'
 import { IconsProvider } from '@/core/IconsContext'
+import { LabelsProvider } from '@/core/LabelsContext'
 
 export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<T>) {
   const {
@@ -35,22 +36,24 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
   })
 
   return (
-    <IconsProvider icons={icons}>
-    <DataGridShell
-      {...props}
-      wrapperRef={wrapperRef}
-      containerRef={containerRef}
-      table={table}
-      rows={rows}
-      isSized={isSized}
-      measure={measure}
-      error={effectiveError}
-      headerLeft={headerLeft}
-      headerRight={headerRight}
-      loadMoreRef={loadMoreRef}
-      isFetchingNextPage={isFetchingNextPage}
-      isLoading={effectiveIsLoading}
-    />
-    </IconsProvider>
+    <LabelsProvider labels={props.labels}>
+      <IconsProvider icons={icons}>
+        <DataGridShell
+          {...props}
+          wrapperRef={wrapperRef}
+          containerRef={containerRef}
+          table={table}
+          rows={rows}
+          isSized={isSized}
+          measure={measure}
+          error={effectiveError}
+          headerLeft={headerLeft}
+          headerRight={headerRight}
+          loadMoreRef={loadMoreRef}
+          isFetchingNextPage={isFetchingNextPage}
+          isLoading={effectiveIsLoading}
+        />
+      </IconsProvider>
+    </LabelsProvider>
   )
 }

@@ -3,7 +3,9 @@ import type { Column, Row, Table } from '@tanstack/react-table'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 import type { DataGridClassNames, DataGridStyles, TableViewConfig, TableWidthMode } from '@/types'
+import type { GridFocusCell } from '@/core/hooks/useGridKeyboardNavigation'
 import { RowWrapperContext } from '@/features/reordering/RowWrapperContext'
 import { useDetailRow } from '@/features/expanding/DetailRowContext'
 import { colStyle } from './tableUtils'
@@ -24,6 +26,9 @@ interface DataGridBodyProps<T extends object>
   measureRows?: boolean
   classNames?: DataGridClassNames
   styles?: DataGridStyles
+  focusedCell?: GridFocusCell
+  columnIndexById?: Map<string, number>
+  onCellKeyDown?: ((event: React.KeyboardEvent<HTMLElement>, cell: GridFocusCell) => void) | undefined
 }
 
 export function DataGridBody<T extends object>({
@@ -46,6 +51,9 @@ export function DataGridBody<T extends object>({
   renderGroupRow,
   classNames,
   styles,
+  focusedCell,
+  columnIndexById,
+  onCellKeyDown,
 }: DataGridBodyProps<T>) {
   const showSpacer = tableWidthMode === 'spacer'
   const fillLast = tableWidthMode === 'fill-last'
@@ -53,6 +61,7 @@ export function DataGridBody<T extends object>({
   const virtual = !!rowVirtualizer
   const detailRowCtx = useDetailRow()
   const icons = useIcons()
+  const labels = useGridKitLabels()
   const visibleColumnIds = React.useMemo(
     () => new Set(visibleLeafColumns.map((column) => column.id)),
     [visibleLeafColumns],
@@ -162,7 +171,7 @@ export function DataGridBody<T extends object>({
                     className="gridkit-group-toggle"
                     onClick={row.getToggleExpandedHandler()}
                     aria-expanded={row.getIsExpanded()}
-                    aria-label={row.getIsExpanded() ? 'Collapse group' : 'Expand group'}
+                    aria-label={row.getIsExpanded() ? labels.collapseGroup : labels.expandGroup}
                   >
                     {row.getIsExpanded() ? icons.treeCollapse : icons.treeExpand}
                   </button>
@@ -206,6 +215,10 @@ export function DataGridBody<T extends object>({
                   isLastRow={index === rows.length - 1}
                   classNames={classNames}
                   styles={styles}
+                  rowIndex={index}
+                  focusedCell={focusedCell}
+                  columnIndexById={columnIndexById}
+                  onCellKeyDown={onCellKeyDown}
                 />
                 {detailPanel}
               </div>
@@ -229,6 +242,10 @@ export function DataGridBody<T extends object>({
                 isLastRow={index === rows.length - 1}
                 classNames={classNames}
                 styles={styles}
+                rowIndex={index}
+                focusedCell={focusedCell}
+                columnIndexById={columnIndexById}
+                onCellKeyDown={onCellKeyDown}
               />
               {detailPanel}
             </React.Fragment>

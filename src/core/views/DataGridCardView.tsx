@@ -3,6 +3,7 @@ import type { Row, Table } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 import { GridKitShell } from '@/core/GridKitShell'
 import { GridKitError } from '@/core/GridKitError'
 import type { DataGridCardProps } from '@/types'
@@ -65,7 +66,7 @@ export function DataGridCardView<T extends object>({
   isFetchingNextPage,
   isLoading,
   error,
-  emptyMessage = 'No data',
+  emptyMessage,
   emptyContent,
   renderCard,
   cardColumns,
@@ -88,6 +89,8 @@ export function DataGridCardView<T extends object>({
   overscan = 3,
 }: DataGridCardViewProps<T>) {
   const icons = useIcons()
+  const labels = useGridKitLabels()
+  const effectiveEmptyMessage = emptyMessage ?? labels.noData
 
   // Track container width to compute column count for row-group virtualization
   const [measuredCols, setMeasuredCols] = useState(cardColumns ?? minColumns)
@@ -155,7 +158,7 @@ export function DataGridCardView<T extends object>({
     if (rows.length === 0) {
       return (
         <div className="gridkit-empty-row">
-          <div className={cn('gridkit-empty', classNames?.empty)} style={styles?.empty}>{emptyContent ?? emptyMessage}</div>
+            <div className={cn('gridkit-empty', classNames?.empty)} style={styles?.empty}>{emptyContent ?? effectiveEmptyMessage}</div>
         </div>
       )
     }

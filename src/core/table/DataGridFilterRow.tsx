@@ -3,6 +3,7 @@ import type { Column, Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 import { Input } from '@/components/ui/input'
 import type { TableViewConfig, TableWidthMode } from '@/types'
 import { colStyle } from './tableUtils'
@@ -29,6 +30,7 @@ export function DataGridFilterRow<T extends object>({
   customFilterComponents,
 }: DataGridFilterRowProps<T>) {
   const icons = useIcons()
+  const labels = useGridKitLabels()
   const fillLast = tableWidthMode === 'fill-last'
 
   return (
@@ -102,7 +104,7 @@ export function DataGridFilterRow<T extends object>({
                 />
                 {filterValue && (
                   <Button
-                    aria-label={`Clear ${col.id} filter`}
+                    aria-label={labels.clearColumnFilter(col.id)}
                     variant="ghost"
                     size="icon-xs"
                     onClick={() => col.setFilterValue(undefined)}

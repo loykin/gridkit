@@ -2,6 +2,7 @@ import type { Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useIcons } from '@/core/IconsContext'
+import { useGridKitLabels } from '@/core/LabelsContext'
 
 interface DataGridPaginationBarProps<T extends object> {
   table: Table<T>
@@ -19,13 +20,14 @@ export function DataGridPaginationBar<T extends object>({
   className,
 }: DataGridPaginationBarProps<T>) {
   const icons = useIcons()
+  const labels = useGridKitLabels()
   const { pageIndex, pageSize } = table.getState().pagination
   const pageCount = table.getPageCount()
 
   return (
     <div className={cn('gridkit-pagination-control gridkit-pagination-control--bar', className)}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span>Rows per page</span>
+        <span>{labels.rowsPerPage}</span>
         <select
           value={pageSize}
           onChange={(e) => table.setPageSize(Number(e.target.value))}
@@ -41,12 +43,10 @@ export function DataGridPaginationBar<T extends object>({
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         <span>
-          {totalCount !== undefined
-            ? `${pageIndex * pageSize + 1}–${Math.min((pageIndex + 1) * pageSize, totalCount)} of ${totalCount}`
-            : `Page ${pageIndex + 1} of ${Math.max(pageCount, 1)}`}
+          {labels.pageRange({ pageIndex, pageSize, pageCount, totalCount })}
         </span>
         <Button
-          aria-label="Go to first page"
+          aria-label={labels.goToFirstPage}
           variant="ghost"
           size="icon-sm"
           onClick={() => table.firstPage()}
@@ -55,7 +55,7 @@ export function DataGridPaginationBar<T extends object>({
           {icons.pageFirst}
         </Button>
         <Button
-          aria-label="Go to previous page"
+          aria-label={labels.goToPreviousPage}
           variant="ghost"
           size="icon-sm"
           onClick={() => table.previousPage()}
@@ -64,7 +64,7 @@ export function DataGridPaginationBar<T extends object>({
           {icons.pagePrev}
         </Button>
         <Button
-          aria-label="Go to next page"
+          aria-label={labels.goToNextPage}
           variant="ghost"
           size="icon-sm"
           onClick={() => table.nextPage()}
@@ -73,7 +73,7 @@ export function DataGridPaginationBar<T extends object>({
           {icons.pageNext}
         </Button>
         <Button
-          aria-label="Go to last page"
+          aria-label={labels.goToLastPage}
           variant="ghost"
           size="icon-sm"
           onClick={() => table.lastPage()}

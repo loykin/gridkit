@@ -4,6 +4,7 @@ import { useInfiniteScroll } from '@/core/hooks/useInfiniteScroll'
 import { useRowVirtualizer } from '@/core/hooks/useRowVirtualizer'
 import { DataGridListView } from '@/core/views/DataGridListView'
 import { IconsProvider } from '@/core/IconsContext'
+import { LabelsProvider } from '@/core/LabelsContext'
 
 export function DataGridList<T extends object>(props: DataGridListProps<T>) {
   const {
@@ -65,42 +66,44 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
     typeof effectiveContainerHeight === 'number' ? effectiveContainerHeight : undefined
 
   return (
-    <IconsProvider icons={icons}>
-      <DataGridListView
-        wrapperRef={wrapperRef}
-        containerRef={containerRef}
-        error={effectiveError}
-        table={table}
-        rows={rows}
-        headerLeft={headerLeft}
-        headerRight={headerRight}
-        footer={footer}
-        loadMoreRef={loadMoreRef}
-        isFetchingNextPage={isFetchingNextPage}
-        isLoading={effectiveIsLoading}
-        renderItem={renderItem}
-        itemKey={itemKey}
-        itemGap={itemGap}
-        itemPadding={itemPadding}
-        containerHeight={containerHeight}
-        tableHeight={tableHeight}
-        maxTableHeight={maxTableHeight}
-        minTableHeight={minTableHeight}
-        fillContainer={fillContainer}
-        fillParent={fillParent}
-        virtual={virtual}
-        rowVirtualizer={virtual ? virtualizer : undefined}
-        virtualEstimateSize={estimateRowHeight}
-        virtualInitialHeight={virtualInitialHeight}
-        virtualOverscan={overscan}
-        scrollbar={scrollbar}
-        onRowClick={props.onRowClick}
-        rowCursor={props.rowCursor}
-        emptyMessage={props.emptyMessage}
-        emptyContent={props.emptyContent}
-        classNames={classNames}
-        styles={props.styles}
-      />
-    </IconsProvider>
+    <LabelsProvider labels={props.labels}>
+      <IconsProvider icons={icons}>
+        <DataGridListView
+          wrapperRef={wrapperRef}
+          containerRef={containerRef}
+          error={effectiveError}
+          table={table}
+          rows={rows}
+          headerLeft={headerLeft}
+          headerRight={headerRight}
+          footer={footer}
+          loadMoreRef={loadMoreRef}
+          isFetchingNextPage={isFetchingNextPage}
+          isLoading={effectiveIsLoading}
+          renderItem={renderItem}
+          itemKey={itemKey}
+          itemGap={itemGap}
+          itemPadding={itemPadding}
+          containerHeight={containerHeight}
+          tableHeight={tableHeight}
+          maxTableHeight={maxTableHeight}
+          minTableHeight={minTableHeight}
+          fillContainer={fillContainer}
+          fillParent={fillParent}
+          virtual={virtual}
+          rowVirtualizer={virtual ? virtualizer : undefined}
+          virtualEstimateSize={estimateRowHeight}
+          virtualInitialHeight={virtualInitialHeight}
+          virtualOverscan={overscan}
+          scrollbar={scrollbar}
+          onRowClick={props.onRowClick}
+          rowCursor={props.rowCursor}
+          emptyMessage={props.emptyMessage}
+          emptyContent={props.emptyContent}
+          classNames={classNames}
+          styles={props.styles}
+        />
+      </IconsProvider>
+    </LabelsProvider>
   )
 }

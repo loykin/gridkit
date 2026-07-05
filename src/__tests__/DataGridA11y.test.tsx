@@ -131,4 +131,97 @@ describe('DataGrid accessibility labels', () => {
     expect(screen.getByRole('checkbox', { name: 'Select all rows' })).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeInTheDocument()
   })
+
+  it('supports roving cell focus with arrow keys and Space row selection', () => {
+    const onSelectOne = vi.fn()
+    const columns: DataGridColumnDef<Person>[] = [
+      { accessorKey: 'name', header: 'Name' },
+      { accessorKey: 'age', header: 'Age' },
+    ]
+
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columns}
+        getRowId={(row) => row.id}
+        checkboxConfig={{
+          getRowId: (row) => row.id,
+          selectedIds: new Set(),
+          onSelectAll: vi.fn(),
+          onSelectOne,
+        }}
+      />,
+    )
+
+    const firstCell = container.querySelector<HTMLElement>('[data-gridkit-cell="true"][data-row-index="0"][data-col-index="0"]')
+    const secondRowCell = container.querySelector<HTMLElement>('[data-gridkit-cell="true"][data-row-index="1"][data-col-index="0"]')
+
+    expect(screen.getByRole('grid')).toHaveAttribute('aria-rowcount', '2')
+    expect(firstCell).toHaveAttribute('tabindex', '0')
+    expect(firstCell).toHaveAttribute('data-focused', 'true')
+
+    firstCell?.focus()
+    fireEvent.keyDown(firstCell!, { key: 'ArrowDown' })
+
+    expect(firstCell).not.toHaveAttribute('data-focused')
+    expect(secondRowCell).toHaveAttribute('data-focused', 'true')
+    expect(secondRowCell).toHaveFocus()
+
+    fireEvent.keyDown(secondRowCell!, { key: ' ' })
+    expect(onSelectOne).toHaveBeenCalledWith('2', true)
+  })
+
+  it('can disable keyboard cell navigation', () => {
+    const columns: DataGridColumnDef<Person>[] = [
+      { accessorKey: 'name', header: 'Name' },
+      { accessorKey: 'age', header: 'Age' },
+    ]
+
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columns}
+        getRowId={(row) => row.id}
+        enableKeyboardNavigation={false}
+      />,
+    )
+
+    expect(container.querySelector('[data-gridkit-cell="true"]')).not.toBeInTheDocument()
+    expect(container.querySelector('.gridkit-cell')).not.toHaveAttribute('tabindex')
+  })
+
+  it('enters inline editing with Enter and exits with Escape', () => {
+    const columns: DataGridColumnDef<Person>[] = [
+      {
+        accessorKey: 'name',
+        header: 'Name',
+        meta: {
+          editCell: ({ value, onCancel }) => (
+            <input aria-label="Edit name" value={String(value)} onChange={() => undefined} onKeyDown={(event) => {
+              if (event.key === 'Escape') onCancel()
+            }} />
+          ),
+        },
+      },
+    ]
+
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columns}
+        getRowId={(row) => row.id}
+        onCellValueChange={vi.fn()}
+      />,
+    )
+
+    const firstCell = container.querySelector<HTMLElement>('[data-gridkit-cell="true"][data-row-index="0"][data-col-index="0"]')
+    firstCell?.focus()
+    fireEvent.keyDown(firstCell!, { key: 'Enter' })
+
+    const input = screen.getByRole('textbox', { name: 'Edit name' })
+    expect(input).toBeInTheDocument()
+
+    fireEvent.keyDown(input, { key: 'Escape' })
+    expect(screen.queryByRole('textbox', { name: 'Edit name' })).not.toBeInTheDocument()
+  })
 })

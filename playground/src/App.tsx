@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import { PaginationTab } from './tabs/PaginationTab'
+import { ShowcaseTab } from './tabs/ShowcaseTab'
 import { InfinityTab } from './tabs/InfinityTab'
 import { FixedHeightTab } from './tabs/FixedHeightTab'
 import { FillContainerTab } from './tabs/FillContainerTab'
@@ -11,6 +12,7 @@ import { LargeListTab } from './tabs/LargeListTab'
 import { LiveUpdateTab } from './tabs/LiveUpdateTab'
 import { PinningTab } from './tabs/PinningTab'
 import { SelectionTab } from './tabs/SelectionTab'
+import { KeyboardNavTab } from './tabs/KeyboardNavTab'
 import { BorderedTab } from './tabs/BorderedTab'
 import { RowHeightTab } from './tabs/RowHeightTab'
 import { TreeTab } from './tabs/TreeTab'
@@ -48,6 +50,7 @@ import { PlaygroundContext } from './PlaygroundContext'
 // ── Tab registry ──────────────────────────────────────────────────────────────
 
 const TABS = [
+  { id: 'showcase',          label: 'Showcase',          content: <ShowcaseTab /> },
   { id: 'pagination',        label: 'Pagination',        content: <PaginationTab /> },
   { id: 'infinity',          label: 'Infinite Scroll',   content: <InfinityTab /> },
   { id: 'backend',           label: 'Backend',           content: <BackendTab /> },
@@ -67,6 +70,7 @@ const TABS = [
   { id: 'header-groups',     label: 'Header Groups',     content: <HeaderGroupsTab /> },
   { id: 'filter-icon',       label: 'Filter Icon',       content: <FilterIconTab /> },
   { id: 'selection',         label: 'Row Selection',     content: <SelectionTab /> },
+  { id: 'keyboard-nav',      label: 'Keyboard Nav',      content: <KeyboardNavTab /> },
   { id: 'row-height',        label: 'Row Height',        content: <RowHeightTab /> },
   { id: 'drag',              label: 'Row Drag',          content: <DragTab /> },
   { id: 'tree',              label: 'Tree / Groups',     content: <TreeTab /> },
@@ -101,7 +105,13 @@ interface NavGroup { label: string; items: NavItem[] }
 
 const NAV: NavGroup[] = [
   {
-    label: 'Data',
+    label: 'Start',
+    items: [
+      { id: 'showcase', label: 'Showcase' },
+    ],
+  },
+  {
+    label: 'All features',
     items: [
       { id: 'pagination',        label: 'Pagination' },
       { id: 'infinity',          label: 'Infinite Scroll' },
@@ -137,6 +147,7 @@ const NAV: NavGroup[] = [
     label: 'Rows',
     items: [
       { id: 'selection',     label: 'Row Selection' },
+      { id: 'keyboard-nav',  label: 'Keyboard Nav' },
       { id: 'row-height',    label: 'Row Height' },
       { id: 'drag',          label: 'Row Drag' },
       { id: 'tree',          label: 'Tree / Groups' },
@@ -218,9 +229,9 @@ function isTabId(id: string | undefined): id is TabId {
 }
 
 function PlaygroundApp() {
-  const { tabId = 'pagination' } = useParams()
+  const { tabId = 'showcase' } = useParams()
   const navigate = useNavigate()
-  const routeTab = isTabId(tabId) ? tabId : 'pagination'
+  const routeTab = isTabId(tabId) ? tabId : 'showcase'
   const [active, setActiveState] = useState<TabId>(routeTab)
 
   const setActive = (id: TabId) => {
@@ -338,8 +349,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/:tabId" element={<PlaygroundApp />} />
-      <Route path="/" element={<Navigate to="/pagination" replace />} />
-      <Route path="*" element={<Navigate to="/pagination" replace />} />
+      <Route path="/" element={<Navigate to="/showcase" replace />} />
+      <Route path="*" element={<Navigate to="/showcase" replace />} />
     </Routes>
   )
 }

@@ -5,6 +5,7 @@ import type { DataGridProps } from '@/types'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { DataGridShell } from '@/core/DataGridShell'
 import { IconsProvider } from '@/core/IconsContext'
+import { LabelsProvider } from '@/core/LabelsContext'
 
 interface DataGridPropsWithRef<T extends object> extends DataGridProps<T> {
   /** Ref populated with the TanStack Table instance after first render */
@@ -39,21 +40,23 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
   }, [table, tableRef])
 
   return (
-    <IconsProvider icons={icons}>
-      <DataGridShell
-        {...props}
-        wrapperRef={wrapperRef}
-        containerRef={containerRef}
-        table={table}
-        rows={rows}
-        isSized={isSized}
-        measure={measure}
-        error={effectiveError}
-        isLoading={effectiveIsLoading}
-        headerLeft={headerLeft}
-        headerRight={headerRight}
-        footer={footer}
-      />
-    </IconsProvider>
+    <LabelsProvider labels={props.labels}>
+      <IconsProvider icons={icons}>
+        <DataGridShell
+          {...props}
+          wrapperRef={wrapperRef}
+          containerRef={containerRef}
+          table={table}
+          rows={rows}
+          isSized={isSized}
+          measure={measure}
+          error={effectiveError}
+          isLoading={effectiveIsLoading}
+          headerLeft={headerLeft}
+          headerRight={headerRight}
+          footer={footer}
+        />
+      </IconsProvider>
+    </LabelsProvider>
   )
 }

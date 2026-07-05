@@ -265,6 +265,32 @@ export interface GridKitScrollbarConfig {
   thumbStyle?: React.CSSProperties
 }
 
+export interface GridKitLabels {
+  rowsPerPage: string
+  pageRange: (ctx: { pageIndex: number; pageSize: number; pageCount: number; totalCount?: number }) => string
+  pageCompact: (ctx: { pageIndex: number; pageCount: number }) => string
+  goToFirstPage: string
+  goToPreviousPage: string
+  goToNextPage: string
+  goToLastPage: string
+  goToPage: (page: number) => string
+  chooseVisibleColumns: string
+  toggleColumnVisibility: (column: string) => string
+  filterColumn: (column: string) => string
+  clearColumnFilter: (column: string) => string
+  clearDateFilter: string
+  clearNumberRangeFilter: string
+  clearSearch: string
+  clear: string
+  min: string
+  max: string
+  expandGroup: string
+  collapseGroup: string
+  grid: string
+  noData: string
+  noMessages: string
+}
+
 export interface GridKitRowsContext<T extends object> {
   rows: Row<T>[]
   containerRef: React.RefObject<HTMLElement | null>
@@ -452,6 +478,8 @@ export interface GridKitCoreProps<T extends object> extends GridKitDisplayProps<
    * Icon overrides. Any omitted slot falls back to the default lucide-react icon.
    */
   icons?: DataGridIcons
+  /** UI strings and aria labels. Omitted labels fall back to English defaults. */
+  labels?: Partial<GridKitLabels>
 
   /**
    * Escape hatch for advanced TanStack Table options not exposed as individual props.
@@ -529,6 +557,13 @@ export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T
   estimateRowHeight?: number
   /** Rows to render outside the visible area (virtualizer overscan, default: 10) */
   overscan?: number
+  /**
+   * Enable roving cell focus and keyboard navigation for table-based views.
+   * Applies to DataGrid, DataGridInfinity, and DataGridDrag. Card/List/Chat
+   * views own different interaction models and ignore this prop.
+   * Defaults to true.
+   */
+  enableKeyboardNavigation?: boolean
   /** Custom renderer for group header rows. Defaults to showing column value and sub-row count. */
   renderGroupRow?: (row: Row<T>) => ReactNode
   /** Slot-based class injection for individual table elements */

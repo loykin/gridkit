@@ -5,6 +5,7 @@ import { useReverseInfiniteScroll } from '@/core/hooks/useReverseInfiniteScroll'
 import { useStickToBottom } from '@/core/hooks/useStickToBottom'
 import { DataGridChatView } from '@/core/views/DataGridChatView'
 import { IconsProvider } from '@/core/IconsContext'
+import { LabelsProvider } from '@/core/LabelsContext'
 
 export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
   const {
@@ -80,33 +81,35 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
   })
 
   return (
-    <IconsProvider icons={icons}>
-      <DataGridChatView
-        wrapperRef={wrapperRef}
-        containerRef={containerRef}
-        table={table}
-        rows={rows}
-        headerLeft={headerLeft}
-        headerRight={headerRight}
-        footer={footer}
-        loadPreviousRef={loadPreviousRef}
-        isFetchingPreviousPage={isFetchingPreviousPage}
-        isLoading={effectiveIsLoading}
-        error={effectiveError}
-        renderMessage={renderMessage}
-        renderDaySeparator={renderDaySeparator}
-        renderUnreadMarker={renderUnreadMarker}
-        renderTypingIndicator={renderTypingIndicator}
-        containerHeight={containerHeight}
-        tableHeight={tableHeight}
-        fillContainer={fillContainer}
-        fillParent={fillParent}
-        scrollbar={scrollbar}
-        emptyMessage={props.emptyMessage}
-        emptyContent={props.emptyContent}
-        classNames={classNames}
-        styles={styles}
-      />
-    </IconsProvider>
+    <LabelsProvider labels={props.labels}>
+      <IconsProvider icons={icons}>
+        <DataGridChatView
+          wrapperRef={wrapperRef}
+          containerRef={containerRef}
+          table={table}
+          rows={rows}
+          headerLeft={headerLeft}
+          headerRight={headerRight}
+          footer={footer}
+          loadPreviousRef={loadPreviousRef}
+          isFetchingPreviousPage={isFetchingPreviousPage}
+          isLoading={effectiveIsLoading}
+          error={effectiveError}
+          renderMessage={renderMessage}
+          renderDaySeparator={renderDaySeparator}
+          renderUnreadMarker={renderUnreadMarker}
+          renderTypingIndicator={renderTypingIndicator}
+          containerHeight={containerHeight}
+          tableHeight={tableHeight}
+          fillContainer={fillContainer}
+          fillParent={fillParent}
+          scrollbar={scrollbar}
+          emptyMessage={props.emptyMessage}
+          emptyContent={props.emptyContent}
+          classNames={classNames}
+          styles={styles}
+        />
+      </IconsProvider>
+    </LabelsProvider>
   )
 }
