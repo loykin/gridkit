@@ -13,9 +13,8 @@ export function enrichFilterColumns<T extends object>(
   columns: DataGridColumnDef<T>[],
 ): DataGridColumnDef<T>[] {
   const enrichColumn = (col: DataGridColumnDef<T>): DataGridColumnDef<T> => {
-    const childColumns = (col as { columns?: DataGridColumnDef<T>[] }).columns
-    const withChildren = childColumns
-      ? { ...col, columns: childColumns.map(enrichColumn) }
+    const withChildren = 'columns' in col && col.columns
+      ? { ...col, columns: col.columns.map(enrichColumn) }
       : col
 
     if (col.meta?.filterType === 'number' && !col.filterFn) {

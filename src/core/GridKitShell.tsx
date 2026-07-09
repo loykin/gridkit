@@ -98,8 +98,22 @@ export function GridKitShell<T extends object>({
     if (!shell || !tableWrapper || typeof ResizeObserver === 'undefined') return
 
     const measure = () => {
-      const shellHeight = shell.clientHeight
-      if (shellHeight <= 0) return
+      // shell now hugs its content (no forced height:100%), so its own
+      // clientHeight can't tell us how much space the parent actually
+      // allows. Read the parent's content-box height instead — that's the
+      // real ceiling "fillContainer" is meant to fit within. shell sits
+      // inside the parent's padding, so parent.clientHeight (which counts
+      // both paddings) must have them subtracted, or the budget silently
+      // grows by one padding's worth and the frame overflows the parent.
+      const parent = shell.parentElement
+      let availableHeight = shell.clientHeight
+      if (parent) {
+        const parentStyle = getComputedStyle(parent)
+        const paddingTop = Number.parseFloat(parentStyle.paddingTop) || 0
+        const paddingBottom = Number.parseFloat(parentStyle.paddingBottom) || 0
+        availableHeight = parent.clientHeight - paddingTop - paddingBottom
+      }
+      if (availableHeight <= 0) return
 
       const toolbarHeight = toolbarFrameRef.current?.getBoundingClientRect().height ?? 0
       const footerHeight = footerFrameRef.current?.getBoundingClientRect().height ?? 0
@@ -107,7 +121,7 @@ export function GridKitShell<T extends object>({
       const style = getComputedStyle(shell)
       const gap = Number.parseFloat(style.rowGap || style.gap || '0') || 0
       const totalGap = Math.max(0, childCount - 1) * gap
-      const next = Math.floor(shellHeight - toolbarHeight - footerHeight - totalGap)
+      const next = Math.floor(availableHeight - toolbarHeight - footerHeight - totalGap)
 
       setFillTableMaxHeight((current) => {
         if (next <= 0) return current

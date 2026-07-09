@@ -19,7 +19,7 @@ function getLeafColumnDefs<T extends object>(
   columns: DataGridColumnDef<T>[],
 ): DataGridColumnDef<T>[] {
   return columns.flatMap((col) => {
-    const childColumns = (col as { columns?: DataGridColumnDef<T>[] }).columns
+    const childColumns = 'columns' in col ? col.columns : undefined
     return childColumns?.length ? getLeafColumnDefs(childColumns) : [col]
   })
 }

@@ -345,7 +345,6 @@
   overflow: hidden;
 }
 .gridkit-shell--fill {
-  height: 100%;
   min-height: 0;
 }
 .gridkit-shell[data-fill-parent="true"] {

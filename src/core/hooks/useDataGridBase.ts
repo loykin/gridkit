@@ -3,6 +3,7 @@ import type { DataGridBaseProps, DataGridColumnDef, DataGridPaginationConfig } f
 import { createCheckboxColumn } from '@/features/selection/CheckboxColumn'
 import { useDataGridCore } from '@/core/hooks/useDataGridCore'
 import { useColumnSizing } from '@/core/hooks/useColumnSizing'
+import { applyMetaWidthSizing } from '@/features/resizing/applyMetaWidthSizing'
 
 interface UseDataGridBaseOptions<T extends object> extends DataGridBaseProps<T> {
   columns: DataGridColumnDef<T>[]
@@ -63,8 +64,8 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
   const containerRef = useRef<HTMLDivElement>(null)
 
   const columnsWithCheckbox = useMemo(() => {
-    if (!checkboxConfig) return columns
-    return [createCheckboxColumn(checkboxConfig), ...columns]
+    const base = checkboxConfig ? [createCheckboxColumn(checkboxConfig), ...columns] : columns
+    return applyMetaWidthSizing(base)
   }, [columns, checkboxConfig])
 
   const { sizing, isSized, setSizing, measure } = useColumnSizing({
