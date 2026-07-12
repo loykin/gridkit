@@ -3,6 +3,7 @@ dist/
 .DS_Store
 *.local
 .idea/
+.claude
 playground/node_modules/
 playground/.vite/
 test-npm/node_modules/
