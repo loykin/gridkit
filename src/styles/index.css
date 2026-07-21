@@ -590,7 +590,7 @@
   align-items: center;
   height: 100%;
   user-select: none;
-  padding: 0 12px;
+  padding: 0 var(--gridkit-cell-padding-x, 12px);
   font-size: 12px;
   font-weight: 500;
   background: var(--gridkit-header-background);
@@ -755,7 +755,7 @@
   overflow: hidden;
   overflow: clip;
   overflow-clip-margin: 1px;
-  padding: 4px 12px;
+  padding: 4px var(--gridkit-cell-padding-x, 12px);
   font-size: 13px;
   background: var(--_row-bg, var(--gridkit-background));
 }

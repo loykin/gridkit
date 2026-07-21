@@ -189,9 +189,10 @@ function ThemeSwitcherDemo() {
   const [mode, setMode] = useState<'quiet' | 'dense' | 'contrast'>('quiet')
   const style = {
     quiet: {},
-    dense: { '--gridkit-row-height': '28px', '--gridkit-cell-padding-x': '8px' },
+    dense: { '--gridkit-cell-padding-x': '8px' },
     contrast: { '--gridkit-primary': 'oklch(0.52 0.16 142)', '--gridkit-border': 'oklch(0.65 0.03 250)' },
   }[mode] as React.CSSProperties
+  const rowHeight = mode === 'dense' ? 26 : 33
 
   return (
     <div className="flex flex-col gap-2" style={style}>
@@ -207,7 +208,7 @@ function ThemeSwitcherDemo() {
           </button>
         ))}
       </div>
-      <DataGrid data={ALL_DATA.slice(0, 24)} columns={adminColumns} tableHeight={320} />
+      <DataGrid data={ALL_DATA.slice(0, 24)} columns={adminColumns} tableHeight={320} rowHeight={rowHeight} />
     </div>
   )
 }
@@ -439,20 +440,20 @@ export function ShowcaseTab() {
         </p>
       </div>
       <ShowcasePanel
-        eyebrow="Commerce"
-        title="Shopping catalog"
-        description="Card layout with toolbar search, column filters, responsive columns, and incremental loading."
-        code={codeSamples.product}
-      >
-        <ProductCatalogDemo />
-      </ShowcasePanel>
-      <ShowcasePanel
         eyebrow="Operations"
         title="Admin users"
         description="Dense table workflow with row selection, filtering, search, and footer pagination."
         code={codeSamples.admin}
       >
         <AdminUsersDemo />
+      </ShowcasePanel>
+      <ShowcasePanel
+        eyebrow="Commerce"
+        title="Shopping catalog"
+        description="Card layout with toolbar search, column filters, responsive columns, and incremental loading."
+        code={codeSamples.product}
+      >
+        <ProductCatalogDemo />
       </ShowcasePanel>
       <ShowcasePanel
         eyebrow="AI UI"
