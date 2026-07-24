@@ -273,6 +273,7 @@ interface GridKitClassNames {
   root?: string      // outermost shell (.gridkit-shell)
   toolbar?: string   // toolbar wrapper (.gridkit-toolbar-frame)
   frame?: string     // bordered outer frame — carries border/radius (.gridkit-frame)
+  frameInner?: string // inner scroll/clip container (.gridkit-frame-inner)
   content?: string   // inner data region (view-specific element)
   header?: string    // header area (.gridkit-header) — Table only
   body?: string      // body wrapper (.gridkit-body-wrapper) — Table only

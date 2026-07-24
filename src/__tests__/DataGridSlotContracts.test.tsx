@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { DataGrid } from '@/DataGrid'
 import { DataGridCard } from '@/DataGridCard'
+import { DataGridChat } from '@/DataGridChat'
 import { DataGridList } from '@/DataGridList'
 import { DataGridAgentChat } from '@/DataGridAgentChat'
 import type { DataGridColumnDef } from '@/types'
@@ -17,6 +18,32 @@ const columns: DataGridColumnDef<Row>[] = [
 const getRowId = (r: Row) => r.id
 
 const ERROR = new Error('fetch failed')
+
+describe('view overflow contracts', () => {
+  it('does not apply the Card visual-overflow policy to Table, List, or Chat', () => {
+    const table = render(<DataGrid data={[]} columns={columns} getRowId={getRowId} />)
+    const list = render(
+      <DataGridList
+        data={[]}
+        columns={columns}
+        getRowId={getRowId}
+        renderItem={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+    const chat = render(
+      <DataGridChat
+        data={[]}
+        columns={columns}
+        getRowId={getRowId}
+        renderMessage={(row) => <div>{row.original.label}</div>}
+      />,
+    )
+
+    expect(table.container.querySelector('.gridkit-shell')).not.toHaveAttribute('data-visual-overflow')
+    expect(list.container.querySelector('.gridkit-shell')).not.toHaveAttribute('data-visual-overflow')
+    expect(chat.container.querySelector('.gridkit-shell')).not.toHaveAttribute('data-visual-overflow')
+  })
+})
 
 // ── Table: styles.loading ──────────────────────────────────────────────────────
 

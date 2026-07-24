@@ -112,14 +112,15 @@ export function DataGridCardView<T extends object>({
   const effectiveCols = Math.max(1, cardColumns ?? measuredCols)
   const rowGroupCount = Math.ceil(rows.length / effectiveCols)
 
-  const hasFixedHeight =
-    fillContainer ||
-    fillParent ||
-    (containerHeight != null && containerHeight !== 'auto') ||
-    (tableHeight != null && tableHeight !== 'auto') ||
+  const effectiveContainerHeight = containerHeight ?? tableHeight
+  const hasCardViewportBoundary =
+    Boolean(fillContainer) ||
+    Boolean(fillParent) ||
+    (effectiveContainerHeight != null && effectiveContainerHeight !== 'auto') ||
     maxTableHeight != null
 
-  const virtual = enableVirtualization && hasFixedHeight && rows.length > 0
+  const visualOverflow = hasCardViewportBoundary ? 'clip' : 'visible'
+  const virtual = enableVirtualization && hasCardViewportBoundary && rows.length > 0
   const virtualInitialHeight =
     typeof containerHeight === 'number'
       ? containerHeight
@@ -249,6 +250,7 @@ export function DataGridCardView<T extends object>({
       fillParent={fillParent}
       openBottom={openBottom}
       frameView="card"
+      visualOverflow={visualOverflow}
       classNames={classNames}
       styles={styles}
       scrollbar={scrollbar}

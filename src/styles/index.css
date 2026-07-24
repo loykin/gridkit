@@ -416,6 +416,10 @@
   overflow: hidden;
   border-radius: max(0px, calc(var(--gridkit-radius) - 1px));
 }
+.gridkit-shell[data-visual-overflow="visible"],
+.gridkit-frame-inner[data-visual-overflow="visible"] {
+  overflow: visible;
+}
 /* Card / List / Chat: inner is the scroll container */
 .gridkit-frame-card.gridkit-frame--fill .gridkit-frame-inner,
 .gridkit-frame-list.gridkit-frame--fill .gridkit-frame-inner,

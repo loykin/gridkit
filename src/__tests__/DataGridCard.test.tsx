@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { DataGridCard } from '@/DataGridCard'
-import type { DataGridColumnDef } from '@/types'
+import type { DataGridCardProps, DataGridColumnDef } from '@/types'
 
 interface Item {
   id: string
@@ -18,6 +18,18 @@ function makeItems(count: number) {
     id: String(index),
     label: `Card ${index}`,
   }))
+}
+
+function renderCardGrid(props: Partial<DataGridCardProps<Item>> = {}) {
+  return render(
+    <DataGridCard
+      data={makeItems(5)}
+      columns={columns}
+      getRowId={(item) => item.id}
+      renderCard={(row) => <div>{row.original.label}</div>}
+      {...props}
+    />,
+  )
 }
 
 describe('DataGridCard virtualization', () => {
@@ -149,4 +161,58 @@ describe('DataGridCard virtualization', () => {
     expect(container.querySelector('.gridkit-scrollbar-track')).toBeInTheDocument()
   })
 
+})
+
+describe('DataGridCard visual overflow', () => {
+  it('allows visual overflow for the natural-height card viewport', () => {
+    const { container } = renderCardGrid()
+
+    expect(container.querySelector('.gridkit-shell')).toHaveAttribute('data-visual-overflow', 'visible')
+    expect(container.querySelector('.gridkit-frame-inner')).toHaveAttribute('data-visual-overflow', 'visible')
+  })
+
+  it('gives an auto containerHeight precedence over a fixed tableHeight', () => {
+    const auto = renderCardGrid({
+      containerHeight: 'auto',
+      tableHeight: 240,
+      enableVirtualization: true,
+    })
+
+    expect(auto.container.querySelector('.gridkit-shell')).toHaveAttribute('data-visual-overflow', 'visible')
+    expect(auto.container.querySelector('.gridkit-card-virtual-spacer')).not.toBeInTheDocument()
+  })
+
+  it('keeps a minimum-only card viewport unbounded', () => {
+    const minimumOnly = renderCardGrid({ minTableHeight: 120 })
+
+    expect(minimumOnly.container.querySelector('.gridkit-shell')).toHaveAttribute('data-visual-overflow', 'visible')
+  })
+
+  it.each([
+    ['containerHeight', { containerHeight: 240 }],
+    ['tableHeight', { tableHeight: 240 }],
+    ['maxTableHeight', { maxTableHeight: 240 }],
+    ['fillContainer', { fillContainer: true }],
+    ['fillParent', { fillParent: true }],
+  ] satisfies Array<[string, Partial<DataGridCardProps<Item>>]>)(
+    'keeps visual overflow clipped with %s',
+    (_name, props) => {
+      const { container } = renderCardGrid(props)
+
+      expect(container.querySelector('.gridkit-shell')).toHaveAttribute('data-visual-overflow', 'clip')
+      expect(container.querySelector('.gridkit-frame-inner')).toHaveAttribute('data-visual-overflow', 'clip')
+    },
+  )
+
+  it('preserves consumer overflow style overrides', () => {
+    const { container } = renderCardGrid({
+      styles: {
+        root: { overflow: 'hidden' },
+        frameInner: { overflow: 'hidden' },
+      },
+    })
+
+    expect(container.querySelector('.gridkit-shell')).toHaveStyle({ overflow: 'hidden' })
+    expect(container.querySelector('.gridkit-frame-inner')).toHaveStyle({ overflow: 'hidden' })
+  })
 })

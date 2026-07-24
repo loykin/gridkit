@@ -6,6 +6,8 @@ import { DataGridToolbar } from '@/core/controls/DataGridToolbar'
 import { CustomScrollbar } from '@/core/table/CustomScrollbar'
 import type { GridKitClassNames, GridKitHeaderSlot, GridKitScrollbarConfig, GridKitStyles } from '@/types'
 
+type GridKitVisualOverflow = 'clip' | 'visible'
+
 export function resolveContainerHeight(
   height: string | number | 'auto' | undefined,
   maxHeight?: string | number,
@@ -42,6 +44,8 @@ export interface GridKitShellProps<T extends object> {
   frameHidden?: boolean
   /** Additional class applied to the frame (e.g. gridkit-agent-chat-frame) */
   frameExtra?: string
+  /** Resolved view-level paint overflow policy. `clip` retains the existing bounded behavior. */
+  visualOverflow?: GridKitVisualOverflow
   scrollbar?: GridKitScrollbarConfig
   footer?: ReactNode
   classNames?: GridKitClassNames
@@ -65,6 +69,7 @@ export function GridKitShell<T extends object>({
   frameView = 'table',
   frameHidden,
   frameExtra,
+  visualOverflow,
   scrollbar,
   footer,
   classNames,
@@ -188,6 +193,7 @@ export function GridKitShell<T extends object>({
           }
         }}
         className={cn('gridkit-frame-inner', 'gridkit-scroll-container', classNames?.frameInner)}
+        data-visual-overflow={visualOverflow}
         data-scrollbar={scrollbarMode === 'native' ? undefined : scrollbarMode}
         style={innerFrameStyle}
       >
@@ -201,6 +207,7 @@ export function GridKitShell<T extends object>({
       ref={wrapperRef}
       className={cn('gridkit-shell', effectiveFillContainer && 'gridkit-shell--fill', classNames?.root)}
       data-fill-parent={fillParent ? 'true' : undefined}
+      data-visual-overflow={visualOverflow}
       style={styles?.root}
     >
       {hasToolbar && (
