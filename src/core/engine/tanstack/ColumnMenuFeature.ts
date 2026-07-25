@@ -8,6 +8,11 @@ declare module '@tanstack/react-table' {
      * when enableColumnMenu is active.
      */
     columnMenu?: false
+    /**
+     * Set to false to hide the standalone pin control while preserving the
+     * column's programmatic and initial pinning capability.
+     */
+    pinControl?: false
   }
 }
 

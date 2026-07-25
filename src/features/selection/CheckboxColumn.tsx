@@ -45,6 +45,10 @@ export function createCheckboxColumn<T extends object>(
     enableResizing: false,
     enableSorting: false,
     enableColumnFilter: false,
+    meta: {
+      columnMenu: false,
+      pinControl: false,
+    },
     header: ({ table }: { table: Table<T> }) => {
       const rows = table.getRowModel().rows
       const allSelected =

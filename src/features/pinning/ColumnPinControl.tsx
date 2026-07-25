@@ -11,7 +11,11 @@ export function ColumnPinControl<T extends object>({
   enabled,
 }: ColumnPinControlProps<T>) {
   const isLeafHeader = header.subHeaders.length === 0 && !header.isPlaceholder
-  if (!isLeafHeader || !enabled) return null
+  if (
+    !isLeafHeader
+    || !enabled
+    || header.column.columnDef.meta?.pinControl === false
+  ) return null
 
   return <ColumnPinPopover col={header.column} />
 }
