@@ -380,6 +380,158 @@
   min-width: 0;
   overflow: hidden;
 }
+
+/*
+ * Adapter appearance recipes are scoped to a GridKit shell. They only change
+ * paint and typography; the shared DOM, sizing, and virtualization stay intact.
+ */
+.gridkit-theme-shadcn {
+  --gridkit-radius: var(--radius, 0.625rem);
+  --gridkit-header-background: var(--gridkit-background);
+  --gridkit-header-foreground: var(--gridkit-muted-foreground);
+  --gridkit-footer-background: transparent;
+  --gridkit-cell-focus-background: color-mix(in oklab, var(--gridkit-accent) 65%, transparent);
+  gap: 1rem;
+}
+.gridkit-theme-shadcn .gridkit-frame-table {
+  box-shadow: none;
+}
+.gridkit-theme-shadcn .gridkit-header-cell {
+  font-size: 14px;
+  font-weight: 500;
+}
+.gridkit-theme-shadcn .gridkit-cell {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 14px;
+}
+.gridkit-theme-shadcn .gridkit-row {
+  transition: background-color 150ms;
+}
+.gridkit-theme-shadcn .gridkit-row:hover {
+  --_row-bg: color-mix(in oklab, var(--gridkit-muted) 50%, transparent);
+}
+.gridkit-theme-shadcn .gridkit-toolbar {
+  gap: 0.5rem;
+}
+.gridkit-theme-shadcn .gridkit-footer {
+  min-height: var(--gridkit-footer-height);
+  padding-top: 1rem;
+}
+.gridkit-theme-shadcn .gridkit-pagination-control--bar {
+  min-height: var(--gridkit-footer-height);
+  color: var(--gridkit-muted-foreground);
+}
+
+.gridkit-theme-mui {
+  --gridkit-header-background: var(--gridkit-background);
+  --gridkit-header-foreground: var(--gridkit-foreground);
+  --gridkit-header-border: var(--gridkit-border);
+  --gridkit-header-control-background: var(--gridkit-header-background);
+  --gridkit-header-control-foreground: var(--gridkit-header-foreground);
+  --gridkit-header-control-border: var(--gridkit-header-border);
+  --gridkit-header-control-placeholder: color-mix(in srgb, var(--gridkit-header-foreground) 70%, transparent);
+  --gridkit-header-popover-background: var(--gridkit-popover);
+  --gridkit-header-popover-foreground: var(--gridkit-popover-foreground);
+  --gridkit-header-popover-border: var(--gridkit-border);
+  --gridkit-footer-background: var(--gridkit-background);
+  --gridkit-footer-foreground: var(--gridkit-muted-foreground);
+  --gridkit-footer-border: var(--gridkit-border);
+  --gridkit-container-border: var(--gridkit-border);
+  --gridkit-control-background: var(--gridkit-background);
+  --gridkit-control-foreground: var(--gridkit-foreground);
+  --gridkit-control-border: var(--gridkit-input);
+  --gridkit-control-placeholder: var(--gridkit-muted-foreground);
+  --gridkit-popover-border: var(--gridkit-border);
+  --gridkit-popover-option-hover-background: var(--gridkit-muted);
+  --gridkit-popover-section-foreground: var(--gridkit-muted-foreground);
+  --gridkit-scrollbar-track: var(--gridkit-muted);
+  --gridkit-scrollbar-thumb: var(--gridkit-muted-foreground);
+  --gridkit-cell-focus-background: color-mix(in srgb, var(--gridkit-primary) 8%, transparent);
+  letter-spacing: 0.01071em;
+  gap: 16px;
+}
+.gridkit-theme-mui .gridkit-header-cell {
+  --gridkit-checkbox-container-height: var(--gridkit-header-height);
+}
+.gridkit-theme-mui .gridkit-table-stack {
+  border-radius: var(--gridkit-radius);
+  box-shadow: var(--gridkit-theme-frame-shadow, 0 1px 3px rgb(0 0 0 / 0.12));
+}
+.gridkit-theme-mui .gridkit-frame-table {
+  box-shadow: none;
+}
+.gridkit-theme-mui .gridkit-table-stack:has(> .gridkit-footer) .gridkit-frame-table {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.gridkit-theme-mui .gridkit-table-stack:has(> .gridkit-footer) .gridkit-frame-inner {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.gridkit-theme-mui .gridkit-header-cell {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01071em;
+}
+.gridkit-theme-mui-data-grid .gridkit-header-cell:not([data-last-col="true"]) {
+  border-right: 1px solid var(--gridkit-header-border);
+}
+.gridkit-theme-mui-data-grid .gridkit-header-cell .gridkit-btn--filter-inactive {
+  opacity: 0;
+}
+.gridkit-theme-mui-data-grid .gridkit-header-cell:hover .gridkit-btn--filter-inactive {
+  opacity: 0.54;
+}
+.gridkit-theme-mui-data-grid .gridkit-sort-icon svg {
+  opacity: 0;
+}
+.gridkit-theme-mui-data-grid .gridkit-header-cell:hover .gridkit-sort-icon svg {
+  opacity: 0.54;
+}
+.gridkit-theme-mui-data-grid .gridkit-header-cell[aria-sort] .gridkit-sort-icon svg {
+  opacity: 1;
+}
+.gridkit-theme-mui-table .gridkit-header-cell {
+  color: var(--gridkit-foreground);
+}
+.gridkit-theme-mui-table .gridkit-sort-icon svg {
+  opacity: 0.54;
+}
+.gridkit-theme-mui .gridkit-cell {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 14px;
+  letter-spacing: 0.01071em;
+}
+.gridkit-theme-mui .gridkit-row:hover {
+  --_row-bg: var(--gridkit-muted);
+}
+.gridkit-theme-mui .gridkit-footer {
+  min-height: var(--gridkit-footer-height);
+  padding: 0 16px;
+  border: 1px solid var(--gridkit-footer-border);
+  border-top: 0;
+  border-bottom-left-radius: var(--gridkit-radius);
+  border-bottom-right-radius: var(--gridkit-radius);
+  color: var(--gridkit-foreground);
+}
+.gridkit-theme-mui .gridkit-pagination-control--bar {
+  justify-content: flex-end;
+  min-height: var(--gridkit-footer-height);
+  gap: 32px;
+  font-size: 14px;
+}
+.gridkit-theme-mui .gridkit-pagination-control--bar > div:last-child {
+  gap: 16px !important;
+}
+.gridkit-theme-mui .gridkit-pagination-control--bar .gridkit-page-first,
+.gridkit-theme-mui .gridkit-pagination-control--bar .gridkit-page-last {
+  display: none !important;
+}
+.gridkit-theme-mui .gridkit-pagination-control--bar .MuiOutlinedInput-notchedOutline {
+  border: 0 !important;
+}
 .gridkit-shell--fill {
   min-height: 0;
 }
@@ -670,6 +822,28 @@
   min-width: 0;
   overflow: hidden;
   flex: 1;
+}
+:where(.gridkit-theme-mui, .gridkit-theme-shadcn)
+  .gridkit-header-cell[data-col-id="__select__"]
+  .gridkit-header-cell-content {
+  overflow: visible;
+}
+:where(.gridkit-theme-mui, .gridkit-theme-shadcn)
+  .gridkit-header-cell[data-col-id="__select__"]
+  .gridkit-header-cell-content > span {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: visible !important;
+}
+:where(.gridkit-theme-mui, .gridkit-theme-shadcn)
+  .gridkit-cell[data-col-id="__select__"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 0;
+  padding-left: 0;
 }
 .gridkit-header-cell-content[data-reorder-handle="true"] {
   cursor: grab;

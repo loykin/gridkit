@@ -15,6 +15,16 @@
     "./styles": {
       "types": "./dist/styles.d.ts",
       "default": "./dist/styles.css"
+    },
+    "./adapters/shadcn": {
+      "types": "./dist/adapters/shadcn.d.ts",
+      "import": "./dist/adapters/shadcn.js",
+      "require": "./dist/adapters/shadcn.cjs"
+    },
+    "./adapters/mui": {
+      "types": "./dist/adapters/mui.d.ts",
+      "import": "./dist/adapters/mui.js",
+      "require": "./dist/adapters/mui.cjs"
     }
   },
   "files": [
@@ -43,13 +53,30 @@
     "zustand": "^5.0.14"
   },
   "peerDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^7.0.0 || ^8.0.0 || ^9.0.0",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.24",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
+  "peerDependenciesMeta": {
+    "@emotion/react": {
+      "optional": true
+    },
+    "@emotion/styled": {
+      "optional": true
+    },
+    "@mui/material": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@eslint/js": "^10.0.1",
+    "@mui/material": "^9.2.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.17",

@@ -219,6 +219,154 @@ GridKit has two customization surfaces:
 }
 ```
 
+### UI adapters
+
+GridKit owns table structure, virtualization, and state. An optional UI adapter
+supplies two recipes:
+
+- component recipe: Badge, Button, Input, Checkbox, Select, and Popover
+- appearance recipe: a scoped root class, design tokens, and synchronized
+  metrics for the grid frame, header, rows, cells, selection column, controls,
+  footer, borders, typography, hover, focus, and elevation
+
+This keeps one stable grid DOM while making the entire grid belong to the
+selected design system. Without `uiAdapter`, the built-in components and
+appearance continue to work exactly as before. Missing component slots fall
+back to the built-in components.
+
+#### Material UI
+
+Install Material UI in the consuming application, then use the optional
+subpath:
+
+```tsx
+import { DataGrid } from '@loykin/gridkit'
+import { MuiGridKitProvider } from '@loykin/gridkit/adapters/mui'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+
+const theme = createTheme()
+
+<ThemeProvider theme={theme}>
+  <MuiGridKitProvider preset="data-grid" density="standard">
+    <DataGrid data={rows} columns={columns} />
+  </MuiGridKitProvider>
+</ThemeProvider>
+```
+
+`muiAdapter` is also exported as a ready-to-use adapter created from MUI's
+default theme. Use `createMuiAdapter(theme)` when the application has a custom
+MUI theme and a provider is not convenient. `MuiGridKitProvider` reads the
+active MUI Theme automatically, so palette, shape, typography, elevation, and
+real MUI controls stay in sync when the theme changes.
+
+MUI has two distinct table families, so the adapter keeps their native sizing
+vocabulary:
+
+```tsx
+// MUI X DataGrid-compatible visual configuration
+<MuiGridKitProvider
+  preset="data-grid"
+  density="compact"
+  columnHeaderHeight={48}
+  rowHeight={40}
+>
+  <DataGrid data={rows} columns={columns} />
+</MuiGridKitProvider>
+
+// Material UI Table-compatible visual configuration
+<MuiGridKitProvider preset="table" size="small">
+  <DataGrid data={rows} columns={columns} />
+</MuiGridKitProvider>
+```
+
+The `data-grid` preset defaults to MUI X standard geometry (56px header, 52px
+rows). It accepts MUI X's `density`, `columnHeaderHeight`, and `rowHeight`
+names. The `table` preset accepts Material UI Table's `size="small | medium"`.
+GridKit data, column, and feature props remain unchanged because GridKit still
+owns the table engine.
+
+Theme overrides for the real adapter components (`MuiButton`, `MuiCheckbox`,
+`MuiTextField`, `MuiSelect`, `MuiPopover`, and `MuiChip`) apply normally.
+`MuiDataGrid` and `MuiTableCell` component overrides do not apply because
+GridKit intentionally retains its own virtualized grid DOM; customize those
+structural slots through GridKit tokens, `classNames`, or `styles`.
+
+#### shadcn/ui
+
+shadcn components live inside the consuming application, so pass those local
+components to the factory:
+
+```tsx
+import { DataGrid } from '@loykin/gridkit'
+import { createShadcnAdapter } from '@loykin/gridkit/adapters/shadcn'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+const shadcnAdapter = createShadcnAdapter({
+  Badge,
+  Button,
+  Input,
+  Checkbox,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+})
+
+<DataGrid uiAdapter={shadcnAdapter} data={rows} columns={columns} />
+```
+
+The shadcn adapter uses the standard shadcn table recipe by default and accepts
+the same `density` options as its optional second argument.
+
+Adapter metrics are defaults, not locks. Explicit grid configuration wins:
+
+```tsx
+<DataGrid
+  uiAdapter={muiAdapter}
+  headerHeight={44}
+  rowHeight={36}
+  checkboxConfig={{ ...checkboxConfig, columnWidth: 52 }}
+/>
+```
+
+Use `GridKitProvider` when the same adapter should apply to multiple views:
+
+```tsx
+<GridKitProvider adapter={muiAdapter}>
+  <DataGrid data={rows} columns={columns} />
+</GridKitProvider>
+```
+
+Adapter boundaries are intentionally one-way:
+
+- GridKit core owns data, state, column capabilities, feature flags, event
+  semantics, virtualization, and layout structure.
+- Adapters may replace declared UI component slots and provide scoped visual
+  tokens or geometry metrics.
+- Adapters must not enable or disable sorting, filtering, grouping, selection,
+  pinning, hiding, reordering, editing, or other core behavior.
+- Without an adapter, component markup, feature availability, events, and
+  default geometry remain backward-compatible.
+
 #### All `--gridkit-*` Variables
 
 | Variable | Description |
