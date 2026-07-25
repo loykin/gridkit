@@ -1,9 +1,9 @@
 import type { Table } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 import { useGridKitLabels } from '@/core/LabelsContext'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Checkbox } from '@/core/UIComponents'
+import { Popover, PopoverContent, PopoverTrigger } from '@/core/UIComponents'
 
 interface Props<T extends object> {
   table: Table<T>

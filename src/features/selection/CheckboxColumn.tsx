@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react'
 import type { ColumnDef, Row, Table } from '@tanstack/react-table'
 import type { CheckboxConfig } from '@/types'
+import { Checkbox } from '@/core/UIComponents'
 
 // ─── Indeterminate checkbox for the header ───────────────────────────────────
 
@@ -12,22 +12,12 @@ interface IndeterminateCheckboxProps {
 }
 
 function IndeterminateCheckbox({ checked, indeterminate, onChange, label }: IndeterminateCheckboxProps) {
-  const ref = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.indeterminate = indeterminate
-    }
-  }, [indeterminate])
-
   return (
-    <input
-      ref={ref}
-      type="checkbox"
+    <Checkbox
       aria-label={label}
       checked={checked}
-      onChange={(e) => onChange(e.target.checked)}
-      className="gridkit-checkbox"
+      indeterminate={indeterminate}
+      onCheckedChange={onChange}
     />
   )
 }
@@ -36,12 +26,15 @@ function IndeterminateCheckbox({ checked, indeterminate, onChange, label }: Inde
 
 export function createCheckboxColumn<T extends object>(
   checkboxConfig: CheckboxConfig<T>,
+  width = 40,
+  lockWidth = false,
 ): ColumnDef<T, unknown> {
   const { getRowId, selectedIds, onSelectAll, onSelectOne } = checkboxConfig
 
   return {
     id: '__select__',
-    size: 40,
+    size: width,
+    ...(lockWidth ? { minSize: width, maxSize: width } : {}),
     enableResizing: false,
     enableSorting: false,
     enableColumnFilter: false,
@@ -67,13 +60,11 @@ export function createCheckboxColumn<T extends object>(
     cell: ({ row }: { row: Row<T> }) => {
       const id = getRowId(row.original)
       return (
-        <input
-          type="checkbox"
+        <Checkbox
           aria-label={`Select row ${id}`}
           checked={selectedIds.has(id)}
-          onChange={(e) => onSelectOne(id, e.target.checked)}
-          onClick={(e) => e.stopPropagation()}
-          className="gridkit-checkbox"
+          onCheckedChange={(checked) => onSelectOne(id, checked)}
+          onClick={(event) => event.stopPropagation()}
         />
       )
     },

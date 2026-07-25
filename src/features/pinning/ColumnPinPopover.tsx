@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Column } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/core/UIComponents'
+import { Popover, PopoverContent, PopoverTrigger } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 
 interface ColumnPinPopoverProps<T extends object> {

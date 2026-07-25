@@ -15,6 +15,7 @@ import type {
   PaginationState,
 } from '@tanstack/react-table'
 import type { DataStore } from './core/engine/store/DataStore'
+import type { GridKitUIAdapter } from './core/UIAdapterContext'
 
 // ColumnMeta and Table augmentations live in the extension files:
 //   src/core/engine/tanstack/ColumnFlexFeature.ts   — flex, autoSize, align, wrap, etc.
@@ -135,6 +136,8 @@ export interface CheckboxConfig<T extends object> {
   selectedIds: Set<string>
   onSelectAll: (rows: Row<T>[], checked: boolean) => void
   onSelectOne: (rowId: string, checked: boolean) => void
+  /** Selection column width. Overrides the active UI adapter metric. */
+  columnWidth?: number
 }
 
 /** Slot-based class names shared across all GridKit views. */
@@ -480,6 +483,8 @@ export interface GridKitCoreProps<T extends object> extends GridKitDisplayProps<
   icons?: DataGridIcons
   /** UI strings and aria labels. Omitted labels fall back to English defaults. */
   labels?: Partial<GridKitLabels>
+  /** Optional design-system controls. Missing slots fall back to GridKit defaults. */
+  uiAdapter?: GridKitUIAdapter
 
   /**
    * Escape hatch for advanced TanStack Table options not exposed as individual props.
@@ -543,6 +548,8 @@ export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T
    * - 'independent': Each column independent px, no fill — right gap when columns are narrow
    */
   tableWidthMode?: TableWidthMode
+  /** Header row height in px. Overrides the active UI adapter metric. */
+  headerHeight?: number
   /**
    * Fixed row height in px. Sets both the actual CSS min-height of each row
    * and the virtualizer's estimateSize so they stay in sync. Default: 33.

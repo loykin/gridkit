@@ -6,6 +6,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { useGridKitLabels } from '@/core/LabelsContext'
+import { useGridKitUI } from '@/core/UIAdapterContext'
 import { ScrollTable } from '@/core/table/ScrollTable'
 import type { DataGridStyles, TableViewConfig } from '@/types'
 import { useTableScrollSync } from '@/core/hooks/useTableScrollSync'
@@ -65,6 +66,7 @@ export function DataGridTableView<T extends object>({
   fillContainer,
   fillParent,
   tableWidthMode = 'spacer',
+  headerHeight,
   rowHeight,
   estimateRowHeight,
   overscan = 10,
@@ -83,7 +85,10 @@ export function DataGridTableView<T extends object>({
   classNames,
   styles,
 }: DataGridTableViewProps<T>) {
-  const effectiveEstimate = estimateRowHeight ?? rowHeight ?? 33
+  const { appearance } = useGridKitUI()
+  const effectiveHeaderHeight = headerHeight ?? appearance?.metrics?.headerHeight ?? 36
+  const effectiveRowHeight = rowHeight ?? appearance?.metrics?.rowHeight
+  const effectiveEstimate = estimateRowHeight ?? effectiveRowHeight ?? 33
   const labels = useGridKitLabels()
   const effectiveEmptyMessage = emptyMessage ?? labels.noData
 
@@ -302,7 +307,7 @@ export function DataGridTableView<T extends object>({
                 onRowClick={onRowClick}
                 rowCursor={rowCursor}
                 bordered={bordered}
-                rowHeight={rowHeight}
+                rowHeight={effectiveRowHeight}
                 onActionTrigger={actionCol ? handleActionTrigger : undefined}
                 tableWidthMode={region.tableWidthMode}
                 pinning={false}
@@ -365,6 +370,7 @@ export function DataGridTableView<T extends object>({
           bordered={bordered}
           virtual={virtual}
           headerGroupLayout={headerGroupLayout}
+          headerHeight={effectiveHeaderHeight}
           enableColumnPinning={enableColumnPinning}
           enableColumnMenu={enableColumnMenu}
           renderColumnMenu={renderColumnMenu}

@@ -4,6 +4,7 @@ import { useInfiniteScroll } from '@/core/hooks/useInfiniteScroll'
 import { DataGridCardView } from '@/core/views/DataGridCardView'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
+import { GridKitProvider } from '@/core/UIAdapterContext'
 
 export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
   const {
@@ -50,8 +51,9 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
   })
 
   return (
-    <LabelsProvider labels={props.labels}>
-      <IconsProvider icons={icons}>
+    <GridKitProvider adapter={props.uiAdapter}>
+      <LabelsProvider labels={props.labels}>
+        <IconsProvider icons={icons}>
         <DataGridCardView
           wrapperRef={wrapperRef}
           containerRef={containerRef}
@@ -85,7 +87,8 @@ export function DataGridCard<T extends object>(props: DataGridCardProps<T>) {
           classNames={props.classNames}
           styles={props.styles}
         />
-      </IconsProvider>
-    </LabelsProvider>
+        </IconsProvider>
+      </LabelsProvider>
+    </GridKitProvider>
   )
 }

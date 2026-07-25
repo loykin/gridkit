@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Table } from '@tanstack/react-table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { Input } from '@/core/UIComponents'
+import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 import { useGridKitLabels } from '@/core/LabelsContext'
 

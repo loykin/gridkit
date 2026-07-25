@@ -1,6 +1,6 @@
 import type { Row } from '@tanstack/react-table'
 import { useIcons } from '@/core/IconsContext'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/core/UIComponents'
 import { useDetailRow } from './DetailRowContext'
 
 interface ExpandToggleCellProps {

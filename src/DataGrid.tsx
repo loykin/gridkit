@@ -6,6 +6,7 @@ import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { DataGridShell } from '@/core/DataGridShell'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
+import { GridKitProvider } from '@/core/UIAdapterContext'
 
 interface DataGridPropsWithRef<T extends object> extends DataGridProps<T> {
   /** Ref populated with the TanStack Table instance after first render */
@@ -40,8 +41,9 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
   }, [table, tableRef])
 
   return (
-    <LabelsProvider labels={props.labels}>
-      <IconsProvider icons={icons}>
+    <GridKitProvider adapter={props.uiAdapter}>
+      <LabelsProvider labels={props.labels}>
+        <IconsProvider icons={icons}>
         <DataGridShell
           {...props}
           wrapperRef={wrapperRef}
@@ -56,7 +58,8 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
           headerRight={headerRight}
           footer={footer}
         />
-      </IconsProvider>
-    </LabelsProvider>
+        </IconsProvider>
+      </LabelsProvider>
+    </GridKitProvider>
   )
 }

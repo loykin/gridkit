@@ -4,6 +4,7 @@ import { useInfiniteScroll } from '@/core/hooks/useInfiniteScroll'
 import { DataGridShell } from '@/core/DataGridShell'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
+import { GridKitProvider } from '@/core/UIAdapterContext'
 
 export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<T>) {
   const {
@@ -36,8 +37,9 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
   })
 
   return (
-    <LabelsProvider labels={props.labels}>
-      <IconsProvider icons={icons}>
+    <GridKitProvider adapter={props.uiAdapter}>
+      <LabelsProvider labels={props.labels}>
+        <IconsProvider icons={icons}>
         <DataGridShell
           {...props}
           wrapperRef={wrapperRef}
@@ -53,7 +55,8 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
           isFetchingNextPage={isFetchingNextPage}
           isLoading={effectiveIsLoading}
         />
-      </IconsProvider>
-    </LabelsProvider>
+        </IconsProvider>
+      </LabelsProvider>
+    </GridKitProvider>
   )
 }

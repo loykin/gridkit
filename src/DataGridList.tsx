@@ -5,6 +5,7 @@ import { useRowVirtualizer } from '@/core/hooks/useRowVirtualizer'
 import { DataGridListView } from '@/core/views/DataGridListView'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
+import { GridKitProvider } from '@/core/UIAdapterContext'
 
 export function DataGridList<T extends object>(props: DataGridListProps<T>) {
   const {
@@ -66,8 +67,9 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
     typeof effectiveContainerHeight === 'number' ? effectiveContainerHeight : undefined
 
   return (
-    <LabelsProvider labels={props.labels}>
-      <IconsProvider icons={icons}>
+    <GridKitProvider adapter={props.uiAdapter}>
+      <LabelsProvider labels={props.labels}>
+        <IconsProvider icons={icons}>
         <DataGridListView
           wrapperRef={wrapperRef}
           containerRef={containerRef}
@@ -103,7 +105,8 @@ export function DataGridList<T extends object>(props: DataGridListProps<T>) {
           classNames={classNames}
           styles={props.styles}
         />
-      </IconsProvider>
-    </LabelsProvider>
+        </IconsProvider>
+      </LabelsProvider>
+    </GridKitProvider>
   )
 }

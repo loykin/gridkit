@@ -1,5 +1,6 @@
 import type { Column, Table } from '@tanstack/react-table'
 import { useColumnOptions } from '@/features/filters/hooks/useColumnOptions'
+import { Select } from '@/core/UIComponents'
 
 interface Props<T extends object> {
   col: Column<T>
@@ -16,22 +17,18 @@ export function SelectFilterCell<T extends object>({ col, table, onSelect }: Pro
   const filterValue = (col.getFilterValue() ?? '') as string
 
   return (
-    <select
+    <Select
       value={filterValue}
-      onChange={(e) => {
-        col.setFilterValue(e.target.value || undefined)
+      onValueChange={(value) => {
+        col.setFilterValue(value || undefined)
         onSelect?.()
       }}
-      className="gridkit-select"
       style={{ width: '100%' }}
       disabled={isLoading}
-    >
-      <option value="">{isLoading ? 'Loading...' : 'All'}</option>
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
+      options={[
+        { value: '', label: isLoading ? 'Loading...' : 'All' },
+        ...options.map((option) => ({ value: option, label: option })),
+      ]}
+    />
   )
 }

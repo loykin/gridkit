@@ -1,5 +1,5 @@
 import type { Row } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 
 interface RowActionTriggerProps<T extends object> {

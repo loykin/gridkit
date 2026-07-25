@@ -21,6 +21,7 @@ interface TableHeaderRegionsProps<T extends object>
     | 'enableColumnPinning'
     | 'enableColumnMenu'
     | 'renderColumnMenu'
+    | 'headerHeight'
   > {
   layout: TableLayoutModel<T>
   headerGroups: HeaderGroup<T>[]
@@ -49,6 +50,7 @@ export function TableHeaderRegions<T extends object>({
   enableColumnPinning,
   enableColumnMenu,
   renderColumnMenu,
+  headerHeight,
   classNames,
   styles,
   headerScrollRef,
@@ -72,6 +74,7 @@ export function TableHeaderRegions<T extends object>({
         bordered={bordered}
         tableWidthMode={region.tableWidthMode}
         headerGroupLayout={headerGroupLayout}
+        headerHeight={headerHeight}
         enableColumnReordering={region.reorderEnabled}
         enableColumnPinning={enableColumnPinning}
         enableColumnMenu={enableColumnMenu}

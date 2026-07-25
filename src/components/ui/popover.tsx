@@ -9,6 +9,7 @@ import React, {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
+import { readGridKitVars, sameGridKitVars } from '@/core/utils/readGridKitVars'
 
 // ── Context ────────────────────────────────────────────────────────────────────
 
@@ -28,7 +29,7 @@ function useCtx() {
 
 // ── Root ───────────────────────────────────────────────────────────────────────
 
-interface PopoverProps {
+export interface PopoverProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   children: React.ReactNode
@@ -52,12 +53,12 @@ export function Popover({ open: controlled, onOpenChange, children }: PopoverPro
 
 // ── Trigger ────────────────────────────────────────────────────────────────────
 
-type TriggerRenderProps = React.HTMLAttributes<HTMLElement> & {
+export type TriggerRenderProps = React.HTMLAttributes<HTMLElement> & {
   ref: React.Ref<HTMLElement>
   'aria-expanded': boolean
 }
 
-interface PopoverTriggerProps {
+export interface PopoverTriggerProps {
   render?: (props: TriggerRenderProps) => React.ReactElement
   children?: React.ReactNode
   className?: string
@@ -92,7 +93,7 @@ export function PopoverTrigger({ render, children, className }: PopoverTriggerPr
 
 // ── Content ────────────────────────────────────────────────────────────────────
 
-interface PopoverContentProps {
+export interface PopoverContentProps {
   children: React.ReactNode
   side?: 'top' | 'bottom' | 'left' | 'right'
   align?: 'start' | 'center' | 'end'
@@ -100,27 +101,6 @@ interface PopoverContentProps {
   sideOffset?: number
   className?: string
   style?: React.CSSProperties
-}
-
-function readGridKitVars(node: HTMLElement): React.CSSProperties {
-  const computed = getComputedStyle(node)
-  const vars: React.CSSProperties = {}
-
-  for (let index = 0; index < computed.length; index += 1) {
-    const name = computed.item(index)
-    if (name.startsWith('--gridkit-')) {
-      ;(vars as Record<string, string>)[name] = computed.getPropertyValue(name).trim()
-    }
-  }
-
-  return vars
-}
-
-function sameStyleVars(a: React.CSSProperties, b: React.CSSProperties) {
-  const aKeys = Object.keys(a)
-  const bKeys = Object.keys(b)
-  if (aKeys.length !== bKeys.length) return false
-  return aKeys.every((key) => (a as Record<string, unknown>)[key] === (b as Record<string, unknown>)[key])
 }
 
 export function PopoverContent({
@@ -141,7 +121,7 @@ export function PopoverContent({
     if (!open || !triggerRef.current) return
 
     const nextThemeVars = readGridKitVars(triggerRef.current)
-    setThemeVars((current) => sameStyleVars(current, nextThemeVars) ? current : nextThemeVars)
+    setThemeVars((current) => sameGridKitVars(current, nextThemeVars) ? current : nextThemeVars)
 
     const update = () => {
       const r = triggerRef.current!.getBoundingClientRect()

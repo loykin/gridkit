@@ -148,7 +148,7 @@
   background: none;
   color: inherit;
   padding: 0 10px;
-  height: 32px;
+  height: var(--gridkit-control-height, 32px);
 }
 .gridkit-btn:disabled {
   pointer-events: none;
@@ -220,7 +220,7 @@
 /* ── gridkit-input ───────────────────────────────────────────────────────────────── */
 
 .gridkit-input {
-  height: 32px;
+  height: var(--gridkit-control-height, 32px);
   width: 100%;
   min-width: 0;
   padding: 4px 10px;
@@ -243,8 +243,8 @@
 /* ── gridkit-checkbox ────────────────────────────────────────────────────────────── */
 
 .gridkit-checkbox {
-  width: 16px;
-  height: 16px;
+  width: var(--gridkit-checkbox-size, 16px);
+  height: var(--gridkit-checkbox-size, 16px);
   flex-shrink: 0;
   cursor: pointer;
   border-radius: var(--gridkit-radius);
@@ -257,6 +257,42 @@
 }
 .gridkit-checkbox:focus-visible {
   box-shadow: 0 0 0 2px color-mix(in oklab, var(--gridkit-ring) 35%, transparent);
+}
+
+/* ── gridkit-badge ─────────────────────────────────────────────────────────── */
+
+.gridkit-badge {
+  display: inline-flex;
+  max-width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2px 8px;
+  border: 1px solid transparent;
+  border-radius: calc(var(--gridkit-radius) + 2px);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gridkit-badge[data-variant="default"] {
+  background: var(--gridkit-primary);
+  color: var(--gridkit-primary-foreground);
+}
+.gridkit-badge[data-variant="secondary"] {
+  background: var(--gridkit-secondary);
+  color: var(--gridkit-secondary-foreground);
+}
+.gridkit-badge[data-variant="destructive"] {
+  background: color-mix(in oklab, var(--gridkit-destructive) 12%, transparent);
+  color: var(--gridkit-destructive);
+}
+.gridkit-badge[data-variant="outline"] {
+  border-color: var(--gridkit-border);
+  background: transparent;
+  color: var(--gridkit-foreground);
 }
 
 /* ── gridkit-select ──────────────────────────────────────────────────────────────── */

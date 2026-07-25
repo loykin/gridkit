@@ -1,7 +1,7 @@
 import type { Column } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/core/UIComponents'
 import { NumberRangeFilterContent } from './NumberRangeFilterContent'
 
 interface Props<T extends object> {

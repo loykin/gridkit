@@ -37,10 +37,9 @@ interface DataGridHeaderLayoutProps<T extends object>
   virtual: boolean
   tableWidthMode?: TableWidthMode
   headerGroupLayout?: HeaderGroupLayout
+  headerHeight?: number
   classNames?: DataGridClassNames
 }
-
-const HEADER_ROW_HEIGHT = 36
 
 export function DataGridHeaderLayout<T extends object>({
   headerGroups,
@@ -51,6 +50,7 @@ export function DataGridHeaderLayout<T extends object>({
   bordered,
   tableWidthMode = 'spacer',
   headerGroupLayout = 'padded',
+  headerHeight = 36,
   enableColumnFilters,
   filterDisplay = 'row',
   enableColumnReordering = false,
@@ -65,7 +65,7 @@ export function DataGridHeaderLayout<T extends object>({
     headerGroups,
     visibleLeafColumns,
     layout: headerGroupLayout,
-    rowHeight: HEADER_ROW_HEIGHT,
+    rowHeight: headerHeight,
   })
 
   const sensors = useSensors(

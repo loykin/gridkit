@@ -1,6 +1,7 @@
 import type { Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/core/UIComponents'
+import { Select } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 import { useGridKitLabels } from '@/core/LabelsContext'
 
@@ -28,17 +29,11 @@ export function DataGridPaginationBar<T extends object>({
     <div className={cn('gridkit-pagination-control gridkit-pagination-control--bar', className)}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span>{labels.rowsPerPage}</span>
-        <select
+        <Select
           value={pageSize}
-          onChange={(e) => table.setPageSize(Number(e.target.value))}
-          className="gridkit-select"
-        >
-          {pageSizes.map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </select>
+          onValueChange={(value) => table.setPageSize(Number(value))}
+          options={pageSizes.map((size) => ({ value: size, label: size }))}
+        />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -47,6 +42,7 @@ export function DataGridPaginationBar<T extends object>({
         </span>
         <Button
           aria-label={labels.goToFirstPage}
+          className="gridkit-page-first"
           variant="ghost"
           size="icon-sm"
           onClick={() => table.firstPage()}
@@ -56,6 +52,7 @@ export function DataGridPaginationBar<T extends object>({
         </Button>
         <Button
           aria-label={labels.goToPreviousPage}
+          className="gridkit-page-previous"
           variant="ghost"
           size="icon-sm"
           onClick={() => table.previousPage()}
@@ -65,6 +62,7 @@ export function DataGridPaginationBar<T extends object>({
         </Button>
         <Button
           aria-label={labels.goToNextPage}
+          className="gridkit-page-next"
           variant="ghost"
           size="icon-sm"
           onClick={() => table.nextPage()}
@@ -74,6 +72,7 @@ export function DataGridPaginationBar<T extends object>({
         </Button>
         <Button
           aria-label={labels.goToLastPage}
+          className="gridkit-page-last"
           variant="ghost"
           size="icon-sm"
           onClick={() => table.lastPage()}

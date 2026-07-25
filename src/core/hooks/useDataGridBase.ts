@@ -4,6 +4,7 @@ import { createCheckboxColumn } from '@/features/selection/CheckboxColumn'
 import { useDataGridCore } from '@/core/hooks/useDataGridCore'
 import { useColumnSizing } from '@/core/hooks/useColumnSizing'
 import { applyMetaWidthSizing } from '@/features/resizing/applyMetaWidthSizing'
+import { useResolvedGridKitUI } from '@/core/UIAdapterContext'
 
 interface UseDataGridBaseOptions<T extends object> extends DataGridBaseProps<T> {
   columns: DataGridColumnDef<T>[]
@@ -14,6 +15,7 @@ interface UseDataGridBaseOptions<T extends object> extends DataGridBaseProps<T> 
 }
 
 export function useDataGridBase<T extends object>(options: UseDataGridBaseOptions<T>) {
+  const resolvedUI = useResolvedGridKitUI(options.uiAdapter)
   const {
     data = [],
     dataStore,
@@ -62,11 +64,25 @@ export function useDataGridBase<T extends object>(options: UseDataGridBaseOption
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const selectionColumnWidth = checkboxConfig?.columnWidth
+    ?? resolvedUI.appearance?.metrics?.selectionColumnWidth
+  // Preserve the legacy default, including TanStack's global 60px minSize.
+  // Only an explicit grid/adapter metric owns and locks this utility column.
+  const hasSelectionColumnWidth = selectionColumnWidth !== undefined
 
   const columnsWithCheckbox = useMemo(() => {
-    const base = checkboxConfig ? [createCheckboxColumn(checkboxConfig), ...columns] : columns
+    const base = checkboxConfig
+      ? [
+          createCheckboxColumn(
+            checkboxConfig,
+            selectionColumnWidth ?? 40,
+            hasSelectionColumnWidth,
+          ),
+          ...columns,
+        ]
+      : columns
     return applyMetaWidthSizing(base)
-  }, [columns, checkboxConfig])
+  }, [columns, checkboxConfig, hasSelectionColumnWidth, selectionColumnWidth])
 
   const { sizing, isSized, setSizing, measure } = useColumnSizing({
     columns: columnsWithCheckbox,

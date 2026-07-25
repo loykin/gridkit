@@ -6,6 +6,7 @@ import { useStickToBottom } from '@/core/hooks/useStickToBottom'
 import { DataGridChatView } from '@/core/views/DataGridChatView'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
+import { GridKitProvider } from '@/core/UIAdapterContext'
 
 export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
   const {
@@ -81,8 +82,9 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
   })
 
   return (
-    <LabelsProvider labels={props.labels}>
-      <IconsProvider icons={icons}>
+    <GridKitProvider adapter={props.uiAdapter}>
+      <LabelsProvider labels={props.labels}>
+        <IconsProvider icons={icons}>
         <DataGridChatView
           wrapperRef={wrapperRef}
           containerRef={containerRef}
@@ -109,7 +111,8 @@ export function DataGridChat<T extends object>(props: DataGridChatProps<T>) {
           classNames={classNames}
           styles={styles}
         />
-      </IconsProvider>
-    </LabelsProvider>
+        </IconsProvider>
+      </LabelsProvider>
+    </GridKitProvider>
   )
 }

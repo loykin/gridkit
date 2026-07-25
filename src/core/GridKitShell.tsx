@@ -4,6 +4,7 @@ import type { Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { DataGridToolbar } from '@/core/controls/DataGridToolbar'
 import { CustomScrollbar } from '@/core/table/CustomScrollbar'
+import { useGridKitUI } from '@/core/UIAdapterContext'
 import type { GridKitClassNames, GridKitHeaderSlot, GridKitScrollbarConfig, GridKitStyles } from '@/types'
 
 type GridKitVisualOverflow = 'clip' | 'visible'
@@ -76,6 +77,22 @@ export function GridKitShell<T extends object>({
   styles,
   children,
 }: GridKitShellProps<T>) {
+  const { appearance } = useGridKitUI()
+  const metrics = appearance?.metrics
+  const metricStyle = metrics
+    ? ({
+        '--gridkit-header-height': metrics.headerHeight != null ? `${metrics.headerHeight}px` : undefined,
+        '--gridkit-row-height': metrics.rowHeight != null ? `${metrics.rowHeight}px` : undefined,
+        '--gridkit-selection-column-width': metrics.selectionColumnWidth != null
+          ? `${metrics.selectionColumnWidth}px`
+          : undefined,
+        '--gridkit-cell-padding-x': metrics.cellPaddingX != null ? `${metrics.cellPaddingX}px` : undefined,
+        '--gridkit-control-height': metrics.controlHeight != null ? `${metrics.controlHeight}px` : undefined,
+        '--gridkit-checkbox-size': metrics.checkboxSize != null ? `${metrics.checkboxSize}px` : undefined,
+        '--gridkit-footer-height': metrics.footerHeight != null ? `${metrics.footerHeight}px` : undefined,
+      } as React.CSSProperties)
+    : undefined
+
   useEffect(() => {
     if (fillParent && fillContainer) {
       console.warn('[GridKit] fillParent and fillContainer were both provided. fillParent takes precedence.')
@@ -205,10 +222,15 @@ export function GridKitShell<T extends object>({
   return (
     <div
       ref={wrapperRef}
-      className={cn('gridkit-shell', effectiveFillContainer && 'gridkit-shell--fill', classNames?.root)}
+      className={cn(
+        'gridkit-shell',
+        appearance?.className,
+        effectiveFillContainer && 'gridkit-shell--fill',
+        classNames?.root,
+      )}
       data-fill-parent={fillParent ? 'true' : undefined}
       data-visual-overflow={visualOverflow}
-      style={styles?.root}
+      style={{ ...appearance?.style, ...metricStyle, ...styles?.root }}
     >
       {hasToolbar && (
         <div ref={toolbarFrameRef} className={cn('gridkit-toolbar-frame', classNames?.toolbar)} style={styles?.toolbar}>

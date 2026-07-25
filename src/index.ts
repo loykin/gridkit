@@ -28,6 +28,15 @@ export { useGridKitView } from './core/view-sdk/useGridKitView'
 export { useGridKitRovingFocus } from './core/view-sdk/useGridKitRovingFocus'
 export { GridKitShell } from './core/GridKitShell'
 export { defaultLabels, LabelsProvider, useGridKitLabels } from './core/LabelsContext'
+export { GridKitProvider, defaultUIAdapter, useGridKitUI } from './core/UIAdapterContext'
+export type {
+  GridKitUIAdapter,
+  GridKitUIAppearance,
+  GridKitUIMetrics,
+  ResolvedGridKitUIAdapter,
+} from './core/UIAdapterContext'
+export { GridKitBadge } from './core/UIComponents'
+export type { BadgeProps as GridKitBadgeProps } from './components/ui/badge'
 export type { GridKitViewContext, GridKitViewOptions } from './core/view-sdk/useGridKitView'
 export type {
   GridKitRovingFocusItemOptions,

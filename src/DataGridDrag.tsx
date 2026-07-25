@@ -17,6 +17,7 @@ import { RowWrapperContext } from '@/features/reordering/RowWrapperContext'
 import { SortableRow } from '@/features/reordering/SortableRow'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
+import { GridKitProvider } from '@/core/UIAdapterContext'
 
 export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
   const { data = [], onRowReorder, getRowId, icons } = props
@@ -64,8 +65,9 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
   const activeRow = activeRowId ? rows.find((r) => r.id === activeRowId) : null
 
   return (
-    <LabelsProvider labels={props.labels}>
-      <IconsProvider icons={icons}>
+    <GridKitProvider adapter={props.uiAdapter}>
+      <LabelsProvider labels={props.labels}>
+        <IconsProvider icons={icons}>
         <RowWrapperContext.Provider value={SortableRow}>
           <DndContext
             sensors={sensors}
@@ -96,7 +98,8 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
             </DragOverlay>
           </DndContext>
         </RowWrapperContext.Provider>
-      </IconsProvider>
-    </LabelsProvider>
+        </IconsProvider>
+      </LabelsProvider>
+    </GridKitProvider>
   )
 }

@@ -1,8 +1,8 @@
 import type { Table } from '@tanstack/react-table'
 import { Check, ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/core/UIComponents'
 import { useColumnOptions } from '@/features/filters/hooks/useColumnOptions'
 import { MultiSelectContent } from './MultiSelectContent'
 
