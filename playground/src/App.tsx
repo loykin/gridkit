@@ -44,6 +44,7 @@ import { EvalReviewTab } from './tabs/EvalReviewTab'
 import { HeaderGroupsTab } from './tabs/HeaderGroupsTab'
 import { GroupingTab } from './tabs/GroupingTab'
 import { StatePersistenceTab } from './tabs/StatePersistenceTab'
+import { UIAdaptersTab } from './tabs/UIAdaptersTab'
 import { THEMES, type Theme } from './themes'
 import { PlaygroundContext } from './PlaygroundContext'
 
@@ -82,6 +83,7 @@ const TABS = [
   { id: 'empty-state',       label: 'Empty State',       content: <EmptyStateTab /> },
   { id: 'icons',             label: 'Custom Icons',      content: <IconsTab /> },
   { id: 'theme-tokens',      label: 'Theme Tokens',      content: <ThemeTokensTab /> },
+  { id: 'ui-adapters',       label: 'UI Adapters',       content: <UIAdaptersTab /> },
   { id: 'toolbar',           label: 'Toolbar',           content: <ToolbarTab /> },
   { id: 'card',              label: 'Card Grid',         content: <CardTab /> },
   { id: 'card-virtual',      label: 'Card Virtualization', content: <CardVirtualizationTab /> },
@@ -164,6 +166,7 @@ const NAV: NavGroup[] = [
       { id: 'empty-state',  label: 'Empty State' },
       { id: 'icons',        label: 'Custom Icons' },
       { id: 'theme-tokens', label: 'Theme Tokens' },
+      { id: 'ui-adapters',  label: 'UI Adapters' },
       { id: 'toolbar',      label: 'Toolbar' },
     ],
   },

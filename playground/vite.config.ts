@@ -9,6 +9,8 @@ export default defineConfig({
   resolve: {
     alias: {
       // Import directly from source — no rebuild needed during development
+      '@loykin/gridkit/adapters/shadcn': resolve(__dirname, '../src/adapters/shadcn.tsx'),
+      '@loykin/gridkit/adapters/mui': resolve(__dirname, '../src/adapters/mui.tsx'),
       '@loykin/gridkit': resolve(__dirname, '../src/index.ts'),
       '@': resolve(__dirname, '../src'),
     },

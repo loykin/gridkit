@@ -9,6 +9,8 @@
     "skipLibCheck": true,
     "paths": {
       "@loykin/gridkit": ["../src/index.ts"],
+      "@loykin/gridkit/adapters/shadcn": ["../src/adapters/shadcn.tsx"],
+      "@loykin/gridkit/adapters/mui": ["../src/adapters/mui.tsx"],
       "@/*": ["../src/*"]
     }
   },
