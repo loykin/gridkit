@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router'
 import { PaginationTab } from './tabs/PaginationTab'
 import { ShowcaseTab } from './tabs/ShowcaseTab'
 import { InfinityTab } from './tabs/InfinityTab'
