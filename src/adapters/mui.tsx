@@ -509,6 +509,7 @@ export function createMuiAdapter(
       ? `${borderRadius}px`
       : String(borderRadius),
     '--gridkit-theme-frame-shadow': theme.shadows[1],
+    color: theme.palette.text.primary,
     fontFamily: theme.typography.fontFamily,
   }
 

@@ -348,6 +348,23 @@ describe('GridKit UI adapter', () => {
     })
   })
 
+  it('applies the MUI dark theme foreground color to the grid shell', () => {
+    const theme = createTheme({ palette: { mode: 'dark' } })
+
+    render(
+      <DataGrid
+        data={rows}
+        columns={columns}
+        uiAdapter={createMuiAdapter(theme)}
+      />,
+    )
+
+    expect(document.querySelector('.gridkit-shell')).toHaveStyle({
+      '--gridkit-foreground': theme.palette.text.primary,
+      color: theme.palette.text.primary,
+    })
+  })
+
   it('keeps MUI density defaults when MuiGridKitProvider receives partial metrics', () => {
     render(
       <ThemeProvider theme={createTheme()}>
