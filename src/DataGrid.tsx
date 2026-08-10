@@ -7,6 +7,7 @@ import { DataGridShell } from '@/core/DataGridShell'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
 import { GridKitProvider } from '@/core/UIAdapterContext'
+import { TableViewMetricsProvider } from '@/core/TableViewMetricsContext'
 
 interface DataGridPropsWithRef<T extends object> extends DataGridProps<T> {
   /** Ref populated with the TanStack Table instance after first render */
@@ -14,22 +15,16 @@ interface DataGridPropsWithRef<T extends object> extends DataGridProps<T> {
 }
 
 export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
-  const {
-    error,
-    headerLeft,
-    headerRight,
-    footer,
-    pagination,
-    tableRef,
-    icons,
-  } = props
+  const { error, headerLeft, headerRight, footer, pagination, tableRef, icons } = props
 
   const { wrapperRef, containerRef, table, rows, isSized, measure, queryState } = useDataGridBase({
     ...props,
     pagination,
   })
   const effectiveError = error ?? (props.queryMode === 'backend' ? queryState.error : null)
-  const effectiveIsLoading = props.isLoading ?? (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
+  const effectiveIsLoading =
+    props.isLoading ??
+    (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
 
   useEffect(() => {
     if (tableRef) {
@@ -42,24 +37,30 @@ export function DataGrid<T extends object>(props: DataGridPropsWithRef<T>) {
 
   return (
     <GridKitProvider adapter={props.uiAdapter}>
-      <LabelsProvider labels={props.labels}>
-        <IconsProvider icons={icons}>
-        <DataGridShell
-          {...props}
-          wrapperRef={wrapperRef}
-          containerRef={containerRef}
-          table={table}
-          rows={rows}
-          isSized={isSized}
-          measure={measure}
-          error={effectiveError}
-          isLoading={effectiveIsLoading}
-          headerLeft={headerLeft}
-          headerRight={headerRight}
-          footer={footer}
-        />
-        </IconsProvider>
-      </LabelsProvider>
+      <TableViewMetricsProvider
+        headerHeight={props.headerHeight}
+        rowHeight={props.rowHeight}
+        estimateRowHeight={props.estimateRowHeight}
+      >
+        <LabelsProvider labels={props.labels}>
+          <IconsProvider icons={icons}>
+            <DataGridShell
+              {...props}
+              wrapperRef={wrapperRef}
+              containerRef={containerRef}
+              table={table}
+              rows={rows}
+              isSized={isSized}
+              measure={measure}
+              error={effectiveError}
+              isLoading={effectiveIsLoading}
+              headerLeft={headerLeft}
+              headerRight={headerRight}
+              footer={footer}
+            />
+          </IconsProvider>
+        </LabelsProvider>
+      </TableViewMetricsProvider>
     </GridKitProvider>
   )
 }

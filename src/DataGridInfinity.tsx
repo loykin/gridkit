@@ -5,6 +5,7 @@ import { DataGridShell } from '@/core/DataGridShell'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
 import { GridKitProvider } from '@/core/UIAdapterContext'
+import { TableViewMetricsProvider } from '@/core/TableViewMetricsContext'
 
 export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<T>) {
   const {
@@ -26,7 +27,9 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
     pagination: undefined,
   })
   const effectiveError = error ?? (props.queryMode === 'backend' ? queryState.error : null)
-  const effectiveIsLoading = isLoading ?? (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
+  const effectiveIsLoading =
+    isLoading ??
+    (props.queryMode === 'backend' && (queryState.isHydrating || queryState.isQuerying))
 
   const { loadMoreRef } = useInfiniteScroll({
     hasNextPage,
@@ -38,25 +41,31 @@ export function DataGridInfinity<T extends object>(props: DataGridInfinityProps<
 
   return (
     <GridKitProvider adapter={props.uiAdapter}>
-      <LabelsProvider labels={props.labels}>
-        <IconsProvider icons={icons}>
-        <DataGridShell
-          {...props}
-          wrapperRef={wrapperRef}
-          containerRef={containerRef}
-          table={table}
-          rows={rows}
-          isSized={isSized}
-          measure={measure}
-          error={effectiveError}
-          headerLeft={headerLeft}
-          headerRight={headerRight}
-          loadMoreRef={loadMoreRef}
-          isFetchingNextPage={isFetchingNextPage}
-          isLoading={effectiveIsLoading}
-        />
-        </IconsProvider>
-      </LabelsProvider>
+      <TableViewMetricsProvider
+        headerHeight={props.headerHeight}
+        rowHeight={props.rowHeight}
+        estimateRowHeight={props.estimateRowHeight}
+      >
+        <LabelsProvider labels={props.labels}>
+          <IconsProvider icons={icons}>
+            <DataGridShell
+              {...props}
+              wrapperRef={wrapperRef}
+              containerRef={containerRef}
+              table={table}
+              rows={rows}
+              isSized={isSized}
+              measure={measure}
+              error={effectiveError}
+              headerLeft={headerLeft}
+              headerRight={headerRight}
+              loadMoreRef={loadMoreRef}
+              isFetchingNextPage={isFetchingNextPage}
+              isLoading={effectiveIsLoading}
+            />
+          </IconsProvider>
+        </LabelsProvider>
+      </TableViewMetricsProvider>
     </GridKitProvider>
   )
 }

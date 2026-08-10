@@ -49,15 +49,12 @@ const columnsWithUngrouped: DataGridColumnDef<Employee>[] = [
 
 describe('DataGrid header groups', () => {
   it('renders grouped headers and leaf headers', () => {
-    render(
-      <DataGrid
-        data={data}
-        columns={columns}
-        getRowId={(row) => row.id}
-      />,
-    )
+    render(<DataGrid data={data} columns={columns} getRowId={(row) => row.id} />)
 
-    expect(screen.getByRole('columnheader', { name: 'Identity' })).toHaveAttribute('aria-colspan', '2')
+    expect(screen.getByRole('columnheader', { name: 'Identity' })).toHaveAttribute(
+      'aria-colspan',
+      '2',
+    )
     expect(screen.getByRole('columnheader', { name: 'Work' })).toHaveAttribute('aria-colspan', '2')
     expect(screen.getByRole('columnheader', { name: /Name/ })).toBeInTheDocument()
     expect(screen.getByRole('columnheader', { name: /Salary/ })).toBeInTheDocument()
@@ -107,11 +104,7 @@ describe('DataGrid header groups', () => {
 
   it('shows resize handles on leaf headers only', () => {
     const { container } = render(
-      <DataGrid
-        data={data}
-        columns={columns}
-        getRowId={(row) => row.id}
-      />,
+      <DataGrid data={data} columns={columns} getRowId={(row) => row.id} />,
     )
 
     const identityHeader = screen.getByRole('columnheader', { name: 'Identity' })
@@ -124,11 +117,7 @@ describe('DataGrid header groups', () => {
 
   it('renders padded placeholders by default', () => {
     const { container } = render(
-      <DataGrid
-        data={data}
-        columns={columnsWithUngrouped}
-        getRowId={(row) => row.id}
-      />,
+      <DataGrid data={data} columns={columnsWithUngrouped} getRowId={(row) => row.id} />,
     )
 
     const idHeader = screen.getByRole('columnheader', { name: /ID/ })
@@ -137,6 +126,29 @@ describe('DataGrid header groups', () => {
     expect(placeholder).toBeInTheDocument()
     expect(idHeader).toHaveStyle({ top: '0px', height: '36px' })
     expect(placeholder).toHaveStyle({ top: '36px' })
+  })
+
+  it('applies a custom height to padded grouped headers with a filter row', () => {
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columnsWithUngrouped}
+        getRowId={(row) => row.id}
+        headerHeight={32}
+        enableColumnFilters
+      />,
+    )
+
+    const idHeader = screen.getByRole('columnheader', { name: /ID/ })
+    const placeholder = container.querySelector('[data-placeholder="true"]')
+
+    expect(container.querySelector('.gridkit-header-row')).toHaveStyle({ height: '64px' })
+    expect(idHeader).toHaveStyle({ top: '0px', height: '32px' })
+    expect(placeholder).toHaveStyle({ top: '32px', height: '32px' })
+    expect(container.querySelector('.gridkit-filter-row')).toHaveStyle({ height: '36px' })
+    expect(container.querySelector('.gridkit-shell')).toHaveStyle({
+      '--gridkit-header-height': '32px',
+    })
   })
 
   it('spans ungrouped leaf headers and hides placeholders in span layout', () => {
@@ -229,5 +241,31 @@ describe('DataGrid header groups', () => {
     expect(idHeader).toHaveAttribute('data-pinned', 'left')
     expect(idHeader).toHaveAttribute('aria-rowspan', '2')
     expect(idHeader).toHaveStyle({ top: '0px', height: '72px' })
+  })
+
+  it('uses one custom height across pinned regions in span layout with filters', () => {
+    const { container } = render(
+      <DataGrid
+        data={data}
+        columns={columnsWithUngrouped}
+        getRowId={(row) => row.id}
+        headerGroupLayout="span"
+        headerHeight={32}
+        initialPinning={{ left: ['id'], right: ['salary'] }}
+        enableColumnPinning
+        enableColumnFilters
+      />,
+    )
+
+    const headerRows = container.querySelectorAll('.gridkit-header-row')
+    const filterRows = container.querySelectorAll('.gridkit-filter-row')
+    const idHeader = screen.getByRole('columnheader', { name: /ID/ })
+
+    expect(headerRows).toHaveLength(3)
+    headerRows.forEach((row) => expect(row).toHaveStyle({ height: '64px' }))
+    expect(filterRows).toHaveLength(3)
+    filterRows.forEach((row) => expect(row).toHaveStyle({ height: '36px' }))
+    expect(idHeader).toHaveAttribute('data-pinned', 'left')
+    expect(idHeader).toHaveStyle({ top: '0px', height: '64px' })
   })
 })

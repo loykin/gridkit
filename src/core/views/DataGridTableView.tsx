@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useCallback, useLayoutEffect, useMemo } from 'react'
-import {
-  type Row,
-  type Table,
-} from '@tanstack/react-table'
+import { type Row, type Table } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { useGridKitLabels } from '@/core/LabelsContext'
-import { useGridKitUI } from '@/core/UIAdapterContext'
+import { useTableViewMetrics } from '@/core/TableViewMetricsContext'
 import { ScrollTable } from '@/core/table/ScrollTable'
 import type { DataGridStyles, TableViewConfig } from '@/types'
 import { useTableScrollSync } from '@/core/hooks/useTableScrollSync'
@@ -26,7 +23,10 @@ import { TableScrollbars } from './table/TableScrollbars'
 // Props
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface DataGridTableViewProps<T extends object> extends TableViewConfig<T> {
+export interface DataGridTableViewProps<T extends object> extends Omit<
+  TableViewConfig<T>,
+  'headerHeight' | 'rowHeight' | 'estimateRowHeight'
+> {
   table: Table<T>
   rows: Row<T>[]
   containerRef: React.RefObject<HTMLDivElement | null>
@@ -66,9 +66,6 @@ export function DataGridTableView<T extends object>({
   fillContainer,
   fillParent,
   tableWidthMode = 'spacer',
-  headerHeight,
-  rowHeight,
-  estimateRowHeight,
   overscan = 10,
   loadMoreRef,
   isFetchingNextPage,
@@ -85,10 +82,7 @@ export function DataGridTableView<T extends object>({
   classNames,
   styles,
 }: DataGridTableViewProps<T>) {
-  const { appearance } = useGridKitUI()
-  const effectiveHeaderHeight = headerHeight ?? appearance?.metrics?.headerHeight ?? 36
-  const effectiveRowHeight = rowHeight ?? appearance?.metrics?.rowHeight
-  const effectiveEstimate = estimateRowHeight ?? effectiveRowHeight ?? 33
+  const metrics = useTableViewMetrics()
   const labels = useGridKitLabels()
   const effectiveEmptyMessage = emptyMessage ?? labels.noData
 
@@ -97,32 +91,45 @@ export function DataGridTableView<T extends object>({
 
   // ── Master-Detail state ─────────────────────────────────────────────────
   const [expandedDetailRows, setExpandedDetailRows] = useState<Set<string>>(new Set())
-  const detailRowCtx = useMemo(() => ({
-    expandedRows: expandedDetailRows,
-    toggleRow: (rowId: string) => setExpandedDetailRows((prev) => {
-      const next = new Set(prev)
-      if (next.has(rowId)) next.delete(rowId)
-      else next.add(rowId)
-      return next
+  const detailRowCtx = useMemo(
+    () => ({
+      expandedRows: expandedDetailRows,
+      toggleRow: (rowId: string) =>
+        setExpandedDetailRows((prev) => {
+          const next = new Set(prev)
+          if (next.has(rowId)) next.delete(rowId)
+          else next.add(rowId)
+          return next
+        }),
     }),
-  }), [expandedDetailRows])
+    [expandedDetailRows],
+  )
 
   // ── Inline editing state ────────────────────────────────────────────────
   const [editingCellId, setEditingCellId] = useState<string | null>(null)
-  const editingCtx = useMemo(() => ({
-    editingCellId,
-    startEdit: (cellId: string) => setEditingCellId(cellId),
-    stopEdit: () => setEditingCellId(null),
-    commitEdit: (rowId: string, columnId: string, value: unknown) => {
-      onCellValueChange?.(rowId, columnId, value)
-      setEditingCellId(null)
-    },
-  }), [editingCellId, onCellValueChange])
+  const editingCtx = useMemo(
+    () => ({
+      editingCellId,
+      startEdit: (cellId: string) => setEditingCellId(cellId),
+      stopEdit: () => setEditingCellId(null),
+      commitEdit: (rowId: string, columnId: string, value: unknown) => {
+        onCellValueChange?.(rowId, columnId, value)
+        setEditingCellId(null)
+      },
+    }),
+    [editingCellId, onCellValueChange],
+  )
 
   const icons = useIcons()
 
   // ── Action menu ────────────────────────────────────────────────────────────
-  const { open: actionMenuOpen, setOpen: setActionMenuOpen, activeRow, anchorRef, trigger: handleActionTrigger } = useActionMenu<T>()
+  const {
+    open: actionMenuOpen,
+    setOpen: setActionMenuOpen,
+    activeRow,
+    anchorRef,
+    trigger: handleActionTrigger,
+  } = useActionMenu<T>()
 
   const actionCol = visibleLeafColumns.find((col) => col.columnDef.meta?.actions != null)
   const actionItems = actionCol && activeRow ? actionCol.columnDef.meta!.actions!(activeRow) : []
@@ -137,14 +144,15 @@ export function DataGridTableView<T extends object>({
   const bodyWrapperRef = React.useRef<HTMLDivElement | null>(null)
   const [fillBodyMaxHeight, setFillBodyMaxHeight] = useState<number | undefined>()
   const hasFixedTableHeight = tableHeight != null && tableHeight !== 'auto'
-  const hasFixedScrollContainer = hasFixedTableHeight || fillParent === true || fillContainer === true
+  const hasFixedScrollContainer =
+    hasFixedTableHeight || fillParent === true || fillContainer === true
 
   // ── Virtualizer ────────────────────────────────────────────────────────────
   const { virtual, virtualizer: rowVirtualizer } = useTableVirtualizer({
     rows,
     enabledByLayout: hasFixedScrollContainer,
     bodyScrollRef,
-    estimateSize: effectiveEstimate,
+    estimateSize: metrics.estimateRowHeight,
     overscan,
   })
   const keyboard = useGridKeyboardNavigation({
@@ -235,7 +243,15 @@ export function DataGridTableView<T extends object>({
       observer.disconnect()
       window.removeEventListener('resize', measure)
     }
-  }, [containerRef, fillContainer, fillParent, hasFixedTableHeight, headerScrollRef, showHeader, tableHeight])
+  }, [
+    containerRef,
+    fillContainer,
+    fillParent,
+    hasFixedTableHeight,
+    headerScrollRef,
+    showHeader,
+    tableHeight,
+  ])
 
   // Body wrapper: fixed height when tableHeight is set so hscroll stays inside
   const toCSS = (v: string | number) => (typeof v === 'number' ? `${v}px` : v)
@@ -247,13 +263,13 @@ export function DataGridTableView<T extends object>({
       ? { height: toCSS(tableHeight as string | number) }
       : fillParent
         ? { flex: '1 1 auto', minHeight: 0 }
-      : fillContainer
-        ? fillBodyMaxHeight != null
-          ? { maxHeight: toCSS(fillBodyMaxHeight) }
-          : {}
-        : maxTableHeight != null
-        ? { maxHeight: toCSS(maxTableHeight) }
-        : {}),
+        : fillContainer
+          ? fillBodyMaxHeight != null
+            ? { maxHeight: toCSS(fillBodyMaxHeight) }
+            : {}
+          : maxTableHeight != null
+            ? { maxHeight: toCSS(maxTableHeight) }
+            : {}),
     ...(minTableHeight != null ? { minHeight: toCSS(minTableHeight) } : {}),
   }
 
@@ -264,18 +280,22 @@ export function DataGridTableView<T extends object>({
     overflow: 'auto',
   }
 
-  const handleHeaderWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
-    const el = bodyScrollRef.current
-    if (!el) return
+  const handleHeaderWheel = useCallback(
+    (event: React.WheelEvent<HTMLDivElement>) => {
+      const el = bodyScrollRef.current
+      if (!el) return
 
-    const horizontalDelta = Math.abs(event.deltaX) >= Math.abs(event.deltaY) || event.shiftKey
-      ? event.deltaX || event.deltaY
-      : 0
-    if (horizontalDelta === 0) return
+      const horizontalDelta =
+        Math.abs(event.deltaX) >= Math.abs(event.deltaY) || event.shiftKey
+          ? event.deltaX || event.deltaY
+          : 0
+      if (horizontalDelta === 0) return
 
-    event.preventDefault()
-    el.scrollLeft += horizontalDelta
-  }, [bodyScrollRef])
+      event.preventDefault()
+      el.scrollLeft += horizontalDelta
+    },
+    [bodyScrollRef],
+  )
 
   const renderBodyRegion = ({
     region,
@@ -289,11 +309,17 @@ export function DataGridTableView<T extends object>({
     return (
       <div
         ref={scrollRef}
-        className={cn('gridkit-body-scroll', 'scrollbar-none', region.id !== 'center' && 'gridkit-body-scroll--pinned')}
+        className={cn(
+          'gridkit-body-scroll',
+          'scrollbar-none',
+          region.id !== 'center' && 'gridkit-body-scroll--pinned',
+        )}
         style={region.id === 'center' ? bodyStyle : { overflow: 'hidden', minHeight: 0 }}
         onScroll={region.id === 'center' ? syncScroll : undefined}
       >
-        <ScrollTable style={{ width: region.width, minWidth: region.id === 'center' ? '100%' : undefined }}>
+        <ScrollTable
+          style={{ width: region.width, minWidth: region.id === 'center' ? '100%' : undefined }}
+        >
           <DetailRowContext value={detailRowCtx}>
             <EditingCellContext value={editingCtx}>
               <DataGridBody
@@ -307,7 +333,7 @@ export function DataGridTableView<T extends object>({
                 onRowClick={onRowClick}
                 rowCursor={rowCursor}
                 bordered={bordered}
-                rowHeight={effectiveRowHeight}
+                rowHeight={metrics.rowHeight}
                 onActionTrigger={actionCol ? handleActionTrigger : undefined}
                 tableWidthMode={region.tableWidthMode}
                 pinning={false}
@@ -326,7 +352,11 @@ export function DataGridTableView<T extends object>({
           </DetailRowContext>
         </ScrollTable>
         {region.id === 'center' && loadMoreRef && (
-          <div ref={loadMoreRef} className={cn('gridkit-table-load-more', classNames?.loadMore)} style={styles?.loadMore}>
+          <div
+            ref={loadMoreRef}
+            className={cn('gridkit-table-load-more', classNames?.loadMore)}
+            style={styles?.loadMore}
+          >
             {isFetchingNextPage && icons.loading}
           </div>
         )}
@@ -351,7 +381,11 @@ export function DataGridTableView<T extends object>({
           contain: 'layout paint',
           ...styles?.content,
         }}
-        className={cn('gridkit-container', fillContainer && !fillParent && 'gridkit-container--fill', classNames?.content)}
+        className={cn(
+          'gridkit-container',
+          fillContainer && !fillParent && 'gridkit-container--fill',
+          classNames?.content,
+        )}
         role="grid"
         aria-label={labels.grid}
         aria-rowcount={rows.length}
@@ -370,7 +404,7 @@ export function DataGridTableView<T extends object>({
           bordered={bordered}
           virtual={virtual}
           headerGroupLayout={headerGroupLayout}
-          headerHeight={effectiveHeaderHeight}
+          headerHeight={metrics.headerHeight}
           enableColumnPinning={enableColumnPinning}
           enableColumnMenu={enableColumnMenu}
           renderColumnMenu={renderColumnMenu}
@@ -383,20 +417,36 @@ export function DataGridTableView<T extends object>({
         {/* Body scroll container + scrollbars */}
         <div
           ref={bodyWrapperRef}
-          className={cn('gridkit-body-wrapper', fillContainer && !fillParent && 'gridkit-body-wrapper--fill', classNames?.body)}
+          className={cn(
+            'gridkit-body-wrapper',
+            fillContainer && !fillParent && 'gridkit-body-wrapper--fill',
+            classNames?.body,
+          )}
           style={{ ...bodyWrapperStyle, ...styles?.body }}
         >
-          <div className="gridkit-region-grid gridkit-body-regions" style={{ gridTemplateColumns: layout.gridTemplateColumns, flex: 1, minHeight: 0 }}>
+          <div
+            className="gridkit-region-grid gridkit-body-regions"
+            style={{ gridTemplateColumns: layout.gridTemplateColumns, flex: 1, minHeight: 0 }}
+          >
             {layout.hasLeftRegion && (
-              <div className="gridkit-region gridkit-region--left" style={{ width: layout.regions.left.width, minHeight: 0 }}>
+              <div
+                className="gridkit-region gridkit-region--left"
+                style={{ width: layout.regions.left.width, minHeight: 0 }}
+              >
                 {renderBodyRegion({ region: layout.regions.left, scrollRef: leftBodyScrollRef })}
               </div>
             )}
-            <div className="gridkit-region gridkit-region--center" style={{ minHeight: 0, minWidth: 0 }}>
+            <div
+              className="gridkit-region gridkit-region--center"
+              style={{ minHeight: 0, minWidth: 0 }}
+            >
               {renderBodyRegion({ region: layout.regions.center, scrollRef: bodyScrollRef })}
             </div>
             {layout.hasRightRegion && (
-              <div className="gridkit-region gridkit-region--right" style={{ width: layout.regions.right.width, minHeight: 0 }}>
+              <div
+                className="gridkit-region gridkit-region--right"
+                style={{ width: layout.regions.right.width, minHeight: 0 }}
+              >
                 {renderBodyRegion({ region: layout.regions.right, scrollRef: rightBodyScrollRef })}
               </div>
             )}
@@ -411,10 +461,7 @@ export function DataGridTableView<T extends object>({
 
       {/* Single shared action menu — custom positioned, no base-ui dependency */}
       {actionCol && actionMenuOpen && anchorRef.current && (
-        <ActionMenuPopup
-          anchor={anchorRef.current}
-          onClose={() => setActionMenuOpen(false)}
-        >
+        <ActionMenuPopup anchor={anchorRef.current} onClose={() => setActionMenuOpen(false)}>
           {actionItems.map((item, i) => (
             <button
               key={i}

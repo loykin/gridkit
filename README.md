@@ -348,6 +348,17 @@ Adapter metrics are defaults, not locks. Explicit grid configuration wins:
 />
 ```
 
+`headerHeight` is a layout input, not just a paint override. GridKit uses the
+resolved value for grouped-header geometry and also exposes it as
+`--gridkit-header-height` so header controls remain aligned. An explicit
+`headerHeight` prop overrides the adapter metric; changing only the CSS variable
+does not change the layout plan.
+
+`rowHeight` follows the same resolution path: the resolved value drives the row
+DOM geometry, virtualizer estimate, and `--gridkit-row-height`. Use
+`estimateRowHeight` only when variable-height rows need a different initial
+virtualizer estimate.
+
 Use `GridKitProvider` when the same adapter should apply to multiple views:
 
 ```tsx

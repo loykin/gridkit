@@ -18,6 +18,22 @@ import { SortableRow } from '@/features/reordering/SortableRow'
 import { IconsProvider } from '@/core/IconsContext'
 import { LabelsProvider } from '@/core/LabelsContext'
 import { GridKitProvider } from '@/core/UIAdapterContext'
+import { TableViewMetricsProvider, useTableViewMetrics } from '@/core/TableViewMetricsContext'
+
+function RowDragOverlay({ active }: { active: boolean }) {
+  const { rowHeight } = useTableViewMetrics()
+
+  return (
+    <DragOverlay>
+      {active && (
+        <div
+          className="rounded border border-[var(--gridkit-primary)]/40 bg-[var(--gridkit-primary)]/5 shadow-xl ring-1 ring-primary/20"
+          style={{ height: rowHeight ?? 36 }}
+        />
+      )}
+    </DragOverlay>
+  )
+}
 
 export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
   const { data = [], onRowReorder, getRowId, icons } = props
@@ -66,40 +82,39 @@ export function DataGridDrag<T extends object>(props: DataGridDragProps<T>) {
 
   return (
     <GridKitProvider adapter={props.uiAdapter}>
-      <LabelsProvider labels={props.labels}>
-        <IconsProvider icons={icons}>
-        <RowWrapperContext.Provider value={SortableRow}>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
-              <DataGridShell
-                {...props}
-                wrapperRef={wrapperRef}
-                containerRef={containerRef}
-                table={table}
-                rows={rows}
-                isSized={isSized}
-                measure={measure}
-              />
-            </SortableContext>
+      <TableViewMetricsProvider
+        headerHeight={props.headerHeight}
+        rowHeight={props.rowHeight}
+        estimateRowHeight={props.estimateRowHeight}
+      >
+        <LabelsProvider labels={props.labels}>
+          <IconsProvider icons={icons}>
+            <RowWrapperContext.Provider value={SortableRow}>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
+                  <DataGridShell
+                    {...props}
+                    wrapperRef={wrapperRef}
+                    containerRef={containerRef}
+                    table={table}
+                    rows={rows}
+                    isSized={isSized}
+                    measure={measure}
+                  />
+                </SortableContext>
 
-            {/* Portal overlay — renders outside scroll container so it's never clipped */}
-            <DragOverlay>
-              {activeRow && (
-                <div
-                  className="rounded border border-[var(--gridkit-primary)]/40 bg-[var(--gridkit-primary)]/5 shadow-xl ring-1 ring-primary/20"
-                  style={{ height: props.rowHeight ?? 36 }}
-                />
-              )}
-            </DragOverlay>
-          </DndContext>
-        </RowWrapperContext.Provider>
-        </IconsProvider>
-      </LabelsProvider>
+                {/* Portal overlay — renders outside scroll container so it's never clipped */}
+                <RowDragOverlay active={activeRow != null} />
+              </DndContext>
+            </RowWrapperContext.Provider>
+          </IconsProvider>
+        </LabelsProvider>
+      </TableViewMetricsProvider>
     </GridKitProvider>
   )
 }

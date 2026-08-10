@@ -1,10 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-import {
-  MuiGridKitProvider,
-  createMuiAdapter,
-} from '@/adapters/mui'
+import { MuiGridKitProvider, createMuiAdapter } from '@/adapters/mui'
 import {
   ColumnVisibilityDropdown,
   DataGrid,
@@ -32,9 +29,7 @@ const rows: TestRow[] = [
   { id: '2', name: 'Grace' },
 ]
 
-const columns: DataGridColumnDef<TestRow>[] = [
-  { accessorKey: 'name', header: 'Name' },
-]
+const columns: DataGridColumnDef<TestRow>[] = [{ accessorKey: 'name', header: 'Name' }]
 
 const DefaultButton = defaultUIAdapter.Button
 const DefaultBadge = defaultUIAdapter.Badge
@@ -166,6 +161,7 @@ describe('GridKit UI adapter', () => {
       height: '56px',
     })
     expect(document.querySelector('.gridkit-shell')).toHaveStyle({
+      '--gridkit-header-height': '56px',
       '--gridkit-cell-padding-x': '10px',
       '--gridkit-checkbox-size': '24px',
     })
@@ -196,6 +192,10 @@ describe('GridKit UI adapter', () => {
     })
     expect(document.querySelector('.gridkit-header-row')).toHaveStyle({
       height: '42px',
+    })
+    expect(document.querySelector('.gridkit-shell')).toHaveStyle({
+      '--gridkit-header-height': '42px',
+      '--gridkit-row-height': '38px',
     })
   })
 
@@ -236,6 +236,62 @@ describe('GridKit UI adapter', () => {
     expect(screen.getByRole('row', { name: /Select row 1/ })).toHaveStyle({
       minHeight: '44px',
     })
+  })
+
+  it('resolves explicit table metrics consistently across table view variants', () => {
+    const metricsAdapter: GridKitUIAdapter = {
+      appearance: {
+        metrics: {
+          headerHeight: 50,
+          rowHeight: 46,
+        },
+      },
+    }
+    const renderers = [
+      () =>
+        render(
+          <DataGrid
+            data={rows}
+            columns={columns}
+            uiAdapter={metricsAdapter}
+            headerHeight={42}
+            rowHeight={38}
+          />,
+        ),
+      () =>
+        render(
+          <DataGridDrag
+            data={rows}
+            columns={columns}
+            uiAdapter={metricsAdapter}
+            headerHeight={42}
+            rowHeight={38}
+            getRowId={(row) => row.id}
+            onRowReorder={() => undefined}
+          />,
+        ),
+      () =>
+        render(
+          <DataGridInfinity
+            data={rows}
+            columns={columns}
+            uiAdapter={metricsAdapter}
+            headerHeight={42}
+            rowHeight={38}
+          />,
+        ),
+    ]
+
+    for (const renderView of renderers) {
+      const view = renderView()
+      expect(view.container.querySelector('.gridkit-shell')).toHaveStyle({
+        '--gridkit-header-height': '42px',
+        '--gridkit-row-height': '38px',
+      })
+      expect(view.container.querySelector('.gridkit-header-row')).toHaveStyle({ height: '42px' })
+      expect(view.container.querySelector('.gridkit-row')).toHaveStyle({ minHeight: '38px' })
+      view.unmount()
+    }
   })
 
   it('does not let undefined nested metrics erase parent adapter values', () => {
@@ -327,19 +383,13 @@ describe('GridKit UI adapter', () => {
 
     render(
       <ThemeProvider theme={theme}>
-        <MuiGridKitProvider
-          preset="data-grid"
-          density="compact"
-          columnHeaderHeight={46}
-        >
+        <MuiGridKitProvider preset="data-grid" density="compact" columnHeaderHeight={46}>
           <DataGrid data={rows} columns={columns} />
         </MuiGridKitProvider>
       </ThemeProvider>,
     )
 
-    expect(document.querySelector('.gridkit-shell')).toHaveClass(
-      'gridkit-theme-mui-data-grid',
-    )
+    expect(document.querySelector('.gridkit-shell')).toHaveClass('gridkit-theme-mui-data-grid')
     expect(document.querySelector('.gridkit-shell')).toHaveStyle({
       '--gridkit-primary': '#00695c',
     })
@@ -351,13 +401,7 @@ describe('GridKit UI adapter', () => {
   it('applies the MUI dark theme foreground color to the grid shell', () => {
     const theme = createTheme({ palette: { mode: 'dark' } })
 
-    render(
-      <DataGrid
-        data={rows}
-        columns={columns}
-        uiAdapter={createMuiAdapter(theme)}
-      />,
-    )
+    render(<DataGrid data={rows} columns={columns} uiAdapter={createMuiAdapter(theme)} />)
 
     expect(document.querySelector('.gridkit-shell')).toHaveStyle({
       '--gridkit-foreground': theme.palette.text.primary,
@@ -368,10 +412,7 @@ describe('GridKit UI adapter', () => {
   it('keeps MUI density defaults when MuiGridKitProvider receives partial metrics', () => {
     render(
       <ThemeProvider theme={createTheme()}>
-        <MuiGridKitProvider
-          density="comfortable"
-          metrics={{ rowHeight: 44 }}
-        >
+        <MuiGridKitProvider density="comfortable" metrics={{ rowHeight: 44 }}>
           <DataGrid
             data={rows}
             columns={columns}
@@ -455,9 +496,9 @@ describe('GridKit UI adapter', () => {
     expect(select).toHaveAttribute('aria-describedby', 'mui-select-description')
     expect(document.querySelector('[data-select-probe="native"]')).toBeInTheDocument()
     expect(onBlur).toHaveBeenCalled()
-    expect(
-      consoleError.mock.calls.some((call) => String(call[0]).includes('controlled')),
-    ).toBe(false)
+    expect(consoleError.mock.calls.some((call) => String(call[0]).includes('controlled'))).toBe(
+      false,
+    )
     consoleError.mockRestore()
   })
 
@@ -474,10 +515,7 @@ describe('GridKit UI adapter', () => {
 
     render(<MuiSelectComponent {...unsupportedProps} />)
 
-    expect(screen.getByRole('combobox')).not.toHaveAttribute(
-      'aria-multiselectable',
-      'true',
-    )
+    expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-multiselectable', 'true')
   })
 
   it('anchors a controlled MUI fallback popover before its first click', async () => {
@@ -534,87 +572,72 @@ describe('GridKit UI adapter', () => {
   })
 
   it('preserves legacy raw menu items without an adapter', () => {
-    render(
-      <DataGrid
-        data={rows}
-        columns={columns}
-        enableColumnMenu
-      />,
-    )
+    render(<DataGrid data={rows} columns={columns} enableColumnMenu />)
 
     fireEvent.click(screen.getByLabelText('Column menu for name'))
-    expect(screen.getByRole('button', { name: 'Sort Ascending' })).not.toHaveClass(
-      'gridkit-btn',
-    )
+    expect(screen.getByRole('button', { name: 'Sort Ascending' })).not.toHaveClass('gridkit-btn')
   })
 
   it('keeps adapter appearance opt-in across the main view families', () => {
     const renderers = [
-      (uiAdapter?: GridKitUIAdapter) => render(
-        <DataGrid data={rows} columns={columns} uiAdapter={uiAdapter} />,
-      ),
-      (uiAdapter?: GridKitUIAdapter) => render(
-        <DataGridDrag
-          data={rows}
-          columns={columns}
-          uiAdapter={uiAdapter}
-          getRowId={(row) => row.id}
-          onRowReorder={() => undefined}
-        />,
-      ),
-      (uiAdapter?: GridKitUIAdapter) => render(
-        <DataGridInfinity
-          data={rows}
-          columns={columns}
-          uiAdapter={uiAdapter}
-        />,
-      ),
-      (uiAdapter?: GridKitUIAdapter) => render(
-        <DataGridCard
-          data={rows}
-          columns={columns}
-          uiAdapter={uiAdapter}
-          renderCard={(row) => <div>{row.original.name}</div>}
-        />,
-      ),
-      (uiAdapter?: GridKitUIAdapter) => render(
-        <DataGridList
-          data={rows}
-          columns={columns}
-          uiAdapter={uiAdapter}
-          renderItem={(row) => <div>{row.original.name}</div>}
-        />,
-      ),
-      (uiAdapter?: GridKitUIAdapter) => render(
-        <DataGridChat
-          data={rows}
-          columns={columns}
-          uiAdapter={uiAdapter}
-          renderMessage={(row) => <div>{row.original.name}</div>}
-        />,
-      ),
-      (uiAdapter?: GridKitUIAdapter) => render(
-        <DataGridAgentChat
-          uiAdapter={uiAdapter}
-          events={[
-            { id: '1', type: 'message', role: 'assistant', content: 'Done' },
-          ]}
-        />,
-      ),
+      (uiAdapter?: GridKitUIAdapter) =>
+        render(<DataGrid data={rows} columns={columns} uiAdapter={uiAdapter} />),
+      (uiAdapter?: GridKitUIAdapter) =>
+        render(
+          <DataGridDrag
+            data={rows}
+            columns={columns}
+            uiAdapter={uiAdapter}
+            getRowId={(row) => row.id}
+            onRowReorder={() => undefined}
+          />,
+        ),
+      (uiAdapter?: GridKitUIAdapter) =>
+        render(<DataGridInfinity data={rows} columns={columns} uiAdapter={uiAdapter} />),
+      (uiAdapter?: GridKitUIAdapter) =>
+        render(
+          <DataGridCard
+            data={rows}
+            columns={columns}
+            uiAdapter={uiAdapter}
+            renderCard={(row) => <div>{row.original.name}</div>}
+          />,
+        ),
+      (uiAdapter?: GridKitUIAdapter) =>
+        render(
+          <DataGridList
+            data={rows}
+            columns={columns}
+            uiAdapter={uiAdapter}
+            renderItem={(row) => <div>{row.original.name}</div>}
+          />,
+        ),
+      (uiAdapter?: GridKitUIAdapter) =>
+        render(
+          <DataGridChat
+            data={rows}
+            columns={columns}
+            uiAdapter={uiAdapter}
+            renderMessage={(row) => <div>{row.original.name}</div>}
+          />,
+        ),
+      (uiAdapter?: GridKitUIAdapter) =>
+        render(
+          <DataGridAgentChat
+            uiAdapter={uiAdapter}
+            events={[{ id: '1', type: 'message', role: 'assistant', content: 'Done' }]}
+          />,
+        ),
     ]
 
     for (const renderView of renderers) {
       const defaultView = renderView()
-      expect(defaultView.container.querySelector('.gridkit-shell')).toHaveClass(
-        'gridkit-shell',
-      )
+      expect(defaultView.container.querySelector('.gridkit-shell')).toHaveClass('gridkit-shell')
       expect(defaultView.container.querySelector('.adapter-theme')).not.toBeInTheDocument()
       defaultView.unmount()
 
       const adaptedView = renderView(adapter)
-      expect(adaptedView.container.querySelector('.gridkit-shell')).toHaveClass(
-        'adapter-theme',
-      )
+      expect(adaptedView.container.querySelector('.gridkit-shell')).toHaveClass('adapter-theme')
       adaptedView.unmount()
     }
   })
