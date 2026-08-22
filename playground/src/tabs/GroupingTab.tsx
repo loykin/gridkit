@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { DataGrid } from '@loykin/gridkit'
-import type { DataGridColumnDef } from '@loykin/gridkit'
-import type { GroupingState, Row } from '@tanstack/react-table'
+import type { DataGridColumnDef, Row } from '@loykin/gridkit'
+import type { GroupingState } from '@tanstack/react-table'
 import { ALL_DATA, type Employee } from '../data/employees'
 
 const STATUS_COLORS: Record<Employee['status'], string> = {

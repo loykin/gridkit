@@ -6,7 +6,7 @@ import { ColumnVisibilityDropdown } from '@/core/controls/ColumnVisibilityDropdo
 import { DataGridPaginationBar } from '@/core/controls/DataGridPaginationBar'
 import { useGridKitRovingFocus } from '@/core/view-sdk/useGridKitRovingFocus'
 import type { DataGridColumnDef } from '@/types'
-import type { Row } from '@tanstack/react-table'
+import type { Row } from '@/core/engine/tanstack/gridKitTable'
 
 interface Person {
   id: string

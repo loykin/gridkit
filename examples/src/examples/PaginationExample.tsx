@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import type { Table } from '@tanstack/react-table'
 import {
   DataGrid,
   DataGridPaginationBar,
   DataGridPaginationCompact,
   DataGridPaginationPages,
 } from '@loykin/gridkit'
-import type { DataGridColumnDef } from '@loykin/gridkit'
+import type { DataGridColumnDef, Table } from '@loykin/gridkit'
 
 // ── Types & Data ───────────────────────────────────────────────────────────────
 

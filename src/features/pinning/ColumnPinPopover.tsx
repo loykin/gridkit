@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Column } from '@tanstack/react-table'
+import type { Column } from '@/core/engine/tanstack/gridKitTable'
 import { Button } from '@/core/UIComponents'
 import { Popover, PopoverContent, PopoverTrigger } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
@@ -27,23 +27,23 @@ export function ColumnPinPopover<T extends object>({ col }: ColumnPinPopoverProp
               size="icon-xs"
               className={pinned ? 'gridkit-btn--filter-active' : 'gridkit-btn--filter-inactive'}
             >
-              {pinned === 'left' ? icons.pinLeft : pinned === 'right' ? icons.pinRight : icons.pinLeft}
+              {pinned === 'start' ? icons.pinLeft : pinned === 'end' ? icons.pinRight : icons.pinLeft}
             </Button>
           )}
         />
         <PopoverContent className="gridkit-header-popover" side="bottom" align="start" style={{ width: 140, padding: '4px 0' }}>
           <button
             className="gridkit-popover-option"
-            onClick={() => { col.pin('left'); close() }}
-            data-active={pinned === 'left' ? 'true' : undefined}
+            onClick={() => { col.pin('start'); close() }}
+            data-active={pinned === 'start' ? 'true' : undefined}
           >
             {icons.pinLeft}
             <span>Pin Left</span>
           </button>
           <button
             className="gridkit-popover-option"
-            onClick={() => { col.pin('right'); close() }}
-            data-active={pinned === 'right' ? 'true' : undefined}
+            onClick={() => { col.pin('end'); close() }}
+            data-active={pinned === 'end' ? 'true' : undefined}
           >
             {icons.pinRight}
             <span>Pin Right</span>

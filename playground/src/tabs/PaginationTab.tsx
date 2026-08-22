@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@loykin/gridkit'
 import {
   DataGrid,
   DataGridPaginationBar,

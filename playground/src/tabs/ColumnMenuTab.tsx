@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { DataGrid } from '@loykin/gridkit'
-import type { ColumnMenuContext, DataGridColumnDef } from '@loykin/gridkit'
-import type { Column, Table } from '@tanstack/react-table'
+import type { Column, ColumnMenuContext, DataGridColumnDef, Table } from '@loykin/gridkit'
 import { ALL_DATA, type Employee } from '../data/employees'
 
 const columns: DataGridColumnDef<Employee>[] = [
@@ -70,8 +69,8 @@ function CustomMenu<T extends object>({
       )}
       {ctx.canPin && (
         <>
-          <button className="gridkit-popover-option" data-active={pinned === 'left' ? 'true' : undefined} onClick={() => { col.pin('left'); close() }}>← Pin Left</button>
-          <button className="gridkit-popover-option" data-active={pinned === 'right' ? 'true' : undefined} onClick={() => { col.pin('right'); close() }}>→ Pin Right</button>
+          <button className="gridkit-popover-option" data-active={pinned === 'start' ? 'true' : undefined} onClick={() => { col.pin('start'); close() }}>← Pin Left</button>
+          <button className="gridkit-popover-option" data-active={pinned === 'end' ? 'true' : undefined} onClick={() => { col.pin('end'); close() }}>→ Pin Right</button>
           {pinned && <button className="gridkit-popover-option" onClick={() => { col.pin(false); close() }}>Unpin</button>}
         </>
       )}

@@ -1,4 +1,4 @@
-import type { Column, Table } from '@tanstack/react-table'
+import type { Column, Table } from '@/core/engine/tanstack/gridKitTable'
 import { Button } from '@/core/UIComponents'
 import { Checkbox } from '@/core/UIComponents'
 import { useColumnOptions } from '@/features/filters/hooks/useColumnOptions'
@@ -9,7 +9,7 @@ interface Props<T extends object> {
 }
 
 export function MultiSelectContent<T extends object>({ col, table }: Props<T>) {
-  const { columnFilters, globalFilter } = table.getState()
+  const { columnFilters, globalFilter } = table.state
   const { options, hasEmpty, isLoading } = useColumnOptions(table, col.id, true, {
     columnFilters,
     globalFilter,

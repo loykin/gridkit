@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
-import type { Row } from '@tanstack/react-table'
+import type { Row } from '@/core/engine/tanstack/gridKitTable'
 
 export type GridKitRovingFocusOrientation = 'vertical' | 'horizontal' | 'grid'
 

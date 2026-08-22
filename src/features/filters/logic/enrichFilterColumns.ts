@@ -1,4 +1,4 @@
-import type { FilterFn } from '@tanstack/react-table'
+import type { FilterFn } from '@/core/engine/tanstack/gridKitTable'
 import type { DataGridColumnDef } from '@/types'
 import {
   betweenFilterFn,

@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createRef } from 'react'
-import type { Table, VisibilityState } from '@tanstack/react-table'
+import type { Table, VisibilityState } from '@/core/engine/tanstack/gridKitTable'
 import { describe, expect, it, vi } from 'vitest'
 import { DataGrid } from '@/DataGrid'
 import { ColumnVisibilityDropdown } from '@/core/controls/ColumnVisibilityDropdown'

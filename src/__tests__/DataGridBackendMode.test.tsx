@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createRef } from 'react'
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import { describe, expect, it, vi } from 'vitest'
 import { DataGrid } from '@/DataGrid'
 import { createDataStore } from '@/core/engine/store/DataStore'

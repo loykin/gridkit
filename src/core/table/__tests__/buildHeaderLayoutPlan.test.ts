@@ -1,4 +1,4 @@
-import type { Column, Header, HeaderGroup } from '@tanstack/react-table'
+import type { Column, Header, HeaderGroup } from '@/core/engine/tanstack/gridKitTable'
 import { describe, expect, it } from 'vitest'
 import { buildHeaderLayoutPlan } from '../buildHeaderLayoutPlan'
 
@@ -12,7 +12,7 @@ function column(id: keyof Row, size: number, pin: false | 'left' | 'right' = fal
   return {
     id,
     getSize: () => size,
-    getIsPinned: () => pin,
+    getIsPinned: () => pin === 'left' ? 'start' : pin === 'right' ? 'end' : false,
     getStart: () => startOffset,
     getAfter: () => startOffset + size,
     getIsVisible: () => true,

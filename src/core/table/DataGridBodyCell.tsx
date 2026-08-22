@@ -1,4 +1,4 @@
-import { type Cell, type Row, type Table } from '@tanstack/react-table'
+import { type Cell, type Row, type Table } from '@/core/engine/tanstack/gridKitTable'
 import type React from 'react'
 import { useEditingCell } from '@/features/editing/EditingCellContext'
 import { EditableCellContent } from '@/features/editing/EditableCellContent'
@@ -6,7 +6,7 @@ import { RowActionTrigger } from '@/features/actions/RowActionTrigger'
 import { cn } from '@/lib/utils'
 import type { DataGridClassNames, DataGridStyles } from '@/types'
 import type { GridFocusCell } from '@/core/hooks/useGridKeyboardNavigation'
-import { colStyle, isPinnedEdge } from './tableUtils'
+import { colStyle, isPinnedEdge, toPhysicalPinRegion } from './tableUtils'
 
 interface DataGridBodyCellProps<T extends object> {
   cell: Cell<T, unknown>
@@ -48,6 +48,7 @@ export function DataGridBodyCell<T extends object>({
   const editingCtx = useEditingCell()
   const meta = cell.column.columnDef.meta
   const pinned = cell.column.getIsPinned()
+  const pinnedRegion = toPhysicalPinRegion(pinned)
   const edge = isPinnedEdge(cell.column, table)
   const isEditing = editingCtx?.editingCellId === cell.id
   const canEdit = !!meta?.editCell
@@ -65,7 +66,7 @@ export function DataGridBodyCell<T extends object>({
       data-col-id={cell.column.id}
       data-align={meta?.align ?? undefined}
       data-wrap={meta?.wrap ? 'true' : undefined}
-      data-pinned={pinned || undefined}
+      data-pinned={pinnedRegion}
       data-pinned-edge={edge || undefined}
       data-last-col={isLast ? 'true' : undefined}
       data-bordered={bordered ? 'true' : undefined}

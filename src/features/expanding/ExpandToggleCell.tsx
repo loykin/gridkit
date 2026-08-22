@@ -1,11 +1,10 @@
-import type { Row } from '@tanstack/react-table'
+import type { Row } from '@/core/engine/tanstack/gridKitTable'
 import { useIcons } from '@/core/IconsContext'
 import { Button } from '@/core/UIComponents'
 import { useDetailRow } from './DetailRowContext'
 
-interface ExpandToggleCellProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  row: Row<any>
+interface ExpandToggleCellProps<TData extends object> {
+  row: Row<TData>
 }
 
 /**
@@ -17,7 +16,7 @@ interface ExpandToggleCellProps {
  *     header: () => null,
  *     cell: ({ row }) => <ExpandToggleCell row={row} /> }
  */
-export function ExpandToggleCell({ row }: ExpandToggleCellProps) {
+export function ExpandToggleCell<TData extends object>({ row }: ExpandToggleCellProps<TData>) {
   const icons = useIcons()
   const ctx = useDetailRow()
 

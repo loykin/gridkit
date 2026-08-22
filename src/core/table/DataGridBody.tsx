@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import type { Column, Row, Table } from '@tanstack/react-table'
+import type { Column, Row, Table } from '@/core/engine/tanstack/gridKitTable'
 import type { Virtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
@@ -190,7 +190,7 @@ export function DataGridBody<T extends object>({
           const detailPanel = isDetailExpanded ? (
             <div role="row" className="gridkit-detail-row">
               <div role="gridcell" style={{ width: '100%' }}>
-                {renderDetailRow(row as Row<unknown>)}
+                {renderDetailRow(row)}
               </div>
             </div>
           ) : null
@@ -261,7 +261,10 @@ export function DataGridBody<T extends object>({
 
           if (RowWrapper) {
             return (
-              <RowWrapper key={row.id} row={row}>
+              <RowWrapper
+                key={row.id}
+                row={row}
+              >
                 {bodyRow}
               </RowWrapper>
             )

@@ -1,5 +1,5 @@
 import React from 'react'
-import type { HeaderGroup, Table } from '@tanstack/react-table'
+import type { HeaderGroup, Table } from '@/core/engine/tanstack/gridKitTable'
 import { cn } from '@/lib/utils'
 import type {
   DataGridClassNames,

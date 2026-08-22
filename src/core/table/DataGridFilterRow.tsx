@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import type { Column, Table } from '@tanstack/react-table'
+import type { Column, Table } from '@/core/engine/tanstack/gridKitTable'
 import { cn } from '@/lib/utils'
 import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'

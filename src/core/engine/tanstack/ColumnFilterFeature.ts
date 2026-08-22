@@ -1,10 +1,10 @@
-import type { RowData, TableFeature } from '@tanstack/react-table'
+import type { RowData, TableFeatures } from '@/core/engine/tanstack/gridKitTable'
 import type { FilterParams } from '@/types'
 
 // ── Declaration merging ───────────────────────────────────────────────────────
 declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta<in out TFeatures extends TableFeatures, in out TData extends RowData, in out TValue> {
     /**
      * Column-level filter type (renders filter row under the header).
      * - 'text'         : free-text contains match (default when enableColumnFilters=true)
@@ -43,7 +43,3 @@ declare module '@tanstack/react-table' {
     filterParams?: FilterParams
   }
 }
-
-// ── Feature ───────────────────────────────────────────────────────────────────
-// Type declaration only — filter rendering is handled in DataGridTableView.
-export const ColumnFilterFeature: TableFeature = {}

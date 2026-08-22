@@ -1,4 +1,4 @@
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 import { useGridKitLabels } from '@/core/LabelsContext'
@@ -35,7 +35,7 @@ export function ColumnVisibilityDropdown<T extends object>({ table }: Props<T>) 
                 <Checkbox
                   aria-label={labels.toggleColumnVisibility(typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id)}
                   checked={col.getIsVisible()}
-                  onCheckedChange={col.toggleVisibility}
+                  onCheckedChange={(value) => col.toggleVisibility(value)}
                 />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {typeof col.columnDef.header === 'string' ? col.columnDef.header : col.id}

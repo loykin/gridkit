@@ -72,6 +72,16 @@ export type {
 } from './core/engine/store/DataStoreBackend'
 
 export type { EditCellProps } from './core/engine/tanstack/ColumnFlexFeature'
+export type {
+  Cell,
+  Column,
+  CoreTable,
+  GridKitTableFeatures,
+  Header,
+  HeaderGroup,
+  Row,
+  Table,
+} from './core/engine/tanstack/gridKitTable'
 
 export type {
   DataGridProps,

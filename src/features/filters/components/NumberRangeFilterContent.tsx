@@ -1,4 +1,4 @@
-import type { Column } from '@tanstack/react-table'
+import type { Column } from '@/core/engine/tanstack/gridKitTable'
 import { Input } from '@/core/UIComponents'
 import { Button } from '@/core/UIComponents'
 import { useGridKitLabels } from '@/core/LabelsContext'

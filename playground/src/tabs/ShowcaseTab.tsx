@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import type React from 'react'
-import type { Row } from '@tanstack/react-table'
+import type { Row } from '@loykin/gridkit'
 import { Code2, Monitor } from 'lucide-react'
 import {
   DataGrid,

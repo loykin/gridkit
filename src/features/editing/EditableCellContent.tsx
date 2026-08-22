@@ -1,4 +1,4 @@
-import { flexRender, type Cell, type Row } from '@tanstack/react-table'
+import { flexRender, type Cell, type Row } from '@/core/engine/tanstack/gridKitTable'
 import { useEditingCell } from './EditingCellContext'
 
 interface EditableCellContentProps<T extends object> {

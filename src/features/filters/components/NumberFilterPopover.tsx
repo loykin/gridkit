@@ -1,4 +1,4 @@
-import type { Column } from '@tanstack/react-table'
+import type { Column } from '@/core/engine/tanstack/gridKitTable'
 import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/core/UIComponents'

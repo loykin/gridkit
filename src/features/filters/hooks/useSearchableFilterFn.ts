@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { FilterFn } from '@tanstack/react-table'
+import type { FilterFn } from '@/core/engine/tanstack/gridKitTable'
 
 export function useSearchableFilterFn<T extends object>(
   searchableColumns?: string[],

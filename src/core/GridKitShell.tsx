@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import { cn } from '@/lib/utils'
 import { DataGridToolbar } from '@/core/controls/DataGridToolbar'
 import { CustomScrollbar } from '@/core/table/CustomScrollbar'

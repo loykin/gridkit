@@ -231,7 +231,7 @@ describe('DataGrid header groups', () => {
         columns={columnsWithUngrouped}
         getRowId={(row) => row.id}
         headerGroupLayout="span"
-        initialPinning={{ left: ['id'] }}
+        initialPinning={{ start: ['id'], end: [] }}
         enableColumnPinning
       />,
     )
@@ -251,7 +251,7 @@ describe('DataGrid header groups', () => {
         getRowId={(row) => row.id}
         headerGroupLayout="span"
         headerHeight={32}
-        initialPinning={{ left: ['id'], right: ['salary'] }}
+        initialPinning={{ start: ['id'], end: ['salary'] }}
         enableColumnPinning
         enableColumnFilters
       />,

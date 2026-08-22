@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react'
-import type { Row, Table } from '@tanstack/react-table'
+import type { Row, Table } from '@/core/engine/tanstack/gridKitTable'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'

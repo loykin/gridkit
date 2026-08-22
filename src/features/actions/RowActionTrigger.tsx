@@ -1,4 +1,4 @@
-import type { Row } from '@tanstack/react-table'
+import type { Row } from '@/core/engine/tanstack/gridKitTable'
 import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 

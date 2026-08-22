@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Column } from '@tanstack/react-table'
+import type { Column } from '@/core/engine/tanstack/gridKitTable'
 import { buildTableLayoutModel } from '../buildTableLayoutModel'
 
 interface Row {
@@ -10,7 +10,7 @@ function column(id: string, size: number, pinned?: 'left' | 'right'): Column<Row
   return {
     id,
     getSize: () => size,
-    getIsPinned: () => pinned ?? false,
+    getIsPinned: () => pinned === 'left' ? 'start' : pinned === 'right' ? 'end' : false,
   } as Column<Row>
 }
 

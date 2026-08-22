@@ -1,8 +1,8 @@
-import type { RowData, TableFeature } from '@tanstack/react-table'
+import type { RowData, TableFeatures } from '@/core/engine/tanstack/gridKitTable'
 
 declare module '@tanstack/react-table' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta<in out TFeatures extends TableFeatures, in out TData extends RowData, in out TValue> {
     /**
      * Set to false to hide the column menu button (⋮) for this column
      * when enableColumnMenu is active.
@@ -15,5 +15,3 @@ declare module '@tanstack/react-table' {
     pinControl?: false
   }
 }
-
-export const ColumnMenuFeature: TableFeature = {}

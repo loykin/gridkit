@@ -8,7 +8,7 @@ import type {
   PaginationState,
   SortingState,
   VisibilityState,
-} from '@tanstack/react-table'
+} from '@/core/engine/tanstack/gridKitTable'
 import type {
   GridKitPersistedState,
   GridKitPersistedStateKey,

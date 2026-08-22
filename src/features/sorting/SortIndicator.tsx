@@ -1,4 +1,4 @@
-import type { Header } from '@tanstack/react-table'
+import type { Header } from '@/core/engine/tanstack/gridKitTable'
 import { useIcons } from '@/core/IconsContext'
 
 interface SortIndicatorProps<T extends object> {

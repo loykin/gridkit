@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { Column, Table } from '@tanstack/react-table'
+import type { Column, Table } from '@/core/engine/tanstack/gridKitTable'
 import { Button } from '@/core/UIComponents'
 import { Input } from '@/core/UIComponents'
 import { Popover, PopoverContent, PopoverTrigger } from '@/core/UIComponents'
@@ -141,16 +141,16 @@ export function ColumnMenuButton<T extends object>({
           <div className="gridkit-col-menu-section">Pin</div>
           <button
             className="gridkit-popover-option"
-            data-active={pinned === 'left' ? 'true' : undefined}
-            onClick={() => { col.pin('left'); close() }}
+            data-active={pinned === 'start' ? 'true' : undefined}
+            onClick={() => { col.pin('start'); close() }}
           >
             {icons.pinLeft}
             <span>Pin Left</span>
           </button>
           <button
             className="gridkit-popover-option"
-            data-active={pinned === 'right' ? 'true' : undefined}
-            onClick={() => { col.pin('right'); close() }}
+            data-active={pinned === 'end' ? 'true' : undefined}
+            onClick={() => { col.pin('end'); close() }}
           >
             {icons.pinRight}
             <span>Pin Right</span>
