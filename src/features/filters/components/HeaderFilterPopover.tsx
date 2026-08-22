@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import type { Column, Table } from '@tanstack/react-table'
+import type { Column, Table } from '@/core/engine/tanstack/gridKitTable'
 import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
 import { useGridKitLabels } from '@/core/LabelsContext'

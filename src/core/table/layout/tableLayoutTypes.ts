@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { Column } from '@tanstack/react-table'
+import type { Column } from '@/core/engine/tanstack/gridKitTable'
 import type { TableWidthMode } from '@/types'
 
 export interface CenterColumnRegionModel<T extends object> {

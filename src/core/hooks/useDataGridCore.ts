@@ -1,23 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  getGroupedRowModel,
-  getPaginationRowModel,
-  getExpandedRowModel,
+  useTable,
   type ColumnFiltersState,
   type ColumnOrderState,
   type ColumnPinningState,
   type ColumnSizingState,
   type ExpandedState,
   type FilterFn,
+  type GridKitTableFeatures,
   type GroupingState,
   type PaginationState,
   type SortingState,
   type VisibilityState,
-} from '@tanstack/react-table'
+} from '@/core/engine/tanstack/gridKitTable'
 import type {
   DataGridBaseProps,
   DataGridPaginationConfig,
@@ -26,7 +21,7 @@ import { useTableStore } from '@/core/hooks/useTableStore'
 import { useGridStatePersistence } from '@/core/hooks/useGridStatePersistence'
 import { useDataStoreSubscription } from '@/core/engine/hooks/useDataStoreSubscription'
 import { useDataStoreQueryState } from '@/core/engine/hooks/useDataStoreQueryState'
-import { gridKitFeatures, getDataStoreCoreRowModel } from '@/core/engine/tanstack/gridKitFeatures'
+import { gridKitFeatures } from '@/core/engine/tanstack/gridKitFeatures'
 import { useBackendQuerySync } from '@/core/engine/hooks/useBackendQuerySync'
 import { useBackendCapabilitiesWarning } from '@/core/engine/hooks/useBackendCapabilitiesWarning'
 import { defaultGlobalFilterFn } from '@/features/filters/logic/filterFns'
@@ -223,15 +218,15 @@ export function useDataGridCore<T extends object>({
     ? pagination?.pageCount ?? Math.ceil(queryState.total / effectivePaginationState.pageSize)
     : pagination?.pageCount
 
-  const table = useReactTable<T>({
+  const table = useTable<GridKitTableFeatures, T>({
     // Escape hatch — spread first so explicit props below always win
     ...tableOptions,
-    // When dataStore is active, data is irrelevant — getDataStoreCoreRowModel
+    // When dataStore is active, data is irrelevant — the DataStore row model
     // reads directly from the store. Pass empty array to satisfy the type.
     data: dataStore ? ([] as T[]) : data,
     columns: enrichedColumns,
     getRowId,
-    _features: [...gridKitFeatures],
+    features: gridKitFeatures,
     dataStore,
     state: {
       sorting,
@@ -247,7 +242,9 @@ export function useDataGridCore<T extends object>({
     },
     manualSorting: effectiveManualSorting,
     manualFiltering: effectiveManualFiltering,
-    manualPagination: enableBackendQuery ? enablePagination : !!pagination?.pageCount,
+    enableGrouping,
+    manualGrouping: !enableGrouping,
+    manualPagination: !enablePagination || enableBackendQuery || !!pagination?.pageCount,
     pageCount: effectivePageCount,
 
     onSortingChange: (updater) => {
@@ -332,14 +329,6 @@ export function useDataGridCore<T extends object>({
           return Array.isArray(subs) && subs.length > 0
         }
       : undefined,
-
-    // Phase 3: row-caching model when DataStore is present; stock model otherwise
-    getCoreRowModel: dataStore ? getDataStoreCoreRowModel<T>() : getCoreRowModel(),
-    getGroupedRowModel: enableGrouping ? getGroupedRowModel() : undefined,
-    getExpandedRowModel: (enableExpanding || enableGrouping) ? getExpandedRowModel() : undefined,
-    getSortedRowModel: effectiveManualSorting ? undefined : getSortedRowModel(),
-    getFilteredRowModel: effectiveManualFiltering ? undefined : getFilteredRowModel(),
-    getPaginationRowModel: enablePagination && !enableBackendQuery ? getPaginationRowModel() : undefined,
 
     globalFilterFn:
       (searchableFilterFn as FilterFn<T> | undefined) ??

@@ -1,4 +1,4 @@
-import type { ColumnFiltersState, Table } from '@tanstack/react-table'
+import type { ColumnFiltersState, Table } from '@/core/engine/tanstack/gridKitTable'
 import { useEffect, useRef, useState } from 'react'
 import { buildBackendFilters, getBackendField } from '@/core/engine/backend/buildBackendQueryParams'
 
@@ -34,8 +34,8 @@ export function useColumnOptions<T extends object>(
   const [options, setOptions] = useState<string[]>([])
   const [hasEmpty, setHasEmpty] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const columnFilters = state?.columnFilters ?? table.getState().columnFilters
-  const globalFilter = state?.globalFilter ?? table.getState().globalFilter
+  const columnFilters = state?.columnFilters ?? table.state.columnFilters
+  const globalFilter = state?.globalFilter ?? table.state.globalFilter
   const columnFiltersKey = JSON.stringify(columnFilters)
   const globalFilterKey = String(globalFilter ?? '')
   const backendGlobalFilter = globalFilterKey || undefined

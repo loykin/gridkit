@@ -1,6 +1,6 @@
 import type React from 'react'
 import type { CSSProperties } from 'react'
-import type { Row, Table } from '@tanstack/react-table'
+import type { Row, Table } from '@/core/engine/tanstack/gridKitTable'
 import { cn } from '@/lib/utils'
 import type { DataGridClassNames, DataGridStyles, TableViewConfig } from '@/types'
 import type { GridFocusCell } from '@/core/hooks/useGridKeyboardNavigation'

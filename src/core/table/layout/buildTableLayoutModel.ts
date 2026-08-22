@@ -1,4 +1,4 @@
-import type { Column } from '@tanstack/react-table'
+import type { Column } from '@/core/engine/tanstack/gridKitTable'
 import type { TableWidthMode } from '@/types'
 import { getColumnsWidth, splitVisibleColumnsByPin } from '@/core/table/tableUtils'
 import type { TableLayoutModel } from './tableLayoutTypes'

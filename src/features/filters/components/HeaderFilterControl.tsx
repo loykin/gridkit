@@ -1,4 +1,4 @@
-import type { Table, Header } from '@tanstack/react-table'
+import type { Table, Header } from '@/core/engine/tanstack/gridKitTable'
 import { HeaderFilterPopover } from './HeaderFilterPopover'
 import type { TableViewConfig } from '@/types'
 

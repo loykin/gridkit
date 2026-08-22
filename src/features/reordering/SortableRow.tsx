@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { Row } from '@tanstack/react-table'
 import { RowDragContext } from '@/features/reordering/RowDragContext'
 
 interface SortableRowProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  row: Row<any>
+  row: { id: string }
   children: ReactNode
 }
 

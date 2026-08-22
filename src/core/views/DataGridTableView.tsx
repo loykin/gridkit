@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useLayoutEffect, useMemo } from 'react'
-import { type Row, type Table } from '@tanstack/react-table'
+import { type Row, type Table } from '@/core/engine/tanstack/gridKitTable'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { useGridKitLabels } from '@/core/LabelsContext'
@@ -168,7 +168,7 @@ export function DataGridTableView<T extends object>({
 
   // ── After each render, trigger column auto-measurement ─────────────────────
   useEffect(() => {
-    if (!table.getState().columnSizingInfo.isResizingColumn) {
+    if (!table.state.columnResizing.isResizingColumn) {
       onMeasureColumns?.()
     }
   })

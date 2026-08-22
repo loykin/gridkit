@@ -1,4 +1,4 @@
-import type { Header } from '@tanstack/react-table'
+import type { Header } from '@/core/engine/tanstack/gridKitTable'
 import { ColumnPinPopover } from './ColumnPinPopover'
 
 interface ColumnPinControlProps<T extends object> {

@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { Row, Table } from '@tanstack/react-table'
+import type { Row, Table } from '@/core/engine/tanstack/gridKitTable'
 import type { DataGridBaseProps, DataGridPaginationConfig } from '@/types'
 import type { DataStoreQueryState } from '@/core/engine/store/DataStore'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'

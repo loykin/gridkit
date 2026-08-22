@@ -1,4 +1,4 @@
-import type { Column, HeaderGroup, Table } from '@tanstack/react-table'
+import type { Column, HeaderGroup, Table } from '@/core/engine/tanstack/gridKitTable'
 import {
   DndContext,
   PointerSensor,
@@ -73,7 +73,7 @@ export function DataGridHeaderLayout<T extends object>({
   )
 
   const handleDragEnd = (event: DragEndEvent) => {
-    if (table.getState().columnSizingInfo.isResizingColumn) return
+    if (table.state.columnResizing.isResizingColumn) return
     const { active, over } = event
     if (!over || active.id === over.id) return
     const allColIds = table.getAllLeafColumns().map((col) => col.id)

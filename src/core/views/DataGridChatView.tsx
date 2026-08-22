@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { Row, Table } from '@tanstack/react-table'
+import type { Row, Table } from '@/core/engine/tanstack/gridKitTable'
 import { cn } from '@/lib/utils'
 import { useIcons } from '@/core/IconsContext'
 import { GridKitShell } from '@/core/GridKitShell'

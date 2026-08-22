@@ -1,4 +1,4 @@
-import type { ColumnDef, Row, Table } from '@tanstack/react-table'
+import type { ColumnDef, Row } from '@/core/engine/tanstack/gridKitTable'
 import type { CheckboxConfig } from '@/types'
 import { Checkbox } from '@/core/UIComponents'
 
@@ -42,7 +42,7 @@ export function createCheckboxColumn<T extends object>(
       columnMenu: false,
       pinControl: false,
     },
-    header: ({ table }: { table: Table<T> }) => {
+    header: ({ table }) => {
       const rows = table.getRowModel().rows
       const allSelected =
         rows.length > 0 && rows.every((r) => selectedIds.has(getRowId(r.original)))
@@ -57,7 +57,7 @@ export function createCheckboxColumn<T extends object>(
         />
       )
     },
-    cell: ({ row }: { row: Row<T> }) => {
+    cell: ({ row }) => {
       const id = getRowId(row.original)
       return (
         <Checkbox

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import type { Table, Row } from '@tanstack/react-table'
+import type { Table, Row } from '@/core/engine/tanstack/gridKitTable'
 import { GridKitShell } from '@/core/GridKitShell'
 import { GridKitError } from '@/core/GridKitError'
 import { useTableViewMetrics } from '@/core/TableViewMetricsContext'

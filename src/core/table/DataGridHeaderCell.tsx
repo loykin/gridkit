@@ -1,5 +1,5 @@
 import type React from 'react'
-import { flexRender, type Header, type Table } from '@tanstack/react-table'
+import { flexRender, type Header, type Table } from '@/core/engine/tanstack/gridKitTable'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
@@ -266,7 +266,7 @@ export function SortableDataGridHeaderCell<T extends object>({
   disabled,
   ...props
 }: SortableDataGridHeaderCellProps<T>) {
-  const isResizing = !!props.table.getState().columnSizingInfo.isResizingColumn
+  const isResizing = !!props.table.state.columnResizing.isResizingColumn
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: props.header.column.id,
     disabled: disabled || isResizing,

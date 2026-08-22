@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import { Input } from '@/core/UIComponents'
 import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
@@ -14,9 +14,9 @@ interface Props<T extends object> {
 export function GlobalSearch<T extends object>({ table, placeholder = 'Search…', className }: Props<T>) {
   const icons = useIcons()
   const labels = useGridKitLabels()
-  const [value, setValue] = useState(String(table.getState().globalFilter ?? ''))
+  const [value, setValue] = useState(String(table.state.globalFilter ?? ''))
 
-  const externalFilter = String(table.getState().globalFilter ?? '')
+  const externalFilter = String(table.state.globalFilter ?? '')
   useEffect(() => { setValue(externalFilter) }, [externalFilter])
 
   useEffect(() => {

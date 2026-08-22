@@ -13,7 +13,7 @@ import type {
   TableOptions,
   VisibilityState,
   PaginationState,
-} from '@tanstack/react-table'
+} from '@/core/engine/tanstack/gridKitTable'
 import type { DataStore } from './core/engine/store/DataStore'
 import type { GridKitUIAdapter } from './core/UIAdapterContext'
 
@@ -110,13 +110,11 @@ export type PassthroughTableOptions<T extends object> = Omit<
   | 'onSortingChange' | 'onColumnFiltersChange' | 'onGlobalFilterChange'
   | 'onColumnVisibilityChange' | 'onColumnSizingChange' | 'onPaginationChange'
   | 'onExpandedChange' | 'onColumnOrderChange' | 'onColumnPinningChange'
-  // Row models (built conditionally based on props)
-  | 'getCoreRowModel' | 'getSortedRowModel' | 'getFilteredRowModel'
-  | 'getPaginationRowModel' | 'getExpandedRowModel'
   // Manual-policy keys exposed as individual props
-  | 'manualSorting' | 'manualPagination' | 'manualFiltering'
+  | 'manualSorting' | 'manualPagination' | 'manualFiltering' | 'manualGrouping'
+  | 'enableGrouping'
   // Internal extension hook
-  | '_features'
+  | 'features'
 >
 
 export type ColumnSizingMode = 'auto' | 'flex' | 'fixed'
@@ -439,7 +437,7 @@ export interface GridKitCoreProps<T extends object> extends GridKitDisplayProps<
   manualSorting?: boolean
 
   // Filtering and search
-  /** Set true when filtering is handled server-side. Disables client-side getFilteredRowModel. */
+  /** Set true when filtering is handled server-side. Disables client-side filtering. */
   manualFiltering?: boolean
   columnFilters?: ColumnFiltersState
   onColumnFiltersChange?: (filters: ColumnFiltersState) => void
@@ -523,7 +521,7 @@ export interface TableViewConfig<T extends object> extends GridKitDisplayProps<T
    * Render a custom detail panel below each row.
    * Use ExpandToggleCell in a column to let users open/close the panel.
    */
-  renderDetailRow?: (row: Row<unknown>) => ReactNode
+  renderDetailRow?: (row: Row<T>) => ReactNode
   /** Show a pin/unpin menu button inside each column header */
   enableColumnPinning?: boolean
   /**
@@ -596,7 +594,7 @@ export interface DataGridBaseProps<T extends object> extends GridKitCoreProps<T>
   columnResizeMode?: 'onChange' | 'onEnd'
   /** Controlled column visibility state. Pair with onColumnVisibilityChange. */
   visibilityState?: VisibilityState
-  /** Initial column pinning — { left: ['id', ...], right: ['id', ...] } */
+  /** Initial column pinning — { start: ['id', ...], end: ['id', ...] } */
   initialPinning?: ColumnPinningState
   columnSizingMode?: ColumnSizingMode
 

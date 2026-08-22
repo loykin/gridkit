@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react'
-import type { Row } from '@tanstack/react-table'
+import type { Row } from '@/core/engine/tanstack/gridKitTable'
 import { useIcons } from '@/core/IconsContext'
 
-interface TreeCellProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  row: Row<any>
+interface TreeCellProps<TData extends object> {
+  row: Row<TData>
   /** Indent per depth level in px (default: 16) */
   indentSize?: number
   children: ReactNode
@@ -21,7 +20,11 @@ interface TreeCellProps {
  *     </TreeCell>
  *   )
  */
-export function TreeCell({ row, indentSize = 16, children }: TreeCellProps) {
+export function TreeCell<TData extends object>({
+  row,
+  indentSize = 16,
+  children,
+}: TreeCellProps<TData>) {
   const icons = useIcons()
   const canExpand = row.getCanExpand()
   const indent = row.depth * indentSize

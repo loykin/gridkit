@@ -3,8 +3,8 @@ import type {DataGridColumnDef} from '@loykin/gridkit'
 import {ALL_DATA, type Employee} from '../data/employees'
 
 const columns: DataGridColumnDef<Employee>[] = [
-    {accessorKey: 'id', header: 'ID', size: 80, meta: {pin: 'left'}},
-    {accessorKey: 'name', header: 'Name', size: 200, meta: {pin: 'left'}},
+    {accessorKey: 'id', header: 'ID', size: 80, meta: {pin: 'start'}},
+    {accessorKey: 'name', header: 'Name', size: 200, meta: {pin: 'start'}},
     {accessorKey: 'department', header: 'Department', size: 200},
     {accessorKey: 'role', header: 'Role', size: 200},
     {
@@ -20,7 +20,7 @@ const columns: DataGridColumnDef<Employee>[] = [
         accessorKey: 'status',
         header: 'Status',
         size: 150,
-        meta: {pin: 'right'},
+        meta: {pin: 'end'},
         cell: ({row}) => {
             const s = row.original.status
             const color =

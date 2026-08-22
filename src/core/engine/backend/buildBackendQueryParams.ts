@@ -1,4 +1,4 @@
-import type { ColumnFiltersState, PaginationState, SortingState, Table } from '@tanstack/react-table'
+import type { ColumnFiltersState, PaginationState, SortingState, Table } from '@/core/engine/tanstack/gridKitTable'
 import type { FilterExpr, QueryParams } from '../store/DataStoreBackend'
 
 function isEmptyFilterValue(value: unknown) {

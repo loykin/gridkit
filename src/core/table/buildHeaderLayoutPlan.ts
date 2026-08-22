@@ -1,5 +1,6 @@
-import type { Column, Header, HeaderGroup } from '@tanstack/react-table'
+import type { Column, Header, HeaderGroup } from '@/core/engine/tanstack/gridKitTable'
 import type { HeaderGroupLayout } from '@/types'
+import { toPhysicalPinRegion, type PhysicalPinRegion } from './tableUtils'
 
 export interface HeaderLayoutPlan<T extends object> {
   width: number
@@ -33,7 +34,7 @@ interface BuildHeaderLayoutPlanInput<T extends object> {
   rowHeight: number
 }
 
-type PinRegion = false | 'left' | 'right'
+type PinRegion = false | PhysicalPinRegion
 
 interface RawHeaderEntry<T extends object> {
   header: Header<T, unknown>
@@ -49,8 +50,10 @@ function getHeaderLeafColumns<T extends object>(header: Header<T, unknown>): Col
 }
 
 function getRegion<T extends object>(columns: Column<T, unknown>[]): PinRegion {
-  const firstPin = columns[0]?.getIsPinned() || false
-  return columns.every((column) => (column.getIsPinned() || false) === firstPin)
+  const firstPin = toPhysicalPinRegion(columns[0]?.getIsPinned() || false) ?? false
+  return columns.every(
+    (column) => (toPhysicalPinRegion(column.getIsPinned() || false) ?? false) === firstPin,
+  )
     ? firstPin
     : false
 }
@@ -117,7 +120,7 @@ function getPinnedCoordinates<T extends object>({
 }) {
   if (pin === 'left') {
     return {
-      left: leafColumns[0]?.getStart('left') ?? fallbackLeft,
+      left: leafColumns[0]?.getStart('start') ?? fallbackLeft,
       right: undefined,
       zIndex: 2,
     }
@@ -126,7 +129,7 @@ function getPinnedCoordinates<T extends object>({
   if (pin === 'right') {
     return {
       left: fallbackLeft,
-      right: leafColumns[leafColumns.length - 1]?.getAfter('right') ?? 0,
+      right: leafColumns[leafColumns.length - 1]?.getAfter('end') ?? 0,
       zIndex: 2,
     }
   }
@@ -142,7 +145,7 @@ function splitByPinRegion<T extends object>(columns: Column<T, unknown>[]) {
   const segments: Array<{ pin: PinRegion, columns: Column<T, unknown>[] }> = []
 
   for (const column of columns) {
-    const pin = column.getIsPinned() || false
+    const pin = toPhysicalPinRegion(column.getIsPinned() || false) ?? false
     const last = segments[segments.length - 1]
     if (last && last.pin === pin) {
       last.columns.push(column)

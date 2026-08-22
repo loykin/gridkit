@@ -1,4 +1,4 @@
-import type { FilterFn } from '@tanstack/react-table'
+import type { FilterFn } from '@/core/engine/tanstack/gridKitTable'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const defaultGlobalFilterFn: FilterFn<any> = (row, columnId, value: string) =>

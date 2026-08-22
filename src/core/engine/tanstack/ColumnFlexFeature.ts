@@ -1,4 +1,12 @@
-import type { CellContext, ColumnSizingState, RowData, TableFeature } from '@tanstack/react-table'
+import {
+  assignTableAPIs,
+  type CellContext,
+  type ColumnSizingState,
+  type RowData,
+  type CoreTable,
+  type TableFeature,
+  type TableFeatures,
+} from '@/core/engine/tanstack/gridKitTable'
 import type { ReactNode } from 'react'
 
 export interface EditCellProps<TData extends RowData, TValue = unknown> {
@@ -10,9 +18,26 @@ export interface EditCellProps<TData extends RowData, TValue = unknown> {
 }
 
 // ── Declaration merging ───────────────────────────────────────────────────────
+interface ColumnFlexTable {
+  getFlexColumnSizing: (containerWidth: number) => ColumnSizingState
+}
+
 declare module '@tanstack/react-table' {
+  interface Plugins {
+    columnFlexFeature: TableFeature
+  }
+
+  interface Table_FeatureMap<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    in out TFeatures extends TableFeatures,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    in out TData extends RowData,
+  > {
+    columnFlexFeature: ColumnFlexTable
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta<in out TFeatures extends TableFeatures, in out TData extends RowData, in out TValue> {
     /** CSS flex ratio — remaining container width distributed proportionally */
     flex?: number
     /** Fixed preferred column width in px. Mirrors TanStack's column size metadata used by examples. */
@@ -22,8 +47,8 @@ declare module '@tanstack/react-table' {
     minWidth?: number
     maxWidth?: number
     align?: 'left' | 'center' | 'right'
-    /** Pin this column to the left or right — fixed at column definition level */
-    pin?: 'left' | 'right'
+    /** Pin this column to the logical start or end — fixed at column definition level */
+    pin?: 'start' | 'end'
     /**
      * Render an inline editor when the cell is double-clicked.
      * The editor is responsible for calling onCommit(value) or onCancel().
@@ -46,20 +71,16 @@ declare module '@tanstack/react-table' {
     cellOverflow?: 'visible' | 'hidden'
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface Table<TData extends RowData> {
-    /** Calculate flex/auto column widths relative to containerWidth */
-    getFlexColumnSizing: (containerWidth: number) => ColumnSizingState
-  }
 }
 
 // ── Feature ───────────────────────────────────────────────────────────────────
 export const ColumnFlexFeature: TableFeature = {
   getDefaultColumnDef: () => ({ minSize: 60 }),
 
-  createTable: (table) => {
-    table.getFlexColumnSizing = (containerWidth: number): ColumnSizingState => {
-      const columns = table.getAllLeafColumns()
+  constructTableAPIs: (table) => {
+    assignTableAPIs('columnFlexFeature', table, {
+      table_getFlexColumnSizing: { fn: (containerWidth: number): ColumnSizingState => {
+      const columns = (table as unknown as CoreTable<RowData>).getAllLeafColumns()
       const sizing: ColumnSizingState = {}
 
       const flexCols = columns.filter((col) => col.columnDef.meta?.flex != null)
@@ -85,6 +106,7 @@ export const ColumnFlexFeature: TableFeature = {
       })
 
       return sizing
-    }
+      } },
+    })
   },
 }

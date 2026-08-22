@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type React from 'react'
-import type { ColumnFiltersState, PaginationState, SortingState, Table } from '@tanstack/react-table'
+import type { ColumnFiltersState, PaginationState, SortingState, Table } from '@/core/engine/tanstack/gridKitTable'
 import type { DataGridPaginationConfig } from '@/types'
 import type { DataStore } from '../store/DataStore'
 import { buildBackendQueryParams } from '../backend/buildBackendQueryParams'
@@ -39,13 +39,15 @@ export function useBackendQuerySync<T extends object>({
   const queryKeyRef = useRef<string | null>(null)
   const paginationOnPageChangeRef = useRef(pagination?.onPageChange)
   paginationOnPageChangeRef.current = pagination?.onPageChange
+  const tableRef = useRef(table)
+  tableRef.current = table
   const { pageIndex, pageSize } = paginationState
 
   useEffect(() => {
     if (!enabled || !dataStore) return
 
     const params = buildBackendQueryParams({
-      table,
+      table: tableRef.current,
       columnFilters,
       globalFilter,
       sorting,
@@ -87,7 +89,6 @@ export function useBackendQuerySync<T extends object>({
     setPaginationState,
     sorting,
     syncState,
-    table,
     tableKey,
     updatePersistedPagination,
   ])

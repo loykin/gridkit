@@ -1,6 +1,6 @@
 import { DataGrid, useCSVExport, DataGridPaginationBar } from '@loykin/gridkit'
 import type { DataGridColumnDef } from '@loykin/gridkit'
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@loykin/gridkit'
 import { ALL_DATA, type Employee } from '../data/employees'
 
 const columns: DataGridColumnDef<Employee>[] = [

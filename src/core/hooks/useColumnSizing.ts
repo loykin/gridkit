@@ -1,6 +1,6 @@
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ColumnSizingState } from '@tanstack/react-table'
+import type { ColumnSizingState } from '@/core/engine/tanstack/gridKitTable'
 import type { ColumnSizingMode, DataGridColumnDef } from '@/types'
 
 interface UseColumnSizingOptions<T extends object> {
@@ -16,9 +16,9 @@ interface SizingState {
 }
 
 function getLeafColumnDefs<T extends object>(
-  columns: DataGridColumnDef<T>[],
+  columns: readonly DataGridColumnDef<T>[],
 ): DataGridColumnDef<T>[] {
-  return columns.flatMap((col) => {
+  return columns.flatMap((col): DataGridColumnDef<T>[] => {
     const childColumns = 'columns' in col ? col.columns : undefined
     return childColumns?.length ? getLeafColumnDefs(childColumns) : [col]
   })

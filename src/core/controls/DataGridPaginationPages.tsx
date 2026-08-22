@@ -1,4 +1,4 @@
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import { cn } from '@/lib/utils'
 import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
@@ -53,7 +53,7 @@ export function DataGridPaginationPages<T extends object>({
 }: DataGridPaginationPagesProps<T>) {
   const icons = useIcons()
   const labels = useGridKitLabels()
-  const { pageIndex } = table.getState().pagination
+  const { pageIndex } = table.state.pagination
   const pageCount = Math.max(table.getPageCount(), 1)
   const items = getPageItems(pageIndex, pageCount, siblingCount)
 

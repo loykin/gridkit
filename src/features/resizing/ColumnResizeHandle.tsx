@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { Header } from '@tanstack/react-table'
+import type { Header } from '@/core/engine/tanstack/gridKitTable'
 
 interface ColumnResizeHandleProps<T extends object> {
   header: Header<T, unknown>
@@ -13,7 +13,7 @@ export function ColumnResizeHandle<T extends object>({
   const isLeafHeader = header.subHeaders.length === 0 && !header.isPlaceholder
   const canResize = isLeafHeader && enabled && header.column.getCanResize()
   if (!canResize) return null
-  const resizeFromLeft = header.column.getIsPinned() === 'right'
+  const resizeFromLeft = header.column.getIsPinned() === 'end'
 
   const handleRightPinnedPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === 'touch') return

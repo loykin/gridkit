@@ -1,36 +1,57 @@
 import {
-  createRow,
-  memo,
-  getMemoOptions,
+  assignTableAPIs,
+  constructRow,
+  createCoreRowModel,
+  makeObjectMap,
+  skipFirstRun,
+  tableMemo,
   type RowData,
+  type GridKitTableFeatures,
   type TableFeature,
+  type TableFeatures,
   type RowModel,
-  type Table,
+  type CoreTable,
   type Row,
-} from '@tanstack/react-table'
+} from '@/core/engine/tanstack/gridKitTable'
 import type { Transaction, TransactionResult, DataStore } from '../store/DataStore'
 
-// ── Declaration merging ───────────────────────────────────────────────────────
-declare module '@tanstack/react-table' {
-  interface TableOptionsResolved<TData extends RowData> {
-    dataStore?: DataStore<TData>
-  }
-
-  interface Table<TData extends RowData> {
-    /** O(1) add/update/delete. Triggers React re-render automatically. */
-    applyTransaction: (tx: Transaction<TData>) => void
-    /** Transaction path that awaits backend persistence when tx.persist is true. */
-    applyTransactionAsync: (tx: Transaction<TData>) => Promise<TransactionResult>
-    /** O(1) row lookup by id */
-    getRowNodeById: (id: string) => TData | undefined
-    /** Escape hatch — direct access to the internal DataStore */
-    _dataStore: DataStore<TData> | undefined
-  }
+interface DataStoreTableOptions<TData extends RowData> {
+  dataStore?: DataStore<TData>
 }
 
-// ── Phase 3: Row-caching getCoreRowModel ──────────────────────────────────────
+interface DataStoreTable<TData extends RowData> {
+  applyTransaction: (tx: Transaction<TData>) => void
+  applyTransactionAsync: (tx: Transaction<TData>) => Promise<TransactionResult>
+  getRowNodeById: (id: string) => TData | undefined
+  _dataStore: DataStore<TData> | undefined
+}
+
+declare module '@tanstack/react-table' {
+  interface Plugins {
+    dataStoreFeature: TableFeature
+  }
+
+  interface TableOptions_FeatureMap<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    in out TFeatures extends TableFeatures,
+    in out TData extends RowData,
+  > {
+    dataStoreFeature: DataStoreTableOptions<TData>
+  }
+
+  interface Table_FeatureMap<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    in out TFeatures extends TableFeatures,
+    in out TData extends RowData,
+  > {
+    dataStoreFeature: DataStoreTable<TData>
+  }
+
+}
+
+// ── Phase 3: Row-caching core row model ───────────────────────────────────────
 /**
- * Drop-in replacement for getCoreRowModel() when a DataStore is used.
+ * Core row-model factory used when a DataStore is active.
  *
  * Differences from the stock implementation:
  * 1. Memo depends on store.getVersion() (a number) instead of table.options.data
@@ -42,27 +63,33 @@ declare module '@tanstack/react-table' {
  *    in-place and `_valuesCache` is cleared so getValue() re-evaluates.
  */
 export function getDataStoreCoreRowModel<T extends RowData>(): (
-  table: Table<T>,
+  table: CoreTable<T>,
 ) => () => RowModel<T> {
-  return (table: Table<T>) => {
+  return (table: CoreTable<T>) => {
     const rowCache = new Map<string, Row<T>>()
+    // tableMemo's public signature intentionally erases the row-data generic.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const memoTable = table as unknown as CoreTable<any>
 
-    return memo(
-      () => {
+    return tableMemo<GridKitTableFeatures, [number], unknown, RowModel<T>>({
+      feature: 'dataStoreFeature',
+      table: memoTable,
+      fnName: 'table.getCoreRowModel',
+      memoDeps: () => {
         const store = table.options.dataStore
         // Version is a plain number — changes only when a transaction is applied
         return [store?.getVersion() ?? -1] as [number]
       },
-      () => {
+      fn: () => {
         const store = table.options.dataStore!
         const data = store.getSnapshot()
 
-        const rowModel: RowModel<T> = { rows: [], flatRows: [], rowsById: {} }
+        const rowModel: RowModel<T> = { rows: [], flatRows: [], rowsById: makeObjectMap() }
         const seenIds = new Set<string>()
 
         for (let i = 0; i < data.length; i++) {
           const item = data[i]
-          const id = table._getRowId(item, i)
+          const id = table.getRowId(item, i)
           seenIds.add(id)
 
           let row = rowCache.get(id)
@@ -75,7 +102,7 @@ export function getDataStoreCoreRowModel<T extends RowData>(): (
             }
             // All memoized row methods (getVisibleCells etc.) remain stable
           } else {
-            row = createRow(table, id, item, i, 0)
+            row = constructRow(table, id, item, i, 0)
             rowCache.set(id, row)
           }
 
@@ -91,33 +118,47 @@ export function getDataStoreCoreRowModel<T extends RowData>(): (
 
         return rowModel
       },
-      getMemoOptions(
-        table.options,
-        'debugTable',
-        'getRowModel',
-        () => table._autoResetPageIndex?.(),
-      ),
-    )
+      onAfterUpdate: skipFirstRun(() => {
+        table.autoResetExpanded()
+        if (
+          (table.options.autoResetAll ?? table.options.autoResetPageIndex ?? !table.options.manualPagination)
+          && (table.atoms.pagination?.get()?.pageIndex ?? 0) !== 0
+        ) {
+          table.resetPageIndex(true)
+        }
+        if (table.options.autoResetAll ?? table.options.autoResetSorting ?? false) {
+          table.resetSorting()
+        }
+        table.autoResetCellSelection()
+      }),
+    })
   }
+}
+
+export function createGridKitCoreRowModel<T extends RowData>() {
+  const createDefaultRowModel = createCoreRowModel<GridKitTableFeatures, T>()
+  const createStoreRowModel = getDataStoreCoreRowModel<T>()
+
+  return (table: CoreTable<T>) => table.options.dataStore
+    ? createStoreRowModel(table)
+    : createDefaultRowModel(table)
 }
 
 // ── Feature ───────────────────────────────────────────────────────────────────
 export const DataStoreFeature: TableFeature = {
-  createTable: (table) => {
-    const store = table.options.dataStore
-
-    table._dataStore = store
-
-    table.applyTransaction = (tx) => {
-      if (!store) return
-      store.applyTransaction(tx)
-    }
-
-    table.applyTransactionAsync = (tx) => {
-      if (!store) return Promise.resolve({ ok: true, affected: 0 })
-      return store.applyTransactionAsync(tx)
-    }
-
-    table.getRowNodeById = (id: string) => store?.get(id)
+  initTableInstanceData: (table) => {
+    const gridTable = table as unknown as CoreTable<RowData>
+    gridTable._dataStore = gridTable.options.dataStore
+  },
+  constructTableAPIs: (table) => {
+    const gridTable = table as unknown as CoreTable<RowData>
+    assignTableAPIs('dataStoreFeature', table, {
+      table_applyTransaction: { fn: (tx: Transaction<RowData>) => {
+        gridTable._dataStore?.applyTransaction(tx)
+      } },
+      table_applyTransactionAsync: { fn: (tx: Transaction<RowData>) =>
+        gridTable._dataStore?.applyTransactionAsync(tx) ?? Promise.resolve({ ok: true, affected: 0 }) },
+      table_getRowNodeById: { fn: (id: string) => gridTable._dataStore?.get(id) },
+    })
   },
 }

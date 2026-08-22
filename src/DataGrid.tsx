@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type React from 'react'
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import type { DataGridProps } from '@/types'
 import { useDataGridBase } from '@/core/hooks/useDataGridBase'
 import { DataGridShell } from '@/core/DataGridShell'

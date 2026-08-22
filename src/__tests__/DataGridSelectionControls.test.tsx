@@ -1,7 +1,7 @@
 import { createRef } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import { DataGrid } from '@/DataGrid'
 import type { DataGridColumnDef } from '@/types'
 
@@ -37,7 +37,7 @@ describe('selection column header controls', () => {
         tableRef={tableRef}
         enableColumnMenu
         enableColumnPinning
-        initialPinning={{ left: ['__select__'] }}
+        initialPinning={{ start: ['__select__'], end: [] }}
         checkboxConfig={checkboxConfig}
       />,
     )
@@ -46,7 +46,7 @@ describe('selection column header controls', () => {
     expect(screen.queryByLabelText('Column menu for __select__')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Column menu for name')).toBeInTheDocument()
     expect(selectionColumn?.getCanPin()).toBe(true)
-    expect(selectionColumn?.getIsPinned()).toBe('left')
+    expect(selectionColumn?.getIsPinned()).toBe('start')
   })
 
   it('hides only the standalone selection pin control', () => {

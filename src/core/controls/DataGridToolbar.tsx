@@ -1,4 +1,4 @@
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import { cn } from '@/lib/utils'
 import type { GridKitHeaderSlot } from '@/types'
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
-import type { Row, Table } from '@tanstack/react-table'
+import type { Row, Table } from '@/core/engine/tanstack/gridKitTable'
 import type { Virtualizer } from '@tanstack/react-virtual'
 
 export interface GridFocusCell {

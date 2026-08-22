@@ -1,4 +1,4 @@
-import type { Column, Table } from '@tanstack/react-table'
+import type { Column, Table } from '@/core/engine/tanstack/gridKitTable'
 import { useColumnOptions } from '@/features/filters/hooks/useColumnOptions'
 import { Select } from '@/core/UIComponents'
 
@@ -9,7 +9,7 @@ interface Props<T extends object> {
 }
 
 export function SelectFilterCell<T extends object>({ col, table, onSelect }: Props<T>) {
-  const { columnFilters, globalFilter } = table.getState()
+  const { columnFilters, globalFilter } = table.state
   const { options, isLoading } = useColumnOptions(table, col.id, true, {
     columnFilters,
     globalFilter,

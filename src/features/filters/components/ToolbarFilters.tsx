@@ -1,4 +1,4 @@
-import type { Table } from '@tanstack/react-table'
+import type { Table } from '@/core/engine/tanstack/gridKitTable'
 import { Check, ChevronDown } from 'lucide-react'
 import { Button } from '@/core/UIComponents'
 import { useIcons } from '@/core/IconsContext'
@@ -20,7 +20,7 @@ export function SelectFilter<T extends object>({ table, columnId, label }: Selec
   const icons = useIcons()
   const col = table.getColumn(columnId)
   const value = (col?.getFilterValue() ?? '') as string
-  const { columnFilters, globalFilter } = table.getState()
+  const { columnFilters, globalFilter } = table.state
   const { options, isLoading } = useColumnOptions(table, columnId, !!col, {
     columnFilters,
     globalFilter,
