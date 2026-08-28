@@ -823,7 +823,9 @@ export interface AgentChatToolResultEvent extends AgentChatEventBase {
   output: unknown
 }
 
-export type GridKitTableColumnType = 'text' | 'number' | 'date' | 'boolean'
+export type GridKitTableColumnType =
+  | 'text' | 'number' | 'date' | 'boolean'
+  | 'currency' | 'percentage' | 'datetime' | 'url' | 'badge'
 
 export interface GridKitTableColumn {
   key: string
@@ -832,6 +834,8 @@ export interface GridKitTableColumn {
   align?: 'left' | 'center' | 'right'
   /** Flex ratio for proportional column width. Defaults to 1 when not set. */
   flex?: number
+  /** ISO 4217 currency code for type: 'currency'. Defaults to 'USD'. */
+  currency?: string
 }
 
 export interface GridKitTablePayload {
@@ -858,9 +862,16 @@ export const GridKitTablePayloadSchema = {
         properties: {
           key:   { type: 'string' },
           label: { type: 'string' },
-          type:  { type: 'string', enum: ['text', 'number', 'date', 'boolean'] },
-          align: { type: 'string', enum: ['left', 'center', 'right'] },
-          flex:  { type: 'number' },
+          type:  {
+            type: 'string',
+            enum: [
+              'text', 'number', 'date', 'boolean',
+              'currency', 'percentage', 'datetime', 'url', 'badge',
+            ],
+          },
+          align:    { type: 'string', enum: ['left', 'center', 'right'] },
+          flex:     { type: 'number' },
+          currency: { type: 'string' },
         },
       },
     },
@@ -892,6 +903,11 @@ export type GridKitQueryPrepare<TQuery> = (
 /** Executes a prepared query and returns raw rows. */
 export type GridKitQueryExecutor<TQuery = unknown> = (
   query: TQuery,
+  options: {
+    /** Aborted when a newer query supersedes this one — pass through to fetch/DB calls. */
+    signal?: AbortSignal
+    params: import('./core/engine/store/DataStoreBackend').QueryParams
+  },
 ) => Promise<Record<string, unknown>[]>
 
 export interface AgentChatArtifactEvent extends AgentChatEventBase {
