@@ -222,7 +222,9 @@ export function DataGridTableView<T extends object>({
       const borderY =
         (Number.parseFloat(containerStyle.borderTopWidth) || 0) +
         (Number.parseFloat(containerStyle.borderBottomWidth) || 0)
-      const next = Math.floor(tableMaxHeight - headerHeight - borderY)
+      // Same rounding-bias fix as GridKitShell's own fill-height calc: flooring here
+      // stacks another ~1px of loss on top of it, so round instead.
+      const next = Math.round(tableMaxHeight - headerHeight - borderY)
 
       setFillBodyMaxHeight((current) => {
         if (next <= 0) return current

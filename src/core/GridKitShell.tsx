@@ -143,7 +143,10 @@ export function GridKitShell<T extends object>({
       const style = getComputedStyle(shell)
       const gap = Number.parseFloat(style.rowGap || style.gap || '0') || 0
       const totalGap = Math.max(0, childCount - 1) * gap
-      const next = Math.floor(availableHeight - toolbarHeight - footerHeight - totalGap)
+      // Sources (getBoundingClientRect, clientHeight) round independently; flooring the
+      // difference biases the budget down by up to 1px, leaving a phantom sub-pixel
+      // overflow inside the frame. Rounding cancels that bias on average.
+      const next = Math.round(availableHeight - toolbarHeight - footerHeight - totalGap)
 
       setFillTableMaxHeight((current) => {
         if (next <= 0) return current

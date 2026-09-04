@@ -45,7 +45,11 @@ export function CustomScrollbar({
     scrollSizeRef.current = scrollSize
     clientSizeRef.current = clientSize
 
-    if (scrollSize <= clientSize) {
+    // Sub-pixel/rounding error from fill-height layout can leave a few px of
+    // technically-real but functionally-meaningless overflow; ignore it so the
+    // thumb doesn't render as a permanently "full" bar with nothing to scroll.
+    const OVERFLOW_EPSILON_PX = 2
+    if (scrollSize <= clientSize + OVERFLOW_EPSILON_PX) {
       setThumbStart(0)
       setThumbEnd(1)
       return
