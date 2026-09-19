@@ -10,8 +10,8 @@
     "@loykin/gridkit": "workspace:*",
     "@tanstack/react-table": "^9.1.2",
     "@tanstack/react-virtual": "^3.14.2",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
