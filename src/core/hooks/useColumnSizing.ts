@@ -40,6 +40,7 @@ export function useColumnSizing<T extends object>({
   const lastComputed = useRef<ColumnSizingState>({})
   const lastContainerWidth = useRef<number>(0)
   const lastFlexFixedWidth = useRef<number | null>(null)
+  const lastLayout = useRef<Map<string, string> | null>(null)
   const hasSized = useRef(false)
   const [state, setState] = useState<SizingState>(() => {
     if (initialSizing && Object.keys(initialSizing).length > 0) {
@@ -99,8 +100,36 @@ export function useColumnSizing<T extends object>({
     lastContainerWidth.current = containerWidth
 
     const cols = getLeafColumnDefs(columnsRef.current)
-    const currentSizing = sizingRef.current
+    const getColId = (col: DataGridColumnDef<T>) =>
+      (col.id ?? (col as { accessorKey?: string }).accessorKey) as string
+
+    const previousSizing = sizingRef.current
+    const currentSizing: ColumnSizingState = { ...previousSizing }
     const m = modeRef.current
+
+    // ── Detect column-definition changes (flex/pin toggles, size/min/max edits) ──
+    // A column's own size/flex/minWidth/maxWidth/autoSize can change at runtime
+    // (e.g. toggling flex or pin from a menu) without the component remounting.
+    // Drop that column's cached width so it gets recomputed below instead of
+    // being stuck with a value measured under the old definition.
+    const layout = new Map(
+      cols.map((col) => [
+        getColId(col),
+        JSON.stringify([col.size, col.meta?.flex, col.meta?.minWidth, col.meta?.maxWidth, col.meta?.autoSize]),
+      ]),
+    )
+    const layoutChanged =
+      lastLayout.current !== null &&
+      JSON.stringify([...lastLayout.current]) !== JSON.stringify([...layout])
+    if (layoutChanged) {
+      for (const [id, definition] of lastLayout.current!) {
+        if (layout.get(id) === definition) continue
+        delete currentSizing[id]
+        delete lastComputed.current[id]
+        userResized.current.delete(id)
+      }
+    }
+    lastLayout.current = layout
 
     // ── Detect user drag-overrides ─────────────────────────────────────────
     for (const [colId, currentSize] of Object.entries(currentSizing)) {
@@ -129,9 +158,6 @@ export function useColumnSizing<T extends object>({
     }
 
     // ── Flex columns: distribute remaining space ───────────────────────────
-    const getColId = (col: DataGridColumnDef<T>) =>
-      (col.id ?? (col as { accessorKey?: string }).accessorKey) as string
-
     const flexCols = cols.filter((col) => col.meta?.flex != null)
     if (flexCols.length > 0) {
       const containerWidthChanged = Math.abs(containerWidth - prevContainerWidth) > 1
@@ -152,9 +178,9 @@ export function useColumnSizing<T extends object>({
       const fixedWidthChanged =
         lastFlexFixedWidth.current !== null && lastFlexFixedWidth.current !== fixedWidth
 
-      if (anyUserResized && !containerWidthChanged) {
+      if (anyUserResized && !containerWidthChanged && !layoutChanged) {
         // User manually resized a flex column and container unchanged: freeze flex sizes.
-      } else if (!containerWidthChanged && hasSized.current && !fixedWidthChanged) {
+      } else if (!containerWidthChanged && hasSized.current && !fixedWidthChanged && !layoutChanged) {
         // Container unchanged and fixed column sizes stable: skip redistribution.
       } else {
         lastFlexFixedWidth.current = fixedWidth
@@ -176,16 +202,23 @@ export function useColumnSizing<T extends object>({
       }
     }
 
+    // Compare against the full next sizing (current + new) vs. the sizing this hook
+    // started the pass with, so removals from the layout-change cleanup above
+    // (not just additions from newSizing) are reflected in the committed state.
+    const nextSizing: ColumnSizingState = { ...currentSizing, ...newSizing }
     const sizingChanged =
-      Object.keys(newSizing).length > 0 &&
-      Object.entries(newSizing).some(([id, w]) => currentSizing[id] !== w)
+      Object.keys(nextSizing).length !== Object.keys(previousSizing).length ||
+      Object.entries(nextSizing).some(([id, width]) => previousSizing[id] !== width)
     const firstTime = !hasSized.current
 
     if (sizingChanged || firstTime) {
-      if (sizingChanged) Object.assign(lastComputed.current, newSizing)
+      if (sizingChanged) {
+        Object.assign(lastComputed.current, newSizing)
+        sizingRef.current = nextSizing
+      }
       if (firstTime) hasSized.current = true
       setState((prev) => ({
-        sizing: sizingChanged ? { ...prev.sizing, ...newSizing } : prev.sizing,
+        sizing: sizingChanged ? nextSizing : prev.sizing,
         isSized: true,
       }))
     }
@@ -217,6 +250,8 @@ export function useColumnSizing<T extends object>({
     lastComputed.current = {}
     lastContainerWidth.current = 0
     lastFlexFixedWidth.current = null
+    lastLayout.current = null
+    sizingRef.current = {}
     hasSized.current = false
     setState({ sizing: {}, isSized: false })
     measure()
