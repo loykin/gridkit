@@ -263,7 +263,8 @@ describe('DataGridAgentChat styles slot contracts', () => {
     const messageEls = container.querySelectorAll('.gridkit-agent-chat-event--message')
     expect(messageEls.length).toBeGreaterThan(0)
     messageEls.forEach((el) => {
-      expect(el).toHaveStyle({ fontWeight: 'bold' })
+      // jsdom's computed style normalizes the `bold` keyword to its numeric weight (700)
+      expect(el).toHaveStyle({ fontWeight: '700' })
     })
   })
 
