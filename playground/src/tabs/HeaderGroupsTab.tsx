@@ -47,7 +47,7 @@ const columns: DataGridColumnDef<Employee>[] = [
       {
         accessorKey: 'salary',
         header: 'Salary',
-        meta: { flex: 1, filterType: 'number', align: 'right' },
+        meta: { flex: 1, filterType: 'number', align: 'right', headerAlign: 'center' },
         cell: ({ getValue }) => `$${getValue<number>().toLocaleString()}`,
       },
       { accessorKey: 'score', header: 'Score', meta: { flex: 0.8, filterType: 'number', align: 'right' } },
@@ -73,7 +73,7 @@ const columnsWithUngrouped: DataGridColumnDef<Employee>[] = [
       {
         accessorKey: 'salary',
         header: 'Salary',
-        meta: { flex: 1, filterType: 'number', align: 'right' },
+        meta: { flex: 1, filterType: 'number', align: 'right', headerAlign: 'center' },
         cell: ({ getValue }) => `$${getValue<number>().toLocaleString()}`,
       },
       { accessorKey: 'score', header: 'Score', meta: { flex: 0.8, filterType: 'number', align: 'right' } },
@@ -88,6 +88,7 @@ export function HeaderGroupsTab() {
       <p className="text-sm text-muted-foreground">
         Identity, Organization, and Metrics are header groups that span their child columns.
         Sorting/filtering applies to leaf headers; group headers resize the child column group.
+        Salary headers are centered while their values remain right-aligned.
       </p>
       <div className="space-y-2">
         <p className="text-xs font-medium text-muted-foreground">

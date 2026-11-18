@@ -1593,7 +1593,8 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `autoSize` | `boolean` | Auto-fit column width to content via canvas text measurement |
 | `minWidth` | `number` | Minimum column width in px |
 | `maxWidth` | `number` | Maximum column width in px |
-| `align` | `'left' \| 'center' \| 'right'` | Cell text alignment |
+| `align` | `'left' \| 'center' \| 'right'` | Body cell alignment and default leaf header alignment |
+| `headerAlign` | `'left' \| 'center' \| 'right'` | Override leaf header label and sort icon alignment; defaults to `align`. Filter, pin, and menu buttons keep their existing positions. |
 | `pin` | `'left' \| 'right'` | Pin column at definition level |
 | `wrap` | `boolean` | Allow multi-line content; row height adjusts automatically |
 | `cellOverflow` | `'visible' \| 'hidden'` | Override cell overflow per column. Default is `clip`. Use `'visible'` for Badge, Avatar, or Chip components with border-radius or box-shadow. Content can escape the cell box but is still clipped by the table's scroll container — use a portal for dropdowns that must escape the table viewport |
@@ -1606,6 +1607,14 @@ Group header resize is intentionally disabled. Group header width is always the 
 | `backend.sortable` | `boolean` | Whether this column is sortable in backend mode |
 | `editCell` | `(props: EditCellProps<T, V>) => ReactNode` | Inline cell editor triggered by double-click. Must call `props.onCommit(value)` or `props.onCancel()`. Requires `onCellValueChange` on the DataGrid |
 | `actions` | `(row: T) => Action[]` | Row action menu items |
+
+To center a numeric column's header while keeping its values right-aligned:
+
+```tsx
+{ accessorKey: 'amount', header: 'Amount', meta: { align: 'right', headerAlign: 'center' } }
+```
+
+`headerAlign` applies to leaf headers. Centering uses the content area remaining after header buttons. Group headers and filter rows are unchanged. This option is part of `DataGridColumnDef.meta`; it is not exposed by the JSON `GridKitTableColumn` payload.
 
 ---
 

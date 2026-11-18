@@ -47,6 +47,8 @@ declare module '@tanstack/react-table' {
     minWidth?: number
     maxWidth?: number
     align?: 'left' | 'center' | 'right'
+    /** Leaf header alignment. Falls back to align when omitted. */
+    headerAlign?: 'left' | 'center' | 'right'
     /** Pin this column to the logical start or end — fixed at column definition level */
     pin?: 'start' | 'end'
     /**

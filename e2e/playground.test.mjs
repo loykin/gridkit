@@ -159,6 +159,46 @@ test('header groups span their leaf header range', async () => {
   await closePage(page)
 })
 
+test('header alignment overrides body alignment in both grouped layouts', async () => {
+  const page = await newPage()
+  try {
+    await openTab(page, 'Header Groups')
+
+    for (const layout of ['padded', 'span']) {
+      const headerRow = page.locator(`[data-header-group-layout="${layout}"]`)
+      const header = headerRow.locator('[data-col-id="salary"]')
+      const grid = page.locator('.gridkit-shell').filter({ has: header })
+      const bodyCell = grid.locator('.gridkit-cell[data-col-id="salary"]').first()
+
+      assert.equal(await header.getAttribute('data-align'), 'center')
+      assert.equal(await bodyCell.getAttribute('data-align'), 'right')
+      assert.equal(
+        await header.locator('.gridkit-header-cell-content').evaluate((node) => getComputedStyle(node).justifyContent),
+        'center',
+      )
+      const rightAlignmentError = await bodyCell.evaluate((node) => {
+        const range = globalThis.document.createRange()
+        range.selectNodeContents(node)
+        const style = getComputedStyle(node)
+        const contentRight = node.getBoundingClientRect().right
+          - parseFloat(style.paddingRight) - parseFloat(style.borderRightWidth)
+        return Math.abs(range.getBoundingClientRect().right - contentRight)
+      })
+      assert.ok(rightAlignmentError < 1, `Body value is not right-aligned: ${rightAlignmentError}px`)
+      assert.equal(await headerRow.locator('[data-header-group="true"][data-align]').count(), 0)
+
+      await header.locator('.gridkit-header-cell-content').click()
+      assert.equal(await header.getAttribute('aria-sort'), 'descending')
+      await header.getByRole('button', { name: 'Filter salary', exact: true }).click()
+      assert.ok(await page.getByPlaceholder('Min', { exact: true }).isVisible())
+      await page.keyboard.press('Escape')
+      assert.equal(await header.getAttribute('aria-sort'), 'descending')
+    }
+  } finally {
+    await closePage(page)
+  }
+})
+
 test('header theme tokens style header cells and filter row', async () => {
   const page = await newPage()
   await openTab(page, 'Fill Container')

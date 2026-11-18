@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GridKitAutoTable } from '@loykin/gridkit'
 import type { GridKitTablePayload } from '@loykin/gridkit'
 import { JsonEditor } from '../components/JsonEditor'
@@ -114,10 +114,34 @@ function parsePayload(json: string): { payload: GridKitTablePayload; error: null
   }
 }
 
+const MCP_SSE_URL = 'http://localhost:3456/events'
+
 export function AutoTableTab() {
   const [selected, setSelected] = useState(0)
   const [promptOpen, setPromptOpen] = useState(false)
   const [jsonText, setJsonText] = useState(() => JSON.stringify(PAYLOADS[0]!.payload, null, 2))
+  const [mcpLive, setMcpLive] = useState(false)
+  const [mcpConnected, setMcpConnected] = useState(false)
+
+  useEffect(() => {
+    if (!mcpLive) return
+    const source = new EventSource(MCP_SSE_URL)
+    source.onopen = () => setMcpConnected(true)
+    source.onmessage = (e) => {
+      try {
+        const payload = JSON.parse(e.data)
+        setJsonText(JSON.stringify(payload, null, 2))
+      } catch {}
+    }
+    source.onerror = () => {
+      setMcpConnected(false)
+      setMcpLive(false)
+    }
+    return () => {
+      source.close()
+      setMcpConnected(false)
+    }
+  }, [mcpLive])
 
   function selectScenario(i: number) {
     setSelected(i)
@@ -141,8 +165,8 @@ export function AutoTableTab() {
         </p>
       </div>
 
-      {/* Sample selector */}
-      <div className="flex items-center gap-2">
+      {/* Sample selector + MCP Live toggle */}
+      <div className="flex items-center gap-2 flex-wrap">
         <span className="text-xs text-muted-foreground">Scenario:</span>
         {PAYLOADS.map((p, i) => (
           <button
@@ -157,6 +181,23 @@ export function AutoTableTab() {
             {p.label}
           </button>
         ))}
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={() => setMcpLive((v) => !v)}
+            className={`rounded border px-3 py-1 text-xs font-medium transition-colors ${
+              mcpLive
+                ? 'border-green-500 bg-green-500 text-white'
+                : 'border-border bg-background text-foreground hover:bg-muted'
+            }`}
+          >
+            {mcpLive ? (mcpConnected ? '⬤ MCP Live' : '⬤ Connecting…') : 'MCP Live'}
+          </button>
+          {mcpLive && (
+            <span className="text-xs text-muted-foreground">
+              Claude → <code className="rounded bg-muted px-1">render_table</code> → 여기
+            </span>
+          )}
+        </div>
       </div>
 
       {/* System Prompt accordion */}

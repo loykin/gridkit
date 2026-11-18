@@ -198,7 +198,8 @@ export function DataGridHeaderCellFrame<T extends object>({
   const rowSpan = layoutCell?.rowSpan ?? 1
   const isPlaceholder = layoutCell?.isPlaceholder ?? header.isPlaceholder
   const pin = layoutCell?.pin ?? (edge === 'left-edge' ? 'left' : edge === 'right-edge' ? 'right' : false)
-  const align = header.column.columnDef.meta?.align
+  const meta = header.column.columnDef.meta
+  const align = meta?.headerAlign ?? meta?.align
 
   return (
     <div
