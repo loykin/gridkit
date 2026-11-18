@@ -593,6 +593,10 @@ Use `fillContainer` when a grid should fit inside an existing app panel without 
 - Accessibility is partial. Table roles, `aria-sort`, and popover semantics are present, but full keyboard grid navigation and screen-reader workflow testing are not complete.
 - Performance guidance is threshold-based rather than benchmark-based. Table virtualization turns on for fixed-height tables at 100+ rows; real app performance still depends on cell render cost, filter/sort cost, and data stability.
 
+### Development Toolchain
+
+Development uses TypeScript 7 for the `tsc` CLI. The `typescript` dependency aliases the official `@typescript/typescript6` compatibility package for ESLint and declaration bundling, which still require the compiler API. The `typescript-native` alias supplies TypeScript 7's CLI without a binary name conflict.
+
 ### Test Coverage
 
 Unit/integration tests cover sorting, header groups, date/datetime filters, chat scroll behavior, list virtualization, reverse infinite scroll, stick-to-bottom, and state persistence.

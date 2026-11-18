@@ -68,7 +68,7 @@ try {
           '@vitejs/plugin-react': version('devDependencies', '@vitejs/plugin-react'),
           react: version('peerDependencies', 'react'),
           'react-dom': version('peerDependencies', 'react-dom'),
-          typescript: version('devDependencies', 'typescript'),
+          typescript: version('devDependencies', 'typescript-native'),
           vite: version('devDependencies', 'vite'),
         },
         devDependencies: {},
